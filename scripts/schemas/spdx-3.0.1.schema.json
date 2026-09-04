@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spdx.org/schema/3.0.1/noeos-foundation.schema.json",
+  "title": "Minimal SPDX 3.0.1 evidence envelope",
+  "type": "object",
+  "required": ["spdxVersion", "name", "packages"],
+  "properties": {
+    "spdxVersion": { "const": "SPDX-3.0.1" },
+    "name": { "type": "string", "minLength": 1 },
+    "packages": { "type": "array" }
+  },
+  "additionalProperties": true
+}

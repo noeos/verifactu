@@ -1,0 +1,33 @@
+name: Stable release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "!v*.*.*-*"
+
+permissions: { contents: read }
+concurrency:
+  group: noeos-stable-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Protected stable publication
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: npm-production
+    permissions: { contents: write, attestations: write, id-token: write }
+    steps:
+      - name: Check out exact signed release
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 0, persist-credentials: false }
+      - name: Fail closed while packages are private
+        run: |
+          set -euo pipefail
+          test "$(node --input-type=module --eval 'import p from "./packages/verifactu/package.json" with {type:"json"}; process.stdout.write(String(p.private))')" = "false"
+      - name: Set up primary Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version-file: .node-version, registry-url: https://registry.npmjs.org }
+      - name: Verify toolchain and release gates
+        run: node scripts/check-toolchain.mjs --profile node-24-primary && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run ci

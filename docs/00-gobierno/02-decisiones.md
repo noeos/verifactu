@@ -1,0 +1,21 @@
+# Registro de decisiones
+
+Estado: **normativo**
+
+| ID | Decisión | Motivo | Alternativas rechazadas |
+|---|---|---|---|
+| D-001 | Cubrir RRSIF completo: VERI*FACTU y NO VERI*FACTU. | Un componente regulatorio completo debe soportar ambas modalidades legales. | Solo remisión; modalidad local aplazada. |
+| D-002 | Excluir la entrega de factura electrónica B2B de la implementación. | Es un flujo de factura comercial distinto del registro RRSIF. | Unificar ambos dominios. |
+| D-003 | Publicar biblioteca y CLI, sin servicio alojado. | Reutilización, auditoría e independencia de `facturacion`. | Solo librería; API remota propia. |
+| D-004 | Mantener la semántica RRSIF exclusivamente en este repositorio. | Evita divergencias entre capas. | Duplicarla en `facturacion` o `verification-engine`. |
+| D-005 | Separar huella oficial, firma oficial y evidencia interna. | Tienen autoridades, bytes y garantías diferentes. | Tratar todo digest como equivalente. |
+| D-006 | El núcleo será determinista y sin I/O; las capacidades externas serán puertos tipados. | Facilita verificación, seguridad y pruebas. | Acceso global a red, reloj, disco o certificados. |
+| D-007 | Documentación y contratos preceden al código. | Impide comportamiento implícito o imposible de auditar. | Diseño emergente no registrado. |
+| D-008 | Apache-2.0 para obra original de Noeos. | Coherencia del ecosistema y reutilización pública. | Licencia propietaria o copyleft. |
+| D-009 | No habrá gate jurídico externo durante la construcción inicial. | Decisión expresa del propietario. | Bloqueo previo por dictamen externo. |
+| D-010 | Un cambio oficial no analizado bloquea la afirmación de conformidad afectada. | Fallar cerrado evita operar con regulación desconocida. | Continuar con última interpretación sin aviso. |
+| D-011 | La persistencia la implementa el host mediante un contrato de conformidad propiedad de `verifactu`. | Permite integración transaccional sin imponer base de datos. | Base de datos compartida o persistencia sin contrato. |
+| D-012 | Dependencias exactas, mínimas y admitidas; no se perseguirá “cero dependencias” si obliga a reinventar XML o criptografía. | Madurez y auditabilidad prevalecen sobre una métrica superficial. | Dependencias flotantes; criptografía casera. |
+| D-013 | El punto 2 replica el estado efectivo de GitHub de `verification-engine`, incluidos el bypass de `OrganizationAdmin` para tags `v*` y el bypass administrativo del environment `npm-production`. | Mantiene equivalencia operativa solicitada por el propietario; la excepción queda versionada y auditada, no implícita. | Baseline normativo de bypass cero; cualquier cambio posterior requiere decisión explícita. |
+
+Una modificación de esta tabla exige registrar fecha, proponente, fuentes, impacto y aprobación. Las decisiones no se borran: se sustituyen explícitamente.

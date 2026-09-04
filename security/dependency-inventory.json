@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "package-lock.json",
+  "lockfileSha256": "c6d397dc53ad7889d8ecede7c5c6b07bb3e4cc7c4df1ce89478e1fdcf8e64d0b",
+  "registry": "https://registry.npmjs.org/",
+  "installPolicy": { "ignoreScripts": true, "omitOptional": true, "engineStrict": true },
+  "components": "See package-lock.json packages map; every resolved component must retain integrity and license evidence."
+}

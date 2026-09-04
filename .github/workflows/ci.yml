@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+  NPM_CONFIG_AUDIT: "false"
+  NPM_CONFIG_FUND: "false"
+  NPM_CONFIG_IGNORE_SCRIPTS: "true"
+  NPM_CONFIG_OMIT: "optional"
+
+jobs:
+  quality:
+    name: Required · quality and policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up primary Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          registry-url: https://registry.npmjs.org
+      - name: Set up reference Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: 3.13.15
+      - name: Verify toolchains
+        run: node scripts/check-toolchain.mjs --profile node-24-primary && node scripts/check-reference-toolchain.mjs
+      - name: Install reviewed dependencies
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional
+      - name: Run policy and documentation gates
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run policy:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run governance:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run docs:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run regulatory:check
+      - name: Build, lint and test
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run build && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run format:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run lint && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run typecheck && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run test:coverage
+      - name: Verify package and supply chain boundaries
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run license:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run pack:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run consumer:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run sbom
+      - name: DCO sign-off
+        if: github.event_name == 'pull_request'
+        env:
+          NOEOS_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          NOEOS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/check-dco.mjs
+
+  compatibility:
+    name: Required · ${{ matrix.os }} · Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, node: 22.14.0, profile: node-22-minimum }
+          - { os: ubuntu-24.04, node: 22.23.2, profile: node-22-latest }
+          - { os: ubuntu-24.04, node: 24.20.0, profile: node-24-primary }
+          - { os: windows-2025, node: 24.20.0, profile: node-24-primary }
+          - { os: macos-15, node: 24.20.0, profile: node-24-primary }
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Verify Node and npm
+        run: node scripts/check-toolchain.mjs --profile ${{ matrix.profile }}
+      - name: Install, build and test consumers
+        run: node scripts/run-verified-package-manager.mjs --profile ${{ matrix.profile }} -- ci --ignore-scripts --omit=optional && node scripts/run-verified-package-manager.mjs --profile ${{ matrix.profile }} -- run build && node scripts/run-verified-package-manager.mjs --profile ${{ matrix.profile }} -- run typecheck && node scripts/run-verified-package-manager.mjs --profile ${{ matrix.profile }} -- run test && node scripts/run-verified-package-manager.mjs --profile ${{ matrix.profile }} -- run consumer:check
+
+  reproducibility:
+    name: Required · package reproducibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up primary Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+      - name: Verify toolchain and install
+        run: node scripts/check-toolchain.mjs --profile node-24-primary && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional
+      - name: Verify clean consumers and reproducibility
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run consumer:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run reproducibility:check

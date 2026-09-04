@@ -1,0 +1,6 @@
+{
+  "python": "3.13.15",
+  "purpose": "Independent regulatory-vector reference only; not a supported product runtime.",
+  "reviewedAt": "2026-09-04",
+  "source": "https://www.python.org/downloads/release/python-31315/"
+}

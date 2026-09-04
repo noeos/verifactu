@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/verifactu/regulatory-sources-v1.schema.json",
+  "title": "Noeos VERI*FACTU regulatory source manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifestVersion", "edition", "retrievedAt", "authority", "baseUrl", "artifacts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "manifestVersion": { "const": 1 },
+    "edition": { "type": "string", "minLength": 1 },
+    "retrievedAt": { "type": "string", "format": "date-time" },
+    "authority": { "type": "string", "minLength": 1 },
+    "baseUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "file", "kind", "bytes", "sha256", "sha512"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Z0-9.-]+$" },
+          "file": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+          "kind": { "enum": ["wsdl", "xsd"] },
+          "bytes": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "sha512": { "type": "string", "pattern": "^[a-f0-9]{128}$" }
+        }
+      }
+    }
+  }
+}

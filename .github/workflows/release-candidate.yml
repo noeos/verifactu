@@ -1,0 +1,53 @@
+name: Release candidate evidence
+
+on:
+  push:
+    tags: ["v*.*.*-rc.*"]
+  workflow_dispatch:
+
+permissions: { contents: read }
+concurrency:
+  group: noeos-release-candidate
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    name: Prepare and attest candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions: { contents: read, attestations: write, id-token: write }
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 0, persist-credentials: false }
+      - name: Require signed tag and protected ancestry
+        run: |
+          set -euo pipefail
+          git config gpg.ssh.allowedSignersFile security/allowed-signers
+          git verify-tag "$GITHUB_REF_NAME"
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - name: Set up primary Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version-file: .node-version, registry-url: https://registry.npmjs.org }
+      - name: Verify and install
+        run: node scripts/check-toolchain.mjs --profile node-24-primary && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional
+      - name: Run all local gates
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run ci
+      - name: Build candidate archives
+        run: mkdir --parents artifacts/release && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- pack --silent --ignore-scripts --pack-destination artifacts/release --workspace @noeos/verifactu && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- pack --silent --ignore-scripts --pack-destination artifacts/release --workspace @noeos/verifactu-cli
+      - name: Attest candidate archives
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: artifacts/release/*.tgz
+      - name: Upload candidate evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-candidate-${{ github.sha }}
+          path: artifacts/release/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Refuse foundation publication
+        run: |
+          set -euo pipefail
+          test "$(node --input-type=module --eval 'import p from "./packages/verifactu/package.json" with {type:"json"}; process.stdout.write(String(p.private))')" = "true"
+          echo "Foundation packages are private; no publication is permitted."

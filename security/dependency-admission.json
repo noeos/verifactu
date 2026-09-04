@@ -1,0 +1,94 @@
+{
+  "policyVersion": 1,
+  "reviewedAt": "2026-09-04",
+  "approvedBy": "@ddavid07",
+  "admissions": [
+    {
+      "name": "@noeos/verification-engine",
+      "version": "1.0.1",
+      "license": "Apache-2.0",
+      "runtime": true,
+      "necessity": "Reuse the completed generic integrity layer through its public API.",
+      "source": "https://www.npmjs.com/package/@noeos/verification-engine",
+      "replacement": "None without duplicating a security-critical layer."
+    },
+    {
+      "name": "@cyclonedx/cyclonedx-npm",
+      "version": "6.0.1",
+      "license": "Apache-2.0",
+      "runtime": false,
+      "necessity": "Generate CycloneDX SBOM evidence."
+    },
+    {
+      "name": "@eslint/js",
+      "version": "10.0.1",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Reviewed ESLint baseline."
+    },
+    {
+      "name": "@microsoft/api-extractor",
+      "version": "7.59.0",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Detect public API drift."
+    },
+    {
+      "name": "@types/node",
+      "version": "24.13.3",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Type-check Node APIs."
+    },
+    {
+      "name": "ajv",
+      "version": "8.20.0",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Validate JSON contracts."
+    },
+    {
+      "name": "eslint",
+      "version": "10.9.1",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Static analysis."
+    },
+    {
+      "name": "fast-check",
+      "version": "4.9.0",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Deterministic property testing."
+    },
+    {
+      "name": "globals",
+      "version": "17.11.0",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Reviewed Node globals for ESLint."
+    },
+    {
+      "name": "prettier",
+      "version": "3.9.6",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Deterministic formatting."
+    },
+    {
+      "name": "typescript",
+      "version": "5.9.3",
+      "license": "Apache-2.0",
+      "runtime": false,
+      "necessity": "Strict compilation."
+    },
+    {
+      "name": "typescript-eslint",
+      "version": "8.68.0",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Type-aware linting."
+    }
+  ],
+  "ciTools": []
+}

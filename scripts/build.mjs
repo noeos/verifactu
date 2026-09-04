@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: Apache-2.0
+import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { assertProjectRoot, projectRoot, run, stableJson } from "./project.mjs";
+
+await assertProjectRoot();
+const generated = [
+  ".build",
+  "packages/verifactu/dist",
+  "packages/cli/dist",
+  "packages/verifactu/temp",
+  "packages/cli/temp",
+].map((item) => resolve(projectRoot, item));
+for (const target of generated) await rm(target, { force: true, recursive: true });
+if (process.argv.includes("--clean-only")) process.exit(0);
+const compiler = resolve(projectRoot, "node_modules/typescript/bin/tsc");
+run(process.execPath, [compiler, "--project", "packages/verifactu/tsconfig.esm.json"]);
+run(process.execPath, [compiler, "--project", "packages/verifactu/tsconfig.cjs.json"]);
+run(process.execPath, [compiler, "--project", "packages/cli/tsconfig.json"]);
+await mkdir(resolve(projectRoot, "packages/verifactu/dist/cjs"), { recursive: true });
+await writeFile(
+  resolve(projectRoot, "packages/verifactu/dist/cjs/package.json"),
+  stableJson({ type: "commonjs" }),
+);
+for (const packageName of ["verifactu", "cli"]) {
+  await copyFile(
+    resolve(projectRoot, "LICENSE"),
+    resolve(projectRoot, `packages/${packageName}/LICENSE`),
+  );
+  await copyFile(
+    resolve(projectRoot, "NOTICE"),
+    resolve(projectRoot, `packages/${packageName}/NOTICE`),
+  );
+}

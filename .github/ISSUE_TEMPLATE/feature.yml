@@ -1,0 +1,29 @@
+name: Capability proposal
+description: Propose a change against the approved scope and requirements.
+title: "proposal: "
+labels: [proposal]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and user
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements, decisions and regulatory sources
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance evidence and negative cases
+    validations:
+      required: true
+  - type: textarea
+    id: impacts
+    attributes:
+      label: Security, legal, compatibility, performance and operations impact
+    validations:
+      required: true
