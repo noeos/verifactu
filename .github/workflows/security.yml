@@ -38,7 +38,10 @@ jobs:
         with: { persist-credentials: false }
       - name: Initialize CodeQL
         uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
-        with: { languages: javascript-typescript, queries: security-extended, security-and-quality }
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+          quality-queries: security-and-quality
       - name: Set up primary Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with: { node-version-file: .node-version }
