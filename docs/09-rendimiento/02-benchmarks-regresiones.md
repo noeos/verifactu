@@ -8,9 +8,9 @@ El orden de escenarios se aleatoriza de forma reproducible. No se descartan outl
 
 ## Regresión
 
-- >5 % con señal estadística: warning y análisis obligatorio.
-- >10 %: bloqueo.
-- >5 % de memoria: análisis; >10 %: bloqueo.
+- > 5 % con señal estadística: warning y análisis obligatorio.
+- > 10 %: bloqueo.
+- > 5 % de memoria: análisis; >10 %: bloqueo.
 - Incumplir gate absoluto bloquea release estable.
 - Cambiar bytes o resultado para mejorar cifras es defecto.
 

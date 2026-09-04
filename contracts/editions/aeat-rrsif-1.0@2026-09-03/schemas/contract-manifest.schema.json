@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "counts": {
+      "required": [
+        "declarations",
+        "operations"
+      ],
+      "type": "object"
+    },
+    "edition": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceDigest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "edition",
+    "sourceDigest",
+    "artifacts",
+    "counts"
+  ],
+  "type": "object"
+}

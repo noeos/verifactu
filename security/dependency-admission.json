@@ -41,6 +41,15 @@
       "necessity": "Type-check Node APIs."
     },
     {
+      "name": "@xmldom/xmldom",
+      "version": "0.9.12",
+      "license": "MIT",
+      "runtime": false,
+      "necessity": "Parse reviewed local XML snapshots for deterministic contract generation.",
+      "source": "https://www.npmjs.com/package/@xmldom/xmldom",
+      "replacement": "No safer built-in Node XML parser is available."
+    },
+    {
       "name": "ajv",
       "version": "8.20.0",
       "license": "MIT",

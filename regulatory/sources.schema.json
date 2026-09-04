@@ -25,7 +25,12 @@
           "kind": { "enum": ["wsdl", "xsd"] },
           "bytes": { "type": "integer", "minimum": 1 },
           "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-          "sha512": { "type": "string", "pattern": "^[a-f0-9]{128}$" }
+          "sha512": { "type": "string", "pattern": "^[a-f0-9]{128}$" },
+          "requirements": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^[A-Z]+-[0-9]{3}$" },
+            "uniqueItems": true
+          }
         }
       }
     }

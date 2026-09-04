@@ -16,15 +16,15 @@ Cada puerto declara atomicidad, idempotencia, concurrencia, límites, timeout, c
 
 ## Semántica mínima
 
-| Puerto | Operaciones contractuales | Garantía que el kit exige |
-|---|---|---|
-| `RecordStore` | `readHead`, `commit(expectedHead, bundle)`, `scan`, `checkpoint`, `verifyFreshness` | serializable por secuencia, CAS, unicidad, bytes inmutables |
-| `OutboxStore` | `enqueue` dentro del commit, `lease`, `complete`, `release`, `inspect` | lease con fencing token, reanudación y entrega al menos una vez |
-| `Signer` | `describe`, `sign(nodeBytes, profile, signal)` | clave no exportable, resultado ligado a profile/certificado |
-| `CertificateProvider` | `select`, `chain`, `statusAt` | identidad/titular explícitos y estado trivalente |
-| `Clock` | `now`, `monotonicNow`, `quality` | zona explícita, monotonicidad para durations, instante inyectable |
-| `AeatTransport` | `send(request, endpointId, signal)` | una observación de red, sin retry, bytes/metadata acotados |
-| `Observer` | `emit(redactedEvent)` | no puede alterar resultado ni recibir secretos |
+| Puerto                | Operaciones contractuales                                                           | Garantía que el kit exige                                         |
+| --------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `RecordStore`         | `readHead`, `commit(expectedHead, bundle)`, `scan`, `checkpoint`, `verifyFreshness` | serializable por secuencia, CAS, unicidad, bytes inmutables       |
+| `OutboxStore`         | `enqueue` dentro del commit, `lease`, `complete`, `release`, `inspect`              | lease con fencing token, reanudación y entrega al menos una vez   |
+| `Signer`              | `describe`, `sign(nodeBytes, profile, signal)`                                      | clave no exportable, resultado ligado a profile/certificado       |
+| `CertificateProvider` | `select`, `chain`, `statusAt`                                                       | identidad/titular explícitos y estado trivalente                  |
+| `Clock`               | `now`, `monotonicNow`, `quality`                                                    | zona explícita, monotonicidad para durations, instante inyectable |
+| `AeatTransport`       | `send(request, endpointId, signal)`                                                 | una observación de red, sin retry, bytes/metadata acotados        |
+| `Observer`            | `emit(redactedEvent)`                                                               | no puede alterar resultado ni recibir secretos                    |
 
 `commit` recibe un bundle indivisible con registro/evento, cabeza nueva, evidencia y outbox. La implementación del puerto declara si puede coordinarse con la transacción de factura del host; si no puede, el kit marca esa arquitectura como insuficiente para afirmar simultaneidad end-to-end.
 

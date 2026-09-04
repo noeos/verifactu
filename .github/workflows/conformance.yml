@@ -17,6 +17,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  drift:
+    name: Informational · regulatory drift
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: Set up primary Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version-file: .node-version }
+      - name: Verify toolchain and inspect official sources
+        run: node scripts/check-toolchain.mjs --profile node-24-primary && node scripts/import-regulatory.mjs --fetch
+      - name: Preserve drift evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: regulatory-drift-${{ github.run_id }}
+          path: regulatory/snapshots/**/provenance.json
+          if-no-files-found: warn
+
   sources:
     name: Required · regulatory sources and traceability
     runs-on: ubuntu-24.04
@@ -33,7 +55,7 @@ jobs:
       - name: Verify toolchain
         run: node scripts/check-toolchain.mjs --profile node-24-primary
       - name: Validate manifest without network
-        run: node scripts/check-regulatory-manifest.mjs && node scripts/check-docs.mjs
+        run: node scripts/check-regulatory-manifest.mjs && node scripts/check-regulatory-snapshots.mjs && node scripts/check-contracts.mjs && node scripts/check-contract-traceability.mjs && node scripts/check-docs.mjs
 
   rrsif:
     name: Required · RRSIF conformance
@@ -50,5 +72,5 @@ jobs:
           node-version-file: .node-version
       - name: Verify toolchain
         run: node scripts/check-toolchain.mjs --profile node-24-primary
-      - name: Enforce foundation scope
-        run: node scripts/check-regulatory-manifest.mjs
+      - name: Verify generated contracts and traceability
+        run: node scripts/check-regulatory-snapshots.mjs && node scripts/check-contracts.mjs && node scripts/check-contract-traceability.mjs
