@@ -69,6 +69,9 @@ jobs:
     runs-on: ubuntu-24.04
     permissions: { contents: read, security-events: write }
     steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
       - name: Scan reviewed lockfile
         uses: google/osv-scanner-action/osv-scanner-action@6e4298ebc4db23e847df9b2e2de2939d6f066c67 # v2.5.1
         with:
