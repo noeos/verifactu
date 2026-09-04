@@ -95,7 +95,7 @@ jobs:
           node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional
           audit_ok=false
           for attempt in 1 2 3; do
-            if node scripts/run-verified-package-manager.mjs --profile node-24-primary -- audit --audit-level=moderate --ignore-scripts --omit=optional; then
+            if timeout --signal=TERM --kill-after=10s 90s node scripts/run-verified-package-manager.mjs --profile node-24-primary -- audit --audit-level=moderate --ignore-scripts --omit=optional; then
               audit_ok=true
               break
             fi
