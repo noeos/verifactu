@@ -19,6 +19,7 @@ for (const record of output.split("\x1e")) {
   const [sha, name, email, ...message] = record.trim().split("\x1f");
   if (
     sha !== undefined &&
+    sha.length > 0 &&
     !message
       .join("\x1f")
       .split(/\r?\n/u)
