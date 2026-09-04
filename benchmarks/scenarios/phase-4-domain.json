@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "phase-4-domain-fingerprint",
+  "hardwareClass": "GitHub-hosted ubuntu-24.04 x64",
+  "warmupIterations": 10000,
+  "sampleIterations": 50000,
+  "samples": 5,
+  "minimumRecordsPerSecond": 10000,
+  "maximumBytesPerRecord": 1048576,
+  "complexity": "O(input bytes) time, O(input record) memory"
+}

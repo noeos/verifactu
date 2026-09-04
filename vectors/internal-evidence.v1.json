@@ -1,0 +1,23 @@
+{
+  "$schema": "urn:noeos:verifactu:internal-evidence-vectors:1",
+  "profile": { "id": "es.noeos.verifactu.record", "version": "1.0.0" },
+  "license": "Apache-2.0",
+  "cases": [
+    {
+      "id": "NOEOS-INTERNAL-EVIDENCE-ALTA-1",
+      "subject": {
+        "edition": "aeat-rrsif-1.0@2026-09-03",
+        "taxpayerScopeId": "tenant.alpha",
+        "installationId": "installation.01",
+        "sequenceId": "sequence.billing.01",
+        "recordClass": "alta",
+        "recordId": "record.0001",
+        "officialFingerprint": "3C464DAF61ACB827C65FDA19F352A4E3BDC2C640E9E9FC4CC058073F38F12F60",
+        "officialBytesUtf8": "<RegistroAlta/>"
+      },
+      "canonicalBase64": "Tk9FT1MtVkVSSUZBQ1RVLVJFQ09SRAABCAEAAAAZYWVhdC1ycnNpZi0xLjBAMjAyNi0wOS0wMwIAAAAMdGVuYW50LmFscGhhAwAAAA9pbnN0YWxsYXRpb24uMDEEAAAAE3NlcXVlbmNlLmJpbGxpbmcuMDEFAAAABGFsdGEGAAAAC3JlY29yZC4wMDAxBwAAAEAzQzQ2NERBRjYxQUNCODI3QzY1RkRBMTlGMzUyQTRFM0JEQzJDNjQwRTlFOUZDNENDMDU4MDczRjM4RjEyRjYwCAAAAA88UmVnaXN0cm9BbHRhLz4=",
+      "contentDigest": "f4dc5fc4b8712a1fc207b8433d2f12be6f59f35b3d807bdec0a673c2bd5ddefc",
+      "recordDigest": "59e71fa43bd1954fc53dedf72ee8e9cdfbb682892043c607c05f8ef09327f2ab"
+    }
+  ]
+}

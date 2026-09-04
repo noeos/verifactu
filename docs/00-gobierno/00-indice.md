@@ -55,7 +55,7 @@ Estado: **registro navegable**
 
 - Calidad: [`estrategia`](../10-calidad/01-estrategia-pruebas.md), [`ejemplos oficiales`](../10-calidad/02-ejemplos-vectores-oficiales.md), [`límites/negativos`](../10-calidad/03-limites-alteraciones-negativos.md), [`property/fuzz/mutación`](../10-calidad/04-property-fuzz-mutation.md), [`CI`](../10-calidad/05-ci-calidad.md), [`auditoría`](../10-calidad/06-auditoria-lanzamiento.md), [`contratos generados`](../10-calidad/07-contratos-generados.md).
 - Repositorio/entrega: [`flujo`](../11-repositorio-entrega/01-github-flujo-cambios.md), [`GitHub`](../11-repositorio-entrega/02-configuracion-github.md), [`toolchain`](../11-repositorio-entrega/03-toolchain-dependencias.md), [`build/SBOM`](../11-repositorio-entrega/04-build-reproducibilidad-sbom.md), [`versionado`](../11-repositorio-entrega/05-versionado-publicacion.md), [`RC/release`](../11-repositorio-entrega/06-release-candidate-estable.md), [`verificación`](../11-repositorio-entrega/07-verificacion-release.md), [`soporte`](../11-repositorio-entrega/08-soporte-recuperacion.md).
-- Roadmap: [`orden`](../12-roadmap/01-roadmap.md), [`cierres`](../12-roadmap/02-criterios-cierre.md), [`riesgos`](../12-roadmap/03-riesgos.md), [`release 1`](../12-roadmap/04-preparacion-release-1.md).
+- Roadmap: [`orden`](../12-roadmap/01-roadmap.md), [`cierres`](../12-roadmap/02-criterios-cierre.md), [`riesgos`](../12-roadmap/03-riesgos.md), [`release 1`](../12-roadmap/04-preparacion-release-1.md), [`cierre fase 4`](../12-roadmap/05-cierre-fase-4.md).
 
 ## Anexos
 

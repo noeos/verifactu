@@ -2,10 +2,10 @@
   "edition": "aeat-rrsif-1.0@2026-09-03",
   "files": [
     {
-      "bytes": 3261,
+      "bytes": 3286,
       "file": "manifest.json",
-      "sha256": "a83b5128bdcc1256093242a339f20724ccead5cead1080499937b88a7c652093",
-      "sha512": "3f1bc3b89227bf0105d156467255cfed2d1a81a95998550639a78a65d18256b4c974c061acea2b2aac99ab41c9bc6f825f0eb783e5b261587ee7053edb1e9fe7"
+      "sha256": "0fb7eead36d4347a6d14206f5ec26c103920b1c86e972ae2f6874b43e48d4b73",
+      "sha512": "55ffbdda7a8721501c852ea0f32beed8c61e828f8dd9bb28d509e4d6c26e24fb2725826be6e7a6eea0e1bcf84124021f1cbda6e783d929b1f5a87764fe89ea41"
     },
     {
       "bytes": 226689,
@@ -20,16 +20,22 @@
       "sha512": "7e2615900c7f8a5b026dae60f5705d8450d9e4e381b3b90388d4c47e482485fb149131441d547665340bc650965ca654665c1eec4697baeb18e6ea01ae094295"
     },
     {
+      "bytes": 586996,
+      "file": "constraint-catalog.json",
+      "sha256": "8813aab13c7108df67246783e251a4474110a968f7b7acb92bf3ad1cc3985609",
+      "sha512": "38722212f2a3b5ff196224d654cc453faa901bc71985be74f6c74bf103249ac7fea82ec5248e89ad5a8556a9e93978fc0343c58d9d7ae065fcc84990986e6205"
+    },
+    {
       "bytes": 260538,
       "file": "source-map.json",
       "sha256": "0d28f14a49c0e62b109bdc0e851f73ee0098f0007c9e7767e102b4d85098d630",
       "sha512": "9f6b9adb46b17772123b1aa537cfe1b68653623a76682d61dd6ebf754d14746878b08beb5d0e5c9617608b592644c671baad19981c8b77dbb1629cad99843d70"
     },
     {
-      "bytes": 638,
+      "bytes": 992,
       "file": "schemas/contract-manifest.schema.json",
-      "sha256": "a2b94dfc58d08b861ccff7c9410e0cd8bc391da34ef5affa1a18ce8ff2e15f65",
-      "sha512": "44f30841c49de9daba4093585430e562e520f0359719480999851ae6f009c7da6b3d899b93d3c98f05183a916d6d1977f6da6be30724c64ae39f16bb3a44d695"
+      "sha256": "abdb49f16d1a2655e21e7434cc0752ed4ba1607ac73c9544bd3c5a04b5af7e47",
+      "sha512": "622e1627e5e65c2ec01e150be81e16b158e72ae64fbe84a24a34d1df65158edd29982241dea9667345dface41aa2ecc6270ef5e180418cbc447cbb018e31b532"
     }
   ],
   "schemaVersion": 1

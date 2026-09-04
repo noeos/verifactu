@@ -1,0 +1,136 @@
+{
+  "$schema": "urn:noeos:verifactu:rule-catalog:1",
+  "edition": "aeat-rrsif-1.0@2026-09-03",
+  "source": {
+    "id": "SRC-AEAT-VALID",
+    "authority": "Agencia Estatal de Administración Tributaria",
+    "title": "Validaciones de Sistemas Informáticos de Facturación y Sistemas VERI*FACTU",
+    "revision": "1.2.2",
+    "publishedAt": "2026-04-08",
+    "reviewedAt": "2026-09-04",
+    "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Validaciones_Errores_Veri-Factu.pdf"
+  },
+  "rules": [
+    {
+      "id": "VAL-AEAT-3.1.3-IDFACTURA-ISSUER",
+      "locator": "3.1.3.1, p. 8",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-IDFACTURA-DATE",
+      "locator": "3.1.3.1, p. 8",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-RECTIFICATION",
+      "locator": "3.1.3.3-6, pp. 8-9",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-SUBSTITUTION",
+      "locator": "3.1.3.5, p. 8",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-OPERATION-DATE",
+      "locator": "3.1.3.7, p. 9",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-FLAGS",
+      "locator": "3.1.3.8-9, p. 9",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-MACRODATA",
+      "locator": "3.1.3.10, p. 9",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-ISSUED-BY",
+      "locator": "3.1.3.11-12, p. 9",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-RECIPIENTS",
+      "locator": "3.1.3.13, pp. 9-10",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-16-CUOTA-TOTAL",
+      "locator": "3.1.3.16, p. 15",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/totals.ts",
+      "tests": ["tests/unit/totals-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-17-IMPORTE-TOTAL",
+      "locator": "3.1.3.17, p. 15",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/totals.ts",
+      "tests": ["tests/unit/totals-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.3-16-17-EXEMPTION",
+      "locator": "3.1.3.16-17, p. 15",
+      "requirement": "REG-005",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/totals.ts",
+      "tests": ["tests/unit/totals-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.4-IDFACTURA-ISSUER",
+      "locator": "3.1.4.1, p. 16",
+      "requirement": "REG-006",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-3.1.4-GENERATOR",
+      "locator": "3.1.4.2-3, pp. 16-17",
+      "requirement": "REG-006",
+      "classification": "implemented",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"]
+    },
+    {
+      "id": "VAL-AEAT-6.2-PRIOR-RECORD",
+      "locator": "6.2, p. 28",
+      "requirement": "REG-006",
+      "classification": "implemented-indeterminate",
+      "implementation": "packages/verifactu/src/validation/record.ts",
+      "tests": ["tests/unit/record-validation.unit.test.ts"],
+      "externalFact": "existence of the prior record in the SIF or AEAT"
+    }
+  ]
+}

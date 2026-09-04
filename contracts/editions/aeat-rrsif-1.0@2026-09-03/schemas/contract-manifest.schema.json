@@ -7,9 +7,25 @@
       "type": "array"
     },
     "counts": {
+      "additionalProperties": false,
+      "properties": {
+        "constraints": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "declarations": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "operations": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
       "required": [
         "declarations",
-        "operations"
+        "operations",
+        "constraints"
       ],
       "type": "object"
     },
