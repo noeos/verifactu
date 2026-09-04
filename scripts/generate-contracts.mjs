@@ -6,6 +6,21 @@ import { DOMParser } from "@xmldom/xmldom";
 import prettier from "prettier";
 import { assertProjectRoot, projectRoot, readJson, stableJson } from "./project.mjs";
 
+const FACET_NAMES = new Set([
+  "enumeration",
+  "fractionDigits",
+  "length",
+  "maxExclusive",
+  "maxInclusive",
+  "maxLength",
+  "minExclusive",
+  "minInclusive",
+  "minLength",
+  "pattern",
+  "totalDigits",
+  "whiteSpace",
+]);
+
 await assertProjectRoot();
 const manifest = await readJson(resolve(projectRoot, "regulatory/sources.json"));
 const edition = manifest.edition;
@@ -14,6 +29,7 @@ const output = resolve(projectRoot, "contracts/editions", edition);
 const generatedSource = resolve(projectRoot, "packages/verifactu/src/generated/edition.ts");
 const typeEntries = [];
 const operationEntries = [];
+const constraintEntries = [];
 const sourceMap = [];
 const generatedDigests = [];
 
@@ -56,12 +72,21 @@ for (const artifact of manifest.artifacts ?? []) {
         locator: locator(element),
       });
     }
+    if (artifact.kind === "xsd" && (local === "element" || local === "attribute")) {
+      const constraint = structuralConstraint(element, artifact);
+      if (constraint !== undefined) constraintEntries.push(constraint);
+    }
+    if (artifact.kind === "xsd" && FACET_NAMES.has(local)) {
+      const constraint = facetConstraint(element, artifact, local);
+      if (constraint !== undefined) constraintEntries.push(constraint);
+    }
   }
 }
 
 typeEntries.sort(compareEntry);
 operationEntries.sort(compareEntry);
 sourceMap.sort(compareEntry);
+constraintEntries.sort(compareEntry);
 const contractManifest = {
   schemaVersion: 1,
   edition,
@@ -75,12 +100,17 @@ const contractManifest = {
     sha256,
     sha512,
   })),
-  counts: { declarations: typeEntries.length, operations: operationEntries.length },
+  counts: {
+    declarations: typeEntries.length,
+    operations: operationEntries.length,
+    constraints: constraintEntries.length,
+  },
 };
 const files = {
   "manifest.json": contractManifest,
   "type-catalog.json": { schemaVersion: 1, edition, entries: typeEntries },
   "operation-catalog.json": { schemaVersion: 1, edition, entries: operationEntries },
+  "constraint-catalog.json": { schemaVersion: 1, edition, entries: constraintEntries },
   "source-map.json": { schemaVersion: 1, edition, entries: sourceMap },
   "schemas/contract-manifest.schema.json": {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -92,7 +122,16 @@ const files = {
       edition: { type: "string", minLength: 1 },
       sourceDigest: { type: "string", pattern: "^[a-f0-9]{64}$" },
       artifacts: { type: "array", minItems: 1 },
-      counts: { type: "object", required: ["declarations", "operations"] },
+      counts: {
+        type: "object",
+        required: ["declarations", "operations", "constraints"],
+        additionalProperties: false,
+        properties: {
+          declarations: { type: "integer", minimum: 1 },
+          operations: { type: "integer", minimum: 1 },
+          constraints: { type: "integer", minimum: 1 },
+        },
+      },
     },
   },
 };
@@ -112,7 +151,7 @@ await writeFile(
   resolve(output, "checksums.json"),
   stableJson({ schemaVersion: 1, edition, files: generatedDigests }),
 );
-const source = `// SPDX-License-Identifier: Apache-2.0\n// GENERATED FILE; do not edit. Edition: ${edition}\n\nexport const editionInfo = ${JSON.stringify({ ...contractManifest, generatedDigest: hash(Buffer.from(stableJson(generatedDigests)), "sha256") }, null, 2)} as const;\n\nexport const typeCatalog = ${JSON.stringify(typeEntries, null, 2)} as const;\n\nexport const operationCatalog = ${JSON.stringify(operationEntries, null, 2)} as const;\n\nexport const contractSchema = ${JSON.stringify(files["schemas/contract-manifest.schema.json"], null, 2)} as const;\n`;
+const source = `// SPDX-License-Identifier: Apache-2.0\n// GENERATED FILE; do not edit. Edition: ${edition}\n\nexport const editionInfo = ${JSON.stringify({ ...contractManifest, generatedDigest: hash(Buffer.from(stableJson(generatedDigests)), "sha256") }, null, 2)} as const;\n\nexport const typeCatalog = ${JSON.stringify(typeEntries, null, 2)} as const;\n\nexport const operationCatalog = ${JSON.stringify(operationEntries, null, 2)} as const;\n\nexport const constraintCatalog = ${JSON.stringify(constraintEntries, null, 2)} as const;\n\nexport const contractSchema = ${JSON.stringify(files["schemas/contract-manifest.schema.json"], null, 2)} as const;\n`;
 await mkdir(resolve(projectRoot, "packages/verifactu/src/generated"), { recursive: true });
 const prettierConfig = (await prettier.resolveConfig(generatedSource)) ?? {};
 await writeFile(
@@ -120,8 +159,70 @@ await writeFile(
   await prettier.format(source, { ...prettierConfig, parser: "typescript" }),
 );
 console.log(
-  `Contracts generated: ${edition}, ${typeEntries.length} declarations, ${operationEntries.length} operations.`,
+  `Contracts generated: ${edition}, ${typeEntries.length} declarations, ${operationEntries.length} operations, ${constraintEntries.length} constraints.`,
 );
+
+function structuralConstraint(element, artifact) {
+  const name = element.getAttribute("name") || element.getAttribute("ref");
+  if (!name) return undefined;
+  const location = locator(element);
+  const attributes = {};
+  for (const key of [
+    "type",
+    "ref",
+    "minOccurs",
+    "maxOccurs",
+    "use",
+    "fixed",
+    "default",
+    "nillable",
+  ]) {
+    const value = element.getAttribute(key);
+    if (value) attributes[key] = value;
+  }
+  return {
+    id: `${artifact.id}/constraint/structure/${name}${location}`,
+    artifact: artifact.id,
+    kind: "structure",
+    name,
+    locator: location,
+    attributes,
+    requirements: artifact.requirements ?? [],
+  };
+}
+
+function facetConstraint(element, artifact, facet) {
+  const value = element.getAttribute("value");
+  if (!value) return undefined;
+  const owner = nearestNamedAncestor(element);
+  const location = locator(element);
+  return {
+    id: `${artifact.id}/constraint/${facet}/${owner.name}/${value}${location}`,
+    artifact: artifact.id,
+    kind: "facet",
+    facet,
+    name: owner.name,
+    ownerKind: owner.kind,
+    value,
+    locator: location,
+    requirements: artifact.requirements ?? [],
+  };
+}
+
+function nearestNamedAncestor(element) {
+  let current = element.parentNode;
+  while (current && current.nodeType === 1) {
+    const name = current.getAttribute("name");
+    if (name) {
+      return {
+        name,
+        kind: current.localName ?? current.nodeName.split(":").pop() ?? current.nodeName,
+      };
+    }
+    current = current.parentNode;
+  }
+  return { name: "anonymous", kind: "schema" };
+}
 
 function parse(xml, id) {
   let parseError;

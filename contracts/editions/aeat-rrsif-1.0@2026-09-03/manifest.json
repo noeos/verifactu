@@ -66,6 +66,7 @@
     }
   ],
   "counts": {
+    "constraints": 1060,
     "declarations": 530,
     "operations": 6
   },

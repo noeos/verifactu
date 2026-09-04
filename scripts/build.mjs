@@ -39,3 +39,6 @@ await cp(
   resolve(projectRoot, `packages/verifactu/dist/contracts/${edition}`),
   { recursive: true },
 );
+await cp(resolve(projectRoot, "vectors"), resolve(projectRoot, "packages/verifactu/dist/vectors"), {
+  recursive: true,
+});

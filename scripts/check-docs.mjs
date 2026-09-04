@@ -4,7 +4,10 @@ import { dirname, extname, resolve } from "node:path";
 import { assertProjectRoot, listRepositoryFiles, toPosix } from "./project.mjs";
 await assertProjectRoot();
 const files = (await listRepositoryFiles()).filter(
-  (path) => extname(path) === ".md" && !toPosix(path).startsWith(".github/"),
+  (path) =>
+    extname(path) === ".md" &&
+    !toPosix(path).startsWith(".github/") &&
+    !toPosix(path).startsWith("packages/verifactu/etc/"),
 );
 for (const file of files) {
   const source = await readFile(file, "utf8");

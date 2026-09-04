@@ -5,7 +5,7 @@ Estado: **normativo**
 1. **Completada — 2026-09-03:** aprobar corpus documental y fuentes.
 2. **Completada — 2026-09-04:** gobierno del repositorio, toolchain y CI; configuración pública y protegida de GitHub auditada, workflows verdes y commits firmados.
 3. **Completada — 2026-09-04:** importar y versionar las ocho fuentes oficiales WSDL/XSD de la edición AEAT fijada, con hashes, procedencia, validación offline, trazabilidad y contratos generados deterministas.
-4. Implementar dominio, validación, huella y evidencia interna.
+4. **Completada técnicamente — 2026-09-04:** implementar dominio, validación, huella y evidencia interna; XML, firma, QR, persistencia y transporte siguen fuera del alcance de esta fase.
 5. Implementar XML, QR, firma y certificados.
 6. Implementar persistencia contractual, estados y outbox.
 7. Implementar transporte y respuestas AEAT.

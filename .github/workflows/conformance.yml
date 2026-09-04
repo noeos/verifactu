@@ -73,4 +73,6 @@ jobs:
       - name: Verify toolchain
         run: node scripts/check-toolchain.mjs --profile node-24-primary
       - name: Verify generated contracts and traceability
-        run: node scripts/check-regulatory-snapshots.mjs && node scripts/check-contracts.mjs && node scripts/check-contract-traceability.mjs
+        run: node scripts/check-regulatory-snapshots.mjs && node scripts/check-contracts.mjs && node scripts/check-contract-traceability.mjs && node scripts/check-rule-catalog.mjs
+      - name: Install, build and verify conformance vectors
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run build && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run vectors:check

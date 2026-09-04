@@ -6,7 +6,33 @@ await assertProjectRoot();
 const esm = await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/index.js")}`);
 const require = createRequire(import.meta.url);
 const common = require(resolve(projectRoot, "packages/verifactu/dist/cjs/index.js"));
-const expected = ["editionInfo", "getEdition", "listEditions"];
+const expected = [
+  "AeatDate",
+  "AeatDateTime",
+  "DecimalLexeme",
+  "Nif",
+  "OpaqueId",
+  "OfficialText",
+  "RrsifFingerprint",
+  "VERIFACTU_DIAGNOSTIC_SCHEMA",
+  "VERIFACTU_EDITION",
+  "VERIFACTU_RECORD_PROFILE_ID",
+  "VERIFACTU_RECORD_PROFILE_VERSION",
+  "buildRrsifPreimage",
+  "calculateRrsifFingerprint",
+  "createInternalRecordEvidence",
+  "editionInfo",
+  "encodeInternalEvidenceSubject",
+  "evaluateApplicability",
+  "getEdition",
+  "listEditions",
+  "validateBillingRecord",
+  "validateBreakdownTotals",
+  "validateFingerprintInput",
+  "verifactuRecordProfile",
+  "verifyInternalRecordEvidence",
+  "verifyRrsifFingerprint",
+].sort();
 if (
   JSON.stringify(Object.keys(esm).sort()) !== JSON.stringify(expected) ||
   JSON.stringify(Object.keys(common).sort()) !== JSON.stringify(expected)
