@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { createHash } from "node:crypto";
-import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, open, readdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { assertProjectRoot, projectRoot, readJson, stableJson } from "./project.mjs";
 
@@ -19,16 +19,17 @@ const maxRedirects = 2;
 const timeoutMs = 30_000;
 const artifacts = [...(manifest.artifacts ?? [])];
 if (artifacts.length === 0) throw new Error("Regulatory manifest has no artifacts.");
+const allowedHostname = new URL(manifest.baseUrl).hostname;
 
 await mkdir(raw, { recursive: true });
 const provenance = [];
 for (const artifact of artifacts) {
-  const target = resolve(raw, artifact.file);
-  if (!target.startsWith(`${raw}/`))
-    throw new Error(`Unsafe regulatory filename: ${artifact.file}`);
+  const target = safeChild(raw, artifact.file);
   if (mode === "fetch") {
     const result = await downloadArtifact(artifact);
-    await writeFile(target, result.bytes, { mode: 0o644 });
+    assertDigest(artifact, result.bytes);
+    // The bytes are bounded and digest-verified against the reviewed manifest before persistence.
+    await writeVerifiedSnapshot(target, result.bytes);
     provenance.push({
       id: artifact.id,
       url: artifact.url ?? `${manifest.baseUrl}${artifact.file}`,
@@ -39,9 +40,14 @@ for (const artifact of artifacts) {
       sha512: digest(result.bytes, "sha512"),
     });
   } else {
-    const bytes = await readFile(target);
-    const metadata = await stat(target);
-    if (!metadata.isFile()) throw new Error(`Snapshot is not a regular file: ${artifact.file}`);
+    const handle = await open(target, "r");
+    const metadata = await handle.stat();
+    if (!metadata.isFile()) {
+      await handle.close();
+      throw new Error(`Snapshot is not a regular file: ${artifact.file}`);
+    }
+    const bytes = await handle.readFile();
+    await handle.close();
     if (bytes.length > maxBytes) throw new Error(`Snapshot exceeds limit: ${artifact.file}`);
     provenance.push({
       id: artifact.id,
@@ -94,6 +100,8 @@ async function downloadArtifact(artifact) {
   let current = new URL(url);
   for (let redirect = 0; redirect <= maxRedirects; redirect += 1) {
     if (current.protocol !== "https:") throw new Error(`HTTPS required: ${current.href}`);
+    if (current.hostname !== allowedHostname)
+      throw new Error(`Unapproved regulatory host: ${current.hostname}`);
     const response = await fetch(current, {
       redirect: "manual",
       signal: AbortSignal.timeout(timeoutMs),
@@ -129,6 +137,28 @@ async function downloadArtifact(artifact) {
     return { bytes, status: response.status, mediaType };
   }
   throw new Error(`Too many redirects: ${url}`);
+}
+
+function safeChild(root, filename) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u.test(filename))
+    throw new Error(`Unsafe regulatory filename: ${filename}`);
+  const target = resolve(root, filename);
+  if (!target.startsWith(`${root}/`)) throw new Error(`Unsafe regulatory filename: ${filename}`);
+  return target;
+}
+
+function assertDigest(artifact, bytes) {
+  if (
+    artifact.bytes !== bytes.length ||
+    artifact.sha256 !== digest(bytes, "sha256") ||
+    artifact.sha512 !== digest(bytes, "sha512")
+  )
+    throw new Error(`Regulatory digest mismatch: ${artifact.id}`);
+}
+
+async function writeVerifiedSnapshot(target, bytes) {
+  // codeql[js/network-data-written-to-file]: bytes are explicitly verified against the pinned digest.
+  await writeFile(target, bytes, { mode: 0o644 });
 }
 
 function digest(bytes, algorithm) {
