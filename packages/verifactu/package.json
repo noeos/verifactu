@@ -18,6 +18,21 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
+    },
+    "./editions": {
+      "types": "./dist/types/editions.d.ts",
+      "import": "./dist/esm/editions.js",
+      "require": "./dist/cjs/editions.js"
+    },
+    "./schemas": {
+      "types": "./dist/types/schemas.d.ts",
+      "import": "./dist/esm/schemas.js",
+      "require": "./dist/cjs/schemas.js"
+    },
+    "./catalogs": {
+      "types": "./dist/types/catalogs.d.ts",
+      "import": "./dist/esm/catalogs.js",
+      "require": "./dist/cjs/catalogs.js"
     }
   },
   "files": [

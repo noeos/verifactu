@@ -15,22 +15,22 @@ El componente no gestionará clientes, catálogo, precios, cobros, PDF, interfaz
 
 ## Mapa documental
 
-| Área | Contenido |
-|---|---|
-| [`00-gobierno/`](00-gobierno/00-indice.md) | autoridad, decisiones, glosario, trazabilidad y aprobación |
-| [`01-producto/`](01-producto/01-vision-alcance.md) | resultado, actores, modalidades, usos y garantías |
-| [`02-legalidad/`](02-legalidad/01-jerarquia-fuentes.md) | fuentes oficiales, alcance, interpretación y vigilancia |
-| [`03-dominio/`](03-dominio/01-modelo-dominio.md) | registros, identidades, cadenas, estados y reglas |
-| [`04-contratos/`](04-contratos/01-api-publica.md) | API, CLI, formatos, puertos, errores y compatibilidad |
+| Área                                                                                | Contenido                                                   |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`00-gobierno/`](00-gobierno/00-indice.md)                                          | autoridad, decisiones, glosario, trazabilidad y aprobación  |
+| [`01-producto/`](01-producto/01-vision-alcance.md)                                  | resultado, actores, modalidades, usos y garantías           |
+| [`02-legalidad/`](02-legalidad/01-jerarquia-fuentes.md)                             | fuentes oficiales, alcance, interpretación y vigilancia     |
+| [`03-dominio/`](03-dominio/01-modelo-dominio.md)                                    | registros, identidades, cadenas, estados y reglas           |
+| [`04-contratos/`](04-contratos/01-api-publica.md)                                   | API, CLI, formatos, puertos, errores y compatibilidad       |
 | [`05-formatos-criptografia/`](05-formatos-criptografia/01-serializacion-oficial.md) | bytes oficiales, huella, firma, certificados, QR y vectores |
-| [`06-comunicacion-aeat/`](06-comunicacion-aeat/01-servicios-entornos.md) | transporte, lotes, respuestas, colas y pruebas externas |
-| [`07-arquitectura/`](07-arquitectura/01-arquitectura.md) | capas, árbol, dependencias, persistencia y concurrencia |
-| [`08-seguridad/`](08-seguridad/01-modelo-amenazas.md) | amenazas, controles, privacidad, incidentes y supply chain |
-| [`09-rendimiento/`](09-rendimiento/01-presupuestos.md) | objetivos, benchmarks, capacidad y regresiones |
-| [`10-calidad/`](10-calidad/01-estrategia-pruebas.md) | estrategia, vectores, negativos, fuzzing, CI y auditoría |
-| [`11-repositorio-entrega/`](11-repositorio-entrega/01-github-flujo-cambios.md) | GitHub, toolchain, publicación, procedencia y soporte |
-| [`12-roadmap/`](12-roadmap/01-roadmap.md) | orden de construcción, cierres y riesgos |
-| [`anexos/`](anexos/01-fuentes.md) | fuentes, matrices, diagramas y plantillas |
+| [`06-comunicacion-aeat/`](06-comunicacion-aeat/01-servicios-entornos.md)            | transporte, lotes, respuestas, colas y pruebas externas     |
+| [`07-arquitectura/`](07-arquitectura/01-arquitectura.md)                            | capas, árbol, dependencias, persistencia y concurrencia     |
+| [`08-seguridad/`](08-seguridad/01-modelo-amenazas.md)                               | amenazas, controles, privacidad, incidentes y supply chain  |
+| [`09-rendimiento/`](09-rendimiento/01-presupuestos.md)                              | objetivos, benchmarks, capacidad y regresiones              |
+| [`10-calidad/`](10-calidad/01-estrategia-pruebas.md)                                | estrategia, vectores, negativos, fuzzing, CI y auditoría    |
+| [`11-repositorio-entrega/`](11-repositorio-entrega/01-github-flujo-cambios.md)      | GitHub, toolchain, publicación, procedencia y soporte       |
+| [`12-roadmap/`](12-roadmap/01-roadmap.md)                                           | orden de construcción, cierres y riesgos                    |
+| [`anexos/`](anexos/01-fuentes.md)                                                   | fuentes, matrices, diagramas y plantillas                   |
 
 ## Convenciones normativas
 

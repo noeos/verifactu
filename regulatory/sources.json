@@ -12,7 +12,8 @@
       "kind": "wsdl",
       "bytes": 8780,
       "sha256": "05919120708ff7650612fa6683c9336eaf919335d9a4db10e86759190af48602",
-      "sha512": "0a3cb514ebdbeb104e7832fa72fe0c80b7f3a78f980246312b1d154b826ceac9a9fd979b1ebff9f0278ae6784eafab62d2548cda682b6db0e5ea67768e4aab1d"
+      "sha512": "0a3cb514ebdbeb104e7832fa72fe0c80b7f3a78f980246312b1d154b826ceac9a9fd979b1ebff9f0278ae6784eafab62d2548cda682b6db0e5ea67768e4aab1d",
+      "requirements": ["NET-001", "NET-002", "NET-004", "NET-005", "NET-006", "NET-008", "NET-009"]
     },
     {
       "id": "AEAT-XSD-SUMINISTRO-LR-1.0",
@@ -20,7 +21,8 @@
       "kind": "xsd",
       "bytes": 1573,
       "sha256": "cbdac8d427cc5ab5d77ca48974cab0f35d6bb819c4c66db361681e3710aeba36",
-      "sha512": "8999802b6ac10e977ae6e61ff3cf68d130f22732ae730b762de6960faf68b004e24ebfc52db10dd9c7aefb692340423f641aa5f590fa940a4bb9555ce3ac8a10"
+      "sha512": "8999802b6ac10e977ae6e61ff3cf68d130f22732ae730b762de6960faf68b004e24ebfc52db10dd9c7aefb692340423f641aa5f590fa940a4bb9555ce3ac8a10",
+      "requirements": ["REG-002", "REG-005", "NET-002"]
     },
     {
       "id": "AEAT-XSD-RESPUESTA-SUMINISTRO-1.0",
@@ -28,7 +30,8 @@
       "kind": "xsd",
       "bytes": 6259,
       "sha256": "82acf80f785643caac13087aae66808ed721a13f08ca5218cf8ae81b695549ef",
-      "sha512": "19ec606ac53f8d60e9c50739cc5a698d9045854c49c4d47bc8e5e711159801e83144f7bf44d6851dda1db804f4149a617e2024ef35fc455d0c762bf75a1c00d4"
+      "sha512": "19ec606ac53f8d60e9c50739cc5a698d9045854c49c4d47bc8e5e711159801e83144f7bf44d6851dda1db804f4149a617e2024ef35fc455d0c762bf75a1c00d4",
+      "requirements": ["NET-004", "NET-005"]
     },
     {
       "id": "AEAT-XSD-CONSULTA-LR-1.0",
@@ -36,7 +39,8 @@
       "kind": "xsd",
       "bytes": 3886,
       "sha256": "bf2cdb8fc4b95b291757a72b76d8fffca06a6d30d9329122ca2fd6b2d5f8f1b1",
-      "sha512": "6daf0535b29924b6313c58f0976db518e52161b677587a56a550d4d77c7344d867278c01be2f682517ff649a298add80b1a84b40e5106318d018104e3f0a167d"
+      "sha512": "6daf0535b29924b6313c58f0976db518e52161b677587a56a550d4d77c7344d867278c01be2f682517ff649a298add80b1a84b40e5106318d018104e3f0a167d",
+      "requirements": ["NET-009"]
     },
     {
       "id": "AEAT-XSD-RESPUESTA-CONSULTA-LR-1.0",
@@ -44,7 +48,8 @@
       "kind": "xsd",
       "bytes": 10058,
       "sha256": "de35063acb8d9ba0d6ae51acc6b595de9c2b12333250e95e13108ef5f2670d45",
-      "sha512": "40414f94493e829adca6eaba9129fd783dcd7451585f217143b7c9698d1c91c3f4b8bb24904b2dc316c1ee4bad2f277c1321d81ecbbaf1a91b066cb8620464d9"
+      "sha512": "40414f94493e829adca6eaba9129fd783dcd7451585f217143b7c9698d1c91c3f4b8bb24904b2dc316c1ee4bad2f277c1321d81ecbbaf1a91b066cb8620464d9",
+      "requirements": ["NET-009"]
     },
     {
       "id": "AEAT-XSD-SUMINISTRO-INFORMACION-1.0",
@@ -52,7 +57,8 @@
       "kind": "xsd",
       "bytes": 49540,
       "sha256": "ee4c1655175644de44c4c25055ffeb8e5f4bb4bc3834ce8254d4222ef18c8aa1",
-      "sha512": "f5036b1c1aabd77a7b3a20c9a4d3de0a3e26235d0ce0bbe0d912df197e61ef6fcdb510129b21e2f039280e0c7e4a57da306f92139e6569d84f9f8215c7fe180f"
+      "sha512": "f5036b1c1aabd77a7b3a20c9a4d3de0a3e26235d0ce0bbe0d912df197e61ef6fcdb510129b21e2f039280e0c7e4a57da306f92139e6569d84f9f8215c7fe180f",
+      "requirements": ["REG-002", "REG-003", "REG-004", "REG-005", "REG-007", "REG-010", "REG-011"]
     },
     {
       "id": "AEAT-XSD-EVENTOS-SIF-1.0",
@@ -60,7 +66,8 @@
       "kind": "xsd",
       "bytes": 30873,
       "sha256": "cc7347c6a9a57a0c8edbc6b9ddcce55176452d0db0e68369477e207e9fbdd7e7",
-      "sha512": "9f36d38ff69b2e26c110431156a0a10501e38915effb7ad97801c278a7bad375e8c292df7664a3cecfb44a2acf4cda972bea6f8cfc7f7a82a8306b95e9b96a55"
+      "sha512": "9f36d38ff69b2e26c110431156a0a10501e38915effb7ad97801c278a7bad375e8c292df7664a3cecfb44a2acf4cda972bea6f8cfc7f7a82a8306b95e9b96a55",
+      "requirements": ["EVT-001", "EVT-002", "EVT-003", "EVT-004"]
     },
     {
       "id": "AEAT-XSD-RESPUESTA-VALIDACION-NVF-1.0",
@@ -68,7 +75,8 @@
       "kind": "xsd",
       "bytes": 4228,
       "sha256": "8f47af4f3c49d29b6a62aed261c09f171e855ad6d6bb72ef3fc0b147dc9572f0",
-      "sha512": "6c378b46bbf0034045204da73f3144ba26cdc7821bb5a37bb21aec7d0e7c1ba91dc5f0f78ee3e697a9a2e83d0c614af1ac8fbfb962d017ac1bbdabc097ad9a87"
+      "sha512": "6c378b46bbf0034045204da73f3144ba26cdc7821bb5a37bb21aec7d0e7c1ba91dc5f0f78ee3e697a9a2e83d0c614af1ac8fbfb962d017ac1bbdabc097ad9a87",
+      "requirements": ["NET-004", "NET-005", "NET-006"]
     }
   ]
 }

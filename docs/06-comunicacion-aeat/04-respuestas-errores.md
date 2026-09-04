@@ -6,14 +6,14 @@ Se preservan bytes, timestamp de recepción, metadatos seguros y versión del pa
 
 ## Estados oficiales y mapeo interno
 
-| Nivel | Valor oficial | Significado interno |
-|---|---|---|
-| envío | `Correcto` | todas las líneas `Correcto` |
-| envío | `ParcialmenteCorrecto` | existe `Incorrecto` o `AceptadoConErrores` junto a línea aceptada, o existe línea aceptada con errores |
-| envío | `Incorrecto` | todas las líneas `Incorrecto`; no hay CSV |
-| registro | `Correcto` | confirmado sin error comunicado |
-| registro | `AceptadoConErrores` | confirmado por AEAT, requiere subsanación trazada cuando corresponda |
-| registro | `Incorrecto` | no aceptado; requiere corregir y nueva remisión |
+| Nivel    | Valor oficial          | Significado interno                                                                                    |
+| -------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| envío    | `Correcto`             | todas las líneas `Correcto`                                                                            |
+| envío    | `ParcialmenteCorrecto` | existe `Incorrecto` o `AceptadoConErrores` junto a línea aceptada, o existe línea aceptada con errores |
+| envío    | `Incorrecto`           | todas las líneas `Incorrecto`; no hay CSV                                                              |
+| registro | `Correcto`             | confirmado sin error comunicado                                                                        |
+| registro | `AceptadoConErrores`   | confirmado por AEAT, requiere subsanación trazada cuando corresponda                                   |
+| registro | `Incorrecto`           | no aceptado; requiere corregir y nueva remisión                                                        |
 
 Cuando al menos una línea se acepta, la respuesta incluye CSV y datos de presentación. Cada `RespuestaLinea` conserva `IDFactura`, `Operacion`, `RefExterna`, estado, código/descripcion de error y, en duplicados, el bloque `RegistroDuplicado`. `TiempoEsperaEnvio` se aplica aunque el resultado funcional no sea totalmente correcto.
 

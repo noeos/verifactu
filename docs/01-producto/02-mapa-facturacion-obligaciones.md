@@ -12,12 +12,12 @@ El registro RRSIF no es una factura electrónica y contiene solo la información
 
 ## Propiedad
 
-| Información o decisión | Propietario |
-|---|---|
+| Información o decisión                              | Propietario                            |
+| --------------------------------------------------- | -------------------------------------- |
 | Datos comerciales, cálculo, numeración y expedición | `facturacion` o aplicación consumidora |
-| Validez y representación de campos RRSIF | `verifactu` |
-| Huella, firma, QR, XML y respuesta AEAT | `verifactu` |
-| Evidencia genérica adicional | `verification-engine` |
-| Entrega B2B y estados comerciales de pago | fuera de este repositorio |
+| Validez y representación de campos RRSIF            | `verifactu`                            |
+| Huella, firma, QR, XML y respuesta AEAT             | `verifactu`                            |
+| Evidencia genérica adicional                        | `verification-engine`                  |
+| Entrega B2B y estados comerciales de pago           | fuera de este repositorio              |
 
 La aplicación consumidora no duplica reglas RRSIF. `verifactu` no corrige decisiones comerciales: rechaza entradas incompletas o incompatibles mediante resultados estructurados.

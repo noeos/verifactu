@@ -33,11 +33,12 @@ Estado: **registro navegable**
 - [`09-conservacion-prescripcion-prueba.md`](../02-legalidad/09-conservacion-prescripcion-prueba.md)
 - [`10-regimenes-relacionados-fronteras.md`](../02-legalidad/10-regimenes-relacionados-fronteras.md)
 - [`11-licencias-reutilizacion-pi.md`](../02-legalidad/11-licencias-reutilizacion-pi.md)
+- [`12-importacion-fuentes.md`](../02-legalidad/12-importacion-fuentes.md)
 
 ## Dominio y contratos
 
 - Dominio: [`modelo`](../03-dominio/01-modelo-dominio.md), [`identidades`](../03-dominio/02-identidades-sistema-instalaciones.md), [`frontera factura/registro`](../03-dominio/03-frontera-factura-registro.md), [`alta/anulación`](../03-dominio/04-registros-alta-anulacion.md), [`eventos`](../03-dominio/05-registros-eventos.md), [`secuencias`](../03-dominio/06-secuencias-encadenamiento.md), [`estados/correcciones`](../03-dominio/07-estados-rechazos-correcciones.md), [`catálogos/diagnósticos`](../03-dominio/08-catalogos-reglas-diagnosticos.md).
-- Contratos: [`API`](../04-contratos/01-api-publica.md), [`esquemas`](../04-contratos/02-esquemas-formatos.md), [`CLI`](../04-contratos/03-cli.md), [`puertos`](../04-contratos/04-puertos-adaptadores.md), [`errores`](../04-contratos/05-errores-resultados.md), [`observabilidad`](../04-contratos/06-eventos-observabilidad.md), [`compatibilidad`](../04-contratos/07-versionado-compatibilidad.md), [`integraciones`](../04-contratos/08-integraciones-engine-facturacion.md).
+- Contratos: [`API`](../04-contratos/01-api-publica.md), [`esquemas`](../04-contratos/02-esquemas-formatos.md), [`CLI`](../04-contratos/03-cli.md), [`puertos`](../04-contratos/04-puertos-adaptadores.md), [`errores`](../04-contratos/05-errores-resultados.md), [`observabilidad`](../04-contratos/06-eventos-observabilidad.md), [`compatibilidad`](../04-contratos/07-versionado-compatibilidad.md), [`integraciones`](../04-contratos/08-integraciones-engine-facturacion.md), [`generación`](../04-contratos/09-generacion-contratos.md).
 
 ## Formatos y AEAT
 
@@ -52,7 +53,7 @@ Estado: **registro navegable**
 
 ## Calidad, entrega y roadmap
 
-- Calidad: [`estrategia`](../10-calidad/01-estrategia-pruebas.md), [`ejemplos oficiales`](../10-calidad/02-ejemplos-vectores-oficiales.md), [`límites/negativos`](../10-calidad/03-limites-alteraciones-negativos.md), [`property/fuzz/mutación`](../10-calidad/04-property-fuzz-mutation.md), [`CI`](../10-calidad/05-ci-calidad.md), [`auditoría`](../10-calidad/06-auditoria-lanzamiento.md).
+- Calidad: [`estrategia`](../10-calidad/01-estrategia-pruebas.md), [`ejemplos oficiales`](../10-calidad/02-ejemplos-vectores-oficiales.md), [`límites/negativos`](../10-calidad/03-limites-alteraciones-negativos.md), [`property/fuzz/mutación`](../10-calidad/04-property-fuzz-mutation.md), [`CI`](../10-calidad/05-ci-calidad.md), [`auditoría`](../10-calidad/06-auditoria-lanzamiento.md), [`contratos generados`](../10-calidad/07-contratos-generados.md).
 - Repositorio/entrega: [`flujo`](../11-repositorio-entrega/01-github-flujo-cambios.md), [`GitHub`](../11-repositorio-entrega/02-configuracion-github.md), [`toolchain`](../11-repositorio-entrega/03-toolchain-dependencias.md), [`build/SBOM`](../11-repositorio-entrega/04-build-reproducibilidad-sbom.md), [`versionado`](../11-repositorio-entrega/05-versionado-publicacion.md), [`RC/release`](../11-repositorio-entrega/06-release-candidate-estable.md), [`verificación`](../11-repositorio-entrega/07-verificacion-release.md), [`soporte`](../11-repositorio-entrega/08-soporte-recuperacion.md).
 - Roadmap: [`orden`](../12-roadmap/01-roadmap.md), [`cierres`](../12-roadmap/02-criterios-cierre.md), [`riesgos`](../12-roadmap/03-riesgos.md), [`release 1`](../12-roadmap/04-preparacion-release-1.md).
 

@@ -1,5 +1,7 @@
 .build
 artifacts
+contracts/editions
+regulatory/snapshots
 coverage
 dist
 docs

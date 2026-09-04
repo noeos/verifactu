@@ -6,7 +6,14 @@ await assertProjectRoot();
 const esm = await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/index.js")}`);
 const require = createRequire(import.meta.url);
 const common = require(resolve(projectRoot, "packages/verifactu/dist/cjs/index.js"));
-if (Object.keys(esm).length !== 0 || Object.keys(common).length !== 0)
-  throw new Error("Foundation API is not empty.");
+const expected = ["editionInfo", "getEdition", "listEditions"];
+if (
+  JSON.stringify(Object.keys(esm).sort()) !== JSON.stringify(expected) ||
+  JSON.stringify(Object.keys(common).sort()) !== JSON.stringify(expected)
+)
+  throw new Error("Generated edition API differs between ESM and CommonJS.");
+await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/editions.js")}`);
+await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/schemas.js")}`);
+await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/catalogs.js")}`);
 await import(`file://${resolve(projectRoot, "packages/cli/dist/esm/main.js")}`);
 console.log("Clean consumer checks passed.");

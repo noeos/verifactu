@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
+import { cp, copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { assertProjectRoot, projectRoot, run, stableJson } from "./project.mjs";
 
@@ -32,3 +32,10 @@ for (const packageName of ["verifactu", "cli"]) {
     resolve(projectRoot, `packages/${packageName}/NOTICE`),
   );
 }
+const edition = (await import("../regulatory/sources.json", { with: { type: "json" } })).default
+  .edition;
+await cp(
+  resolve(projectRoot, `contracts/editions/${edition}`),
+  resolve(projectRoot, `packages/verifactu/dist/contracts/${edition}`),
+  { recursive: true },
+);

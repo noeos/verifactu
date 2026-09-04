@@ -31,6 +31,6 @@ Auditoría local de 2026-09-03:
 
 La aprobación final queda registrada por instrucción expresa del propietario del proyecto en fecha 2026-09-03. Esta anotación identifica la edición documental, la fecha y el aprobador; el commit que incorpore este registro podrá firmarse conforme al procedimiento habitual del repositorio. La aprobación autoriza el inicio de la implementación de la fase siguiente, sin atribuir conformidad legal a un SIF integrado ni sustituir las revisiones futuras previstas.
 
-| Edición | Commit | Fecha | Aprobador | Resultado |
-|---|---|---|---|---|
+| Edición      | Commit                      | Fecha        | Aprobador                | Resultado    |
+| ------------ | --------------------------- | ------------ | ------------------------ | ------------ |
 | `1.0.0-plan` | pendiente de commit firmado | `2026-09-03` | propietario del proyecto | **aprobada** |

@@ -26,15 +26,15 @@ Todos los comandos aceptan `--edition`, `--format json|ndjson|human`, `--quiet` 
 
 JSON es el default para resultados únicos y NDJSON para streams; `human` es presentación. stdout contiene exclusivamente resultado y stderr diagnóstico operativo saneado.
 
-| Código | Significado |
-|---:|---|
-| 0 | operación válida/completa |
-| 1 | resultado inválido o rechazo funcional esperado |
-| 2 | uso/configuración inválidos |
-| 3 | resultado indeterminado |
-| 4 | abortado/timeout |
-| 5 | fallo I/O o transporte |
-| 6 | contrato/edición incompatible |
-| 70 | defecto interno |
+| Código | Significado                                     |
+| -----: | ----------------------------------------------- |
+|      0 | operación válida/completa                       |
+|      1 | resultado inválido o rechazo funcional esperado |
+|      2 | uso/configuración inválidos                     |
+|      3 | resultado indeterminado                         |
+|      4 | abortado/timeout                                |
+|      5 | fallo I/O o transporte                          |
+|      6 | contrato/edición incompatible                   |
+|     70 | defecto interno                                 |
 
 La escritura es atómica; un stream interrumpido deja manifiesto `complete:false`. No sobrescribe sin `--force`, rehúsa dispositivo/directorio/symlink inseguro y limita permisos de salida sensible.

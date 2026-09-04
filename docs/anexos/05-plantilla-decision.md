@@ -12,13 +12,21 @@ Requisitos:
 Fuentes y fragmentos:
 
 ## Contexto
+
 ## Restricciones
+
 ## Opciones evaluadas
+
 ## Decisión
+
 ## Consecuencias y compatibilidad
+
 ## Seguridad, privacidad y rendimiento
+
 ## Pruebas y evidencia
+
 ## Plan de reversión o migración
+
 ## Aprobación
 ```
 

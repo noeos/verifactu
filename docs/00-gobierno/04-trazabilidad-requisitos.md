@@ -4,16 +4,16 @@ Estado: **normativo**
 
 ## Familias
 
-| Prefijo | Autoridad |
-|---|---|
-| `LEG` | alcance, jerarquía y obligaciones legales |
-| `REG` | comportamiento regulatorio RRSIF/AEAT |
-| `DOM` | modelo e invariantes de dominio |
-| `CON` | API, CLI, esquemas y compatibilidad |
-| `SEC` | seguridad y privacidad |
-| `PER` | rendimiento y recursos |
-| `QUA` | pruebas, auditoría y calidad |
-| `OPS` | operación, publicación, soporte y recuperación |
+| Prefijo | Autoridad                                      |
+| ------- | ---------------------------------------------- |
+| `LEG`   | alcance, jerarquía y obligaciones legales      |
+| `REG`   | comportamiento regulatorio RRSIF/AEAT          |
+| `DOM`   | modelo e invariantes de dominio                |
+| `CON`   | API, CLI, esquemas y compatibilidad            |
+| `SEC`   | seguridad y privacidad                         |
+| `PER`   | rendimiento y recursos                         |
+| `QUA`   | pruebas, auditoría y calidad                   |
+| `OPS`   | operación, publicación, soporte y recuperación |
 
 ## Cadena obligatoria
 

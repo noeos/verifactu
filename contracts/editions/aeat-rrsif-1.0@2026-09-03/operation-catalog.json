@@ -1,0 +1,96 @@
+{
+  "edition": "aeat-rrsif-1.0@2026-09-03",
+  "entries": [
+    {
+      "artifact": "AEAT-WSDL-SIF-1.0",
+      "id": "AEAT-WSDL-SIF-1.0/operation/ConsultaFactuSistemaFacturacion/wsdl:definitions[1]/wsdl:binding[1]/wsdl:operation[2]",
+      "locator": "/wsdl:definitions[1]/wsdl:binding[1]/wsdl:operation[2]",
+      "name": "ConsultaFactuSistemaFacturacion",
+      "requirements": [
+        "NET-001",
+        "NET-002",
+        "NET-004",
+        "NET-005",
+        "NET-006",
+        "NET-008",
+        "NET-009"
+      ]
+    },
+    {
+      "artifact": "AEAT-WSDL-SIF-1.0",
+      "id": "AEAT-WSDL-SIF-1.0/operation/ConsultaFactuSistemaFacturacion/wsdl:definitions[1]/wsdl:portType[1]/wsdl:operation[2]",
+      "locator": "/wsdl:definitions[1]/wsdl:portType[1]/wsdl:operation[2]",
+      "name": "ConsultaFactuSistemaFacturacion",
+      "requirements": [
+        "NET-001",
+        "NET-002",
+        "NET-004",
+        "NET-005",
+        "NET-006",
+        "NET-008",
+        "NET-009"
+      ]
+    },
+    {
+      "artifact": "AEAT-WSDL-SIF-1.0",
+      "id": "AEAT-WSDL-SIF-1.0/operation/RegFactuSistemaFacturacion/wsdl:definitions[1]/wsdl:binding[1]/wsdl:operation[1]",
+      "locator": "/wsdl:definitions[1]/wsdl:binding[1]/wsdl:operation[1]",
+      "name": "RegFactuSistemaFacturacion",
+      "requirements": [
+        "NET-001",
+        "NET-002",
+        "NET-004",
+        "NET-005",
+        "NET-006",
+        "NET-008",
+        "NET-009"
+      ]
+    },
+    {
+      "artifact": "AEAT-WSDL-SIF-1.0",
+      "id": "AEAT-WSDL-SIF-1.0/operation/RegFactuSistemaFacturacion/wsdl:definitions[1]/wsdl:binding[2]/wsdl:operation[1]",
+      "locator": "/wsdl:definitions[1]/wsdl:binding[2]/wsdl:operation[1]",
+      "name": "RegFactuSistemaFacturacion",
+      "requirements": [
+        "NET-001",
+        "NET-002",
+        "NET-004",
+        "NET-005",
+        "NET-006",
+        "NET-008",
+        "NET-009"
+      ]
+    },
+    {
+      "artifact": "AEAT-WSDL-SIF-1.0",
+      "id": "AEAT-WSDL-SIF-1.0/operation/RegFactuSistemaFacturacion/wsdl:definitions[1]/wsdl:portType[1]/wsdl:operation[1]",
+      "locator": "/wsdl:definitions[1]/wsdl:portType[1]/wsdl:operation[1]",
+      "name": "RegFactuSistemaFacturacion",
+      "requirements": [
+        "NET-001",
+        "NET-002",
+        "NET-004",
+        "NET-005",
+        "NET-006",
+        "NET-008",
+        "NET-009"
+      ]
+    },
+    {
+      "artifact": "AEAT-WSDL-SIF-1.0",
+      "id": "AEAT-WSDL-SIF-1.0/operation/RegFactuSistemaFacturacion/wsdl:definitions[1]/wsdl:portType[2]/wsdl:operation[1]",
+      "locator": "/wsdl:definitions[1]/wsdl:portType[2]/wsdl:operation[1]",
+      "name": "RegFactuSistemaFacturacion",
+      "requirements": [
+        "NET-001",
+        "NET-002",
+        "NET-004",
+        "NET-005",
+        "NET-006",
+        "NET-008",
+        "NET-009"
+      ]
+    }
+  ],
+  "schemaVersion": 1
+}

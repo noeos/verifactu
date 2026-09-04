@@ -1,0 +1,36 @@
+{
+  "edition": "aeat-rrsif-1.0@2026-09-03",
+  "files": [
+    {
+      "bytes": 3261,
+      "file": "manifest.json",
+      "sha256": "a83b5128bdcc1256093242a339f20724ccead5cead1080499937b88a7c652093",
+      "sha512": "3f1bc3b89227bf0105d156467255cfed2d1a81a95998550639a78a65d18256b4c974c061acea2b2aac99ab41c9bc6f825f0eb783e5b261587ee7053edb1e9fe7"
+    },
+    {
+      "bytes": 226689,
+      "file": "type-catalog.json",
+      "sha256": "83a228e58d603a99e9671e913813a381965d0b4fb880b6e771edfd746fbbb9e7",
+      "sha512": "e57ecc0ebe8fc7cb316f86d18db376e78998318d074eb118401422ff1a7a32fe953b3eb372c7951028d3caa0023410c1899b455c24bb8b1a26e21a5af49d7b0a"
+    },
+    {
+      "bytes": 2866,
+      "file": "operation-catalog.json",
+      "sha256": "27fa9b2482fc0c0cee090709617a98581a777092836d73705c534eed30f8e148",
+      "sha512": "7e2615900c7f8a5b026dae60f5705d8450d9e4e381b3b90388d4c47e482485fb149131441d547665340bc650965ca654665c1eec4697baeb18e6ea01ae094295"
+    },
+    {
+      "bytes": 260538,
+      "file": "source-map.json",
+      "sha256": "0d28f14a49c0e62b109bdc0e851f73ee0098f0007c9e7767e102b4d85098d630",
+      "sha512": "9f6b9adb46b17772123b1aa537cfe1b68653623a76682d61dd6ebf754d14746878b08beb5d0e5c9617608b592644c671baad19981c8b77dbb1629cad99843d70"
+    },
+    {
+      "bytes": 638,
+      "file": "schemas/contract-manifest.schema.json",
+      "sha256": "a2b94dfc58d08b861ccff7c9410e0cd8bc391da34ef5affa1a18ce8ff2e15f65",
+      "sha512": "44f30841c49de9daba4093585430e562e520f0359719480999851ae6f009c7da6b3d899b93d3c98f05183a916d6d1977f6da6be30724c64ae39f16bb3a44d695"
+    }
+  ],
+  "schemaVersion": 1
+}
