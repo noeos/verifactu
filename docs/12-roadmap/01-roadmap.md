@@ -3,7 +3,7 @@
 Estado: **normativo**
 
 1. **Completada — 2026-09-03:** aprobar corpus documental y fuentes.
-2. Crear gobierno del repositorio, toolchain y CI.
+2. **Completada — 2026-09-04:** gobierno del repositorio, toolchain y CI; configuración pública y protegida de GitHub auditada, workflows verdes y commits firmados.
 3. Importar/versionar fuentes oficiales y generar contratos.
 4. Implementar dominio, validación, huella y evidencia interna.
 5. Implementar XML, QR, firma y certificados.
