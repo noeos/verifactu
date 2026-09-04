@@ -101,4 +101,4 @@ jobs:
       - name: Verify toolchain and install
         run: node scripts/check-toolchain.mjs --profile node-24-primary && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- ci --ignore-scripts --omit=optional
       - name: Verify clean consumers and reproducibility
-        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run consumer:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run reproducibility:check
+        run: node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run build && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run consumer:check && node scripts/run-verified-package-manager.mjs --profile node-24-primary -- run reproducibility:check
