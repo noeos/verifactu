@@ -8,6 +8,9 @@ import { NormalizationProfile } from '@noeos/verification-engine';
 import { RecordEvidence } from '@noeos/verification-engine';
 
 // @public (undocumented)
+export function aborted<T>(diagnostics: readonly Diagnostic[]): ValidationResult<T>;
+
+// @public (undocumented)
 export class AeatDate {
     // (undocumented)
     compare(other: AeatDate): number;
@@ -180,6 +183,14 @@ export interface AltaFingerprintInput {
 }
 
 // @public (undocumented)
+export interface AltaInput {
+    // (undocumented)
+    readonly record: unknown;
+    // (undocumented)
+    readonly recordId: string;
+}
+
+// @public (undocumented)
 export interface AnulacionBusinessFacts {
     // (undocumented)
     readonly generatedBy: "issuer" | "third-party" | "recipient" | "none";
@@ -207,6 +218,14 @@ export interface AnulacionFingerprintInput {
     readonly kind: "anulacion";
     // (undocumented)
     readonly previous: PreviousFingerprint;
+}
+
+// @public (undocumented)
+export interface AnulacionInput {
+    // (undocumented)
+    readonly record: unknown;
+    // (undocumented)
+    readonly recordId: string;
 }
 
 // @public (undocumented)
@@ -276,6 +295,22 @@ export function buildSubmissionBatch(input: {
     readonly createdAt: string;
     readonly header: SubmissionHeader;
 }): Result<SubmissionBatch>;
+
+// @public (undocumented)
+export interface BuildSubmissionInput {
+    // (undocumented)
+    readonly batchId: string;
+    // (undocumented)
+    readonly createdAt: string;
+    // (undocumented)
+    readonly endpointId: string;
+    // (undocumented)
+    readonly environment: "test" | "production";
+    // (undocumented)
+    readonly header?: Readonly<Record<string, string>>;
+    // (undocumented)
+    readonly records: readonly StoredRecord[];
+}
 
 // @public (undocumented)
 export function calculateRrsifFingerprint(input: FingerprintInput): FingerprintComputation;
@@ -351,6 +386,19 @@ export function commitSecuredRecord(store: RecordStore, input: CommitRecordInput
     readonly head: SequenceHead;
 }>>;
 
+// @public (undocumented)
+export interface CommittedArtifact {
+    // (undocumented)
+    readonly artifact: PreparedArtifact;
+    // (undocumented)
+    readonly head: SequenceHead;
+    // (undocumented)
+    readonly record: StoredRecord;
+}
+
+// @public (undocumented)
+export function createDiagnostic(input: DiagnosticInput): Diagnostic;
+
 // @public
 export function createDssBackend(bridge: DssBridge): XadesBackend;
 
@@ -362,6 +410,9 @@ export function createOutboxWork(input: OutboxEnqueue, now: string): OutboxWork;
 
 // @public (undocumented)
 export function createSignatureRequest(input: Omit<SignatureRequest, "profile">): SignatureRequest;
+
+// @public (undocumented)
+export function createVerifactu(config: VerifactuConfig): Result<Verifactu>;
 
 // @public (undocumented)
 export function decideRetry(input: {
@@ -424,6 +475,26 @@ export type DiagnosticCode = "VF_INPUT_REQUIRED" | "VF_INPUT_TYPE_INVALID" | "VF
 export type DiagnosticDetail = string | number | boolean | null;
 
 // @public (undocumented)
+export interface DiagnosticInput {
+    // (undocumented)
+    readonly code: DiagnosticCode;
+    // (undocumented)
+    readonly details?: Readonly<Record<string, DiagnosticDetail>>;
+    // (undocumented)
+    readonly engineCode?: string;
+    // (undocumented)
+    readonly officialCode?: string;
+    // (undocumented)
+    readonly path?: string;
+    // (undocumented)
+    readonly phase: DiagnosticPhase;
+    // (undocumented)
+    readonly ruleId?: string;
+    // (undocumented)
+    readonly severity: DiagnosticSeverity;
+}
+
+// @public (undocumented)
 export type DiagnosticPhase = "input" | "applicability" | "record" | "catalog" | "fingerprint" | "chain" | "evidence" | "limits" | "security" | "compatibility" | "state" | "transport";
 
 // @public (undocumented)
@@ -479,7 +550,28 @@ export interface EventFingerprintInput {
 }
 
 // @public (undocumented)
+export interface EventInput {
+    // (undocumented)
+    readonly event: unknown;
+    // (undocumented)
+    readonly recordId: string;
+}
+
+// @public (undocumented)
 export type EventType = "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10";
+
+// @public (undocumented)
+export interface ExportInput {
+    // (undocumented)
+    readonly contextId: string;
+    // (undocumented)
+    readonly limit: number;
+    // (undocumented)
+    readonly sequenceId: string;
+}
+
+// @public (undocumented)
+export function failure<T>(code: VerifactuErrorCode, diagnostics: readonly Diagnostic[]): Result<T>;
 
 // @public (undocumented)
 export interface FingerprintComputation {
@@ -497,6 +589,15 @@ export function genesisHead(contextId: string, sequenceId: string): SequenceHead
 
 // @public (undocumented)
 export function getEdition(id?: EditionId): Result<EditionInfo>;
+
+// @public (undocumented)
+export function indeterminate<T>(diagnostics: readonly Diagnostic[]): ValidationResult<T>;
+
+// @public (undocumented)
+export interface InspectResponseInput {
+    // (undocumented)
+    readonly bytes: Uint8Array;
+}
 
 // @public (undocumented)
 export interface InternalEvidenceSubject {
@@ -531,6 +632,9 @@ export interface InternalRecordEvidence {
         readonly version: typeof VERIFACTU_RECORD_PROFILE_VERSION;
     }>;
 }
+
+// @public (undocumented)
+export function invalid<T>(diagnostics: readonly Diagnostic[]): ValidationResult<T>;
 
 // @public (undocumented)
 export type InvoiceType = "F1" | "F2" | "F3" | "R1" | "R2" | "R3" | "R4" | "R5";
@@ -697,6 +801,26 @@ export function parseSecureXml(input: string | Uint8Array, limits?: XmlLimits): 
 export function parseSoapEnvelope(input: Uint8Array): Result<XmlElement>;
 
 // @public (undocumented)
+export interface PreparedArtifact {
+    // (undocumented)
+    readonly bytes: Uint8Array;
+    // (undocumented)
+    readonly edition: string;
+    // (undocumented)
+    readonly fingerprint: string;
+    // (undocumented)
+    readonly internalEvidence?: InternalRecordEvidence;
+    // (undocumented)
+    readonly kind: "alta" | "anulacion" | "event";
+    // (undocumented)
+    readonly mode: VerifactuConfig["mode"];
+    // (undocumented)
+    readonly recordId: string;
+    // (undocumented)
+    readonly validated: ValidatedBillingRecord | Record<string, unknown>;
+}
+
+// @public (undocumented)
 export type PreviousFingerprint = {
     readonly kind: "genesis";
 } | {
@@ -708,7 +832,31 @@ export type PreviousFingerprint = {
 export type PriorRecordState = "exists" | "absent" | "unknown";
 
 // @public (undocumented)
+export interface ProcessQueueInput {
+    // (undocumented)
+    readonly leaseSeconds: number;
+    // (undocumented)
+    readonly limit: number;
+    // (undocumented)
+    readonly owner: string;
+}
+
+// @public (undocumented)
 export function processQueueOnce(options: QueueProcessOptions): Promise<Result<QueueProcessReport>>;
+
+// @public (undocumented)
+export interface ProcessReport {
+    // (undocumented)
+    readonly completed: number;
+    // (undocumented)
+    readonly indeterminate: number;
+    // (undocumented)
+    readonly leased: number;
+    // (undocumented)
+    readonly retryable: number;
+    // (undocumented)
+    readonly submitted: number;
+}
 
 // @public (undocumented)
 export type ProducerFingerprintIdentity = {
@@ -791,6 +939,22 @@ export interface QueueProcessReport {
 }
 
 // @public (undocumented)
+export interface ReconcileInput {
+    // (undocumented)
+    readonly workId: string;
+}
+
+// @public (undocumented)
+export interface ReconciliationReport {
+    // (undocumented)
+    readonly response?: AeatSubmissionResponse;
+    // (undocumented)
+    readonly status: "resolved" | "indeterminate" | "unsupported";
+    // (undocumented)
+    readonly workId: string;
+}
+
+// @public (undocumented)
 export interface RecordCommitBundle {
     // (undocumented)
     readonly evidence: readonly Uint8Array[];
@@ -837,6 +1001,14 @@ export interface RecordStore {
     transition(recordId: string, expected: RecordState, next: RecordState, transition: StateTransition, signal?: AbortSignal): Promise<Result<StoredRecord>>;
     // (undocumented)
     verifyFreshness(checkpoint: SequenceHead, signal?: AbortSignal): Promise<Result<true>>;
+}
+
+// @public (undocumented)
+export interface RecordVerification {
+    // (undocumented)
+    readonly recordId?: string;
+    // (undocumented)
+    readonly status: "valid" | "invalid" | "indeterminate" | "aborted";
 }
 
 // @public (undocumented)
@@ -1038,6 +1210,9 @@ export interface SubmissionBatch {
 }
 
 // @public (undocumented)
+export function success<T>(value: T, diagnostics?: readonly Diagnostic[]): Result<T>;
+
+// @public (undocumented)
 export type TaxpayerCategory = "corporate-taxpayer" | "economic-activity-individual" | "nonresident-permanent-establishment" | "income-allocation-entity" | "outside-article-3-1" | "unknown";
 
 // @public (undocumented)
@@ -1053,6 +1228,9 @@ export function transitionRecord(input: {
     readonly actor: StateActor;
     readonly at: string;
 }): Result<StateTransition>;
+
+// @public (undocumented)
+export function valid<T>(value: T, diagnostics?: readonly Diagnostic[]): ValidationResult<T>;
 
 // @public (undocumented)
 export function validateBillingRecord(input: unknown, signal?: AbortSignal): ValidationResult<ValidatedBillingRecord>;
@@ -1107,6 +1285,69 @@ export type ValidationResult<T> = {
 };
 
 // @public (undocumented)
+export const VECTOR_SET: Readonly<{
+    $schema: "urn:noeos:verifactu:vector-set:1";
+    version: "1.0.0";
+    edition: "aeat-rrsif-1.0@2026-09-03";
+    license: "Apache-2.0";
+    files: readonly (Readonly<{
+        path: "internal-evidence.v1.json";
+        category: "internal-evidence";
+        caseCount: 1;
+        bytes: 1180;
+        sha256: "9b9c70e7d5cc10ec5b756ec8142dfb07a2ebd7b849d22f0b109572265951f90d";
+        sha512: "f2efbc79259504ffb2629f6c347bb5dbc001fbdb111040773a3a032b694ec8b09797a8ffb0a7ea780c9897a4b92e89573f96aa0e81baf71a3bf55da3bfe3418e";
+    }> | Readonly<{
+        path: "rrsif-fingerprint.v1.json";
+        category: "rrsif-fingerprint";
+        caseCount: 3;
+        bytes: 2776;
+        sha256: "a399ce5771d9c41aa7a86105985d852868d7f3e01c11dcbe7321d5fb7fc97328";
+        sha512: "e489e20dbf58b67f1b60d98dea9ec41923e9ea5b6d31e565556d7fa496690e86957cc04823e3537e505743afecf23b1f1d2fb1efa9b764111bff21adad4cc8ed";
+    }>)[];
+}>;
+
+// @public (undocumented)
+export type VectorSet = typeof VECTOR_SET;
+
+// @public (undocumented)
+export interface Verifactu {
+    // (undocumented)
+    buildQr(input: QrInvoiceData): Result<QrCode>;
+    // (undocumented)
+    buildSubmission(input: BuildSubmissionInput): Promise<Result<SubmissionBatch>>;
+    // (undocumented)
+    commit(prepared: PreparedArtifact, expectedHead: SequenceHead, signal?: AbortSignal): Promise<Result<CommittedArtifact>>;
+    // (undocumented)
+    readonly edition: EditionInfo;
+    // (undocumented)
+    evaluateApplicability(input: ApplicabilityFacts): Result<ApplicabilityDecision>;
+    // (undocumented)
+    export(input: ExportInput, signal?: AbortSignal): AsyncIterable<Uint8Array>;
+    // (undocumented)
+    inspectResponse(input: InspectResponseInput): Result<AeatSubmissionResponse>;
+    // (undocumented)
+    prepareAlta(input: AltaInput, signal?: AbortSignal): Promise<Result<PreparedArtifact>>;
+    // (undocumented)
+    prepareAnulacion(input: AnulacionInput, signal?: AbortSignal): Promise<Result<PreparedArtifact>>;
+    // (undocumented)
+    prepareEvent(input: EventInput, signal?: AbortSignal): Promise<Result<PreparedArtifact>>;
+    // (undocumented)
+    processQueue(input: ProcessQueueInput, signal?: AbortSignal): Promise<Result<ProcessReport>>;
+    // (undocumented)
+    reconcile(input: ReconcileInput, signal?: AbortSignal): Promise<Result<ReconciliationReport>>;
+    // (undocumented)
+    verifyChain(input: VerifyChainInput, signal?: AbortSignal): AsyncIterable<RecordVerification>;
+    // (undocumented)
+    verifyQr(input: {
+        readonly payload: string;
+        readonly expected: QrInvoiceData;
+    }): Result<true>;
+    // (undocumented)
+    verifyRecord(input: VerifyRecordInput, signal?: AbortSignal): Promise<ValidationResult<RecordVerification>>;
+}
+
+// @public (undocumented)
 export const VERIFACTU_DIAGNOSTIC_SCHEMA: "urn:noeos:verifactu:diagnostic:1";
 
 // @public (undocumented)
@@ -1126,6 +1367,41 @@ export const VERIFACTU_SIGNATURE_POLICY: Readonly<{
 }>;
 
 // @public (undocumented)
+export interface VerifactuConfig {
+    // (undocumented)
+    readonly certificates?: CertificatePort;
+    // (undocumented)
+    readonly clock?: Clock;
+    // (undocumented)
+    readonly edition?: EditionId;
+    // (undocumented)
+    readonly installationId: string;
+    // (undocumented)
+    readonly limits?: Readonly<{
+        readonly maxRecordBytes?: number;
+        readonly maxExportRecords?: number;
+    }>;
+    // (undocumented)
+    readonly mode: "verifactu" | "no-verifactu";
+    // (undocumented)
+    readonly observer?: Observer;
+    // (undocumented)
+    readonly outboxStore?: OutboxStore;
+    // (undocumented)
+    readonly recordStore?: RecordStore;
+    // (undocumented)
+    readonly retryPolicy?: RetryPolicy;
+    // (undocumented)
+    readonly sequenceId: string;
+    // (undocumented)
+    readonly signer?: SignerPort;
+    // (undocumented)
+    readonly taxpayerScopeId: string;
+    // (undocumented)
+    readonly transport?: AeatTransport;
+}
+
+// @public (undocumented)
 export interface VerifactuError {
     // (undocumented)
     readonly code: VerifactuErrorCode;
@@ -1142,7 +1418,25 @@ export type VerifactuErrorCode = "INVALID_INPUT" | "UNSUPPORTED_EDITION" | "ABOR
 export const verifactuRecordProfile: NormalizationProfile<Uint8Array>;
 
 // @public (undocumented)
+export interface VerifyChainInput {
+    // (undocumented)
+    readonly contextId?: string;
+    // (undocumented)
+    readonly limit: number;
+    // (undocumented)
+    readonly sequenceId?: string;
+}
+
+// @public (undocumented)
 export function verifyInternalRecordEvidence(input: unknown, evidence: unknown): Result<InternalRecordEvidence>;
+
+// @public (undocumented)
+export interface VerifyRecordInput {
+    // (undocumented)
+    readonly artifact: unknown;
+    // (undocumented)
+    readonly expectedFingerprint?: string;
+}
 
 // @public (undocumented)
 export function verifyRrsifFingerprint(input: FingerprintInput, expected: unknown): ValidationResult<FingerprintComputation>;

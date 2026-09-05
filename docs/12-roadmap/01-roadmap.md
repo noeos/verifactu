@@ -9,7 +9,7 @@ Estado: **normativo**
 5. **Completada técnicamente — 2026-09-05:** implementar XML seguro y determinista, QR AEAT con corrección M, contratos de certificados opacos y puerto XAdES-EPES interoperable; persistencia, transporte y validación final con portal AEAT siguen fuera del alcance.
 6. **Completada técnicamente — 2026-09-05:** implementar persistencia contractual, estados y outbox; cierre: [`06-cierre-fases-6-7`](06-cierre-fases-6-7.md).
 7. **Completada técnicamente — 2026-09-05:** implementar transporte y respuestas AEAT; cierre conjunto en [`06-cierre-fases-6-7`](06-cierre-fases-6-7.md).
-8. Implementar API, CLI y kit de adapters.
+8. **Completada técnicamente — 2026-09-05:** implementar API, CLI y kit de adapters; cierre: [`07-cierre-fase8`](07-cierre-fase8.md).
 9. Completar seguridad, fuzz, mutación, rendimiento y recuperación.
 10. Validar portal AEAT, consumers y compatibilidad histórica.
 11. Auditar expediente y publicar 1.0.0.

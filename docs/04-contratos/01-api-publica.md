@@ -1,5 +1,7 @@
 # API pública
 
+La fachada ejecutable y sus garantías de fase 8 están especificadas en [`10-api-fase8`](10-api-fase8.md).
+
 Estado: **normativo**
 
 El paquete `@noeos/verifactu` expone una fachada creada con configuración inmutable y capacidades explícitas. No hay singletons ni configuración ambiental leída por el núcleo.

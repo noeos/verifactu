@@ -12,7 +12,9 @@ const expected = [
   "DecimalLexeme",
   "MAX_BATCH_RECORDS",
   "Nif",
+  "VECTOR_SET",
   "OpaqueId",
+  "aborted",
   "OfficialText",
   "RrsifFingerprint",
   "VERIFACTU_DIAGNOSTIC_SCHEMA",
@@ -30,17 +32,22 @@ const expected = [
   "canTransition",
   "canonicalizeXml",
   "commitSecuredRecord",
+  "createDiagnostic",
   "createDssBackend",
   "createInternalRecordEvidence",
   "createOutboxWork",
   "createSignatureRequest",
+  "createVerifactu",
   "decideRetry",
   "describeCertificate",
   "editionInfo",
   "encodeInternalEvidenceSubject",
   "evaluateApplicability",
+  "failure",
   "genesisHead",
   "getEdition",
+  "indeterminate",
+  "invalid",
   "listAeatEndpoints",
   "listEditions",
   "nextHead",
@@ -52,7 +59,9 @@ const expected = [
   "resolveAeatEndpoint",
   "serializeBillingRecord",
   "serializeXml",
+  "success",
   "transitionRecord",
+  "valid",
   "validateBillingRecord",
   "validateBreakdownTotals",
   "validateFingerprintInput",
@@ -77,5 +86,8 @@ await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/submiss
 await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/transport/index.js")}`);
 await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/application/index.js")}`);
 await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/outbox/index.js")}`);
+await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/adapters/index.js")}`);
+await import(`file://${resolve(projectRoot, "packages/verifactu/dist/esm/vectors.js")}`);
 await import(`file://${resolve(projectRoot, "packages/cli/dist/esm/main.js")}`);
+await import(`file://${resolve(projectRoot, "packages/adapter-kit/dist/esm/index.js")}`);
 console.log("Clean consumer checks passed.");
