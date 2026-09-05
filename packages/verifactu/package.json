@@ -58,6 +58,31 @@
       "types": "./dist/types/ports/index.d.ts",
       "import": "./dist/esm/ports/index.js",
       "require": "./dist/cjs/ports/index.js"
+    },
+    "./state": {
+      "types": "./dist/types/state/index.d.ts",
+      "import": "./dist/esm/state/index.js",
+      "require": "./dist/cjs/state/index.js"
+    },
+    "./submissions": {
+      "types": "./dist/types/submissions/index.d.ts",
+      "import": "./dist/esm/submissions/index.js",
+      "require": "./dist/cjs/submissions/index.js"
+    },
+    "./transport": {
+      "types": "./dist/types/transport/index.d.ts",
+      "import": "./dist/esm/transport/index.js",
+      "require": "./dist/cjs/transport/index.js"
+    },
+    "./application": {
+      "types": "./dist/types/application/index.d.ts",
+      "import": "./dist/esm/application/index.js",
+      "require": "./dist/cjs/application/index.js"
+    },
+    "./outbox": {
+      "types": "./dist/types/outbox/index.d.ts",
+      "import": "./dist/esm/outbox/index.js",
+      "require": "./dist/cjs/outbox/index.js"
     }
   },
   "files": [

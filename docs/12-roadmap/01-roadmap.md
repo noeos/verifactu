@@ -7,8 +7,8 @@ Estado: **normativo**
 3. **Completada — 2026-09-04:** importar y versionar las ocho fuentes oficiales WSDL/XSD de la edición AEAT fijada, con hashes, procedencia, validación offline, trazabilidad y contratos generados deterministas.
 4. **Completada técnicamente — 2026-09-04:** implementar dominio, validación, huella y evidencia interna; XML, firma, QR, persistencia y transporte siguen fuera del alcance de esta fase.
 5. **Completada técnicamente — 2026-09-05:** implementar XML seguro y determinista, QR AEAT con corrección M, contratos de certificados opacos y puerto XAdES-EPES interoperable; persistencia, transporte y validación final con portal AEAT siguen fuera del alcance.
-6. Implementar persistencia contractual, estados y outbox.
-7. Implementar transporte y respuestas AEAT.
+6. **Completada técnicamente — 2026-09-05:** implementar persistencia contractual, estados y outbox; cierre: [`06-cierre-fases-6-7`](06-cierre-fases-6-7.md).
+7. **Completada técnicamente — 2026-09-05:** implementar transporte y respuestas AEAT; cierre conjunto en [`06-cierre-fases-6-7`](06-cierre-fases-6-7.md).
 8. Implementar API, CLI y kit de adapters.
 9. Completar seguridad, fuzz, mutación, rendimiento y recuperación.
 10. Validar portal AEAT, consumers y compatibilidad histórica.

@@ -32,6 +32,98 @@ export class AeatDateTime {
 }
 
 // @public (undocumented)
+export interface AeatEndpoint {
+    // (undocumented)
+    readonly environment: AeatEnvironment;
+    // (undocumented)
+    readonly id: AeatEndpointId;
+    // (undocumented)
+    readonly soapAction: string;
+    // (undocumented)
+    readonly url: string;
+}
+
+// @public (undocumented)
+export type AeatEndpointId = "verifactu" | "requerimiento" | "verifactu-sello" | "requerimiento-sello";
+
+// @public (undocumented)
+export type AeatEnvironment = "test" | "production";
+
+// @public (undocumented)
+export type AeatLineStatus = "Correcto" | "AceptadoConErrores" | "Incorrecto";
+
+// @public (undocumented)
+export interface AeatObservation {
+    // (undocumented)
+    readonly bytesRead: number;
+    // (undocumented)
+    readonly bytesWritten: number;
+    // (undocumented)
+    readonly completed: boolean;
+    // (undocumented)
+    readonly httpStatus: number | undefined;
+    // (undocumented)
+    readonly receivedAt: string;
+    // (undocumented)
+    readonly requestDigest: string;
+    // (undocumented)
+    readonly responseBytes: Uint8Array | undefined;
+}
+
+// @public (undocumented)
+export interface AeatRequest {
+    // (undocumented)
+    readonly body: Uint8Array;
+    // (undocumented)
+    readonly certificateId: string;
+    // (undocumented)
+    readonly endpointId: AeatEndpointId;
+    // (undocumented)
+    readonly environment: "test" | "production";
+    // (undocumented)
+    readonly requestDigest: string;
+}
+
+// @public (undocumented)
+export interface AeatResponseLine {
+    // (undocumented)
+    readonly code: string | undefined;
+    // (undocumented)
+    readonly description: string | undefined;
+    // (undocumented)
+    readonly externalReference: string | undefined;
+    // (undocumented)
+    readonly invoiceId: string;
+    // (undocumented)
+    readonly operation: string;
+    // (undocumented)
+    readonly status: AeatLineStatus;
+}
+
+// @public (undocumented)
+export interface AeatSubmissionResponse {
+    // (undocumented)
+    readonly csv: string | undefined;
+    // (undocumented)
+    readonly lines: readonly AeatResponseLine[];
+    // (undocumented)
+    readonly soapFault: boolean;
+    // (undocumented)
+    readonly status: AeatSubmissionStatus;
+    // (undocumented)
+    readonly waitSeconds: number | undefined;
+}
+
+// @public (undocumented)
+export type AeatSubmissionStatus = "Correcto" | "ParcialmenteCorrecto" | "Incorrecto";
+
+// @public (undocumented)
+export interface AeatTransport {
+    // (undocumented)
+    send(request: AeatRequest, signal?: AbortSignal): Promise<Result<AeatObservation>>;
+}
+
+// @public (undocumented)
 export interface AltaBusinessFacts {
     // (undocumented)
     readonly correctedInvoices: boolean;
@@ -150,6 +242,9 @@ export interface ApplicabilityFacts {
 export function assertCertificateUsable(descriptor: CertificateDescriptor, at: Date): Result<CertificateDescriptor>;
 
 // @public (undocumented)
+export function assertFreshness(checkpoint: SequenceHead, actual: SequenceHead): Result<true>;
+
+// @public (undocumented)
 export interface BreakdownTotals {
     // (undocumented)
     readonly declaredTaxMinorUnits: bigint;
@@ -170,10 +265,26 @@ export function buildQrPayload(input: QrInvoiceData): Result<string>;
 export function buildRrsifPreimage(input: FingerprintInput): string;
 
 // @public (undocumented)
+export function buildSoapRequest(payload: XmlElement, soapAction: string): Result<SoapRequest>;
+
+// @public (undocumented)
+export function buildSubmissionBatch(input: {
+    readonly batchId: string;
+    readonly environment: "test" | "production";
+    readonly endpointId: AeatEndpointId;
+    readonly records: readonly StoredRecord[];
+    readonly createdAt: string;
+    readonly header: SubmissionHeader;
+}): Result<SubmissionBatch>;
+
+// @public (undocumented)
 export function calculateRrsifFingerprint(input: FingerprintInput): FingerprintComputation;
 
 // @public (undocumented)
 export function canonicalizeXml(root: XmlElement): Uint8Array;
+
+// @public (undocumented)
+export function canTransition(from: RecordState, to: RecordState): boolean;
 
 // @public (undocumented)
 export interface CertificateDescriptor {
@@ -222,6 +333,24 @@ export interface Clock {
     now(): Date;
 }
 
+// @public (undocumented)
+export interface CommitReceipt {
+    // (undocumented)
+    readonly head: SequenceHead;
+    // (undocumented)
+    readonly recordId: string;
+    // (undocumented)
+    readonly state: RecordState;
+}
+
+// Warning: (ae-forgotten-export) The symbol "CommitRecordInput" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export function commitSecuredRecord(store: RecordStore, input: CommitRecordInput): Promise<Result<{
+    readonly record: StoredRecord;
+    readonly head: SequenceHead;
+}>>;
+
 // @public
 export function createDssBackend(bridge: DssBridge): XadesBackend;
 
@@ -229,7 +358,18 @@ export function createDssBackend(bridge: DssBridge): XadesBackend;
 export function createInternalRecordEvidence(input: unknown): Result<InternalRecordEvidence>;
 
 // @public (undocumented)
+export function createOutboxWork(input: OutboxEnqueue, now: string): OutboxWork;
+
+// @public (undocumented)
 export function createSignatureRequest(input: Omit<SignatureRequest, "profile">): SignatureRequest;
+
+// @public (undocumented)
+export function decideRetry(input: {
+    readonly now: string;
+    readonly attempt: number;
+    readonly reason: string;
+    readonly policy: RetryPolicy;
+}): Result<RetryDecision>;
 
 // @public (undocumented)
 export class DecimalLexeme {
@@ -278,13 +418,13 @@ export interface Diagnostic {
 }
 
 // @public (undocumented)
-export type DiagnosticCode = "VF_INPUT_REQUIRED" | "VF_INPUT_TYPE_INVALID" | "VF_INPUT_PROPERTY_UNKNOWN" | "VF_INPUT_PROPERTY_MISSING" | "VF_INPUT_VALUE_INVALID" | "VF_INPUT_LIMIT_EXCEEDED" | "VF_INPUT_ABORTED" | "VF_APPLICABILITY_FACT_MISSING" | "VF_APPLICABILITY_EXCLUDED" | "VF_RECORD_RULE_FAILED" | "VF_RECORD_EXTERNAL_FACT_MISSING" | "VF_RECORD_TOTAL_MISMATCH" | "VF_RECORD_TOTAL_CHECK_NOT_APPLICABLE" | "VF_CATALOG_VALUE_UNKNOWN" | "VF_FINGERPRINT_FORMAT_INVALID" | "VF_FINGERPRINT_MISMATCH" | "VF_CHAIN_REFERENCE_INVALID" | "VF_EVIDENCE_INPUT_INVALID" | "VF_EVIDENCE_ENGINE_REJECTED" | "VF_EVIDENCE_MISMATCH" | "VF_DIAGNOSTICS_TRUNCATED" | "VF_EDITION_UNKNOWN" | "VF_XML_MALFORMED" | "VF_XML_UNSAFE" | "VF_XML_LIMIT_EXCEEDED" | "VF_XML_SCHEMA_INVALID" | "VF_QR_INPUT_INVALID" | "VF_QR_UNSUPPORTED" | "VF_CERTIFICATE_INVALID" | "VF_CERTIFICATE_UNTRUSTED" | "VF_SIGNATURE_INVALID" | "VF_SIGNATURE_UNAVAILABLE";
+export type DiagnosticCode = "VF_INPUT_REQUIRED" | "VF_INPUT_TYPE_INVALID" | "VF_INPUT_PROPERTY_UNKNOWN" | "VF_INPUT_PROPERTY_MISSING" | "VF_INPUT_VALUE_INVALID" | "VF_INPUT_LIMIT_EXCEEDED" | "VF_INPUT_ABORTED" | "VF_APPLICABILITY_FACT_MISSING" | "VF_APPLICABILITY_EXCLUDED" | "VF_RECORD_RULE_FAILED" | "VF_RECORD_EXTERNAL_FACT_MISSING" | "VF_RECORD_TOTAL_MISMATCH" | "VF_RECORD_TOTAL_CHECK_NOT_APPLICABLE" | "VF_CATALOG_VALUE_UNKNOWN" | "VF_FINGERPRINT_FORMAT_INVALID" | "VF_FINGERPRINT_MISMATCH" | "VF_CHAIN_REFERENCE_INVALID" | "VF_EVIDENCE_INPUT_INVALID" | "VF_EVIDENCE_ENGINE_REJECTED" | "VF_EVIDENCE_MISMATCH" | "VF_DIAGNOSTICS_TRUNCATED" | "VF_EDITION_UNKNOWN" | "VF_XML_MALFORMED" | "VF_XML_UNSAFE" | "VF_XML_LIMIT_EXCEEDED" | "VF_XML_SCHEMA_INVALID" | "VF_QR_INPUT_INVALID" | "VF_QR_UNSUPPORTED" | "VF_CERTIFICATE_INVALID" | "VF_CERTIFICATE_UNTRUSTED" | "VF_SIGNATURE_INVALID" | "VF_SIGNATURE_UNAVAILABLE" | "VF_STATE_TRANSITION_INVALID" | "VF_STATE_CONFLICT" | "VF_STATE_ROLLBACK_DETECTED" | "VF_OUTBOX_LEASE_INVALID" | "VF_OUTBOX_DUPLICATE" | "VF_OUTBOX_LIMIT_EXCEEDED" | "VF_TRANSPORT_ENDPOINT_INVALID" | "VF_TRANSPORT_TIMEOUT" | "VF_TRANSPORT_TLS_INVALID" | "VF_TRANSPORT_RESPONSE_INVALID" | "VF_AEAT_CODE_UNKNOWN" | "VF_AEAT_RESPONSE_PARTIAL" | "VF_AEAT_INDETERMINATE" | "VF_RETRY_POLICY_EXHAUSTED";
 
 // @public (undocumented)
 export type DiagnosticDetail = string | number | boolean | null;
 
 // @public (undocumented)
-export type DiagnosticPhase = "input" | "applicability" | "record" | "catalog" | "fingerprint" | "chain" | "evidence" | "limits" | "security" | "compatibility";
+export type DiagnosticPhase = "input" | "applicability" | "record" | "catalog" | "fingerprint" | "chain" | "evidence" | "limits" | "security" | "compatibility" | "state" | "transport";
 
 // @public (undocumented)
 export type DiagnosticSeverity = "error" | "warning" | "info";
@@ -353,6 +493,9 @@ export interface FingerprintComputation {
 export type FingerprintInput = AltaFingerprintInput | AnulacionFingerprintInput | EventFingerprintInput;
 
 // @public (undocumented)
+export function genesisHead(contextId: string, sequenceId: string): SequenceHead;
+
+// @public (undocumented)
 export function getEdition(id?: EditionId): Result<EditionInfo>;
 
 // @public (undocumented)
@@ -396,7 +539,40 @@ export type InvoiceType = "F1" | "F2" | "F3" | "R1" | "R2" | "R3" | "R4" | "R5";
 export type IssuedBy = "issuer" | "third-party" | "recipient";
 
 // @public (undocumented)
+export interface Lease {
+    // (undocumented)
+    readonly expiresAt: string;
+    // (undocumented)
+    readonly fencing: number;
+    // (undocumented)
+    readonly owner: string;
+    // (undocumented)
+    readonly token: string;
+}
+
+// @public (undocumented)
+export interface LeaseRequest {
+    // (undocumented)
+    readonly leaseSeconds: number;
+    // (undocumented)
+    readonly limit: number;
+    // (undocumented)
+    readonly now: string;
+    // (undocumented)
+    readonly owner: string;
+}
+
+// @public (undocumented)
+export function listAeatEndpoints(): readonly AeatEndpoint[];
+
+// @public (undocumented)
 export function listEditions(): readonly EditionInfo[];
+
+// @public (undocumented)
+export const MAX_BATCH_RECORDS = 1000;
+
+// @public (undocumented)
+export function nextHead(previous: SequenceHead, linkDigest: string): Result<SequenceHead>;
 
 // @public (undocumented)
 export class Nif {
@@ -404,6 +580,28 @@ export class Nif {
     static parse(input: unknown): Nif | undefined;
     // (undocumented)
     readonly value: string;
+}
+
+// @public (undocumented)
+export interface ObservedEvent {
+    // (undocumented)
+    readonly correlationId: string;
+    // (undocumented)
+    readonly edition: string;
+    // (undocumented)
+    readonly name: string;
+    // (undocumented)
+    readonly outcome: "started" | "completed" | "failed" | "aborted";
+    // (undocumented)
+    readonly phase: string;
+    // (undocumented)
+    readonly version: 1;
+}
+
+// @public (undocumented)
+export interface Observer {
+    // (undocumented)
+    emit(event: ObservedEvent): void;
 }
 
 // @public (undocumented)
@@ -423,7 +621,80 @@ export class OpaqueId {
 }
 
 // @public (undocumented)
+export interface OutboxCompletion {
+    // (undocumented)
+    readonly error?: string;
+    // (undocumented)
+    readonly responseBytes?: Uint8Array;
+    // (undocumented)
+    readonly state: "completed" | "retryable" | "indeterminate" | "dead-letter";
+}
+
+// @public (undocumented)
+export interface OutboxEnqueue {
+    // (undocumented)
+    readonly certificateId: string;
+    // (undocumented)
+    readonly createdAt: string;
+    // (undocumented)
+    readonly endpointId: AeatEndpointId;
+    // (undocumented)
+    readonly environment: "test" | "production";
+    // (undocumented)
+    readonly recordIds: readonly string[];
+    // (undocumented)
+    readonly requestBytes: Uint8Array;
+    // (undocumented)
+    readonly requestDigest: string;
+    // (undocumented)
+    readonly workId: string;
+}
+
+// @public (undocumented)
+export type OutboxState = "pending" | "leased" | "submitting" | "completed" | "retryable" | "indeterminate" | "dead-letter" | "cancelled";
+
+// @public (undocumented)
+export interface OutboxStore {
+    // (undocumented)
+    complete(workId: string, lease: Lease_2, result: OutboxCompletion, now: string, signal?: AbortSignal): Promise<Result<OutboxWork>>;
+    // (undocumented)
+    enqueue(work: readonly OutboxWork[], signal?: AbortSignal): Promise<Result<readonly OutboxWork[]>>;
+    // (undocumented)
+    inspect(workId: string, signal?: AbortSignal): Promise<Result<OutboxWork | undefined>>;
+    // (undocumented)
+    lease(input: LeaseRequest, signal?: AbortSignal): Promise<Result<readonly OutboxWork[]>>;
+    // Warning: (ae-forgotten-export) The symbol "Lease_2" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    markSubmitting(workId: string, lease: Lease_2, now: string, signal?: AbortSignal): Promise<Result<OutboxWork>>;
+    // (undocumented)
+    release(workId: string, lease: Lease_2, nextAttemptAt: string, reason: string, now: string, signal?: AbortSignal): Promise<Result<OutboxWork>>;
+}
+
+// @public (undocumented)
+export interface OutboxWork extends OutboxEnqueue {
+    // (undocumented)
+    readonly attempt: number;
+    // (undocumented)
+    readonly lastError: string | undefined;
+    // (undocumented)
+    readonly lease: Lease | undefined;
+    // (undocumented)
+    readonly nextAttemptAt: string;
+    // (undocumented)
+    readonly responseBytes: Uint8Array | undefined;
+    // (undocumented)
+    readonly state: OutboxState;
+}
+
+// @public (undocumented)
+export function parseAeatResponse(input: Uint8Array): Result<AeatSubmissionResponse>;
+
+// @public (undocumented)
 export function parseSecureXml(input: string | Uint8Array, limits?: XmlLimits): Result<XmlElement>;
+
+// @public (undocumented)
+export function parseSoapEnvelope(input: Uint8Array): Result<XmlElement>;
 
 // @public (undocumented)
 export type PreviousFingerprint = {
@@ -435,6 +706,9 @@ export type PreviousFingerprint = {
 
 // @public (undocumented)
 export type PriorRecordState = "exists" | "absent" | "unknown";
+
+// @public (undocumented)
+export function processQueueOnce(options: QueueProcessOptions): Promise<Result<QueueProcessReport>>;
 
 // @public (undocumented)
 export type ProducerFingerprintIdentity = {
@@ -479,6 +753,93 @@ export interface QrInvoiceData {
 }
 
 // @public (undocumented)
+export interface QueueProcessOptions {
+    // (undocumented)
+    readonly clock: Clock;
+    // (undocumented)
+    readonly leaseSeconds: number;
+    // (undocumented)
+    readonly limit: number;
+    // (undocumented)
+    readonly observer?: Observer;
+    // (undocumented)
+    readonly outbox: OutboxStore;
+    // (undocumented)
+    readonly owner: string;
+    // (undocumented)
+    readonly recordStore?: RecordStore;
+    // (undocumented)
+    readonly retryPolicy?: RetryPolicy;
+    // (undocumented)
+    readonly signal?: AbortSignal;
+    // (undocumented)
+    readonly transport: AeatTransport;
+}
+
+// @public (undocumented)
+export interface QueueProcessReport {
+    // (undocumented)
+    readonly completed: number;
+    // (undocumented)
+    readonly indeterminate: number;
+    // (undocumented)
+    readonly leased: number;
+    // (undocumented)
+    readonly retryable: number;
+    // (undocumented)
+    readonly submitted: number;
+}
+
+// @public (undocumented)
+export interface RecordCommitBundle {
+    // (undocumented)
+    readonly evidence: readonly Uint8Array[];
+    // (undocumented)
+    readonly head: SequenceHead;
+    // (undocumented)
+    readonly outbox: readonly OutboxEnqueue[];
+    // (undocumented)
+    readonly record: StoredRecord;
+    // (undocumented)
+    readonly transitions: readonly StateTransition[];
+}
+
+// @public (undocumented)
+export interface RecordScanInput {
+    // (undocumented)
+    readonly afterPosition?: number;
+    // (undocumented)
+    readonly contextId: string;
+    // (undocumented)
+    readonly limit: number;
+    // (undocumented)
+    readonly sequenceId: string;
+    // (undocumented)
+    readonly states?: readonly RecordState[];
+}
+
+// @public (undocumented)
+export type RecordState = "prepared" | "secured" | "persisted" | "queued" | "submitting" | "accepted" | "accepted-with-errors" | "rejected" | "retryable" | "correction-required" | "cancelled" | "indeterminate";
+
+// @public (undocumented)
+export interface RecordStore {
+    // (undocumented)
+    checkpoint(contextId: string, sequenceId: string, signal?: AbortSignal): Promise<Result<SequenceHead>>;
+    // (undocumented)
+    commit(expected: SequenceHead, bundle: RecordCommitBundle, signal?: AbortSignal): Promise<Result<CommitReceipt>>;
+    // (undocumented)
+    read(recordId: string, signal?: AbortSignal): Promise<Result<StoredRecord | undefined>>;
+    // (undocumented)
+    readHead(contextId: string, sequenceId: string, signal?: AbortSignal): Promise<Result<SequenceHead>>;
+    // (undocumented)
+    scan(input: RecordScanInput, signal?: AbortSignal): AsyncIterable<StoredRecord>;
+    // (undocumented)
+    transition(recordId: string, expected: RecordState, next: RecordState, transition: StateTransition, signal?: AbortSignal): Promise<Result<StoredRecord>>;
+    // (undocumented)
+    verifyFreshness(checkpoint: SequenceHead, signal?: AbortSignal): Promise<Result<true>>;
+}
+
+// @public (undocumented)
 export type RectificationType = "substitution" | "differences" | "none";
 
 // @public (undocumented)
@@ -486,6 +847,9 @@ export function renderQr(input: QrInvoiceData, options?: {
     readonly millimetres?: number;
     readonly quietZoneMillimetres?: number;
 }): Result<QrCode>;
+
+// @public (undocumented)
+export function resolveAeatEndpoint(environment: AeatEnvironment, endpointId: AeatEndpointId): Result<AeatEndpoint>;
 
 // @public (undocumented)
 export type Result<T> = {
@@ -499,11 +863,49 @@ export type Result<T> = {
 };
 
 // @public (undocumented)
+export interface RetryDecision {
+    // (undocumented)
+    readonly attempt: number;
+    // (undocumented)
+    readonly nextAttemptAt: string | undefined;
+    // (undocumented)
+    readonly reason: string;
+    // (undocumented)
+    readonly retry: boolean;
+}
+
+// @public (undocumented)
+export interface RetryPolicy {
+    // (undocumented)
+    readonly baseDelayMs: number;
+    // (undocumented)
+    readonly jitter: (attempt: number) => number;
+    // (undocumented)
+    readonly maxAttempts: number;
+    // (undocumented)
+    readonly maxDelayMs: number;
+}
+
+// @public (undocumented)
 export class RrsifFingerprint {
     // (undocumented)
     static parse(input: unknown): RrsifFingerprint | undefined;
     // (undocumented)
     readonly value: string;
+}
+
+// @public (undocumented)
+export interface SequenceHead {
+    // (undocumented)
+    readonly contextId: string;
+    // (undocumented)
+    readonly linkDigest: string | undefined;
+    // (undocumented)
+    readonly position: number;
+    // (undocumented)
+    readonly sequenceId: string;
+    // (undocumented)
+    readonly version: number;
 }
 
 // @public
@@ -558,10 +960,99 @@ export interface SignerPort {
 }
 
 // @public (undocumented)
+export interface SoapRequest {
+    // (undocumented)
+    readonly bytes: Uint8Array;
+    // (undocumented)
+    readonly contentType: "text/xml; charset=utf-8";
+    // (undocumented)
+    readonly soapAction: string;
+}
+
+// @public (undocumented)
+export interface StateTransition {
+    // Warning: (ae-forgotten-export) The symbol "StateActor" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    readonly actor: StateActor;
+    // (undocumented)
+    readonly at: string;
+    // (undocumented)
+    readonly attempt: number;
+    // (undocumented)
+    readonly from: RecordState;
+    // (undocumented)
+    readonly reason: string;
+    // (undocumented)
+    readonly recordId: string;
+    // (undocumented)
+    readonly to: RecordState;
+}
+
+// @public (undocumented)
+export interface StoredRecord {
+    // (undocumented)
+    readonly attempt: number;
+    // (undocumented)
+    readonly bytes: Uint8Array;
+    // (undocumented)
+    readonly contextId: string;
+    // (undocumented)
+    readonly createdAt: string;
+    // (undocumented)
+    readonly edition: string;
+    // (undocumented)
+    readonly linkDigest: string;
+    // (undocumented)
+    readonly position: number;
+    // (undocumented)
+    readonly recordDigest: string;
+    // (undocumented)
+    readonly recordId: string;
+    // (undocumented)
+    readonly sequenceId: string;
+    // (undocumented)
+    readonly state: RecordState;
+    // (undocumented)
+    readonly updatedAt: string;
+}
+
+// @public (undocumented)
+export interface SubmissionBatch {
+    // (undocumented)
+    readonly batchId: string;
+    // (undocumented)
+    readonly body: Uint8Array;
+    // (undocumented)
+    readonly createdAt: string;
+    // (undocumented)
+    readonly endpointId: string;
+    // (undocumented)
+    readonly environment: "test" | "production";
+    // (undocumented)
+    readonly recordIds: readonly string[];
+    // (undocumented)
+    readonly records: readonly StoredRecord[];
+    // (undocumented)
+    readonly requestDigest: string;
+}
+
+// @public (undocumented)
 export type TaxpayerCategory = "corporate-taxpayer" | "economic-activity-individual" | "nonresident-permanent-establishment" | "income-allocation-entity" | "outside-article-3-1" | "unknown";
 
 // @public (undocumented)
 export type Territory = "common" | "basque-country" | "navarre" | "unknown";
+
+// @public (undocumented)
+export function transitionRecord(input: {
+    readonly recordId: string;
+    readonly from: RecordState;
+    readonly to: RecordState;
+    readonly reason: string;
+    readonly attempt: number;
+    readonly actor: StateActor;
+    readonly at: string;
+}): Result<StateTransition>;
 
 // @public (undocumented)
 export function validateBillingRecord(input: unknown, signal?: AbortSignal): ValidationResult<ValidatedBillingRecord>;
@@ -698,6 +1189,10 @@ export interface XmlPort {
     // (undocumented)
     serialize(record: unknown, signal?: AbortSignal): Result<Uint8Array>;
 }
+
+// Warnings were encountered during analysis:
+//
+// dist/types/submissions/batch-builder.d.ts:21:5 - (ae-forgotten-export) The symbol "SubmissionHeader" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

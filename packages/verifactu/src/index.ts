@@ -115,10 +115,65 @@ export {
 export type {
   CertificatePort,
   Clock,
+  AeatObservation,
+  AeatRequest,
+  AeatTransport,
+  CommitReceipt,
+  LeaseRequest,
+  Observer,
+  ObservedEvent,
+  OutboxCompletion,
+  OutboxStore,
+  RecordScanInput,
+  RecordStore,
   SignerPort,
   SignatureBackendPort,
   XmlPort,
 } from "./ports/index.js";
+export {
+  genesisHead,
+  nextHead,
+  assertFreshness,
+  canTransition,
+  transitionRecord,
+  type Lease,
+  type OutboxEnqueue,
+  type OutboxState,
+  type OutboxWork,
+  type RecordCommitBundle,
+  type RecordState,
+  type SequenceHead,
+  type StateTransition,
+  type StoredRecord,
+} from "./state/index.js";
+export {
+  buildSubmissionBatch,
+  MAX_BATCH_RECORDS,
+  type SubmissionBatch,
+} from "./submissions/index.js";
+export {
+  listAeatEndpoints,
+  resolveAeatEndpoint,
+  buildSoapRequest,
+  parseSoapEnvelope,
+  parseAeatResponse,
+  type AeatEndpoint,
+  type AeatEndpointId,
+  type AeatEnvironment,
+  type AeatResponseLine,
+  type AeatSubmissionResponse,
+  type AeatLineStatus,
+  type AeatSubmissionStatus,
+  type SoapRequest,
+} from "./transport/index.js";
+export {
+  commitSecuredRecord,
+  createOutboxWork,
+  processQueueOnce,
+  type QueueProcessOptions,
+  type QueueProcessReport,
+} from "./application/index.js";
+export { decideRetry, type RetryDecision, type RetryPolicy } from "./outbox/index.js";
 
 export const editionInfo: EditionInfo = deepFreeze(generatedEditionInfo);
 
