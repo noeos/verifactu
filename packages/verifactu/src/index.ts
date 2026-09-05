@@ -9,8 +9,10 @@ export type EditionId = string & { readonly __brand: "NoeosEditionId" };
 export type EditionInfo = typeof generatedEditionInfo;
 export {
   VERIFACTU_DIAGNOSTIC_SCHEMA,
+  createDiagnostic,
   type DiagnosticCode,
   type DiagnosticDetail,
+  type DiagnosticInput,
   type DiagnosticPhase,
   type DiagnosticSeverity,
   type Diagnostic,
@@ -21,6 +23,7 @@ export type {
   VerifactuError,
   VerifactuErrorCode,
 } from "./diagnostics/result.js";
+export { failure, success, valid, invalid, indeterminate, aborted } from "./diagnostics/result.js";
 export {
   evaluateApplicability,
   type ApplicabilityFactId,
@@ -174,6 +177,27 @@ export {
   type QueueProcessReport,
 } from "./application/index.js";
 export { decideRetry, type RetryDecision, type RetryPolicy } from "./outbox/index.js";
+export { createVerifactu } from "./api/create-verifactu.js";
+export { VECTOR_SET, type VectorSet } from "./vectors.js";
+export type {
+  AltaInput,
+  AnulacionInput,
+  BuildSubmissionInput,
+  CommittedArtifact,
+  EventInput,
+  ExportInput,
+  InspectResponseInput,
+  ProcessQueueInput,
+  ProcessReport,
+  PreparedArtifact,
+  ReconcileInput,
+  ReconciliationReport,
+  RecordVerification,
+  Verifactu,
+  VerifactuConfig,
+  VerifyChainInput,
+  VerifyRecordInput,
+} from "./api/types.js";
 
 export const editionInfo: EditionInfo = deepFreeze(generatedEditionInfo);
 

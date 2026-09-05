@@ -8,8 +8,10 @@ const generated = [
   ".build",
   "packages/verifactu/dist",
   "packages/cli/dist",
+  "packages/adapter-kit/dist",
   "packages/verifactu/temp",
   "packages/cli/temp",
+  "packages/adapter-kit/temp",
 ].map((item) => resolve(projectRoot, item));
 for (const target of generated) await rm(target, { force: true, recursive: true });
 if (process.argv.includes("--clean-only")) process.exit(0);
@@ -17,12 +19,13 @@ const compiler = resolve(projectRoot, "node_modules/typescript/bin/tsc");
 run(process.execPath, [compiler, "--project", "packages/verifactu/tsconfig.esm.json"]);
 run(process.execPath, [compiler, "--project", "packages/verifactu/tsconfig.cjs.json"]);
 run(process.execPath, [compiler, "--project", "packages/cli/tsconfig.json"]);
+run(process.execPath, [compiler, "--project", "packages/adapter-kit/tsconfig.json"]);
 await mkdir(resolve(projectRoot, "packages/verifactu/dist/cjs"), { recursive: true });
 await writeFile(
   resolve(projectRoot, "packages/verifactu/dist/cjs/package.json"),
   stableJson({ type: "commonjs" }),
 );
-for (const packageName of ["verifactu", "cli"]) {
+for (const packageName of ["verifactu", "cli", "adapter-kit"]) {
   await copyFile(
     resolve(projectRoot, "LICENSE"),
     resolve(projectRoot, `packages/${packageName}/LICENSE`),

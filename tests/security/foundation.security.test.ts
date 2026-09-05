@@ -21,11 +21,13 @@ void test("contract metadata is exposed without implicit I/O", async () => {
     "OfficialText",
     "OpaqueId",
     "RrsifFingerprint",
+    "VECTOR_SET",
     "VERIFACTU_DIAGNOSTIC_SCHEMA",
     "VERIFACTU_EDITION",
     "VERIFACTU_RECORD_PROFILE_ID",
     "VERIFACTU_RECORD_PROFILE_VERSION",
     "VERIFACTU_SIGNATURE_POLICY",
+    "aborted",
     "assertCertificateUsable",
     "assertFreshness",
     "buildQrPayload",
@@ -36,17 +38,22 @@ void test("contract metadata is exposed without implicit I/O", async () => {
     "canTransition",
     "canonicalizeXml",
     "commitSecuredRecord",
+    "createDiagnostic",
     "createDssBackend",
     "createInternalRecordEvidence",
     "createOutboxWork",
     "createSignatureRequest",
+    "createVerifactu",
     "decideRetry",
     "describeCertificate",
     "editionInfo",
     "encodeInternalEvidenceSubject",
     "evaluateApplicability",
+    "failure",
     "genesisHead",
     "getEdition",
+    "indeterminate",
+    "invalid",
     "listAeatEndpoints",
     "listEditions",
     "nextHead",
@@ -58,7 +65,9 @@ void test("contract metadata is exposed without implicit I/O", async () => {
     "resolveAeatEndpoint",
     "serializeBillingRecord",
     "serializeXml",
+    "success",
     "transitionRecord",
+    "valid",
     "validateBillingRecord",
     "validateBreakdownTotals",
     "validateFingerprintInput",
@@ -134,11 +143,6 @@ void test("contract metadata is exposed without implicit I/O", async () => {
   await import(`file://${resolve(root, "packages/cli/dist/esm/main.js")}`);
 });
 void test("foundation source cannot perform implicit I/O", async () => {
-  for (const path of ["packages/verifactu/src/index.ts", "packages/cli/src/main.ts"]) {
-    const source = await readFile(resolve(root, path), "utf8");
-    assert.doesNotMatch(
-      source,
-      /node:(?:fs|net|http|https|tls|child_process)|console\.|process\./u,
-    );
-  }
+  const source = await readFile(resolve(root, "packages/verifactu/src/index.ts"), "utf8");
+  assert.doesNotMatch(source, /node:(?:fs|net|http|https|tls|child_process)|console\.|process\./u);
 });

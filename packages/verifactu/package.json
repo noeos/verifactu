@@ -83,6 +83,16 @@
       "types": "./dist/types/outbox/index.d.ts",
       "import": "./dist/esm/outbox/index.js",
       "require": "./dist/cjs/outbox/index.js"
+    },
+    "./adapters": {
+      "types": "./dist/types/adapters/index.d.ts",
+      "import": "./dist/esm/adapters/index.js",
+      "require": "./dist/cjs/adapters/index.js"
+    },
+    "./vectors": {
+      "types": "./dist/types/vectors.d.ts",
+      "import": "./dist/esm/vectors.js",
+      "require": "./dist/cjs/vectors.js"
     }
   },
   "files": [
