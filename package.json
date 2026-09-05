@@ -60,6 +60,7 @@
     "@eslint/js": "10.0.1",
     "@microsoft/api-extractor": "7.59.0",
     "@types/node": "24.13.3",
+    "@types/qrcode": "1.5.5",
     "@xmldom/xmldom": "0.9.12",
     "ajv": "8.20.0",
     "eslint": "10.9.1",
@@ -68,5 +69,8 @@
     "prettier": "3.9.6",
     "typescript": "5.9.3",
     "typescript-eslint": "8.68.0"
+  },
+  "dependencies": {
+    "qrcode": "1.5.4"
   }
 }

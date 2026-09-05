@@ -78,6 +78,47 @@ export {
   type ValidatedBillingRecord,
 } from "./validation/record.js";
 export { validateBreakdownTotals, type BreakdownTotals } from "./validation/totals.js";
+export {
+  parseSecureXml,
+  serializeXml,
+  canonicalizeXml,
+  type XmlElement,
+  type XmlNode,
+  type XmlLimits,
+} from "./xml/codec.js";
+export { serializeBillingRecord } from "./xml/records.js";
+export {
+  buildQrPayload,
+  renderQr,
+  type QrCode,
+  type QrEnvironment,
+  type QrInvoiceData,
+} from "./qr/index.js";
+export {
+  assertCertificateUsable,
+  describeCertificate,
+  type CertificateDescriptor,
+  type CertificateHandle,
+  type CertificateProvider,
+} from "./certificates/index.js";
+export {
+  VERIFACTU_SIGNATURE_POLICY,
+  createDssBackend,
+  createSignatureRequest,
+  validateXadesEnvelope,
+  type SignatureProfile,
+  type SignatureRequest,
+  type SignatureResult,
+  type DssBridge,
+  type XadesBackend,
+} from "./signatures/index.js";
+export type {
+  CertificatePort,
+  Clock,
+  SignerPort,
+  SignatureBackendPort,
+  XmlPort,
+} from "./ports/index.js";
 
 export const editionInfo: EditionInfo = deepFreeze(generatedEditionInfo);
 
