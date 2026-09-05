@@ -17,9 +17,12 @@ if (mode === "fetch" && !process.argv.includes("--fetch")) {
 const maxBytes = 64 * 1024 * 1024;
 const maxRedirects = 2;
 const timeoutMs = 30_000;
+const approvedOrigin =
+  "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/";
 const artifacts = [...(manifest.artifacts ?? [])];
 if (artifacts.length === 0) throw new Error("Regulatory manifest has no artifacts.");
-const allowedHostname = new URL(manifest.baseUrl).hostname;
+if (manifest.baseUrl !== approvedOrigin) throw new Error("Unapproved regulatory origin.");
+const allowedHostname = new URL(approvedOrigin).hostname;
 
 await mkdir(raw, { recursive: true });
 const provenance = [];
@@ -32,7 +35,7 @@ for (const artifact of artifacts) {
     await writeVerifiedSnapshot(target, result.bytes);
     provenance.push({
       id: artifact.id,
-      url: artifact.url ?? `${manifest.baseUrl}${artifact.file}`,
+      url: approvedArtifactUrl(artifact),
       status: result.status,
       mediaType: result.mediaType,
       bytes: result.bytes.length,
@@ -67,12 +70,6 @@ if (mode === "fetch") {
       expected.sha256 !== item.sha256 ||
       expected.sha512 !== item.sha512
     ) {
-      // codeql[js/http-to-file-access]: this report contains only bounded metadata after digest
-      // verification; it never persists untrusted source bytes.
-      await writeFile(
-        resolve(snapshot, "drift-report.json"),
-        stableJson({ edition, status: "indeterminate", reason: "digest-mismatch", item }),
-      );
       throw new Error(`Regulatory digest mismatch: ${item.id}`);
     }
   }
@@ -98,14 +95,15 @@ await writeFile(
 console.log(`Regulatory snapshot verified: ${edition}, ${artifacts.length} artifacts, ${mode}.`);
 
 async function downloadArtifact(artifact) {
-  const url = artifact.url ?? `${manifest.baseUrl}${artifact.file}`;
+  // Resolve network destinations exclusively from the reviewed, compile-time allowlist below.
+  // The manifest may tighten a digest or metadata, but cannot redirect this process to an
+  // arbitrary endpoint. This also makes the network trust boundary explicit to static analysis.
+  const url = approvedArtifactUrl(artifact);
   let current = new URL(url);
   for (let redirect = 0; redirect <= maxRedirects; redirect += 1) {
     if (current.protocol !== "https:") throw new Error(`HTTPS required: ${current.href}`);
     if (current.hostname !== allowedHostname)
       throw new Error(`Unapproved regulatory host: ${current.hostname}`);
-    // codeql[js/file-access-to-http]: URL comes from the reviewed hash-pinned manifest and is
-    // constrained to the approved HTTPS authority before this request.
     const response = await fetch(current, {
       redirect: "manual",
       signal: AbortSignal.timeout(timeoutMs),
@@ -161,9 +159,36 @@ function assertDigest(artifact, bytes) {
 }
 
 async function writeVerifiedSnapshot(target, bytes) {
-  // codeql[js/http-to-file-access] codeql[js/network-data-written-to-file]: bytes are explicitly
-  // verified against the pinned digest and target is a safe child of the reviewed snapshot.
   await writeFile(target, bytes, { mode: 0o644 });
+}
+
+function approvedArtifactUrl(artifact) {
+  const path = (() => {
+    switch (artifact.id) {
+      case "AEAT-WSDL-SIF-1.0":
+        return "SistemaFacturacion.wsdl";
+      case "AEAT-XSD-SUMINISTRO-LR-1.0":
+        return "SuministroLR.xsd";
+      case "AEAT-XSD-RESPUESTA-SUMINISTRO-1.0":
+        return "RespuestaSuministro.xsd";
+      case "AEAT-XSD-CONSULTA-LR-1.0":
+        return "ConsultaLR.xsd";
+      case "AEAT-XSD-RESPUESTA-CONSULTA-LR-1.0":
+        return "RespuestaConsultaLR.xsd";
+      case "AEAT-XSD-SUMINISTRO-INFORMACION-1.0":
+        return "SuministroInformacion.xsd";
+      case "AEAT-XSD-EVENTOS-SIF-1.0":
+        return "EventosSIF.xsd";
+      case "AEAT-XSD-RESPUESTA-VALIDACION-NVF-1.0":
+        return "RespuestaValRegistNoVeriFactu.xsd";
+      default:
+        throw new Error(`Unapproved regulatory artifact: ${artifact.id}`);
+    }
+  })();
+  const url = `${approvedOrigin}${path}`;
+  if (artifact.file !== path || (artifact.url !== undefined && artifact.url !== url))
+    throw new Error(`Regulatory manifest URL mismatch: ${artifact.id}`);
+  return url;
 }
 
 function digest(bytes, algorithm) {
