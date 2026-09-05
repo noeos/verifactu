@@ -25,3 +25,5 @@ Use `git commit --signoff`. The author certifies the right to contribute under A
 PRs are mandatory. Required checks, conversations, generated contracts, traceability and evidence must complete. Do not weaken a gate, accept unexplained flakiness, regenerate expected bytes without reviewing the diff or convert an indeterminate result into success.
 
 Third-party code, standards, examples or assets require source, version, license/reuse terms, modifications and approval. Unknown licensing blocks inclusion.
+
+The pinned Node/npm toolchain and `npm run ci` must pass before every PR. Regulatory source changes require provenance, hashes, contract generation, independent review and a documented decision. Never include taxpayer data, credentials or private keys in code, tests, fixtures, logs or issue reports.

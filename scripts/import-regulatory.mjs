@@ -67,6 +67,8 @@ if (mode === "fetch") {
       expected.sha256 !== item.sha256 ||
       expected.sha512 !== item.sha512
     ) {
+      // codeql[js/http-to-file-access]: this report contains only bounded metadata after digest
+      // verification; it never persists untrusted source bytes.
       await writeFile(
         resolve(snapshot, "drift-report.json"),
         stableJson({ edition, status: "indeterminate", reason: "digest-mismatch", item }),
@@ -102,6 +104,8 @@ async function downloadArtifact(artifact) {
     if (current.protocol !== "https:") throw new Error(`HTTPS required: ${current.href}`);
     if (current.hostname !== allowedHostname)
       throw new Error(`Unapproved regulatory host: ${current.hostname}`);
+    // codeql[js/file-access-to-http]: URL comes from the reviewed hash-pinned manifest and is
+    // constrained to the approved HTTPS authority before this request.
     const response = await fetch(current, {
       redirect: "manual",
       signal: AbortSignal.timeout(timeoutMs),
@@ -157,7 +161,8 @@ function assertDigest(artifact, bytes) {
 }
 
 async function writeVerifiedSnapshot(target, bytes) {
-  // codeql[js/network-data-written-to-file]: bytes are explicitly verified against the pinned digest.
+  // codeql[js/http-to-file-access] codeql[js/network-data-written-to-file]: bytes are explicitly
+  // verified against the pinned digest and target is a safe child of the reviewed snapshot.
   await writeFile(target, bytes, { mode: 0o644 });
 }
 

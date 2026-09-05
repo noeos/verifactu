@@ -15,3 +15,5 @@ import "./fuzz/phase4.fuzz.test.js";
 import "./unit/phase5.unit.test.js";
 import "./unit/phase6-7.unit.test.js";
 import "./unit/phase8.unit.test.js";
+import "./unit/phase9.unit.test.js";
+import "./e2e/phase9-cli.e2e.test.js";
