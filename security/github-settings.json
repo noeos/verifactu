@@ -30,7 +30,7 @@
       "requireLinearHistory": true,
       "requirePullRequest": true,
       "requireSignedCommits": true,
-      "requiredApprovingReviewCount": 1,
+      "requiredApprovingReviewCount": 2,
       "requiredChecks": [
         "Required · quality and policy",
         "Required · regulatory sources and traceability",

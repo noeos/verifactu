@@ -17,7 +17,7 @@ Baseline equivalente a `verification-engine`, auditado por script y snapshot en 
 
 ## Rulesets
 
-`main`: commits firmados, PR, checks estrictos, historial lineal, resolución de conversaciones, stale reviews descartadas, cambios no atribuidos con aprobación adicional y sin borrado/force-push/bypass. Con un único mantenedor, aprobación mínima 0; cuando exista un segundo mantenedor elegible se activan code-owner review y aprobación del último push sin reducir checks.
+`main`: commits firmados, PR, dos aprobaciones independientes, revisión CODEOWNERS, aprobación del último push, checks estrictos, historial lineal, resolución de conversaciones, stale reviews descartadas, cambios no atribuidos con aprobación adicional y sin borrado/force-push/bypass. El ruleset no contiene bypasses permanentes; cualquier excepción administrativa puntual queda registrada en el expediente de entrega.
 
 Checks requeridos previstos:
 
