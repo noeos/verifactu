@@ -11,7 +11,8 @@ Se verificará independientemente:
 - paquetes npm coinciden con assets y checksums;
 - provenance/attestations pertenecen al workflow y commit esperados;
 - vectores publicados funcionan desde instalación limpia;
-- no hay alerts, secretos, dependencias o fuentes sin revisar;
+- no hay alertas de CodeQL, secretos, dependencias o fuentes sin revisar; los indicadores de
+  madurez de Scorecard se revisan y documentan, sin ocultarlos mediante dismissals;
 - afirmaciones públicas coinciden con limitaciones.
 
 Ausencia de autoridad independiente se declara. La auditoría interna no se denomina certificación legal.
