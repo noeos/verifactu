@@ -19,6 +19,10 @@ Baseline equivalente a `verification-engine`, auditado por script y snapshot en 
 
 `main`: commits firmados, PR, dos aprobaciones independientes, revisión CODEOWNERS, aprobación del último push, checks estrictos, historial lineal, resolución de conversaciones, stale reviews descartadas, cambios no atribuidos con aprobación adicional y sin borrado/force-push/bypass. El ruleset no contiene bypasses permanentes; cualquier excepción administrativa puntual queda registrada en el expediente de entrega.
 
+La protección clásica de la rama se mantiene sincronizada como segunda barrera: aplica a
+administradores, exige las mismas revisiones y checks, resolución de conversaciones, historial
+lineal, commits firmados y no permite borrado ni force-push.
+
 Checks requeridos previstos:
 
 - `Required · quality and policy`;
