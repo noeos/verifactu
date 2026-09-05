@@ -96,7 +96,7 @@ void test("submission batches are bounded, deterministic and parseable as SOAP",
     batchId: "b1",
     environment: "test",
     endpointId: "verifactu",
-    records: [{ ...sampleRecord(), contextId: "A12345678" }],
+    records: [{ ...sampleRecord(), position: 7 }],
     createdAt: NOW,
     header: {
       obligadoNif: "A12345678",
