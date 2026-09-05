@@ -36,11 +36,17 @@ export function buildSubmissionBatch(input: {
         path: "/records",
       }),
     ]);
+  const first = input.records.at(0);
+  if (first === undefined)
+    return failure("INVALID_INPUT", [
+      createDiagnostic({ code: "VF_INPUT_REQUIRED", severity: "error", phase: "record" }),
+    ]);
   if (
     input.records.some(
       (record, index) =>
-        record.position !== index ||
-        record.contextId !== input.header.obligadoNif ||
+        record.contextId !== first.contextId ||
+        record.sequenceId !== first.sequenceId ||
+        record.position !== first.position + index ||
         record.bytes.byteLength === 0,
     )
   )
