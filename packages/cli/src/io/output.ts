@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-/* eslint-disable @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-empty-function */
-
 import { open, rename, rm, lstat } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { Writable } from "node:stream";
@@ -19,7 +17,7 @@ export async function openWriter(
   if (path === undefined) return new StreamWriter(format, stdout);
   const target = resolve(path);
   await ensure(target, force);
-  const temp = `${target}.noeos-${process.pid}`;
+  const temp = `${target}.noeos-${String(process.pid)}`;
   const handle = await open(temp, "wx", 0o600);
   return new FileWriter(format, handle, target, temp);
 }
@@ -44,7 +42,10 @@ class StreamWriter implements LineWriter {
         this.stream.once("error", error);
       });
   }
-  async close(): Promise<void> {}
+  async close(_success: boolean): Promise<void> {
+    void _success;
+    await Promise.resolve();
+  }
 }
 class FileWriter implements LineWriter {
   constructor(
@@ -64,9 +65,14 @@ class FileWriter implements LineWriter {
   }
 }
 function format(kind: OutputFormat, value: unknown): string {
-  if (kind === "human")
-    return `${typeof value === "object" && value !== null && "operation" in value ? String((value as { operation?: unknown }).operation) : "operation"}\n`;
-  return `${JSON.stringify(value)}\n`;
+  if (kind === "human") return `${operationName(value)}\n`;
+  const json = JSON.stringify(value);
+  return `${typeof json === "string" ? json : "null"}\n`;
+}
+function operationName(value: unknown): string {
+  if (typeof value !== "object" || value === null || !("operation" in value)) return "operation";
+  const operation = value.operation;
+  return typeof operation === "string" ? operation : "operation";
 }
 async function ensure(path: string, force: boolean): Promise<void> {
   try {

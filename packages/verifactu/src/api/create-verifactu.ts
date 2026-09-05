@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/consistent-type-imports, @typescript-eslint/no-unsafe-type-assertion */
-
 import { createHash } from "node:crypto";
 import { evaluateApplicability as evaluate } from "../domain/applicability.js";
 import { createDiagnostic } from "../diagnostics/diagnostic.js";
@@ -26,6 +24,7 @@ import {
 import { buildQrPayload, renderQr, type QrCode, type QrInvoiceData } from "../qr/index.js";
 import { buildSubmissionBatch, type SubmissionHeader } from "../submissions/batch-builder.js";
 import { resolveAeatEndpoint, type AeatEndpointId } from "../transport/endpoints.js";
+import type { SubmissionBatch } from "../submissions/model.js";
 import { parseAeatResponse, type AeatSubmissionResponse } from "../transport/response.js";
 import { commitSecuredRecord, processQueueOnce } from "../application/index.js";
 import type { SequenceHead, StoredRecord } from "../state/model.js";
@@ -80,7 +79,7 @@ class VerifactuImpl implements Verifactu {
         : never
   > {
     const result = evaluate(input);
-    return result.status === "valid" && result.value !== undefined
+    return result.status === "valid"
       ? success(result.value, result.diagnostics)
       : failure("INVALID_INPUT", result.diagnostics);
   }
@@ -167,6 +166,7 @@ class VerifactuImpl implements Verifactu {
       recordId?: string;
     }>
   > {
+    await Promise.resolve();
     if (signal?.aborted === true)
       return {
         status: "aborted",
@@ -249,17 +249,18 @@ class VerifactuImpl implements Verifactu {
         ]);
   }
 
-  async buildSubmission(
-    input: BuildSubmissionInput,
-  ): Promise<Result<import("../submissions/model.js").SubmissionBatch>> {
+  async buildSubmission(input: BuildSubmissionInput): Promise<Result<SubmissionBatch>> {
+    await Promise.resolve();
     const header = input.header;
     if (header === undefined) return unsupported("header");
-    const endpoint = resolveAeatEndpoint(input.environment, input.endpointId as AeatEndpointId);
+    if (!isAeatEndpointId(input.endpointId)) return unsupported("endpointId");
+    if (!isSubmissionHeader(header)) return unsupported("header");
+    const endpoint = resolveAeatEndpoint(input.environment, input.endpointId);
     if (!endpoint.ok) return endpoint;
     return buildSubmissionBatch({
       ...input,
       endpointId: endpoint.value.id,
-      header: header as unknown as SubmissionHeader,
+      header,
     });
   }
 
@@ -336,6 +337,7 @@ class VerifactuImpl implements Verifactu {
     value: unknown,
     signal?: AbortSignal,
   ): Promise<Result<PreparedArtifact>> {
+    await Promise.resolve();
     if (signal?.aborted === true) return abortedResult();
     if (typeof recordId !== "string" || recordId.length === 0)
       return failure("INVALID_INPUT", [
@@ -452,6 +454,32 @@ function isPreparedArtifact(value: unknown): value is PreparedArtifact {
     (value["kind"] === "alta" || value["kind"] === "anulacion" || value["kind"] === "event") &&
     value["bytes"] instanceof Uint8Array &&
     typeof value["fingerprint"] === "string"
+  );
+}
+function isAeatEndpointId(value: string): value is AeatEndpointId {
+  return (
+    value === "verifactu" ||
+    value === "requerimiento" ||
+    value === "verifactu-sello" ||
+    value === "requerimiento-sello"
+  );
+}
+function isSubmissionHeader(value: unknown): value is SubmissionHeader {
+  if (!isRecord(value)) return false;
+  const required = [
+    "obligadoNif",
+    "idVersion",
+    "nombreSistemaInformatico",
+    "idSistemaInformatico",
+    "version",
+    "numeroInstalacion",
+    "tipoUsoPosibleMultiOT",
+    "tipoUsoPosibleSoloVerifactu",
+  ] as const;
+  return (
+    required.every((key) => typeof value[key] === "string") &&
+    (value["tipoUsoPosibleMultiOT"] === "S" || value["tipoUsoPosibleMultiOT"] === "N") &&
+    (value["tipoUsoPosibleSoloVerifactu"] === "S" || value["tipoUsoPosibleSoloVerifactu"] === "N")
   );
 }
 function unsupported(path: string): Result<never> {

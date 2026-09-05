@@ -48,6 +48,17 @@ export async function runAdapterConformance(
   );
   scenarios.push(
     Object.freeze({
+      id: "record-store.bytes-isolation",
+      status:
+        input.recordStore === undefined
+          ? "not-applicable"
+          : (await checkRecordBytesIsolation(input.recordStore))
+            ? "passed"
+            : "failed",
+    }),
+  );
+  scenarios.push(
+    Object.freeze({
       id: "outbox.fencing",
       status:
         input.outboxStore === undefined
@@ -57,9 +68,22 @@ export async function runAdapterConformance(
             : "failed",
     }),
   );
-  const status = scenarios.every((scenario) => scenario.status === "not-applicable")
-    ? ("not-applicable" as const)
-    : ("passed" as const);
+  scenarios.push(
+    Object.freeze({
+      id: "outbox.idempotency",
+      status:
+        input.outboxStore === undefined
+          ? "not-applicable"
+          : (await checkOutboxIdempotency(input.outboxStore))
+            ? "passed"
+            : "failed",
+    }),
+  );
+  const status = scenarios.some((scenario) => scenario.status === "failed")
+    ? ("failed" as const)
+    : scenarios.every((scenario) => scenario.status === "not-applicable")
+      ? ("not-applicable" as const)
+      : ("passed" as const);
   return success(
     Object.freeze({
       name: input.name,
@@ -68,6 +92,15 @@ export async function runAdapterConformance(
       status,
     }),
   );
+}
+
+async function checkRecordBytesIsolation(store: RecordStore): Promise<boolean> {
+  const record = await store.read("adapter-kit-record");
+  if (!record.ok || record.value === undefined) return false;
+  const original = record.value.bytes[0];
+  record.value.bytes[0] = 255;
+  const reread = await store.read("adapter-kit-record");
+  return reread.ok && reread.value?.bytes[0] === original;
 }
 
 async function checkRecordStore(store: RecordStore): Promise<boolean> {
@@ -160,4 +193,16 @@ async function checkOutboxStore(store: OutboxStore): Promise<boolean> {
     "2026-01-01T00:00:02.000Z",
   );
   return completed.ok && completed.value.state === "completed";
+}
+
+async function checkOutboxIdempotency(store: OutboxStore): Promise<boolean> {
+  const inspected = await store.inspect("adapter-kit-work");
+  if (!inspected.ok || inspected.value === undefined) return false;
+  const result = await store.complete(
+    "adapter-kit-work",
+    inspected.value.lease ?? Object.freeze({ token: "", fencing: 0, owner: "", expiresAt: "" }),
+    { state: "completed" },
+    "2026-01-01T00:00:03.000Z",
+  );
+  return !result.ok;
 }

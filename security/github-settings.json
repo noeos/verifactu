@@ -23,14 +23,14 @@
       "bypassActors": [],
       "dismissStaleReviews": true,
       "enforcement": "active",
-      "requireCodeOwnerReview": false,
+      "requireCodeOwnerReview": true,
       "requireConversationResolution": true,
       "requireExtraApprovalForUnattributedChanges": true,
       "requireLastPushApproval": false,
       "requireLinearHistory": true,
       "requirePullRequest": true,
       "requireSignedCommits": true,
-      "requiredApprovingReviewCount": 0,
+      "requiredApprovingReviewCount": 1,
       "requiredChecks": [
         "Required · quality and policy",
         "Required · regulatory sources and traceability",
@@ -45,7 +45,9 @@
         "Required · CodeQL",
         "Required · secret scan",
         "Required · OSV",
-        "Required · npm audit and license inventory"
+        "Required · npm audit and license inventory",
+        "Required · phase 9 performance budgets",
+        "Required · application security boundaries"
       ],
       "strictRequiredChecks": true
     }
