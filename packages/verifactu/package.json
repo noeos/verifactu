@@ -33,6 +33,31 @@
       "types": "./dist/types/catalogs.d.ts",
       "import": "./dist/esm/catalogs.js",
       "require": "./dist/cjs/catalogs.js"
+    },
+    "./xml": {
+      "types": "./dist/types/xml/index.d.ts",
+      "import": "./dist/esm/xml/index.js",
+      "require": "./dist/cjs/xml/index.js"
+    },
+    "./qr": {
+      "types": "./dist/types/qr/public.d.ts",
+      "import": "./dist/esm/qr/public.js",
+      "require": "./dist/cjs/qr/public.js"
+    },
+    "./signatures": {
+      "types": "./dist/types/signatures/public.d.ts",
+      "import": "./dist/esm/signatures/public.js",
+      "require": "./dist/cjs/signatures/public.js"
+    },
+    "./certificates": {
+      "types": "./dist/types/certificates/public.d.ts",
+      "import": "./dist/esm/certificates/public.js",
+      "require": "./dist/cjs/certificates/public.js"
+    },
+    "./ports": {
+      "types": "./dist/types/ports/index.d.ts",
+      "import": "./dist/esm/ports/index.js",
+      "require": "./dist/cjs/ports/index.js"
     }
   },
   "files": [
@@ -43,7 +68,9 @@
     "README.md"
   ],
   "dependencies": {
-    "@noeos/verification-engine": "1.0.1"
+    "@noeos/verification-engine": "1.0.1",
+    "@xmldom/xmldom": "0.9.12",
+    "qrcode": "1.5.4"
   },
   "repository": {
     "type": "git",

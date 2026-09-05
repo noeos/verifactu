@@ -147,6 +147,9 @@ export interface ApplicabilityFacts {
 }
 
 // @public (undocumented)
+export function assertCertificateUsable(descriptor: CertificateDescriptor, at: Date): Result<CertificateDescriptor>;
+
+// @public (undocumented)
 export interface BreakdownTotals {
     // (undocumented)
     readonly declaredTaxMinorUnits: bigint;
@@ -161,13 +164,72 @@ export interface BreakdownTotals {
 }
 
 // @public (undocumented)
+export function buildQrPayload(input: QrInvoiceData): Result<string>;
+
+// @public (undocumented)
 export function buildRrsifPreimage(input: FingerprintInput): string;
 
 // @public (undocumented)
 export function calculateRrsifFingerprint(input: FingerprintInput): FingerprintComputation;
 
 // @public (undocumented)
+export function canonicalizeXml(root: XmlElement): Uint8Array;
+
+// @public (undocumented)
+export interface CertificateDescriptor {
+    // (undocumented)
+    readonly derSha256: string;
+    // (undocumented)
+    readonly id: string;
+    // (undocumented)
+    readonly issuer: string;
+    // (undocumented)
+    readonly notAfter: string;
+    // (undocumented)
+    readonly notBefore: string;
+    // (undocumented)
+    readonly qualified: boolean;
+    // (undocumented)
+    readonly serialNumber: string;
+    // (undocumented)
+    readonly subject: string;
+}
+
+// @public (undocumented)
+export interface CertificateHandle {
+    // (undocumented)
+    readonly descriptor: CertificateDescriptor;
+    readonly sign: (algorithm: "RSA-SHA256" | "RSA-SHA384" | "RSA-SHA512", data: Uint8Array, signal?: AbortSignal) => Promise<Uint8Array>;
+}
+
+// @public (undocumented)
+export interface CertificatePort extends CertificateProvider {
+    // (undocumented)
+    chain(handle: CertificateHandle, signal?: AbortSignal): Promise<Result<readonly CertificateHandle[]>>;
+    // (undocumented)
+    readonly id: string;
+}
+
+// @public (undocumented)
+export interface CertificateProvider {
+    // (undocumented)
+    select(subjectNif: string, at: Date, signal?: AbortSignal): Promise<Result<CertificateHandle>>;
+}
+
+// @public (undocumented)
+export interface Clock {
+    // (undocumented)
+    now(): Date;
+}
+
+// @public
+export function createDssBackend(bridge: DssBridge): XadesBackend;
+
+// @public (undocumented)
 export function createInternalRecordEvidence(input: unknown): Result<InternalRecordEvidence>;
+
+// @public (undocumented)
+export function createSignatureRequest(input: Omit<SignatureRequest, "profile">): SignatureRequest;
 
 // @public (undocumented)
 export class DecimalLexeme {
@@ -187,6 +249,9 @@ export class DecimalLexeme {
 
 // @public (undocumented)
 export type DeclaredFact = "yes" | "no" | "unknown";
+
+// @public (undocumented)
+export function describeCertificate(id: string, der: Uint8Array, qualified?: boolean): Result<CertificateDescriptor>;
 
 // @public (undocumented)
 export interface Diagnostic {
@@ -213,7 +278,7 @@ export interface Diagnostic {
 }
 
 // @public (undocumented)
-export type DiagnosticCode = "VF_INPUT_REQUIRED" | "VF_INPUT_TYPE_INVALID" | "VF_INPUT_PROPERTY_UNKNOWN" | "VF_INPUT_PROPERTY_MISSING" | "VF_INPUT_VALUE_INVALID" | "VF_INPUT_LIMIT_EXCEEDED" | "VF_INPUT_ABORTED" | "VF_APPLICABILITY_FACT_MISSING" | "VF_APPLICABILITY_EXCLUDED" | "VF_RECORD_RULE_FAILED" | "VF_RECORD_EXTERNAL_FACT_MISSING" | "VF_RECORD_TOTAL_MISMATCH" | "VF_RECORD_TOTAL_CHECK_NOT_APPLICABLE" | "VF_CATALOG_VALUE_UNKNOWN" | "VF_FINGERPRINT_FORMAT_INVALID" | "VF_FINGERPRINT_MISMATCH" | "VF_CHAIN_REFERENCE_INVALID" | "VF_EVIDENCE_INPUT_INVALID" | "VF_EVIDENCE_ENGINE_REJECTED" | "VF_EVIDENCE_MISMATCH" | "VF_DIAGNOSTICS_TRUNCATED" | "VF_EDITION_UNKNOWN";
+export type DiagnosticCode = "VF_INPUT_REQUIRED" | "VF_INPUT_TYPE_INVALID" | "VF_INPUT_PROPERTY_UNKNOWN" | "VF_INPUT_PROPERTY_MISSING" | "VF_INPUT_VALUE_INVALID" | "VF_INPUT_LIMIT_EXCEEDED" | "VF_INPUT_ABORTED" | "VF_APPLICABILITY_FACT_MISSING" | "VF_APPLICABILITY_EXCLUDED" | "VF_RECORD_RULE_FAILED" | "VF_RECORD_EXTERNAL_FACT_MISSING" | "VF_RECORD_TOTAL_MISMATCH" | "VF_RECORD_TOTAL_CHECK_NOT_APPLICABLE" | "VF_CATALOG_VALUE_UNKNOWN" | "VF_FINGERPRINT_FORMAT_INVALID" | "VF_FINGERPRINT_MISMATCH" | "VF_CHAIN_REFERENCE_INVALID" | "VF_EVIDENCE_INPUT_INVALID" | "VF_EVIDENCE_ENGINE_REJECTED" | "VF_EVIDENCE_MISMATCH" | "VF_DIAGNOSTICS_TRUNCATED" | "VF_EDITION_UNKNOWN" | "VF_XML_MALFORMED" | "VF_XML_UNSAFE" | "VF_XML_LIMIT_EXCEEDED" | "VF_XML_SCHEMA_INVALID" | "VF_QR_INPUT_INVALID" | "VF_QR_UNSUPPORTED" | "VF_CERTIFICATE_INVALID" | "VF_CERTIFICATE_UNTRUSTED" | "VF_SIGNATURE_INVALID" | "VF_SIGNATURE_UNAVAILABLE";
 
 // @public (undocumented)
 export type DiagnosticDetail = string | number | boolean | null;
@@ -223,6 +288,14 @@ export type DiagnosticPhase = "input" | "applicability" | "record" | "catalog" |
 
 // @public (undocumented)
 export type DiagnosticSeverity = "error" | "warning" | "info";
+
+// @public (undocumented)
+export interface DssBridge {
+    // (undocumented)
+    readonly sign: (request: SignatureRequest) => Promise<Result<SignatureResult>>;
+    // (undocumented)
+    readonly verify: (xml: Uint8Array, signal?: AbortSignal) => Promise<Result<boolean>>;
+}
 
 // @public (undocumented)
 export type EditionId = string & {
@@ -350,6 +423,9 @@ export class OpaqueId {
 }
 
 // @public (undocumented)
+export function parseSecureXml(input: string | Uint8Array, limits?: XmlLimits): Result<XmlElement>;
+
+// @public (undocumented)
 export type PreviousFingerprint = {
     readonly kind: "genesis";
 } | {
@@ -370,7 +446,46 @@ export type ProducerFingerprintIdentity = {
 };
 
 // @public (undocumented)
+export interface QrCode {
+    // (undocumented)
+    readonly correctionLevel: "M";
+    // (undocumented)
+    readonly millimetres: number;
+    // (undocumented)
+    readonly modules: number;
+    // (undocumented)
+    readonly payload: string;
+    // (undocumented)
+    readonly quietZoneMillimetres: number;
+    // (undocumented)
+    readonly svg: string;
+}
+
+// @public (undocumented)
+export type QrEnvironment = "production" | "test";
+
+// @public (undocumented)
+export interface QrInvoiceData {
+    // (undocumented)
+    readonly environment?: QrEnvironment;
+    // (undocumented)
+    readonly invoiceNumber: string;
+    // (undocumented)
+    readonly issueDate: string;
+    // (undocumented)
+    readonly nif: string;
+    // (undocumented)
+    readonly total: string;
+}
+
+// @public (undocumented)
 export type RectificationType = "substitution" | "differences" | "none";
+
+// @public (undocumented)
+export function renderQr(input: QrInvoiceData, options?: {
+    readonly millimetres?: number;
+    readonly quietZoneMillimetres?: number;
+}): Result<QrCode>;
 
 // @public (undocumented)
 export type Result<T> = {
@@ -389,6 +504,57 @@ export class RrsifFingerprint {
     static parse(input: unknown): RrsifFingerprint | undefined;
     // (undocumented)
     readonly value: string;
+}
+
+// @public
+export function serializeBillingRecord(record: ValidatedBillingRecord, signal?: AbortSignal): Result<Uint8Array>;
+
+// @public (undocumented)
+export function serializeXml(root: XmlElement): string;
+
+// @public (undocumented)
+export type SignatureBackendPort = XadesBackend;
+
+// @public (undocumented)
+export type SignatureProfile = "xades-epes";
+
+// @public (undocumented)
+export interface SignatureRequest {
+    // (undocumented)
+    readonly certificate: CertificateHandle;
+    // (undocumented)
+    readonly profile?: SignatureProfile;
+    // (undocumented)
+    readonly recordId: string;
+    // (undocumented)
+    readonly recordXml: Uint8Array;
+    // (undocumented)
+    readonly signal?: AbortSignal;
+}
+
+// @public (undocumented)
+export interface SignatureResult {
+    // (undocumented)
+    readonly certificateId: string;
+    // (undocumented)
+    readonly profile: SignatureProfile;
+    // (undocumented)
+    readonly recordSha256: string;
+    // (undocumented)
+    readonly signedRecordId: string;
+    // (undocumented)
+    readonly xml: Uint8Array;
+}
+
+// @public (undocumented)
+export interface SignerPort {
+    // (undocumented)
+    describe(): Readonly<{
+        readonly id: string;
+        readonly profiles: readonly SignatureProfile[];
+    }>;
+    // (undocumented)
+    sign(recordXml: Uint8Array, recordId: string, profile: SignatureProfile, signal?: AbortSignal): Promise<Result<SignatureResult>>;
 }
 
 // @public (undocumented)
@@ -434,6 +600,12 @@ export type ValidatedBillingRecord = ValidatedAltaRecord | ValidatedAnulacionRec
 export function validateFingerprintInput(input: unknown): ValidationResult<FingerprintInput>;
 
 // @public (undocumented)
+export function validateXadesEnvelope(xml: Uint8Array): Result<{
+    readonly recordSha256: string;
+    readonly hasPolicy: true;
+}>;
+
+// @public (undocumented)
 export type ValidationResult<T> = {
     readonly status: "valid";
     readonly value: T;
@@ -456,6 +628,13 @@ export const VERIFACTU_RECORD_PROFILE_ID: "es.noeos.verifactu.record";
 export const VERIFACTU_RECORD_PROFILE_VERSION: "1.0.0";
 
 // @public (undocumented)
+export const VERIFACTU_SIGNATURE_POLICY: Readonly<{
+    oid: "2.16.724.1.3.1.1.2.1.9";
+    uri: "https://sede.administracion.gob.es/politica_de_firma_anexo_1.pdf";
+    sha1Base64: "G7roucf600+f03r/o0bAOQ6WAs0=";
+}>;
+
+// @public (undocumented)
 export interface VerifactuError {
     // (undocumented)
     readonly code: VerifactuErrorCode;
@@ -476,6 +655,49 @@ export function verifyInternalRecordEvidence(input: unknown, evidence: unknown):
 
 // @public (undocumented)
 export function verifyRrsifFingerprint(input: FingerprintInput, expected: unknown): ValidationResult<FingerprintComputation>;
+
+// @public
+export interface XadesBackend {
+    // (undocumented)
+    readonly id: string;
+    // (undocumented)
+    sign(request: SignatureRequest): Promise<Result<SignatureResult>>;
+    // (undocumented)
+    verify(xml: Uint8Array, signal?: AbortSignal): Promise<Result<boolean>>;
+}
+
+// @public
+export interface XmlElement {
+    // (undocumented)
+    readonly attributes: Readonly<Record<string, string>>;
+    // (undocumented)
+    readonly children: readonly XmlNode[];
+    // (undocumented)
+    readonly name: string;
+}
+
+// @public (undocumented)
+export interface XmlLimits {
+    // (undocumented)
+    readonly maxBytes?: number;
+    // (undocumented)
+    readonly maxDepth?: number;
+    // (undocumented)
+    readonly maxNodes?: number;
+    // (undocumented)
+    readonly maxTextBytes?: number;
+}
+
+// @public (undocumented)
+export type XmlNode = XmlElement | string;
+
+// @public (undocumented)
+export interface XmlPort {
+    // (undocumented)
+    parse(xml: Uint8Array, signal?: AbortSignal): Result<unknown>;
+    // (undocumented)
+    serialize(record: unknown, signal?: AbortSignal): Result<Uint8Array>;
+}
 
 // (No @packageDocumentation comment for this package)
 

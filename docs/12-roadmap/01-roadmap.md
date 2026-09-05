@@ -6,7 +6,7 @@ Estado: **normativo**
 2. **Completada — 2026-09-04:** gobierno del repositorio, toolchain y CI; configuración pública y protegida de GitHub auditada, workflows verdes y commits firmados.
 3. **Completada — 2026-09-04:** importar y versionar las ocho fuentes oficiales WSDL/XSD de la edición AEAT fijada, con hashes, procedencia, validación offline, trazabilidad y contratos generados deterministas.
 4. **Completada técnicamente — 2026-09-04:** implementar dominio, validación, huella y evidencia interna; XML, firma, QR, persistencia y transporte siguen fuera del alcance de esta fase.
-5. Implementar XML, QR, firma y certificados.
+5. **Completada técnicamente — 2026-09-05:** implementar XML seguro y determinista, QR AEAT con corrección M, contratos de certificados opacos y puerto XAdES-EPES interoperable; persistencia, transporte y validación final con portal AEAT siguen fuera del alcance.
 6. Implementar persistencia contractual, estados y outbox.
 7. Implementar transporte y respuestas AEAT.
 8. Implementar API, CLI y kit de adapters.

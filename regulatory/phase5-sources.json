@@ -1,0 +1,45 @@
+{
+  "$schema": "./sources.schema.json",
+  "manifestVersion": 1,
+  "edition": "aeat-rrsif-1.0@2026-09-05",
+  "authority": "Agencia Estatal de Administración Tributaria",
+  "status": "successor-reference-catalog",
+  "artifacts": [
+    {
+      "id": "AEAT-SIGNATURE-SPEC-0.1.5",
+      "kind": "pdf",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Espec-Tecnicas/EspecTecGenerFirmaElectRfact.pdf",
+      "retrieved": "2026-09-05",
+      "notes": "XAdES-EPES policy, target nodes and certificate requirements; bytes are reviewed by the release import job."
+    },
+    {
+      "id": "AEAT-QR-SPEC-0.5.0",
+      "kind": "pdf",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "retrieved": "2026-09-05",
+      "notes": "QR parameters, endpoints, ISO/IEC 18004 rendering and label requirements; bytes are reviewed by the release import job."
+    },
+    {
+      "id": "AEAT-TECHNICAL-PORTAL",
+      "kind": "html",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica.html",
+      "retrieved": "2026-09-05",
+      "notes": "Official publication index used to select successor snapshots."
+    },
+    {
+      "id": "ETSI-XADES-TS-101903",
+      "kind": "standard",
+      "url": "https://www.w3.org/TR/XAdES/",
+      "retrieved": "2026-09-05",
+      "notes": "Interoperability reference; implementation delegates signing and trust validation to DSS/HSM adapters."
+    },
+    {
+      "id": "DSS-6.4-REFERENCE",
+      "kind": "software",
+      "url": "https://github.com/esig/dss/releases/tag/6.4",
+      "retrieved": "2026-09-05",
+      "license": "LGPL-2.1",
+      "notes": "Reference interoperability engine; never loaded as an npm runtime dependency."
+    }
+  ]
+}
