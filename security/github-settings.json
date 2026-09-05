@@ -26,7 +26,7 @@
       "requireCodeOwnerReview": true,
       "requireConversationResolution": true,
       "requireExtraApprovalForUnattributedChanges": true,
-      "requireLastPushApproval": false,
+      "requireLastPushApproval": true,
       "requireLinearHistory": true,
       "requirePullRequest": true,
       "requireSignedCommits": true,
