@@ -111,6 +111,31 @@ if (main) {
     pr?.allowed_merge_methods?.join(",") === "squash",
     "main ruleset merge methods are not squash-only",
   );
+  equal(
+    pr?.required_approving_review_count,
+    expected.branchRules.main.requiredApprovingReviewCount,
+    "main required approving reviews",
+  );
+  equal(
+    pr?.require_code_owner_review,
+    expected.branchRules.main.requireCodeOwnerReview,
+    "main CODEOWNERS review",
+  );
+  equal(
+    pr?.require_last_push_approval,
+    expected.branchRules.main.requireLastPushApproval,
+    "main last-push approval",
+  );
+  equal(
+    pr?.dismiss_stale_reviews_on_push,
+    expected.branchRules.main.dismissStaleReviews,
+    "main stale-review dismissal",
+  );
+  equal(
+    pr?.require_extra_approval_for_unattributed_changes,
+    expected.branchRules.main.requireExtraApprovalForUnattributedChanges,
+    "main extra approval for unattributed changes",
+  );
   equal(pr?.required_review_thread_resolution, true, "main conversation resolution");
   const status = main.rules.find((rule) => rule.type === "required_status_checks")?.parameters;
   equal(status?.strict_required_status_checks_policy, true, "strict required checks");
