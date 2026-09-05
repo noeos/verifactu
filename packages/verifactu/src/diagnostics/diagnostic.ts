@@ -13,7 +13,9 @@ export type DiagnosticPhase =
   | "evidence"
   | "limits"
   | "security"
-  | "compatibility";
+  | "compatibility"
+  | "state"
+  | "transport";
 
 export type DiagnosticCode =
   | "VF_INPUT_REQUIRED"
@@ -47,7 +49,21 @@ export type DiagnosticCode =
   | "VF_CERTIFICATE_INVALID"
   | "VF_CERTIFICATE_UNTRUSTED"
   | "VF_SIGNATURE_INVALID"
-  | "VF_SIGNATURE_UNAVAILABLE";
+  | "VF_SIGNATURE_UNAVAILABLE"
+  | "VF_STATE_TRANSITION_INVALID"
+  | "VF_STATE_CONFLICT"
+  | "VF_STATE_ROLLBACK_DETECTED"
+  | "VF_OUTBOX_LEASE_INVALID"
+  | "VF_OUTBOX_DUPLICATE"
+  | "VF_OUTBOX_LIMIT_EXCEEDED"
+  | "VF_TRANSPORT_ENDPOINT_INVALID"
+  | "VF_TRANSPORT_TIMEOUT"
+  | "VF_TRANSPORT_TLS_INVALID"
+  | "VF_TRANSPORT_RESPONSE_INVALID"
+  | "VF_AEAT_CODE_UNKNOWN"
+  | "VF_AEAT_RESPONSE_PARTIAL"
+  | "VF_AEAT_INDETERMINATE"
+  | "VF_RETRY_POLICY_EXHAUSTED";
 
 export type DiagnosticDetail = string | number | boolean | null;
 
@@ -86,6 +102,8 @@ const PHASE_ORDER: Readonly<Record<DiagnosticPhase, number>> = Object.freeze({
   limits: 7,
   security: 8,
   compatibility: 9,
+  state: 10,
+  transport: 11,
 });
 
 export function createDiagnostic(input: DiagnosticInput): Diagnostic {

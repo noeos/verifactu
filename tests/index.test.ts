@@ -13,3 +13,4 @@ import "./security/regulatory-import.security.test.js";
 import "./integration/internal-evidence.integration.test.js";
 import "./fuzz/phase4.fuzz.test.js";
 import "./unit/phase5.unit.test.js";
+import "./unit/phase6-7.unit.test.js";
