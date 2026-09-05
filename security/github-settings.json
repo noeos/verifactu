@@ -140,7 +140,7 @@
     "dependabotSecrets": 0,
     "environmentSecrets": 0,
     "environmentVariables": 0,
-    "openCodeScanningAlerts": 0,
+    "openCodeScanningAlerts": 3,
     "openDependabotAlerts": 0,
     "openSecretScanningAlerts": 0,
     "pendingInvitations": 0,
