@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0014
 title: Historical and current finding index
-status: draft
+status: approved
 authority: informative
 owner: assurance-owner
 created: 2026-09-12

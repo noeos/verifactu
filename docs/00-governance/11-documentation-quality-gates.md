@@ -1,7 +1,7 @@
 ---
 id: GOV-011
 title: Documentation quality gates
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

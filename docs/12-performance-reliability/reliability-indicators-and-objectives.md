@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0012
 title: Reliability indicators and objectives
-status: draft
+status: approved
 authority: normative
 owner: reliability-owner
 created: 2026-09-12

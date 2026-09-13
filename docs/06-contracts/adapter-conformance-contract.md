@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0015
 title: Adapter conformance contract
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

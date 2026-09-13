@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0013
 title: Performance and reliability audit evidence
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

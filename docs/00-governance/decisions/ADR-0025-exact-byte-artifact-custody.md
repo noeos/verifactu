@@ -1,7 +1,7 @@
 ---
 id: ADR-0025
 title: Exact byte artifact identity and custody
-status: proposed
+status: accepted
 authority: decision
 owner: cryptography-owner
 created: 2026-09-12

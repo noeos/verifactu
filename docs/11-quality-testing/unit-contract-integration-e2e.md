@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0006
 title: Unit, contract, integration and end-to-end suites
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

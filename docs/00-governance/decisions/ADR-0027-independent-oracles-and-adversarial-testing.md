@@ -1,7 +1,7 @@
 ---
 id: ADR-0027
 title: Independent oracles and genuine adversarial testing
-status: proposed
+status: accepted
 authority: decision
 owner: quality-owner
 created: 2026-09-12

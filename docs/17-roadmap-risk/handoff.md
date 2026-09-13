@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0017
 title: Implementation phase handoff
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-13

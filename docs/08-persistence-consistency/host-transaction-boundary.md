@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0002
 title: Host transaction boundary
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

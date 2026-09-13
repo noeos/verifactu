@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0014
 title: Backup restore and disaster recovery
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

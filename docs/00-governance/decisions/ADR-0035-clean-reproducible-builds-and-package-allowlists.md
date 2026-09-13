@@ -1,7 +1,7 @@
 ---
 id: ADR-0035
 title: Clean reproducible builds and closed package allowlists
-status: proposed
+status: accepted
 authority: decision
 owner: supply-chain-owner
 created: 2026-09-12

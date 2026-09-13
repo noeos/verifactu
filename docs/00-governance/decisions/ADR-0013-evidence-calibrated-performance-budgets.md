@@ -1,7 +1,7 @@
 ---
 id: ADR-0013
 title: Evidence-calibrated performance budgets
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

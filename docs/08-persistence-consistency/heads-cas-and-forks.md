@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0007
 title: Sequence heads CAS and forks
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

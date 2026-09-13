@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0009
 title: Build reproducibility
-status: draft
+status: approved
 authority: normative
 owner: build-owner
 created: 2026-09-12

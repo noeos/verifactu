@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-INDEX
 title: Integrations and conformance documentation index
-status: proposed
+status: approved
 authority: informative
 owner: integration-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0007
 title: Network and endpoint security
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

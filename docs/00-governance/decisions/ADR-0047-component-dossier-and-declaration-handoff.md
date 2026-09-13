@@ -1,7 +1,7 @@
 ---
 id: ADR-0047
 title: Component dossier and responsible-declaration handoff
-status: proposed
+status: accepted
 authority: decision
 owner: regulatory-owner
 created: 2026-09-12

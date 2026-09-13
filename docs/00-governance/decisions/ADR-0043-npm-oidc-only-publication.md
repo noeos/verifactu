@@ -1,7 +1,7 @@
 ---
 id: ADR-0043
 title: npm trusted OIDC-only publication
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

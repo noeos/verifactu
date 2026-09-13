@@ -1,7 +1,7 @@
 ---
 id: ARCH-DOC-0007
 title: Trust boundaries and data flows
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

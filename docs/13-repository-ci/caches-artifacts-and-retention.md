@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0018
 title: CI caches, artifacts and retention
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

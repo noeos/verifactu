@@ -1,7 +1,7 @@
 ---
 id: DOM-DOC-0007
 title: Compliance-mode lifecycle
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

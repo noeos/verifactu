@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0007
 title: Build system
-status: draft
+status: approved
 authority: normative
 owner: build-owner
 created: 2026-09-12

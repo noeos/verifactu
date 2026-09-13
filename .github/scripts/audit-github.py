@@ -29,7 +29,7 @@ def run_gh(endpoint: str, paginate: bool = False) -> dict[str, object]:
         if result.returncode != 0:
             status_match = re.search(r"HTTP\s+(\d{3})", result.stderr)
             status = int(status_match.group(1)) if status_match else None
-            state = "inaccessible" if status in {401, 403, 404} else "error"
+            state = "inaccessible" if status in {401, 403} else "not-found" if status == 404 else "error"
             return {"state": state, "httpStatus": status, "diagnostic": result.stderr.strip()[:240]}
         try:
             current = json.loads(result.stdout) if result.stdout.strip() else None
@@ -142,6 +142,7 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
 
     organization_endpoints = {
         "organizationMetadata": f"orgs/{organization}",
+        "organizationAppInstallations": f"orgs/{organization}/installations",
         "organizationActionsPermissions": f"orgs/{organization}/actions/permissions",
         "organizationRulesets": f"orgs/{organization}/rulesets",
         "organizationRunners": f"orgs/{organization}/actions/runners",
@@ -243,7 +244,7 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     assert_equal(checks, "tagRuleset.currentUserCanBypass", "never", tag.get("currentUserCanBypass"))
     assert_equal(checks, "tagRuleset.ruleTypes", desired_tag["rules"], tag.get("ruleTypes"))
 
-    assert_equal(checks, "classicMainProtection.absent", "inaccessible", classic_obs.get("state"))
+    assert_equal(checks, "classicMainProtection.absent", "not-found", classic_obs.get("state"))
     for name in ("teams", "invitations", "hooks", "deployKeys", "repositoryRunners", "actionsSecrets", "dependabotSecrets", "actionsVariables", "environments"):
         observation = count_observation(observations[name])
         assert_equal(checks, f"forbiddenSurface.{name}.count", 0, observation.get("count"))

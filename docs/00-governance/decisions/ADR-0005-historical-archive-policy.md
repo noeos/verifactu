@@ -1,7 +1,7 @@
 ---
 id: ADR-0005
 title: Historical archive policy
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-11

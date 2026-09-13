@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0012
 title: Signer and certificate conformance
-status: draft
+status: approved
 authority: normative
 owner: cryptography-owner
 created: 2026-09-12

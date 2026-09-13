@@ -1,7 +1,7 @@
 ---
 id: DOM-DOC-0010
 title: Regulatory catalogues and rule execution
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0004
 title: Naming and file conventions
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

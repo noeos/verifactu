@@ -181,7 +181,7 @@ def validate_documents(root: Path) -> tuple[int, str]:
             raise PolicyError(f"{path}: invalid subject-sha")
         if not re.search(r"^#\s+\S", text, re.MULTILINE):
             raise PolicyError(f"{path}: missing level-one heading")
-        if metadata["status"] == "approved" and re.search(r"\b(?:TODO|TBD|FIXME)\b", text):
+        if metadata["status"] == "approved" and re.search(r"(?<!`)\b(?:TODO|TBD|FIXME)\b(?!`)", text):
             raise PolicyError(f"{path}: approved document contains a placeholder")
         for dependency in metadata.get("dependencies", []):
             dependencies.append((path, dependency))

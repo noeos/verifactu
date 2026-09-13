@@ -1,7 +1,7 @@
 ---
 id: ADR-0045
 title: Stable rebuild and independent public verification
-status: proposed
+status: accepted
 authority: decision
 owner: assurance-owner
 created: 2026-09-12

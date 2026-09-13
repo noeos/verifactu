@@ -1,7 +1,7 @@
 ---
 id: ADR-0046
 title: Closed immutable GitHub release
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

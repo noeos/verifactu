@@ -1,7 +1,7 @@
 ---
 id: ADR-0042
 title: Single-maintainer release authorization
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0024
 title: Continuity and disaster recovery
-status: draft
+status: approved
 authority: normative
 owner: operations-owner
 created: 2026-09-12

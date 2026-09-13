@@ -1,7 +1,7 @@
 ---
 id: GOV-SCHEMA-INDEX
 title: Governance schemas
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

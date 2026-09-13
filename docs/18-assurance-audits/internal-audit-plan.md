@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0007
 title: Internal audit plan
-status: draft
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-12

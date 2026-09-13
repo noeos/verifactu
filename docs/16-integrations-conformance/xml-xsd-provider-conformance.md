@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0011
 title: XML and XSD provider conformance
-status: draft
+status: approved
 authority: normative
 owner: cryptography-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: PROD-INDEX
 title: Product documentation
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0001
 title: Versioning and regulatory editions
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

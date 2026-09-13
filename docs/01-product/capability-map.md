@@ -1,7 +1,7 @@
 ---
 id: PROD-DOC-0006
 title: Capability map
-status: draft
+status: approved
 authority: generated
 owner: product-owner
 created: 2026-09-12

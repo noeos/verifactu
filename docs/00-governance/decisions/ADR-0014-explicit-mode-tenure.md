@@ -1,7 +1,7 @@
 ---
 id: ADR-0014
 title: Explicit per-taxpayer compliance-mode tenure
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

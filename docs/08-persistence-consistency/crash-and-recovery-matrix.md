@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0015
 title: Crash and recovery matrix
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

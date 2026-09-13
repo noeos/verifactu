@@ -1,7 +1,7 @@
 ---
 id: ADR-0009
 title: Immutable regulatory editions
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

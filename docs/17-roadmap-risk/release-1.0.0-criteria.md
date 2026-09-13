@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0014
 title: Release 1.0.0 criteria
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

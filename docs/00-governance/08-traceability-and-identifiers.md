@@ -1,7 +1,7 @@
 ---
 id: GOV-008
 title: Traceability and identifiers
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

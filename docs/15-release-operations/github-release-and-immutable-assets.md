@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0008
 title: GitHub release and immutable assets
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

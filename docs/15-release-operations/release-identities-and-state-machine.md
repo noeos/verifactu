@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0002
 title: Release identities and state machine
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0003
 title: Test levels and ownership
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

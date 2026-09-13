@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0003
 title: GitHub Action admission
-status: draft
+status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12

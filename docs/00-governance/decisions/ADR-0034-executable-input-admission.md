@@ -1,7 +1,7 @@
 ---
 id: ADR-0034
 title: Exact executable-input admission
-status: proposed
+status: accepted
 authority: decision
 owner: supply-chain-owner
 created: 2026-09-12

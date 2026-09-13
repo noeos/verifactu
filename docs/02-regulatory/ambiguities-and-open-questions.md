@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0007
 title: Regulatory ambiguities and open questions
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

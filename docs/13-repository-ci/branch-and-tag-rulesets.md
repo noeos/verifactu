@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0013
 title: Branch and tag rulesets
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

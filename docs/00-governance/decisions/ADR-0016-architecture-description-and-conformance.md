@@ -1,7 +1,7 @@
 ---
 id: ADR-0016
 title: Architecture description and executable conformance
-status: proposed
+status: accepted
 authority: decision
 owner: architecture-owner
 created: 2026-09-12

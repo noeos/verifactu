@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0015
 title: Integration conformance evidence
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

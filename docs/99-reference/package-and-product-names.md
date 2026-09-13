@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0006
 title: Package and product names
-status: draft
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: ARCH-DOC-0011
 title: Configuration and isolation
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

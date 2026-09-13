@@ -1,7 +1,7 @@
 ---
 id: QA-INDEX
 title: Quality and testing documentation index
-status: proposed
+status: approved
 authority: informative
 owner: quality-owner
 created: 2026-09-12

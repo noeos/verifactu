@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0010
 title: AEAT faults and transport errors
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

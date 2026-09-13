@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0009
 title: npm package ownership and preflight
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

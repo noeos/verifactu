@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0002
 title: Performance and resource budgets
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

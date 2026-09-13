@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0004
 title: Bibliography
-status: draft
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: REQ-DOC-0006
 title: Performance requirements
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

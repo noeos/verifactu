@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0002
 title: Assets, actors and trust boundaries
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0009
 title: Resource exhaustion and hard limits
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

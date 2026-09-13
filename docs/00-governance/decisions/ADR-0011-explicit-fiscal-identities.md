@@ -1,7 +1,7 @@
 ---
 id: ADR-0011
 title: Explicit fiscal identities and artifact boundaries
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

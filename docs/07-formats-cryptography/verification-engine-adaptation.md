@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0015
 title: Verification Engine adaptation
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

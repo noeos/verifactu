@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0018
 title: AEAT operational observability and runbooks
-status: draft
+status: approved
 authority: normative
 owner: operations-owner
 created: 2026-09-12

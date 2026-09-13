@@ -1,7 +1,7 @@
 ---
 id: ADR-0030
 title: Owned repository tree and canonical task graph
-status: proposed
+status: accepted
 authority: decision
 owner: repository-owner
 created: 2026-09-12

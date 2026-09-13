@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0006
 title: Regulatory interpretation method
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

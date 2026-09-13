@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0013
 title: QR rendering and verification
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

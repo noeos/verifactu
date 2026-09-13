@@ -1,7 +1,7 @@
 ---
 id: ADR-0001
 title: Complete-product planning
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-11

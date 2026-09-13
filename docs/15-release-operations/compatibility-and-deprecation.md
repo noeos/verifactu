@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0018
 title: Compatibility and deprecation
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

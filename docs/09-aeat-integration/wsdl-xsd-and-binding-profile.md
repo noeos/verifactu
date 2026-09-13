@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0002
 title: AEAT WSDL XSD and binding profile
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

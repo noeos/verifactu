@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0003
 title: Configuration and capability contracts
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

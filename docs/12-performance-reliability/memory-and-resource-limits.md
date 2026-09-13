@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0006
 title: Memory and resource limits
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

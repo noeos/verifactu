@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0006
 title: Toolchain profiles and integrity
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

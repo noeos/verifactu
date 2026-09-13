@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0017
 title: AEAT protocol drift and compatibility
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

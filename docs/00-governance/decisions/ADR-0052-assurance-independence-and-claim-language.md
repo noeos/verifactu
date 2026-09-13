@@ -1,7 +1,7 @@
 ---
 id: ADR-0052
 title: Assurance independence and calibrated claim language
-status: proposed
+status: accepted
 authority: decision
 owner: assurance-owner
 created: 2026-09-12

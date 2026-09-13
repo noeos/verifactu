@@ -1,7 +1,7 @@
 ---
 id: PLAN-L4
 title: Lot 4 release, assurance and product-closure documentation plan
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0015
 title: Post-publication verification
-status: draft
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0001
 title: Workload model
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

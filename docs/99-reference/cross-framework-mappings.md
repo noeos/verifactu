@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0011
 title: Cross-framework mappings
-status: draft
+status: approved
 authority: informative
 owner: assurance-owner
 created: 2026-09-12

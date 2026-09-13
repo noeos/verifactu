@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0008
 title: Concurrency and capacity planning
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

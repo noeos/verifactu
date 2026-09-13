@@ -1,7 +1,7 @@
 ---
 id: GOV-009
 title: Change and impact management
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

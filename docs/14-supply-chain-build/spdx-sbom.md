@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0014
 title: SPDX 3.0.1 SBOM
-status: draft
+status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12

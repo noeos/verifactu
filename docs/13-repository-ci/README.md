@@ -1,7 +1,7 @@
 ---
 id: REPO-INDEX
 title: Repository engineering and CI documentation index
-status: proposed
+status: approved
 authority: informative
 owner: repository-owner
 created: 2026-09-12

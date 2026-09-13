@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0009
 title: Leases and fencing
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0016
 title: AEAT portal validation
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

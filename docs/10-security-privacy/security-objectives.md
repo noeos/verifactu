@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0001
 title: Security and privacy objectives
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

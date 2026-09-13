@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0010
 title: Baselines and regression policy
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

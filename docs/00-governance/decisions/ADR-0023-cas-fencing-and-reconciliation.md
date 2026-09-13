@@ -1,7 +1,7 @@
 ---
 id: ADR-0023
 title: CAS heads fencing and reconciliation before resend
-status: proposed
+status: accepted
 authority: decision
 owner: persistence-owner
 created: 2026-09-12

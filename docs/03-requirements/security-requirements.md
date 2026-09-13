@@ -1,7 +1,7 @@
 ---
 id: REQ-DOC-0005
 title: Security and privacy requirements
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

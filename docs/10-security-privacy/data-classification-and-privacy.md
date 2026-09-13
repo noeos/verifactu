@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0011
 title: Data classification and privacy
-status: draft
+status: approved
 authority: normative
 owner: privacy-owner
 created: 2026-09-12

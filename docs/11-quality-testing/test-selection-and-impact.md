@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0016
 title: Test selection and impact analysis
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

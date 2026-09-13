@@ -1,7 +1,7 @@
 ---
 id: ADR-0020
 title: XAdES and PKI provider boundary
-status: proposed
+status: accepted
 authority: decision
 owner: cryptography-owner
 created: 2026-09-12

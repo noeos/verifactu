@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0012
 title: Document index
-status: draft
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

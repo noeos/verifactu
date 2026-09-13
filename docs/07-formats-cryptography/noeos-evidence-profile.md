@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0014
 title: Noeos evidence profile
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

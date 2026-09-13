@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0010
 title: Events and observability contracts
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

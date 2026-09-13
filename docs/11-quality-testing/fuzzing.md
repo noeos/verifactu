@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0008
 title: Semantic fuzzing
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

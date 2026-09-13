@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0008
 title: Clean and hermetic builds
-status: draft
+status: approved
 authority: normative
 owner: build-owner
 created: 2026-09-12

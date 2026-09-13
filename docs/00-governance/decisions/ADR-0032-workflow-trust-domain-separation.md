@@ -1,7 +1,7 @@
 ---
 id: ADR-0032
 title: Workflow trust-domain separation
-status: proposed
+status: accepted
 authority: decision
 owner: security-owner
 created: 2026-09-12

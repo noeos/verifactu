@@ -1,7 +1,7 @@
 ---
 id: ADR-0018
 title: Generated official structure with semantic overlay
-status: proposed
+status: accepted
 authority: decision
 owner: regulatory-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: ADR-0015
 title: Modular workspace and package boundaries
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0011
 title: Submission timing and wait instructions
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0014
 title: AEAT consultation and required submission
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0001
 title: Glossary
-status: draft
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

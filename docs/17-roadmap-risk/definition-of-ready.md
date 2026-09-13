@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0006
 title: Definition of ready
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

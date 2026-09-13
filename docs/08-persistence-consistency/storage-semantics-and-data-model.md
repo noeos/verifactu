@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0001
 title: Storage semantics and logical data model
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

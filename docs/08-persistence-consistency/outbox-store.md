@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0005
 title: Outbox store
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

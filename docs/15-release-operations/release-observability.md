@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0016
 title: Release observability
-status: draft
+status: approved
 authority: normative
 owner: operations-owner
 created: 2026-09-12

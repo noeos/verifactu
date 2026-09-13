@@ -1,7 +1,7 @@
 ---
 id: ADR-0037
 title: Honest provenance and attestation claims
-status: proposed
+status: accepted
 authority: decision
 owner: supply-chain-owner
 created: 2026-09-12

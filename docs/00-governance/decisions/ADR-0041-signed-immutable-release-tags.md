@@ -1,7 +1,7 @@
 ---
 id: ADR-0041
 title: Signed immutable release tags and independent trust roots
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

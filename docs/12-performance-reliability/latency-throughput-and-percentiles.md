@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0005
 title: Latency, throughput and percentile policy
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

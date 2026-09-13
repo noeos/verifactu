@@ -1,7 +1,7 @@
 ---
 id: DOM-DOC-0008
 title: Sequences, integrity and chaining
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: DOM-DOC-0001
 title: Ubiquitous language
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

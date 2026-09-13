@@ -1,7 +1,7 @@
 ---
 id: ADR-0048
 title: Support period and historical verification
-status: proposed
+status: accepted
 authority: decision
 owner: product-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: GOV-005
 title: Research and source policy
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

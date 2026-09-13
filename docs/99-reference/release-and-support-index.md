@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0015
 title: Release and support index
-status: draft
+status: approved
 authority: informative
 owner: release-owner
 created: 2026-09-12

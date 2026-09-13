@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0011
 title: Regulatory audit evidence
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0025
 title: Operations runbook catalog
-status: draft
+status: approved
 authority: normative
 owner: operations-owner
 created: 2026-09-12

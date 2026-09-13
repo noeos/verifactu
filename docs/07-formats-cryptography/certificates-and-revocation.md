@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0011
 title: Certificates authorization and revocation
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

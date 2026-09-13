@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0010
 title: Retention and restoration conformance
-status: draft
+status: approved
 authority: normative
 owner: operations-owner
 created: 2026-09-12

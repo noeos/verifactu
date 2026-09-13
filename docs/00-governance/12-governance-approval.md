@@ -1,7 +1,7 @@
 ---
 id: GOV-012
 title: Governance approval plan
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11
@@ -38,17 +38,18 @@ identified commit:
    retained;
 10. the owner records final approval without an unresolved material finding.
 
-## Current gaps
+## Execution disposition
 
-The initial schemas now exist, but their executable checker, negative fixtures,
-workflows and live GitHub enforcement do not. Therefore every file in this
-package remains `draft`, irrespective of prose completeness. The next planning
-area may be researched, but no product implementation is authorized by draft
-governance.
+The P1 protected-bootstrap procedure implemented the schemas' executable
+checker, maintained negative fixtures, least-privilege workflow and effective
+GitHub enforcement. The exact evidence and limitations are recorded in
+[`13-documentation-approval-report.md`](13-documentation-approval-report.md).
+Governance and the complete planning corpus are approved as specifications;
+this transition does not claim that any product capability is implemented.
 
 ## Approval evidence
 
-The eventual report must list subject SHA and tree, PR, squash commit,
+The approval report lists subject SHA and tree, PR, squash commit,
 signatures, DCO result, exact required checks and conclusions, toolchain lock,
 historical disposition summary, effective repository-policy snapshot,
 exceptions and residual risks. Claims are limited to that recorded scope.

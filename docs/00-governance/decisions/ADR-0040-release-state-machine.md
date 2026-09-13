@@ -1,7 +1,7 @@
 ---
 id: ADR-0040
 title: Durable exact-subject release state machine
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

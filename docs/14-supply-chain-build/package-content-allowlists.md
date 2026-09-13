@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0010
 title: Package content allowlists
-status: draft
+status: approved
 authority: normative
 owner: build-owner
 created: 2026-09-12

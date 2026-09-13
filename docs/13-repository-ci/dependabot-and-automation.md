@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0019
 title: Dependabot and repository automation
-status: draft
+status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12

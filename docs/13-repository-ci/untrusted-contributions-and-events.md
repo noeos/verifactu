@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0017
 title: Untrusted contributions and events
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

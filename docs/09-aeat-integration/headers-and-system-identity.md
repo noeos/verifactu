@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0006
 title: AEAT headers and system identity
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0012
 title: Exports and package surface
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0004
 title: Abuse and misuse cases
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

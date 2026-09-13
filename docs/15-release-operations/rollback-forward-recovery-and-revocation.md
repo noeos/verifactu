@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0021
 title: Rollback, forward recovery and revocation
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

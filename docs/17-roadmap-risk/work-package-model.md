@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0005
 title: Work package model
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

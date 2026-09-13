@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0020
 title: Evidence retention and integrity
-status: draft
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0012
 title: QR content
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

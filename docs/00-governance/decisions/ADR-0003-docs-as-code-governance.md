@@ -1,7 +1,7 @@
 ---
 id: ADR-0003
 title: Docs-as-code governance
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-11

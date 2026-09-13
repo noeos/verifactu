@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0014
 title: Adapter conformance kit
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

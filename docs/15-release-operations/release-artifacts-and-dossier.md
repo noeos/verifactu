@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0012
 title: Release artifacts and dossier
-status: draft
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: ADR-0012
 title: Threat-driven security and privacy baseline
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

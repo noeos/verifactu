@@ -1,7 +1,7 @@
 ---
 id: ADR-0006
 title: Source authority and reproducible research
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-11

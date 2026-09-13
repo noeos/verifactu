@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0002
 title: Operation lifecycle and command model
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

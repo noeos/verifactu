@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0012
 title: Licences and attribution
-status: draft
+status: approved
 authority: normative
 owner: legal-owner
 created: 2026-09-12
