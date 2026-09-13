@@ -20,25 +20,29 @@ class AuditError(Exception):
 
 def run_gh(endpoint: str, paginate: bool = False) -> dict[str, object]:
     executable = "/usr/bin/gh" if Path("/usr/bin/gh").exists() else "gh"
-    command = [executable, "api", endpoint]
-    if paginate:
-        command += ["--paginate", "--slurp"]
-    result = subprocess.run(command, text=True, capture_output=True)
-    if result.returncode != 0:
-        status_match = re.search(r"HTTP\s+(\d{3})", result.stderr)
-        status = int(status_match.group(1)) if status_match else None
-        state = "inaccessible" if status in {401, 403, 404} else "error"
-        return {"state": state, "httpStatus": status, "diagnostic": result.stderr.strip()[:240]}
-    try:
-        value = json.loads(result.stdout) if result.stdout.strip() else None
-    except json.JSONDecodeError as exc:
-        raise AuditError(f"unparseable response from {endpoint}") from exc
-    if paginate:
-        pages = value if isinstance(value, list) else [value]
-        if pages and all(isinstance(page, list) for page in pages):
-            value = [item for page in pages for item in page]
-        elif len(pages) == 1:
-            value = pages[0]
+    pages: list[object] = []
+    page = 1
+    while True:
+        separator = "&" if "?" in endpoint else "?"
+        requested = f"{endpoint}{separator}per_page=100&page={page}" if paginate else endpoint
+        result = subprocess.run([executable, "api", requested], text=True, capture_output=True)
+        if result.returncode != 0:
+            status_match = re.search(r"HTTP\s+(\d{3})", result.stderr)
+            status = int(status_match.group(1)) if status_match else None
+            state = "inaccessible" if status in {401, 403, 404} else "error"
+            return {"state": state, "httpStatus": status, "diagnostic": result.stderr.strip()[:240]}
+        try:
+            current = json.loads(result.stdout) if result.stdout.strip() else None
+        except json.JSONDecodeError as exc:
+            raise AuditError(f"unparseable response from {requested}") from exc
+        pages.append(current)
+        if not paginate or not isinstance(current, list) or len(current) < 100:
+            break
+        page += 1
+    if paginate and pages and all(isinstance(item, list) for item in pages):
+        value = [entry for item in pages for entry in item]
+    else:
+        value = pages[0] if pages else None
     canonical = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return {
         "state": "verified",
@@ -200,7 +204,12 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     assert_equal(checks, "security.secretScanningValidityChecks", policy["security"]["secretScanningValidityChecks"], status("secret_scanning_validity_checks"))
 
     by_name = {item["name"]: item for item in detailed_rulesets}
-    assert_equal(checks, "rulesets.names", {policy["mainRuleset"]["name"], policy["tagRuleset"]["name"]}, set(by_name))
+    assert_equal(
+        checks,
+        "rulesets.names",
+        sorted([policy["mainRuleset"]["name"], policy["tagRuleset"]["name"]]),
+        sorted(by_name),
+    )
     main = by_name.get(policy["mainRuleset"]["name"], {})
     desired_main = policy["mainRuleset"]
     for field in ("target", "enforcement", "include", "exclude", "bypassActors"):
