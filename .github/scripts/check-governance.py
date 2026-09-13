@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dependency-free P1 governance and documentation validator."""
+"""Dependency-free repository governance and documentation validator."""
 
 from __future__ import annotations
 
@@ -45,8 +45,9 @@ REQUIRED_CONTEXTS = {
 }
 COMMUNITY_FILE_CONTRACT = {
     "README.md": (
-        r"documentation-only, governed repository",
-        r"It does not yet contain product source",
+        r"governed product repository executing Phase P2",
+        r"three private package shells",
+        r"no fiscal behavior, public bindings or command-line executable",
         r"Facturación is a future client application\. It has not\s+been built",
         r"docs/17-roadmap-risk/implementation-roadmap\.md",
         r"No licence to\s+copy, modify or distribute",
@@ -73,9 +74,10 @@ COMMUNITY_FILE_CONTRACT = {
         r"Distribution of product code or packages is\s+forbidden",
     ),
     "NOTICE": (
-        r"no product\s+implementation or distributable package",
+        r"three private P2 package shells",
+        r"no product behavior and are not distributable packages",
         r"visibility grants no licence",
-        r"No third-party software is bundled for distribution in P1",
+        r"No third-party software is bundled for distribution in P2",
         r"canonical licence graph",
         r"pre-distribution legal decisions",
     ),
@@ -327,7 +329,7 @@ def validate_community_files(root: Path) -> dict[str, str]:
 
 def validate_workflow_text(path: Path, text: str) -> set[str]:
     if "pull_request_target:" in text or "workflow_run:" in text:
-        raise PolicyError(f"{path}: privileged event is forbidden in P1")
+        raise PolicyError(f"{path}: privileged event is forbidden for required untrusted checks")
     if not re.search(r"^permissions:\s*\{\}\s*$", text, re.MULTILINE):
         raise PolicyError(f"{path}: top-level permissions must be empty")
     if re.search(r"\b(?:id-token|attestations|packages|deployments|security-events):\s*write\b", text):
@@ -359,7 +361,7 @@ def validate_workflow_text(path: Path, text: str) -> set[str]:
 def validate_workflows(root: Path) -> None:
     paths = sorted((root / ".github/workflows").glob("*.yml"))
     if paths != [root / ".github/workflows/governance.yml"]:
-        raise PolicyError("P1 must contain exactly the governance workflow")
+        raise PolicyError("the current protected increment must contain exactly the governance workflow")
     observed: set[str] = set()
     for path in paths:
         observed |= validate_workflow_text(path, path.read_text(encoding="utf-8"))
@@ -384,7 +386,7 @@ def validate_github_policy(root: Path) -> None:
         "artifactAndLogRetentionDays": 90,
         "reusableWorkflowAccess": "not-applicable-public",
     }:
-        raise PolicyError("GitHub Actions policy is not the P1 least-privilege state")
+        raise PolicyError("GitHub Actions policy is not the admitted least-privilege state")
     main = policy["mainRuleset"]
     if main["bypassActors"] or main["include"] != ["refs/heads/main"] or main["exclude"]:
         raise PolicyError("main ruleset target or bypass policy is unsafe")
@@ -400,9 +402,11 @@ def validate_github_policy(root: Path) -> None:
 
 def validate_repo(root: Path) -> dict[str, object]:
     root = root.resolve()
-    for forbidden in (root / "packages", root / "src"):
-        if forbidden.exists():
-            raise PolicyError(f"product source is forbidden during P1: {forbidden.relative_to(root)}")
+    package_directories = sorted(path.name for path in (root / "packages").iterdir() if path.is_dir())
+    if package_directories != ["adapter-kit", "cli", "verifactu"]:
+        raise PolicyError(f"P2 package shell set drift: {package_directories}")
+    if (root / "src").exists():
+        raise PolicyError("root src is forbidden by the semantic tree")
     codeowners = [path for path in root.rglob("CODEOWNERS") if "previous-docs" not in path.parts and ".git" not in path.parts]
     if codeowners:
         raise PolicyError(f"CODEOWNERS is forbidden: {codeowners}")
@@ -422,7 +426,9 @@ def validate_repo(root: Path) -> dict[str, object]:
         "allowedSignerPublicMaterialSha256": signer_material_digest,
         "rootCommunityFileSha256": community_digests,
         "requiredContexts": sorted(REQUIRED_CONTEXTS),
-        "productSourcePresent": False,
+        "phase": "P2",
+        "productSourcePresent": True,
+        "fiscalCapabilityPresent": False,
         "codeownersPresent": False,
     }
 

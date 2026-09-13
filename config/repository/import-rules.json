@@ -1,0 +1,48 @@
+{
+  "$schema": "./import-rules.schema.json",
+  "schemaVersion": 1,
+  "policyId": "ARCH-IMPORT-0001",
+  "productionRoots": ["packages/verifactu/src", "packages/adapter-kit/src", "packages/cli/src"],
+  "packageRules": {
+    "packages/verifactu/src": {
+      "allowedExternal": [
+        "@noeos/verification-engine",
+        "@noeos/verification-engine/profiles",
+        "@noeos/verification-engine/schemas",
+        "@noeos/verification-engine/vectors"
+      ],
+      "forbiddenBuiltins": [
+        "node:child_process",
+        "node:crypto",
+        "node:fs",
+        "node:fs/promises",
+        "node:http",
+        "node:https",
+        "node:net",
+        "node:os",
+        "node:process",
+        "node:tls",
+        "node:worker_threads"
+      ]
+    },
+    "packages/adapter-kit/src": {
+      "allowedExternal": ["@noeos/verifactu"],
+      "forbiddenRelativePrefixes": ["../../verifactu/src", "../../cli/src", "../../../internal", "../../../tests"]
+    },
+    "packages/cli/src": {
+      "allowedExternal": ["@noeos/verifactu"],
+      "allowedBuiltins": ["node:process"],
+      "forbiddenRelativePrefixes": [
+        "../../verifactu/src",
+        "../../adapter-kit/src",
+        "../../../internal",
+        "../../../tests"
+      ]
+    }
+  },
+  "globallyForbiddenSpecifiers": ["@noeos/verification-engine/src", "@noeos/verification-engine/internal"],
+  "forbiddenProductionSegments": ["/dist/", "/internal/", "/test/", "/tests/"],
+  "forbidDynamicNonLiteralImports": true,
+  "forbidCycles": true,
+  "undeclaredExternalFails": true
+}

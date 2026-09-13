@@ -1,0 +1,36 @@
+{
+  "$schema": "./packages.schema.json",
+  "schemaVersion": 1,
+  "policyId": "PACKAGE-SHELL-0001",
+  "workspaceVersion": "0.0.0-development",
+  "publicationState": "forbidden-until-p8",
+  "packages": [
+    {
+      "directory": "packages/verifactu",
+      "name": "@noeos/verifactu",
+      "role": "library",
+      "expectedExports": ["."],
+      "expectedBins": [],
+      "allowedProductionDependencies": ["@noeos/verification-engine@1.0.1"],
+      "p2ExportCount": 0
+    },
+    {
+      "directory": "packages/adapter-kit",
+      "name": "@noeos/verifactu-adapter-kit",
+      "role": "adapter-conformance-kit",
+      "expectedExports": ["."],
+      "expectedBins": [],
+      "allowedProductionDependencies": ["@noeos/verifactu@0.0.0-development"],
+      "p2ExportCount": 0
+    },
+    {
+      "directory": "packages/cli",
+      "name": "@noeos/verifactu-cli",
+      "role": "command-line-interface",
+      "expectedExports": ["."],
+      "expectedBins": [],
+      "allowedProductionDependencies": ["@noeos/verifactu@0.0.0-development"],
+      "p2ExportCount": 0
+    }
+  ]
+}

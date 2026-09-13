@@ -1,0 +1,44 @@
+{
+  "name": "@noeos/verifactu-workspace",
+  "version": "0.0.0-development",
+  "private": true,
+  "description": "Governed workspace for the complete Noeos VeriFactu product.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "npm@11.19.1",
+  "engines": {
+    "node": ">=22.14.0 <23 || >=24.0.0 <25",
+    "npm": ">=10.9.2 <12"
+  },
+  "workspaces": [
+    "packages/verifactu",
+    "packages/cli",
+    "packages/adapter-kit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noeos/verifactu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/noeos/verifactu/issues"
+  },
+  "homepage": "https://github.com/noeos/verifactu#readme",
+  "scripts": {
+    "check": "node tooling/tasks/run-task.mjs --task gate:p2",
+    "check:foundation": "node tooling/tasks/run-task.mjs --task gate:foundation",
+    "format:check": "node tooling/tasks/run-task.mjs --task format:check",
+    "lint": "node tooling/tasks/run-task.mjs --task lint:all",
+    "typecheck": "node tooling/tasks/run-task.mjs --task types:packages"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.13.3",
+    "ajv": "8.20.0",
+    "eslint": "10.9.1",
+    "globals": "17.11.0",
+    "npm": "11.19.1",
+    "prettier": "3.9.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.68.0"
+  }
+}

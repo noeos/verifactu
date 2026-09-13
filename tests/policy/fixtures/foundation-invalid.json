@@ -1,0 +1,56 @@
+{
+  "$schema": "./foundation-invalid.schema.json",
+  "schemaVersion": 1,
+  "fixtures": [
+    {
+      "id": "wrong-tree-unowned-root",
+      "control": "repository-tree",
+      "expectedCode": "UNREGISTERED_ROOT_FILE",
+      "path": "surprise.txt"
+    },
+    {
+      "id": "wrong-tree-case-collision",
+      "control": "repository-tree",
+      "expectedCode": "PATH_CASE_COLLISION",
+      "paths": ["docs/Case.md", "docs/case.md"]
+    },
+    {
+      "id": "wrong-import-deep-private",
+      "control": "architecture-imports",
+      "expectedCode": "FORBIDDEN_DEEP_IMPORT",
+      "source": "import '@noeos/verification-engine/src';"
+    },
+    {
+      "id": "wrong-import-ambient-builtin",
+      "control": "architecture-imports",
+      "expectedCode": "BUILTIN_NOT_ALLOWED",
+      "source": "import 'node:fs';"
+    },
+    { "id": "wrong-import-cycle", "control": "architecture-imports", "expectedCode": "IMPORT_CYCLE" },
+    {
+      "id": "wrong-package-export",
+      "control": "package-shells",
+      "expectedCode": "FAKE_PUBLIC_EXPORT",
+      "source": "export const fake = true;"
+    },
+    {
+      "id": "wrong-package-bin",
+      "control": "package-shells",
+      "expectedCode": "FAKE_CAPABILITY",
+      "bin": { "noeos-verifactu": "dist/main.js" }
+    },
+    {
+      "id": "wrong-node-version",
+      "control": "toolchain-profile",
+      "expectedCode": "NODE_VERSION_DRIFT",
+      "version": "0.0.0"
+    },
+    {
+      "id": "path-shadow",
+      "control": "toolchain-profile",
+      "expectedCode": "PATH_SHADOW",
+      "execPath": "/admitted/node",
+      "resolved": "/shadow/node"
+    }
+  ]
+}

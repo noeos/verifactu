@@ -1,0 +1,104 @@
+{
+  "$schema": "./profiles.schema.json",
+  "schemaVersion": 1,
+  "policyId": "TOOLCHAIN-0001",
+  "reviewedAt": "2026-09-13T16:00:00Z",
+  "nodeReleaseKeyring": {
+    "repository": "nodejs/release-keys",
+    "commit": "481637f813e912c4aa3622d7964ab426c97b8e8d",
+    "commitVerified": true,
+    "activeKeyringSha256": "140f2ad5260fd62773b6243ce8e1d3009645d558f121b8262c55e383dc285932",
+    "historicalKeyringSha256": "610b8d249da3d5733f5a128def2dd0294dbbf5b5713e6ca2529db8db419dee00"
+  },
+  "profiles": {
+    "node-22-minimum": {
+      "status": "required",
+      "node": "22.14.0",
+      "npm": "11.19.1",
+      "checksumManifestSha256": "d67cdb735b1764bf5b553a0d9b067ed861b91a4d934afc20442c04f5234b55db",
+      "checksumSignatureSha256": "9b4aa34f6ff6f46274be0cbbd39ffacbccf7f85bc9a7880b84e4c520955888c6",
+      "signingFingerprint": "C0D6248439F1D5604AAFFB4021D900FFDB233756",
+      "assets": {
+        "darwin-arm64": "e9404633bc02a5162c5c573b1e2490f5fb44648345d64a958b17e325729a5e42",
+        "darwin-x64": "6698587713ab565a94a360e091df9f6d91c8fadda6d00f0cf6526e9b40bed250",
+        "linux-x64": "69b09dba5c8dcb05c4e4273a4340db1005abeafe3927efda2bc5b249e80437ec",
+        "win-x64": "55b639295920b219bb2acbcfa00f90393a2789095b7323f79475c9f34795f217"
+      }
+    },
+    "node-22-latest": {
+      "status": "required",
+      "node": "22.23.2",
+      "npm": "11.19.1",
+      "checksumManifestSha256": "778ac5b2fcdbd68d9c0ae9f4310674faa3af0910bd0d18e7f6597787c40a3e39",
+      "checksumSignatureSha256": "169f1452c14cd653247408352f1534b9f31e3d13f9c6399c3977368095e11eda",
+      "signingFingerprint": "CC68F5A3106FF448322E48ED27F5E38D5B0A215F",
+      "assets": {
+        "darwin-arm64": "61130f394c1630d211dd50aecc4353d379480f36d3ac913cd85dbba1aed585c6",
+        "darwin-x64": "58e99022c2ff89395576cc7fd4d98cea24bb68081475d5f88b801ee8729fb026",
+        "linux-x64": "d60acfe00a2932254bb0ad20e01b0d74397a0875595de719654b214f4b03f307",
+        "win-x64": "1177b4137ba5adaa56354ae40f1080c7450e8ae09cecb47da459d1c52ac99f97"
+      }
+    },
+    "node-24-primary": {
+      "status": "required",
+      "node": "24.21.0",
+      "npm": "11.19.1",
+      "checksumManifestSha256": "f410428039e2c922a14058df067a4482691c9304a5c01a75847f9f3f2d3307f6",
+      "checksumSignatureSha256": "865f22b026e4080554e10d247553fd770573893dac8fc7affc7d58b72de35a89",
+      "signingFingerprint": "5BE8A3F6C8A5C01D106C0AD820B1A390B168D356",
+      "assets": {
+        "darwin-arm64": "bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057",
+        "darwin-x64": "1462cb3b3046b815cf8ea436d3da450ec1a9f11dac7e5a46b0ada5305d7e8097",
+        "linux-x64": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+        "win-x64": "158f7685b44de51f6c0df1d153526cbcd3e1bc739a8dfc607721cef75de9e541"
+      }
+    },
+    "node-26-current": {
+      "status": "informational",
+      "node": "26.8.2",
+      "npm": "12.0.2",
+      "checksumManifestSha256": "c31cbd53707d1e82ed2094d4554eb13562a8be9521433f8bc4447776a7e7dad3",
+      "checksumSignatureSha256": "6cd3bd8c41c87085698cbd79c69cf6c8ce5585fa2878c34a3773fdec9d13e343",
+      "signingFingerprint": "5BE8A3F6C8A5C01D106C0AD820B1A390B168D356",
+      "assets": {
+        "darwin-arm64": "974b6d5fb2fc7c33ff2354db0902b4e91c2de01ec8acc6de48e543c97e18c9e1",
+        "darwin-x64": "adb8feb2d4987df3d72d2ec46f4fc4b58039c859b8c3f0e3cc2d3c6cbaf8629c",
+        "linux-x64": "40e1d3225c1c9ae9a2671c98ecb9857e4d5555026394f348645676798840d5c5",
+        "win-x64": "cf02f5d0c06c794b84f277177d5cf3743d0924ca49f6641cd435dd7cb6ee9085"
+      }
+    }
+  },
+  "npmDistributions": {
+    "10.9.2": {
+      "integrity": "sha512-iriPEPIkoMYUy3F6f3wwSZAU93E0Eg6cHwIR6jzzOXWSy+SD/rOODEs74cVONHKSx2obXtuUoyidVEhISrisgQ==",
+      "sha1": "784b3e2194fc151d5709a14692cf49c4afc60dfe",
+      "signatureKeyId": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+    },
+    "11.19.1": {
+      "integrity": "sha512-ztsxKxt/kkIaAs+2i0GU6I+DRmUdrNasxTZKJe9TCdSjKxlhah/4r/hl5ygMD6XAg1qZ9c2TNomR4qgOydp10g==",
+      "sha1": "19984947ed6b8b1e0c794ceadb0a848cc5585128",
+      "signatureKeyId": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+    },
+    "12.0.2": {
+      "integrity": "sha512-uIXokLlBj6FpNUTQX1PmT5pz7BlIN9QlixX+zdaSNHsd0qUXsbDLr50xzY6Sw7cJVr0uzHKDOle0swmPW/p5Qw==",
+      "sha1": "788d93dc8869000b1078e0395c60748a0aadc4f1",
+      "signatureKeyId": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+    }
+  },
+  "typescript": {
+    "version": "5.9.3",
+    "source": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz"
+  },
+  "pythonReference": {
+    "version": "3.13.15",
+    "distribution": "actions/python-versions",
+    "releaseTag": "3.13.15-31064747964",
+    "ubuntu2404X64Sha256": "4e544242f8a4ef647a6f511b67f9b00eefc9ef366644e3c40a27a6eff709ae2b"
+  },
+  "environment": {
+    "timezone": "UTC",
+    "locale": "C.UTF-8",
+    "sourceDateEpoch": "0",
+    "umask": "0022"
+  }
+}

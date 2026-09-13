@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/package-shells-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "policyId", "workspaceVersion", "publicationState", "packages"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "PACKAGE-SHELL-0001" },
+    "workspaceVersion": { "const": "0.0.0-development" },
+    "publicationState": { "const": "forbidden-until-p8" },
+    "packages": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "directory",
+          "name",
+          "role",
+          "expectedExports",
+          "expectedBins",
+          "allowedProductionDependencies",
+          "p2ExportCount"
+        ],
+        "properties": {
+          "directory": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "expectedExports": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+          "expectedBins": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+          "allowedProductionDependencies": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+          "p2ExportCount": { "const": 0 }
+        }
+      }
+    }
+  }
+}

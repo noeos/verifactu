@@ -1,0 +1,15 @@
+{
+  "$schema": "./task-runner-invalid.schema.json",
+  "schemaVersion": 1,
+  "fixtures": [
+    { "id": "duplicate-task", "expectedCode": "DUPLICATE_TASK" },
+    { "id": "task-cycle", "expectedCode": "TASK_CYCLE" },
+    { "id": "undeclared-tool", "expectedCode": "UNDECLARED_TOOL" },
+    { "id": "zero-work", "expectedCode": "ZERO_WORK" },
+    { "id": "undeclared-write", "expectedCode": "UNDECLARED_WRITE" },
+    { "id": "stale-output", "expectedCode": "STALE_OUTPUT" },
+    { "id": "missing-report", "expectedCode": "MISSING_TASK_REPORT" },
+    { "id": "duplicate-report", "expectedCode": "DUPLICATE_TASK_REPORT" },
+    { "id": "undeclared-network", "expectedCode": "UNDECLARED_NETWORK" }
+  ]
+}

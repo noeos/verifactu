@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/repository-tree-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyId",
+    "rootFiles",
+    "pathClasses",
+    "requiredDirectories",
+    "forbiddenTopLevel",
+    "forbiddenTrackedSegments",
+    "caseInsensitive",
+    "unicodeNormalization",
+    "allowSymlinks"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "REPO-TREE-0001" },
+    "rootFiles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "pathClasses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["prefix", "owner", "artifactClass", "visibility"],
+        "properties": {
+          "prefix": { "type": "string", "pattern": "/$" },
+          "owner": { "type": "string", "minLength": 1 },
+          "artifactClass": { "type": "string", "minLength": 1 },
+          "visibility": { "enum": ["internal", "private", "public", "package-candidate"] }
+        }
+      }
+    },
+    "requiredDirectories": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "forbiddenTopLevel": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "forbiddenTrackedSegments": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "caseInsensitive": { "const": true },
+    "unicodeNormalization": { "const": "NFKC" },
+    "allowSymlinks": { "const": false }
+  }
+}

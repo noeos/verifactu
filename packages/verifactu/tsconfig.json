@@ -1,0 +1,10 @@
+{
+  "extends": "../../config/typescript/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist/types",
+    "emitDeclarationOnly": true,
+    "tsBuildInfoFile": "../../.cache/typescript/verifactu.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"]
+}
