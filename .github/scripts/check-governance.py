@@ -250,6 +250,15 @@ def validate_workflow_text(path: Path, text: str) -> set[str]:
             continue
         if "@" not in used or not SHA_RE.fullmatch(used.rsplit("@", 1)[1]):
             raise PolicyError(f"{path}: Action is not pinned to a full SHA: {used}")
+    if not re.search(r"^  pull_request:\s*$", text, re.MULTILINE):
+        raise PolicyError(f"{path}: pull_request trigger is required")
+    main_push = re.search(
+        r"^  push:\s*\n    branches:\s*\n      - main\s*$",
+        text,
+        re.MULTILINE,
+    )
+    if not main_push or re.search(r"^      - [\"']?\*", text, re.MULTILINE):
+        raise PolicyError(f"{path}: push trigger must target only main")
     names = set(re.findall(r"^\s{4}name:\s*(Required · .+?)\s*$", text, re.MULTILINE))
     return names
 
@@ -342,6 +351,14 @@ def self_test() -> dict[str, object]:
         "privileged-event",
         lambda: validate_workflow_text(Path("fixture.yml"), "permissions: {}\npull_request_target:\n"),
         "privileged event",
+    )
+    expect_failure(
+        "branch-push-context-duplication",
+        lambda: validate_workflow_text(
+            Path("fixture.yml"),
+            "permissions: {}\n  pull_request:\n  push:\n    branches:\n      - \"**\"\n",
+        ),
+        "push trigger must target only main",
     )
     with tempfile.TemporaryDirectory(prefix="verifactu-governance-") as directory:
         root = Path(directory)
