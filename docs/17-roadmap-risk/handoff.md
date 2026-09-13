@@ -417,3 +417,59 @@ Append corrections in this form:
   retains the complete redacted successor report and requires final protected
   squash, main-only checks, branch deletion and effective-state read-back before
   P1 returns to `evidence-complete`.
+
+### AMD-P1-004 — 2026-09-13
+
+- Statement corrected: P1 was treated as complete although the roadmap's P1
+  path-effects matrix explicitly requires root community files, `REPO-DOC-0001`
+  requires `README.md`, `SECURITY.md`, `CONTRIBUTING.md`, `LICENSE` and `NOTICE`,
+  and `REPO-DOC-0009` requires a PR template with change/omission, impact,
+  evidence and rollback fields. None existed on protected `main`.
+- Correct value and reason: P1 has the five root files, a governed PR template
+  and one non-sensitive structured work-item form with private security routing.
+  The repository is described truthfully as documentation-only; Facturación is
+  an unbuilt future consumer; no product, release, support-version or compliance
+  claim is made. Because no distribution licence has been selected or legally
+  reviewed, `LICENSE` reserves rights and blocks distribution instead of
+  inventing an open-source grant. DCO records provenance but is not represented
+  as a licence.
+- Discovered by / actor: Codex requirement-by-requirement completion audit after
+  PR `#8`, comparing the P1 phase matrix, repository tree contract and actual
+  protected tree.
+- Evidence locator and digest: signed+DCO branch commit
+  `812ad206baa7df75273d546ab3abce4f3f7903f9`, tree
+  `6646ec54892e751c3c8bad8d1094e150d3f371f4`, in PR `#9`; sole
+  `pull_request` run `34763062255` produced the three exact successful required
+  contexts. A read-only effective-state audit at `2026-09-13T14:35:25Z` passed
+  75/75 comparisons with zero mismatch; redacted transient-report SHA-256
+  `94de41e7c1fb3f3da2acd67204fdfe83064ef95a5c8e06366f4c71c7229dd159`.
+  The governance report binds SHA-256 for every mandatory artifact:
+  `README.md` `472aeca6a43ea1981a42a9c9e7b1e29ae54e2e502bef701f290ead07b9608e5f`,
+  `CONTRIBUTING.md` `2d3eb13bd25d68b91e8fd12db87ec035422348275a752d2eb7b0d015855cb21d`,
+  `SECURITY.md` `c05599c3076ccfee2dd62fd4af69497e0c86daddc749404bbcf100c36683acf4`,
+  `LICENSE` `7e1de9c15443eee92da435265af15813a36e7e4d34a11095142d43d32e7d3dff`,
+  `NOTICE` `fbccd2b807ea0ba8278d633f088d79b1997783748f5b82f162d494a5a1b56e6c`,
+  PR template `28efab4958199b48361f037c903a9cdab3681447057d6d91db6e7c91e01a248b`,
+  issue config `03a26f3208f89d1647ad922ff81fa126478f0e235131f38b3c7b016b0262696b`
+  and work-item form
+  `aba4639a605aae6c401c7366ac63f14ce78c8fac30b232e5c5336ce875ecbfb8`.
+- Affected requirements, phases, releases and claims: P1-W7,
+  `ROADMAP-DOC-0004`, `REPO-DOC-0001`, `REPO-DOC-0009`, `REPO-DOC-0016`,
+  `BUILD-DOC-0012`, `RELEASE-DOC-0017`, `RELEASE-DOC-0019`, ADR-0003,
+  ADR-0004, ADR-0030 and ADR-0031. P2 and every public contribution or release
+  depend on the corrected repository contract.
+- Evidence/exits invalidated: P1 artifact/completeness and handoff closure were
+  reopened. Prior signature/DCO probes, protection/settings read-backs,
+  context-isolation proof, archive identity and documentation semantics remain
+  valid.
+- Remediation and protected PR: PR `#9` adds the eight governed artifacts and a
+  dependency-free validator that fails on absence, CR/non-UTF-8, unresolved
+  placeholders, broken Markdown links or missing mandatory declarations and
+  emits each digest. Its negative fixture proves a missing root artifact fails.
+  This amendment is the dedicated corrective handoff commit; self-identifying
+  its own commit or eventual squash SHA is impossible without changing that
+  identity. P1 returns to `evidence-complete` only after this final PR head passes
+  all three contexts, GitHub native-squashes it with verified signature and DCO,
+  its `main` run passes, the branch is automatically deleted and the 75-control
+  read-back passes. P2 intake derives and records the resulting immutable
+  squash SHA/tree.
