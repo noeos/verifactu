@@ -18,34 +18,71 @@ class AuditError(Exception):
     pass
 
 
+def decode_json_stream(rendered: str, label: str) -> list[object]:
+    """Decode the concatenated JSON documents emitted by `gh api --paginate`."""
+    if not rendered.strip():
+        return [None]
+    decoder = json.JSONDecoder()
+    documents: list[object] = []
+    offset = 0
+    while offset < len(rendered):
+        while offset < len(rendered) and rendered[offset].isspace():
+            offset += 1
+        if offset == len(rendered):
+            break
+        try:
+            document, offset = decoder.raw_decode(rendered, offset)
+        except json.JSONDecodeError as exc:
+            raise AuditError(f"unparseable paginated response from {label}") from exc
+        documents.append(document)
+    return documents
+
+
+def merge_pages(pages: list[object], label: str) -> object:
+    if not pages:
+        raise AuditError(f"empty JSON document stream from {label}")
+    if all(isinstance(page, list) for page in pages):
+        return [entry for page in pages for entry in page]
+    if all(isinstance(page, dict) for page in pages):
+        merged = dict(pages[0])
+        for page in pages[1:]:
+            for key, observed in page.items():
+                current = merged.get(key)
+                if isinstance(current, list) and isinstance(observed, list):
+                    current.extend(observed)
+                elif current != observed:
+                    raise AuditError(f"inconsistent paginated field {key!r} from {label}")
+        return merged
+    if len(pages) == 1:
+        return pages[0]
+    raise AuditError(f"incompatible paginated JSON shapes from {label}")
+
+
 def run_gh(endpoint: str, paginate: bool = False) -> dict[str, object]:
     executable = "/usr/bin/gh" if Path("/usr/bin/gh").exists() else "gh"
-    pages: list[object] = []
-    page = 1
-    while True:
-        separator = "&" if "?" in endpoint else "?"
-        requested = f"{endpoint}{separator}per_page=100&page={page}" if paginate else endpoint
-        result = subprocess.run([executable, "api", requested], text=True, capture_output=True)
-        if result.returncode != 0:
-            status_match = re.search(r"HTTP\s+(\d{3})", result.stderr)
-            status = int(status_match.group(1)) if status_match else None
-            state = "inaccessible" if status in {401, 403} else "not-found" if status == 404 else "error"
-            return {"state": state, "httpStatus": status, "diagnostic": result.stderr.strip()[:240]}
-        try:
-            current = json.loads(result.stdout) if result.stdout.strip() else None
-        except json.JSONDecodeError as exc:
-            raise AuditError(f"unparseable response from {requested}") from exc
-        pages.append(current)
-        if not paginate or not isinstance(current, list) or len(current) < 100:
-            break
-        page += 1
-    if paginate and pages and all(isinstance(item, list) for item in pages):
-        value = [entry for item in pages for entry in item]
-    else:
-        value = pages[0] if pages else None
+    command = [executable, "api", endpoint]
+    if paginate:
+        command.append("--paginate")
+    result = subprocess.run(command, text=True, capture_output=True)
+    if result.returncode != 0:
+        status_match = re.search(r"HTTP\s+(\d{3})", result.stderr)
+        status = int(status_match.group(1)) if status_match else None
+        state = "inaccessible" if status in {401, 403} else "not-found" if status == 404 else "error"
+        return {
+            "state": state,
+            "endpoint": endpoint,
+            "paginated": paginate,
+            "httpStatus": status,
+            "diagnostic": result.stderr.strip()[:240],
+        }
+    pages = decode_json_stream(result.stdout, endpoint)
+    value = merge_pages(pages, endpoint) if paginate else pages[0]
     canonical = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return {
         "state": "verified",
+        "endpoint": endpoint,
+        "paginated": paginate,
+        "pageDocuments": len(pages),
         "sha256": hashlib.sha256(canonical).hexdigest(),
         "value": value,
     }
@@ -58,14 +95,18 @@ def value(observation: dict[str, object], label: str):
 
 
 def count_observation(observation: dict[str, object]) -> dict[str, object]:
-    result = {key: observation.get(key) for key in ("state", "httpStatus", "sha256") if observation.get(key) is not None}
+    result = {
+        key: observation.get(key)
+        for key in ("state", "endpoint", "paginated", "pageDocuments", "httpStatus", "sha256")
+        if observation.get(key) is not None
+    }
     observed = observation.get("value")
     if isinstance(observed, list):
         result["count"] = len(observed)
     elif isinstance(observed, dict) and isinstance(observed.get("total_count"), int):
         result["count"] = observed["total_count"]
     elif observation.get("state") == "verified":
-        result["present"] = observed is not None
+        result["emptyResponseBody"] = observed is None
     if observation.get("diagnostic"):
         result["diagnostic"] = observation["diagnostic"]
     return result
@@ -203,6 +244,9 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     assert_equal(checks, "security.secretScanningPushProtection", policy["security"]["secretScanningPushProtection"], status("secret_scanning_push_protection"))
     assert_equal(checks, "security.secretScanningNonProviderPatterns", policy["security"]["secretScanningNonProviderPatterns"], status("secret_scanning_non_provider_patterns"))
     assert_equal(checks, "security.secretScanningValidityChecks", policy["security"]["secretScanningValidityChecks"], status("secret_scanning_validity_checks"))
+    assert_equal(checks, "security.dependabotAlertsReadable", "verified", observations["dependabotAlerts"].get("state"))
+    assert_equal(checks, "security.secretScanningAlertsReadable", "verified", observations["secretScanningAlerts"].get("state"))
+    assert_equal(checks, "security.codeScanningBeforeP2", "not-found", observations["codeScanningAlerts"].get("state"))
 
     by_name = {item["name"]: item for item in detailed_rulesets}
     assert_equal(
@@ -296,17 +340,55 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     }
 
 
+def self_test() -> dict[str, object]:
+    tests: list[str] = []
+
+    arrays = decode_json_stream('[{"id":1}]\n[{"id":2}]\n', "array-fixture")
+    if merge_pages(arrays, "array-fixture") != [{"id": 1}, {"id": 2}]:
+        raise AuditError("array pagination fixture was not fully merged")
+    tests.append("concatenated-array-pages")
+
+    objects = decode_json_stream(
+        '{"total_count":2,"secrets":[{"name":"first"}]}\n'
+        '{"total_count":2,"secrets":[{"name":"second"}]}\n',
+        "object-fixture",
+    )
+    if merge_pages(objects, "object-fixture") != {
+        "total_count": 2,
+        "secrets": [{"name": "first"}, {"name": "second"}],
+    }:
+        raise AuditError("object pagination fixture was not fully merged")
+    tests.append("concatenated-object-pages")
+
+    try:
+        decode_json_stream('{"valid":true}\nnot-json', "malformed-fixture")
+    except AuditError:
+        tests.append("malformed-page-fails-closed")
+    else:
+        raise AuditError("malformed pagination fixture unexpectedly passed")
+
+    try:
+        merge_pages([{"total_count": 1}, {"total_count": 2}], "drift-fixture")
+    except AuditError:
+        tests.append("cross-page-drift-fails-closed")
+    else:
+        raise AuditError("inconsistent pagination fixture unexpectedly passed")
+
+    return {"schemaVersion": 1, "result": "passed", "negativeFixtures": tests}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--policy", type=Path)
     parser.add_argument("--subject-sha")
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     root = args.root.resolve()
     policy = args.policy or root / ".github/policy/github.json"
     try:
-        report = audit(root, policy.resolve(), args.subject_sha)
+        report = self_test() if args.self_test else audit(root, policy.resolve(), args.subject_sha)
     except (AuditError, OSError, json.JSONDecodeError, subprocess.SubprocessError) as exc:
         print(json.dumps({"schemaVersion": 1, "result": "error", "diagnostic": str(exc)}, sort_keys=True))
         return 2

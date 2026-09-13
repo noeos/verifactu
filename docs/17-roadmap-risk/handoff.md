@@ -51,24 +51,24 @@ Historical detail belongs in phase records below.
 | Field | Current value |
 | --- | --- |
 | Roadmap | Eight phases P1–P8; P2 is next. |
-| Current phase | `P1` corrective closure; PR `#6` removes cross-event context ambiguity. |
-| Phase status | P1 is re-established as `evidence-complete` only by protected merge and final read-back of PR `#6`; P2 remains `planned`. |
-| Last evidence-complete phase | None while the post-closure P1 finding is open; PR `#6` re-establishes P1. |
+| Current phase | `P1` corrective closure; PR `#7` removes incomplete endpoint pagination and audit false-green behavior. |
+| Phase status | P1 is re-established as `evidence-complete` only by protected merge and final read-back of PR `#7`; P2 remains `planned`. |
+| Last evidence-complete phase | None while the post-closure P1 audit finding is open; PR `#7` re-establishes P1. |
 | Local repository | Documentation/governance only: 411 current Markdown documents before this handoff update, 117 immutable historical files and no product source. |
-| Protected `main` SHA | `ff99ed6e8ced56337d2c32dbf27ad5e738550640`, tree `8310fd68d3ca6a5c63e6ef9a12fe09e94a2baddf`; corrective PR `#6` result is derived at P2 intake. |
-| GitHub effective state | 68/68 policy comparisons passed on corrective head `01e001eb1b4a3f7b72573e2dc0c101b5f7f68d2c`; exactly one PR run produced its three contexts; organization visibility limits remain explicit. |
+| Protected `main` SHA | `c5697e33297daab98bc77de3202e7ca4d0fa290f`, tree `2f1aca1fa336ad3e48bbb113502e10f05a4f4b9d`; corrective PR `#7` result is derived at P2 intake. |
+| GitHub effective state | Link-paginated audit passes 71/71 on `c5697e33297daab98bc77de3202e7ca4d0fa290f`; Dependabot/secret alert surfaces are readable and CodeQL remains explicitly P2/not-configured. |
 | Toolchain/lock | Planned profiles only; no admitted implementation manifest/lock evidence yet. |
 | Regulatory edition | No implemented edition selected or generated yet. |
 | Verification Engine | Planned integration baseline must be independently re-observed/admitted. |
 | Public packages | Not implemented or published. |
 | External gates | Legal/CRA review, AEAT access/certificates, npm ownership/OIDC, performance runner and independent review must be observed. Facturacion is not built; only its versioned contract and maintained synthetic host are in current scope. |
-| Immediate instruction | Merge corrective PR `#6` only after final checks, then verify native squash, main-only push run, automatic branch deletion and effective state before P2. |
+| Immediate instruction | Merge corrective PR `#7` only after final checks and retained audit, then verify native squash, main-only push run, automatic branch deletion and full 71-check state before P2. |
 
 ## Phase ledger
 
 | Phase | Status | Input `main` | Closure `main` | Closure PR | Summary |
 | --- | --- | --- | --- | --- | --- |
-| P1 | evidence-complete after PR `#6` read-back | no remote commit | derived by P2 intake | `#5`, correction `#6` | Bootstrap, enforcement probes, planning approval and event-isolated required contexts. |
+| P1 | evidence-complete after PR `#7` read-back | no remote commit | derived by P2 intake | `#5`, corrections `#6`, `#7` | Bootstrap, probes, planning approval, isolated contexts and complete fail-closed GitHub audit. |
 | P2 | planned | — | — | — | Executable engineering/CI/build foundation. |
 | P3 | planned | — | — | — | Official sources, editions, contracts and oracles. |
 | P4 | planned | — | — | — | Deterministic fiscal core, artifacts and verification. |
@@ -80,7 +80,7 @@ Historical detail belongs in phase records below.
 ## Active-phase working record
 
 No phase is active after protected merge and final read-back of corrective PR
-`#6`. P2 starts with a new working record only after its intake reconciles this
+`#7`. P2 starts with a new working record only after its intake reconciles this
 handoff with Git and GitHub.
 
 ## Required phase-record schema
@@ -353,3 +353,39 @@ Append corrections in this form:
   P1 returns to `evidence-complete` only after its final-head checks, native
   signed/DCO squash, `main` push run, automatic branch deletion and full
   effective-state read-back pass. P2 derives the resulting SHA and tree.
+
+### AMD-P1-002 — 2026-09-13
+
+- Statement corrected: audits before PR `#7` claimed complete paginated endpoint
+  coverage although numeric `page` traversal failed for Dependabot alerts and
+  that signal error did not affect the overall result.
+- Correct value and reason: every P1-required security surface must be readable
+  and every paginated response must follow GitHub's actual `Link` pagination;
+  malformed, inconsistent or inaccessible required data fails the audit.
+- Discovered by / actor: Codex requirement-by-requirement completion audit after
+  protected merge and final read-back of PR `#6`.
+- Evidence locator and digest: first corrected local execution against protected
+  main `c5697e33297daab98bc77de3202e7ca4d0fa290f` passed 71/71 checks at
+  `2026-09-13T13:59:37Z`; Dependabot and secret-scanning alerts were verified
+  with count zero, code scanning was explicitly `not-found`, and the redacted
+  JSON SHA-256 was
+  `9592427f77c5e7372de36fef3180acb184a65ff160a60a7bc9654560263db2f1`.
+  The committed corrective auditor then produced 71/71 passing comparisons for
+  exact PR `#7` subject `6237e2282cf8543346264ba1f5eefe072636d937`
+  at `2026-09-13T14:02:50Z`; the complete redacted report is retained at
+  `.github/evidence/p1-effective-state-6237e22.json` with SHA-256
+  `995b6488d33be0e06bdd423cb3c4c6bf32bff236cd84951195b3ff1934bd940e`.
+- Affected requirements, phases, releases and claims: P1-W4, P1-W5, P1-W7,
+  REV-076, `REPO-DOC-0012`, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and every
+  later phase relying on GitHub drift evidence.
+- Evidence/exits invalidated: earlier 68-check GitHub audit closure reports are
+  retained as historical but no longer sufficient; signing/DCO, branch/tag
+  rules, destructive/invalid probes, documentation approval and context
+  isolation remain valid.
+- Remediation and protected PR: PR `#7` replaces numeric pagination with
+  GitHub-Link traversal, adds four deterministic pagination fixtures, promotes
+  required signal readability to conformance checks, and clarifies effective
+  security capability states. P1 returns to `evidence-complete` only after the
+  PR's final-head audit is retained and its signed/DCO native squash, main-only
+  run, branch deletion and 71-check final-main audit all pass. P2 derives the
+  resulting SHA and tree.
