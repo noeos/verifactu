@@ -119,3 +119,28 @@ comparisons with redacted-report SHA-256
 `f18e7123057c9083fc06d79ff69c5566a58fa801061c0eed20d8a33051589450`.
 P1 approval is re-established only by the protected native squash of PR `#6`
 and its final main-push and effective-state read-backs.
+
+## Audit-pagination correction
+
+A second completion audit found that the interim collector implemented numeric
+`page` traversal itself. GitHub's Dependabot alerts endpoint rejected that
+parameter, while the report exposed the error only as an informational signal
+and still returned `passed`. This reproduced the exact partial-audit/false-green
+class P1 assigns from `REV-076` and invalidated P1 audit closure.
+
+Corrective PR `#7` delegates traversal of GitHub `Link` pagination to
+`gh api --paginate`, safely decodes and merges every returned JSON document, and
+fails on malformed pages or cross-page scalar drift. Maintained offline fixtures
+cover multi-page arrays, collection objects, malformed streams and inconsistent
+pages. Dependabot and secret-scanning alert surfaces are now mandatory-readable
+P1 checks; code scanning is explicitly required to remain `not-found` until the
+versioned CodeQL implementation in P2.
+
+The same review tested additional GitHub security capabilities. A repository
+`PATCH` requesting validity checks and non-provider secret patterns returned
+success but immediate read-back kept both `disabled`; CodeQL default setup
+reported `not-configured`. These are retained capability observations, not
+successful-enable claims. The enabled P1 controls remain Dependabot alerts and
+security updates, private vulnerability reporting, secret scanning and push
+protection. P2 must re-evaluate entitlement and add versioned CodeQL without
+silently changing the recorded historical result.

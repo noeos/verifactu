@@ -24,10 +24,20 @@ full SHA pinning. Default workflow token is read-only and Actions may not create
 approve PRs. Fork workflow approval, artifact/log retention and reusable workflow
 access are explicit desired-state fields, never platform defaults.
 
-Dependabot alerts/updates, dependency graph, secret scanning, push protection,
-validity checks and code scanning are enabled where GitHub exposes them. Private/
-organization settings are recorded `verified`, `inaccessible`, `unknown` or
-`not-applicable-demonstrated`; inaccessible never equals disabled or passing.
+P1 enables Dependabot alerts/updates, secret scanning and push protection; the
+dependency graph is an always-on public-repository capability. Validity checks
+and non-provider patterns MUST be enabled when the repository's plan and
+organization entitlement actually admit the change. P1 attempted both fields
+and the immediate repository read-back remained `disabled`, so policy records
+that observed state and P2 MUST reassess capability rather than claim success.
+
+Code scanning is implemented in P2 through the admitted versioned CodeQL
+workflow, after executable source exists. P1 records default setup as
+`not-configured` and the alerts surface as `not-found`; it does not create an
+unversioned default-setup workflow or call this state enabled. Private/
+organization settings are recorded `verified`, `inaccessible`, `not-found`,
+`unknown` or `not-applicable-demonstrated`; none of the latter states is silently
+converted to disabled, absent or passing.
 
 A versioned machine schema declares value, API source, required visibility,
 normalization and drift severity. Mutation is ordered, least-privileged and
