@@ -50,25 +50,25 @@ Historical detail belongs in phase records below.
 
 | Field | Current value |
 | --- | --- |
-| Roadmap | Eight phases P1–P8; P1 is next. |
-| Current phase | `P1` — governed bootstrap and effective protection. |
-| Phase status | `active`; P1 intake and local policy validation started at `2026-09-13T11:14:42Z`. |
-| Last evidence-complete phase | None. |
-| Local repository | Empty-history repository on `docs/governance-foundation`; 410 current Markdown documents and 117 immutable historical files observed; no product source. |
-| Protected `main` SHA | `not-observed`; do not infer one. |
-| GitHub effective state | Intake observed empty remote history, no rulesets/environments and settings that do not yet satisfy P1; issue `#1` tracks remediation. |
+| Roadmap | Eight phases P1–P8; P2 is next. |
+| Current phase | None; P1 closes through PR `#5`, then P2 intake may begin. |
+| Phase status | P1 `evidence-complete` upon protected merge of PR `#5`; P2 remains `planned`. |
+| Last evidence-complete phase | `P1` — governed bootstrap and effective protection. |
+| Local repository | Documentation/governance only: 411 current Markdown documents before this handoff update, 117 immutable historical files and no product source. |
+| Protected `main` SHA | P1 evidence subject `57a062c7d907287eb25461bea560f42d9dd8b87c`; PR `#5` result must be derived at P2 intake. |
+| GitHub effective state | 68/68 policy comparisons passed at `2026-09-13T11:47:26Z`; repository protection has no bypass; organization-level visibility limits remain explicit. |
 | Toolchain/lock | Planned profiles only; no admitted implementation manifest/lock evidence yet. |
 | Regulatory edition | No implemented edition selected or generated yet. |
 | Verification Engine | Planned integration baseline must be independently re-observed/admitted. |
 | Public packages | Not implemented or published. |
 | External gates | Legal/CRA review, AEAT access/certificates, npm ownership/OIDC, performance runner and independent review must be observed. Facturacion is not built; only its versioned contract and maintained synthetic host are in current scope. |
-| Immediate instruction | Complete P1 bootstrap, producer observation, effective protection probes, governance acceptance and dedicated closure PR. |
+| Immediate instruction | Merge PR `#5` only after its final-head checks pass; P2 must re-observe its squash SHA, branch deletion and effective controls before creating source. |
 
 ## Phase ledger
 
 | Phase | Status | Input `main` | Closure `main` | Closure PR | Summary |
 | --- | --- | --- | --- | --- | --- |
-| P1 | active | no remote commit | — | — | Issue `#1`; local governance validators and negative fixtures pass before bootstrap. |
+| P1 | evidence-complete | no remote commit | derived by P2 intake | `#5` | Bootstrap, enforcement probes, protected squash, planning approval and effective-state audit complete. |
 | P2 | planned | — | — | — | Executable engineering/CI/build foundation. |
 | P3 | planned | — | — | — | Official sources, editions, contracts and oracles. |
 | P4 | planned | — | — | — | Deterministic fiscal core, artifacts and verification. |
@@ -79,30 +79,8 @@ Historical detail belongs in phase records below.
 
 ## Active-phase working record
 
-### P1 working record — governed bootstrap and effective protection
-
-- Status: `active`.
-- Started: `2026-09-13T11:14:42Z`.
-- Input Git state: repository has no commit; branch
-  `docs/governance-foundation`; origin `noeos/verifactu` has no branch.
-- Work item: GitHub issue `#1`.
-- Documentation baseline: 410 current Markdown files, aggregate SHA-256
-  `3814cb84052cdd7e14090f320398cf1d2a5679195f0c487fdfa11439112bd730`.
-- Historical baseline: 117 files under `docs/previous-docs`, aggregate SHA-256
-  `99641c59c5e5bc32c08dfc337912301b8a7c1f91f08976673eb52396f41c93a1`.
-- Identity baseline: repository-local SSH signing and tag signing enabled;
-  admitted public-key fingerprint
-  `SHA256:65VbGskWghAQAXDbJ3/1hrWuYegZNLs/+S96BbNQCzI`; no private material retained.
-- Local policy gates: documentation/governance validation and their negative
-  fixtures pass; commit-policy positive and negative fixtures pass.
-- GitHub intake discrepancy: merge/rebase enabled, automatic branch deletion
-  disabled, SHA pinning and secret scanning disabled, and no effective rulesets.
-- Recovery point: empty remote repository; no prior commit can be restored.
-- Next operation: signed/DCO bootstrap, observe all three check producers, then
-  install and read back the documented settings and no-bypass rulesets.
-- Long-lead lane: external legal/CRA review, AEAT access, npm custody,
-  performance environment, independent assessment and recovery custody remain
-  `not-observed`; P1 does not claim their completion.
+No phase is active after protected merge of the P1 closure. P2 starts with a new
+working record only after its intake reconciles this handoff with Git and GitHub.
 
 ## Required phase-record schema
 
@@ -193,5 +171,154 @@ Append corrections in this form:
 
 ## Phase closure records
 
-No implementation phase has yet produced a protected closure record. Planning
-approval is not implementation or evidence.
+## P1 closure — governed bootstrap and effective protection
+
+### Identity and status
+
+- Status: `evidence-complete` upon protected merge of PR `#5`.
+- Started/closed (UTC): `2026-09-13T11:14:42Z` / protected merge time of PR
+  `#5`, to be derived by P2 intake.
+- Input main SHA / tree: no remote commit / empty repository.
+- Closure main SHA / tree: derived by P2 intake; self-reference from this commit
+  is impossible and is not guessed.
+- Closure PR: `#5`, branch `docs/p1-closure`.
+- Roadmap revision: `ROADMAP-DOC-0004`; content baseline at
+  `57a062c7d907287eb25461bea560f42d9dd8b87c`.
+- Documentation inventory digest: pre-handoff approved candidate, 411 current
+  Markdown files, SHA-256
+  `52cb771f27f2abe36498ec55735529f47dd64f6314c46f934a4e12d0942c253e`;
+  P2 derives the final closure-tree inventory.
+
+### Readiness and sources
+
+- Prerequisites and their evidence: empty-history/local/remote/GitHub intake;
+  owner identity; usable SSH signer; documentation and archive inventory; issue
+  `#1`; all recorded in the initial signed bootstrap.
+- Re-observed mutable sources/dependencies: GitHub REST effective state,
+  `actions/checkout` official `v7.0.1` tag and Verification Engine governance
+  reference. Checkout resolved to full SHA
+  `3d3c42e5aac5ba805825da76410c181273ba90b1`.
+- Assumptions resolved/falsified: the remote was empty; GitHub selected the
+  first-pushed branch as default and was explicitly corrected to `main`; web DCO
+  is organization-enforced; installed `gh` lacks `--slurp`; new-branch push
+  events use a zero `before` SHA.
+- Initial risks/blockers: protection deadlock and fictional reviewers were
+  avoided by observing producers before enforcement and setting zero approvals,
+  no CODEOWNERS and no bypass. No P1 blocker remains.
+
+### Work packages and protected history
+
+| Work ID | Issue | Branch | PR | branch commits/signers/DCO | squash SHA | result |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1-W1–W5 | `#1` | `docs/governance-foundation` | bootstrap plus `#2` | `c40f5d6e4e2dc8debe0b365790f9a112d27af663`, `6b61669e2c487b2b449ef97cb8fb40785a92f60d`; admitted SSH signer and matching DCO | `57a062c7d907287eb25461bea560f42d9dd8b87c` for PR `#2` | pass |
+| P1-W6 unsigned | `#1` | `probe/unsigned-commit` | `#3`, closed | `b2d8158d303a15c9060680d9a8650d2b39db7f76`; deliberately unsigned, DCO present | none | rejected as intended |
+| P1-W6 missing DCO | `#1` | `probe/missing-dco` | `#4`, closed | `d79ae2b4a1d47b15f1307651c05ee088da056327`; admitted SSH signer, deliberately no DCO | none | rejected as intended |
+| P1-W6/W7 | `#1` | `docs/p1-closure` | `#5` | `bb897f7073f9b58eec44357780be26c3a72f1327`, `349692ed721eeb40e523a25ea799c706c8aa3689` and this handoff commit; admitted SSH signer and matching DCO | derived by P2 intake | final closure candidate |
+
+### Implemented state
+
+- Components and behavior: dependency-free documentation/governance validator,
+  trailer-aware whole-range SSH/DCO validator, read-only paginated/redacted
+  GitHub auditor and an always-closed three-context workflow.
+- Paths/files created, changed or removed: `.github/policy/*`,
+  `.github/scripts/*`, `.github/workflows/governance.yml`, `.gitignore`, complete
+  `docs/`; transient Python bytecode was removed before publication.
+- Public API/CLI/events/diagnostics: no product API or CLI. Governance scripts
+  emit versioned JSON results and precise fail-closed diagnostics.
+- Schemas/formats/editions/generated output: governance schemas and immutable
+  previous-docs aggregate only; no regulatory edition or generated product
+  output.
+- Persistence/migrations/compatibility: none in P1.
+- Toolchain/dependencies/Actions: Python standard library, Git, OpenSSH and one
+  GitHub-owned checkout Action pinned to the admitted full SHA; no package
+  dependency or install step.
+- GitHub/npm/external effective state: `main` ruleset `23163524`, release-tag
+  ruleset `23163527`, squash-only, automatic branch deletion, full-SHA selected
+  Actions, read-only default workflow token and enabled repository security
+  controls. No npm/publication action occurred.
+
+### Verification and evidence
+
+| Claim/requirement | test/oracle | canonical task/job | subject/environment | result | evidence locator/digest |
+| --- | --- | --- | --- | --- | --- |
+| Bootstrap identity | local and CI signature/DCO verification | `Required · governance signatures and DCO` | `c40f5d6e4e2dc8debe0b365790f9a112d27af663` | pass | run `34754555914` |
+| Documentation/archive | metadata, IDs, dependencies, links, archive digest | `Required · documentation and traceability` | bootstrap and every accepted head | pass | 410 initial docs; 117 archive files; archive digest in `GOV-013` |
+| Required-check closure | always-run dependency result assertion | `Required · required-check closure` | bootstrap, PR and main push events | pass | runs `34754555914`, `34754932667`, `34754989598` |
+| Positive protected flow | signed PR, native squash verification and branch read-back | all three contexts | PR `#2` / main | pass | squash `57a062c7d907287eb25461bea560f42d9dd8b87c`; head branch `404` |
+| Direct/force/delete protection | live Git pushes | GitHub rules | `main` | rejected | `GH013` direct/force diagnostics; default-branch deletion refusal; `GOV-013` |
+| Unsigned rejection | live negative PR | signature/DCO plus closure jobs | PR `#3` | rejected/blocked | run `34755046577` |
+| Missing-DCO rejection | live negative PR | signature/DCO plus closure jobs | PR `#4` | rejected/blocked | run `34755154669` |
+| New-branch range regression | zero-before positive branch event | all three contexts | `349692ed721eeb40e523a25ea799c706c8aa3689` | pass | run `34755507436`; disposable branch deleted |
+| Effective GitHub policy | 68 exact read-only comparisons | `audit-github.py` | protected main `57a062c7d907287eb25461bea560f42d9dd8b87c` | pass, zero mismatches | observed `2026-09-13T11:47:26Z`; redacted JSON SHA-256 `b29e02105091b27d168d128f877a52eebfa67269f4ca960ca4f8b984ccc471a9` |
+
+- Coverage/mutation/fuzz results and justified scope: not applicable to the
+  absent product; policy self-tests cover all material P1 false-pass classes.
+- Security/privacy/supply-chain results: no secret/private key retained; Actions
+  has empty top-level permissions, no privileged event/write permission, one
+  admitted full-SHA Action and no persistent repository secret.
+- Performance/reliability/recovery results: policy tasks complete within bounded
+  5/10-minute jobs; product performance is not a P1 claim.
+- Package/tarball/integration matrix results: not applicable; no packages exist.
+- Legal/regulatory/external observations and independence class: owner/self and
+  tool evidence only; no legal, AEAT or independent validation claimed.
+
+### Failures, corrections and review
+
+- First failures retained: local diff gate found three surplus final blank lines;
+  prepublication review found generated bytecode staged; `gh --slurp` was absent;
+  GitHub returned `422` when a repository patch attempted to restate inherited
+  web DCO; an audit report contained a non-serializable set; and new-branch run
+  `34755419567` failed on zero `before` SHA.
+- Root causes and affected variants: input formatting; transient local output;
+  CLI-version assumption; organization inheritance; JSON normalization error;
+  and conflation of an empty-history bootstrap with a new branch based on main.
+- Corrections/regressions: normalized files; removed bytecode and ignored it;
+  implemented explicit REST pagination; omitted the immutable inherited field
+  and read it back as enabled; sorted ruleset names; distinguished `404` from
+  authorization denial; resolved new-branch base via authenticated default-branch
+  API and verified the full ancestral range.
+- Invalidated evidence rerun: all local fixtures/gates, effective-state audit,
+  PR checks and the dedicated new-branch run `34755507436` passed after fixes.
+- Review conversations and dispositions: project-owner approval is represented
+  by the lifecycle transition and `GOV-013`; zero additional human approval is
+  required or fabricated.
+
+### Traceability and residual state
+
+- Requirements/ADRs/controls closed: P1-W1 through P1-W7; ADR-0003/0004/0005/
+  0031/0032/0033 governance scope; GOV-001 through GOV-013.
+- REV findings disposed: REV-073 and REV-075–081 have explicit P1 dispositions
+  in `GOV-013`; every other historical finding remains mapped in the ledger.
+- Current findings: none material in P1 scope.
+- Risks/exceptions/open questions: no exception accepted. Organization Actions,
+  runner, secret and variable surfaces returned `403`; organization rulesets and
+  hooks returned `404` and are not treated as proof of absence.
+- Explicit remaining committed scope: all P2–P8 implementation, assurance,
+  external and release work remains; documentation approval is not implementation.
+- Deviations from roadmap and authority: none. The false-red correction added a
+  maintained full-range new-branch behavior rather than weakening a check.
+
+### Recovery and next phase
+
+- Recovery/revert point and verified procedure: protected main evidence point
+  `57a062c7d907287eb25461bea560f42d9dd8b87c`; any correction is a new signed+DCO
+  PR and native squash. No bypass or history rewrite is available.
+- Exit-criteria evaluation: effective desired state matches 68/68 comparisons;
+  negative and positive paths behave as required; documentation is accepted;
+  no product source/CODEOWNERS/bypass/approval fiction or temporary relaxation
+  remains. P1 passes upon protected merge of PR `#5`.
+- Next phase and exact prerequisites: P2, only after deriving PR `#5` squash SHA,
+  verifying its GitHub signature/DCO/one-PR mapping, confirming automatic branch
+  deletion, rerunning all three checks and auditing effective state.
+- Exact first commands/observations: `git fetch --prune origin`; switch to clean
+  `main`; inspect `git status`, signed log and tree; run both policy self-tests and
+  repository validation; run the GitHub auditor against the derived main SHA;
+  compare ruleset IDs/contexts/producers and reopen P1 on any mismatch.
+- Priority documents to reread: implementation roadmap/handoff/P2 prompt,
+  `05-architecture`, complete `13-repository-ci`, `14-supply-chain-build`,
+  applicable quality/assurance docs, ADRs and mapped historical findings.
+- Long-lead items carried forward: legal/RRSIF and CRA review, AEAT
+  authorization/certificates/portal, three npm names and OIDC custody,
+  Verification Engine exact release admission, future-Facturacion synthetic host
+  contract, stable performance runner, signing/account recovery and independent
+  assessment. Absence retains the exact downstream block; it is not waived.
