@@ -403,8 +403,11 @@ Append corrections in this form:
 - Evidence locator and digest: GitHub read-back changed fork approval from
   `first_time_contributors` to `all_external_contributors`; retention returned
   `{days: 90, maximum_allowed_days: 90}`; access returned the documented `422`
-  applicability response. PR `#8` and its successor retained report bind the
-  exact final subjects and digest.
+  applicability response. Exact PR `#8` subject
+  `a55f3ee1951c5478590f00c740f6658febee6f29` passed 75/75 comparisons at
+  `2026-09-13T14:15:25Z`; its complete redacted report is retained at
+  `.github/evidence/p1-effective-state-a55f3ee.json` with SHA-256
+  `dec1d1b6e19854c3d285cf4a3a40498cd5b19f04b2ab15662924a47f6b2fe3c5`.
 - Affected requirements, phases, releases and claims: P1-W4, P1-W5, P1-W7,
   ADR-0032, `REPO-DOC-0012`, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and future
   untrusted-contribution workflows.

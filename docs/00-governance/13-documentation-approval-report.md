@@ -168,7 +168,12 @@ private/internal repositories; the auditor normalizes only that exact
 public-repository response to `not-applicable` and fails on other errors.
 
 Corrective PR `#8` versions these values, adds their exact endpoint checks and
-retains a successor redacted report. This strengthens untrusted-contribution
+retains the successor redacted report at
+`.github/evidence/p1-effective-state-a55f3ee.json`. It binds exact subject
+`a55f3ee1951c5478590f00c740f6658febee6f29`, 75/75 passing checks at
+`2026-09-13T14:15:25Z` and SHA-256
+`dec1d1b6e19854c3d285cf4a3a40498cd5b19f04b2ab15662924a47f6b2fe3c5`.
+This strengthens untrusted-contribution
 handling without inventing a human code-review requirement: the repository still
 requires zero approving reviews, while untrusted external workflow execution
 requires the sole maintainer's explicit security approval.
