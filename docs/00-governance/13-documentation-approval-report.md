@@ -144,3 +144,13 @@ successful-enable claims. The enabled P1 controls remain Dependabot alerts and
 security updates, private vulnerability reporting, secret scanning and push
 protection. P2 must re-evaluate entitlement and add versioned CodeQL without
 silently changing the recorded historical result.
+
+The full redacted 71-check candidate report is retained as
+`.github/evidence/p1-effective-state-6237e22.json`. It was produced by the
+committed corrective auditor for subject
+`6237e2282cf8543346264ba1f5eefe072636d937` at
+`2026-09-13T14:02:50Z`; its SHA-256 is
+`995b6488d33be0e06bdd423cb3c4c6bf32bff236cd84951195b3ff1934bd940e`.
+The report contains normalized settings, endpoint identities and digests,
+rulesets, exact check producers and explicit limitations, but no credential,
+secret value, private key or unredacted account data.

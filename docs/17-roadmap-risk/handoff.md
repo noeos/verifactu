@@ -370,6 +370,11 @@ Append corrections in this form:
   with count zero, code scanning was explicitly `not-found`, and the redacted
   JSON SHA-256 was
   `9592427f77c5e7372de36fef3180acb184a65ff160a60a7bc9654560263db2f1`.
+  The committed corrective auditor then produced 71/71 passing comparisons for
+  exact PR `#7` subject `6237e2282cf8543346264ba1f5eefe072636d937`
+  at `2026-09-13T14:02:50Z`; the complete redacted report is retained at
+  `.github/evidence/p1-effective-state-6237e22.json` with SHA-256
+  `995b6488d33be0e06bdd423cb3c4c6bf32bff236cd84951195b3ff1934bd940e`.
 - Affected requirements, phases, releases and claims: P1-W4, P1-W5, P1-W7,
   REV-076, `REPO-DOC-0012`, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and every
   later phase relying on GitHub drift evidence.
