@@ -150,6 +150,12 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     actions_obs = observe("actionsPermissions", f"repos/{repository}/actions/permissions")
     workflow_permissions_obs = observe("workflowPermissions", f"repos/{repository}/actions/permissions/workflow")
     selected_obs = observe("selectedActions", f"repos/{repository}/actions/permissions/selected-actions")
+    fork_approval_obs = observe("forkPullRequestApproval", f"repos/{repository}/actions/permissions/fork-pr-contributor-approval")
+    retention_obs = observe("artifactAndLogRetention", f"repos/{repository}/actions/permissions/artifact-and-log-retention")
+    reusable_access_obs = observe("reusableWorkflowAccess", f"repos/{repository}/actions/permissions/access")
+    if policy["visibility"] == "public" and reusable_access_obs.get("httpStatus") == 422:
+        reusable_access_obs["state"] = "not-applicable"
+        reusable_access_obs["reason"] = "endpoint applies only to private or internal repositories"
     rulesets_obs = observe("rulesets", f"repos/{repository}/rulesets", True)
     branches_obs = observe("branches", f"repos/{repository}/branches", True)
     classic_obs = observe("classicMainProtection", f"repos/{repository}/branches/main/protection")
@@ -233,6 +239,12 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     assert_equal(checks, "actions.githubOwnedAllowed", policy["actions"]["githubOwnedAllowed"], selected.get("github_owned_allowed"))
     assert_equal(checks, "actions.verifiedAllowed", policy["actions"]["verifiedAllowed"], selected.get("verified_allowed"))
     assert_equal(checks, "actions.patternsAllowed", policy["actions"]["patternsAllowed"], selected.get("patterns_allowed") or [])
+    fork_approval = value(fork_approval_obs, "fork PR contributor approval")
+    assert_equal(checks, "actions.forkPullRequestApproval", policy["actions"]["forkPullRequestApproval"], fork_approval.get("approval_policy"))
+    retention = value(retention_obs, "artifact and log retention")
+    assert_equal(checks, "actions.artifactAndLogRetentionDays", policy["actions"]["artifactAndLogRetentionDays"], retention.get("days"))
+    assert_equal(checks, "actions.artifactAndLogRetentionMaximum", True, retention.get("maximum_allowed_days", 0) >= policy["actions"]["artifactAndLogRetentionDays"])
+    assert_equal(checks, "actions.reusableWorkflowAccess", "not-applicable", reusable_access_obs.get("state"))
 
     security = repo.get("security_and_analysis") or {}
     status = lambda key: (security.get(key) or {}).get("status") == "enabled"

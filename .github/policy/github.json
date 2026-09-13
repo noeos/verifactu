@@ -25,7 +25,10 @@
     "patternsAllowed": [],
     "shaPinningRequired": true,
     "defaultWorkflowPermissions": "read",
-    "canApprovePullRequestReviews": false
+    "canApprovePullRequestReviews": false,
+    "forkPullRequestApproval": "all_external_contributors",
+    "artifactAndLogRetentionDays": 90,
+    "reusableWorkflowAccess": "not-applicable-public"
   },
   "security": {
     "dependabotAlerts": true,

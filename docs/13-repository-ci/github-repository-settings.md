@@ -21,8 +21,12 @@ SSH+DCO policy.
 
 Actions permit GitHub-owned Actions plus an exact admitted allowlist and require
 full SHA pinning. Default workflow token is read-only and Actions may not create/
-approve PRs. Fork workflow approval, artifact/log retention and reusable workflow
-access are explicit desired-state fields, never platform defaults.
+approve PRs. Every external contributor requires owner approval before a fork PR
+workflow can execute. Artifact/log retention is the public-repository maximum of
+90 days. Reusable-workflow access is explicitly `not-applicable` because GitHub's
+repository endpoint applies only to private/internal repositories; a `422` with
+that documented reason is retained rather than misreported as configured. These
+are versioned desired-state fields, never platform defaults.
 
 P1 enables Dependabot alerts/updates, secret scanning and push protection; the
 dependency graph is an always-on public-repository capability. Validity checks
