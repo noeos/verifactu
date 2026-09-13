@@ -177,3 +177,29 @@ This strengthens untrusted-contribution
 handling without inventing a human code-review requirement: the repository still
 requires zero approving reviews, while untrusted external workflow execution
 requires the sole maintainer's explicit security approval.
+
+## Root-community contract correction
+
+The final P1 path audit found that the required root community files and governed
+change-record templates were absent. Documentation approval did not authorize
+that omission: `ROADMAP-DOC-0004` assigns root community files to P1,
+`REPO-DOC-0001` names the five exact root files and `REPO-DOC-0009` specifies the
+PR record fields. P1 closure was reopened rather than carrying the inconsistency
+into the product foundation.
+
+Corrective PR `#9` adds `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `LICENSE`,
+`NOTICE`, `.github/PULL_REQUEST_TEMPLATE.md` and a non-sensitive governed issue
+form/configuration. The content states the real boundary: documentation and
+bootstrap controls exist, product code and Facturación do not, security intake
+is private and no distribution licence has been granted. It neither chooses a
+licence without legal review nor mistakes DCO provenance for permission.
+
+The dependency-free policy now validates every artifact's presence, encoding,
+line endings, absence of unresolved placeholders, required declarations and
+Markdown links, and emits individual SHA-256 digests. Signed+DCO commit
+`812ad206baa7df75273d546ab3abce4f3f7903f9` passed all three exact contexts in
+sole PR run `34763062255`; the read-only effective-state audit passed 75/75 at
+`2026-09-13T14:35:25Z` with zero mismatch. Exact artifact digests and the audit
+digest are retained in `AMD-P1-004` of the handoff. Approval returns to
+`evidence-complete` only after PR `#9` itself completes the protected
+squash/main-run/branch-deletion/final-read-back sequence.
