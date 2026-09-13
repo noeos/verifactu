@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-INDEX
 title: Public contracts documentation index
-status: draft
+status: approved
 authority: informative
 owner: api-owner
 created: 2026-09-12

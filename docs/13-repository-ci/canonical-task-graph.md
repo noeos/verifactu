@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0008
 title: Canonical task graph
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0003
 title: SOAP binding and wire message
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

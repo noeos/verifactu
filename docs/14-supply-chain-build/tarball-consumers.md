@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0011
 title: Tarball consumer verification
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

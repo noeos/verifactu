@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0009
 title: Results errors and diagnostics
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

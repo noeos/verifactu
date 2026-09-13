@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0003
 title: Record and artifact store
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

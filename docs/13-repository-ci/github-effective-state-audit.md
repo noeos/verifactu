@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0021
 title: GitHub effective-state audit
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

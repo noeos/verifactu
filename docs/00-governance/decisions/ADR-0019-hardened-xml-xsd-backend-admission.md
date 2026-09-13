@@ -1,7 +1,7 @@
 ---
 id: ADR-0019
 title: Hardened XML and XSD backend admission
-status: proposed
+status: accepted
 authority: decision
 owner: cryptography-owner
 created: 2026-09-12

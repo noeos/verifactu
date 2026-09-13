@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0023
 title: Regulatory change operation
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

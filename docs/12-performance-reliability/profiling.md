@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0011
 title: Profiling and optimization protocol
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

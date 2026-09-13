@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0003
 title: Applicability and exclusions
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

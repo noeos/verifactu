@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0005
 title: XSD validation
-status: draft
+status: approved
 authority: normative
 owner: cryptography-owner
 created: 2026-09-12

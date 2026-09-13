@@ -1,7 +1,7 @@
 ---
 id: ARCH-DOC-0004
 title: Package container and future source tree
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

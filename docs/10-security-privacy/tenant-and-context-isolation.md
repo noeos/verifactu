@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0010
 title: Tenant and fiscal-context isolation
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

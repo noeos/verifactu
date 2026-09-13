@@ -1,7 +1,7 @@
 ---
 id: ADR-0007
 title: Product form and release surface
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

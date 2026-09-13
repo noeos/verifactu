@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0008
 title: Host atomicity contract
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

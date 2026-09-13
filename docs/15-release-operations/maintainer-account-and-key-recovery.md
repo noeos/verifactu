@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0022
 title: Maintainer, account and key recovery
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0010
 title: Durable state machine and journal
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

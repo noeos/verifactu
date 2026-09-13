@@ -1,7 +1,7 @@
 ---
 id: PROD-DOC-0009
 title: Product support and lifecycle
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

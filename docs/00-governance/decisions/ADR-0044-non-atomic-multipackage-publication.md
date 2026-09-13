@@ -1,7 +1,7 @@
 ---
 id: ADR-0044
 title: Non-atomic multi-package publication
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

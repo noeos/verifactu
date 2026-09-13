@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0002
 title: Acronyms
-status: draft
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

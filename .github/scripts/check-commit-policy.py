@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -161,6 +162,21 @@ def verify_github_squash(root: Path, sha: str, repository: str, api_url: str, to
     return str(candidates[0]["number"])
 
 
+def default_branch_head(repository: str, api_url: str, token: str) -> str:
+    if not token:
+        raise CommitPolicyError("GitHub token is required to resolve a new-branch range")
+    metadata = api_json(f"{api_url}/repos/{repository}", token)
+    branch = metadata.get("default_branch") if isinstance(metadata, dict) else None
+    if not isinstance(branch, str) or not branch:
+        raise CommitPolicyError("repository API lacks a default branch")
+    encoded = urllib.parse.quote(branch, safe="")
+    commit = api_json(f"{api_url}/repos/{repository}/commits/{encoded}", token)
+    sha = commit.get("sha") if isinstance(commit, dict) else None
+    if not isinstance(sha, str) or not SHA_RE.fullmatch(sha):
+        raise CommitPolicyError("default-branch API response lacks a commit SHA")
+    return sha
+
+
 def check_policy(
     root: Path,
     event: str,
@@ -195,8 +211,13 @@ def check_policy(
         verify_ssh_signature(root, head, allowed_signers)
         verify_dco(root, head)
     elif event == "push":
-        commits = range_commits(root, base.lower(), head)
-        mode = "branch-push-ssh"
+        effective_base = base.lower()
+        if effective_base == ZERO_SHA:
+            effective_base = default_branch_head(repository, api_url, token)
+            mode = "new-branch-push-ssh"
+        else:
+            mode = "branch-push-ssh"
+        commits = range_commits(root, effective_base, head)
         for sha in commits:
             verify_ssh_signature(root, sha, allowed_signers)
             verify_dco(root, sha)

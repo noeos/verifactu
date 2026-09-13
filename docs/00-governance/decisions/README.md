@@ -1,7 +1,7 @@
 ---
 id: ADR-INDEX
 title: Governance decision records
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

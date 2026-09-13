@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0012
 title: Issue and pull-request mapping
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

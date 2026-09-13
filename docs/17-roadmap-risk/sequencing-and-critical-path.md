@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0003
 title: Sequencing and critical path
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

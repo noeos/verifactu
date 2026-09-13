@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0007
 title: Signed release tags
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

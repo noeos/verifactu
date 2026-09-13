@@ -1,7 +1,7 @@
 ---
 id: ADR-0028
 title: Deterministic tests and no rerun-to-green
-status: proposed
+status: accepted
 authority: decision
 owner: quality-owner
 created: 2026-09-12

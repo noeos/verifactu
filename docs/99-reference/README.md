@@ -1,7 +1,7 @@
 ---
 id: REF-INDEX
 title: Reference documentation index
-status: proposed
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

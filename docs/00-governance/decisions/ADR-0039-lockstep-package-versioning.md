@@ -1,7 +1,7 @@
 ---
 id: ADR-0039
 title: Lockstep public package versioning
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

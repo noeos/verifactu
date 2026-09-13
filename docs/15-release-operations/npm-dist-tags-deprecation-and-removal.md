@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0011
 title: npm dist-tags, deprecation and removal
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0014
 title: Performance and resource testing
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

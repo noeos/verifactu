@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0005
 title: Generated, vendored and temporary files
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

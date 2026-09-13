@@ -1,7 +1,7 @@
 ---
 id: REQ-DOC-0004
 title: Non-functional requirements
-status: draft
+status: approved
 authority: normative
 owner: requirements-owner
 created: 2026-09-12

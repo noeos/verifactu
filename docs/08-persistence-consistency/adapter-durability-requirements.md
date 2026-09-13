@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0016
 title: Adapter durability requirements
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

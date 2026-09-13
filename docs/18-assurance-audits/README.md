@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-INDEX
 title: Assurance and audits documentation index
-status: proposed
+status: approved
 authority: informative
 owner: assurance-owner
 created: 2026-09-12

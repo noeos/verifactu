@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0010
 title: SSH signatures and DCO
-status: draft
+status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12

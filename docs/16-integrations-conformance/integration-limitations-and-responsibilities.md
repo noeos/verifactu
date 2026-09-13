@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0017
 title: Integration limitations and responsibilities
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

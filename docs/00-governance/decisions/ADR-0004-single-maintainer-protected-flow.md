@@ -1,7 +1,7 @@
 ---
 id: ADR-0004
 title: Single-maintainer protected change flow
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-11

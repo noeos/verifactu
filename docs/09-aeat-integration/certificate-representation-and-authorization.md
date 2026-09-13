@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0005
 title: AEAT certificate representation and authorization
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

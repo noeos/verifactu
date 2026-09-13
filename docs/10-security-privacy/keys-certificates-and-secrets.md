@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0008
 title: Keys, certificates and secrets
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

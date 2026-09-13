@@ -1,7 +1,7 @@
 ---
 id: GOV-TEMPLATE-INDEX
 title: Governance templates
-status: draft
+status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-11

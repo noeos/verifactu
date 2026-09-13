@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0001
 title: Public library API
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

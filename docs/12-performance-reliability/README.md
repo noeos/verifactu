@@ -1,7 +1,7 @@
 ---
 id: PERF-INDEX
 title: Performance and reliability documentation
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

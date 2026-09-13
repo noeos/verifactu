@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0004
 title: Lockfile and registry integrity
-status: draft
+status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12

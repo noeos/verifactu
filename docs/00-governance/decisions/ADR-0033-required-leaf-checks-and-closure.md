@@ -1,7 +1,7 @@
 ---
 id: ADR-0033
 title: Required leaf checks and fail-closed closure
-status: proposed
+status: accepted
 authority: decision
 owner: repository-owner
 created: 2026-09-12

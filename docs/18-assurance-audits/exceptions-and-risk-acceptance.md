@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0018
 title: Exceptions and risk acceptance
-status: draft
+status: approved
 authority: normative
 owner: risk-owner
 created: 2026-09-12

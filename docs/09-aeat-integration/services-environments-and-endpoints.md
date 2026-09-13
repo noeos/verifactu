@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0001
 title: AEAT services environments and endpoints
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

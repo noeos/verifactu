@@ -1,7 +1,7 @@
 ---
 id: ADR-0002
 title: Ecosystem repository boundaries
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-11

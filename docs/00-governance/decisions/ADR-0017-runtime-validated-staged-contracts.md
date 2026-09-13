@@ -1,7 +1,7 @@
 ---
 id: ADR-0017
 title: Runtime-validated staged public contracts
-status: proposed
+status: accepted
 authority: decision
 owner: api-owner
 created: 2026-09-12

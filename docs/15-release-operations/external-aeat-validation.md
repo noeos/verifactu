@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0014
 title: External AEAT validation
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

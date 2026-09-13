@@ -1,7 +1,7 @@
 ---
 id: ADR-0022
 title: Atomic host record and outbox commit
-status: proposed
+status: accepted
 authority: decision
 owner: persistence-owner
 created: 2026-09-12

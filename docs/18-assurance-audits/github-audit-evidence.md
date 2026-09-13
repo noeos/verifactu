@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0010
 title: GitHub audit evidence
-status: draft
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-12

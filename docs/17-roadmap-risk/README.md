@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-INDEX
 title: Roadmap and risk documentation index
-status: proposed
+status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-12

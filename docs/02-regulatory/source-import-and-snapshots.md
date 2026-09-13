@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0012
 title: Source import and snapshots
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

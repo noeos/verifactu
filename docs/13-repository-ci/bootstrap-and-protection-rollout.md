@@ -1,7 +1,7 @@
 ---
 id: REPO-DOC-0022
 title: Bootstrap and protection rollout
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

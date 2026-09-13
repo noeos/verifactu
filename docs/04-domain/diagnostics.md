@@ -1,7 +1,7 @@
 ---
 id: DOM-DOC-0011
 title: Domain diagnostics
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

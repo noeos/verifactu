@@ -1,7 +1,7 @@
 ---
 id: ADR-0050
 title: Forward recovery and scoped revocation
-status: proposed
+status: accepted
 authority: decision
 owner: release-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: DOM-DOC-0005
 title: Alta and anulacion semantics
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

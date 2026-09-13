@@ -1,7 +1,7 @@
 ---
 id: ARCH-DOC-0002
 title: Architecture principles and quality attributes
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

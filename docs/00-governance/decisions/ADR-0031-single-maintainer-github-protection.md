@@ -1,7 +1,7 @@
 ---
 id: ADR-0031
 title: Honest single-maintainer GitHub protection
-status: proposed
+status: accepted
 authority: decision
 owner: repository-owner
 created: 2026-09-12

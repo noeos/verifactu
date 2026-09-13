@@ -1,7 +1,7 @@
 ---
 id: BUILD-INDEX
 title: Supply chain and build documentation index
-status: proposed
+status: approved
 authority: informative
 owner: supply-chain-owner
 created: 2026-09-12

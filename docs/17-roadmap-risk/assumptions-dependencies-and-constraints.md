@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0010
 title: Assumptions, dependencies and constraints
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: ADR-0029
 title: Versioned toolchain profiles
-status: proposed
+status: accepted
 authority: decision
 owner: repository-owner
 created: 2026-09-12

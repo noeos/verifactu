@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0003
 title: Evidence store and chain of custody
-status: draft
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-12

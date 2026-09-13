@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0005
 title: Security control catalog
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

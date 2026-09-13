@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-INDEX
 title: Formats and cryptography documentation index
-status: draft
+status: approved
 authority: informative
 owner: cryptography-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: PERSIST-INDEX
 title: Persistence and consistency documentation index
-status: draft
+status: approved
 authority: informative
 owner: persistence-owner
 created: 2026-09-12

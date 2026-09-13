@@ -1,7 +1,7 @@
 ---
 id: ARCH-INDEX
 title: Architecture documentation index
-status: draft
+status: approved
 authority: informative
 owner: architecture-owner
 created: 2026-09-12

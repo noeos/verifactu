@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0018
 title: Test evidence and traceability
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

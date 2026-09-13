@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0011
 title: Related regimes and boundaries
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: PROD-DOC-0001
 title: Product vision and success
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

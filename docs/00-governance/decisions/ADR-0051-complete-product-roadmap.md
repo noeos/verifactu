@@ -1,7 +1,7 @@
 ---
 id: ADR-0051
 title: Dependency-driven complete-product roadmap
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

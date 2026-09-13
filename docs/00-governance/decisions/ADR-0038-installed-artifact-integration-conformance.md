@@ -1,7 +1,7 @@
 ---
 id: ADR-0038
 title: Installed-artifact and real-capability integration conformance
-status: proposed
+status: accepted
 authority: decision
 owner: integration-owner
 created: 2026-09-12

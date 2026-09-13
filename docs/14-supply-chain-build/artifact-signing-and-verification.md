@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0017
 title: Artifact signing and verification
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

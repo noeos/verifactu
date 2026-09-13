@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0009
 title: AEAT record correlation
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

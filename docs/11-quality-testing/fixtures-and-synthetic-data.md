@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0004
 title: Fixtures and synthetic data
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

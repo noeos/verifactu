@@ -1,7 +1,7 @@
 ---
 id: BUILD-DOC-0013
 title: CycloneDX 1.7 SBOM
-status: draft
+status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12

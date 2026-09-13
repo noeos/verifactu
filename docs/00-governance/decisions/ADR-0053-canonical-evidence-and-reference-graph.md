@@ -1,7 +1,7 @@
 ---
 id: ADR-0053
 title: Canonical retained evidence and reference graph
-status: proposed
+status: accepted
 authority: decision
 owner: assurance-owner
 created: 2026-09-12

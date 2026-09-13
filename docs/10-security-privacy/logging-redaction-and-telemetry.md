@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0012
 title: Logging, redaction and telemetry
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0006
 title: Facturacion host contract
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

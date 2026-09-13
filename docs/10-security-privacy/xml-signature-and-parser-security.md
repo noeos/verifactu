@@ -1,7 +1,7 @@
 ---
 id: SEC-DOC-0006
 title: XML, fingerprint and signature security
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

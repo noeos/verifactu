@@ -1,7 +1,7 @@
 ---
 id: AEAT-DOC-0004
 title: HTTPS mTLS and transport
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

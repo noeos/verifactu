@@ -1,7 +1,7 @@
 ---
 id: PLAN-L1
 title: Lot 1 foundations documentation plan
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12

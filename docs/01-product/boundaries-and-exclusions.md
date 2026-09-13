@@ -1,7 +1,7 @@
 ---
 id: PROD-DOC-0007
 title: Product boundaries and exclusions
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

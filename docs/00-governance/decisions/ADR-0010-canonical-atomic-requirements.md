@@ -1,7 +1,7 @@
 ---
 id: ADR-0010
 title: Canonical atomic requirements
-status: proposed
+status: accepted
 authority: decision
 owner: project-owner
 created: 2026-09-12

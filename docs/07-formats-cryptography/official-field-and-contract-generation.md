@@ -1,7 +1,7 @@
 ---
 id: CRYPTO-DOC-0001
 title: Official field and contract generation
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

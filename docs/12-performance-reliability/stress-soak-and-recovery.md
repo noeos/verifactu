@@ -1,7 +1,7 @@
 ---
 id: PERF-DOC-0009
 title: Stress, soak and recovery testing
-status: draft
+status: approved
 authority: normative
 owner: performance-owner
 created: 2026-09-12

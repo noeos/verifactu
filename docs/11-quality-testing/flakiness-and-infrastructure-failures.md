@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0017
 title: Flakiness and infrastructure failures
-status: draft
+status: approved
 authority: normative
 owner: quality-owner
 created: 2026-09-12

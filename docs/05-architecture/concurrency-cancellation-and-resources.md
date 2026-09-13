@@ -1,7 +1,7 @@
 ---
 id: ARCH-DOC-0012
 title: Concurrency cancellation and resources
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

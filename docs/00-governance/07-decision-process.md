@@ -1,7 +1,7 @@
 ---
 id: GOV-007
 title: Decision process
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

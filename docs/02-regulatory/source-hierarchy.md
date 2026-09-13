@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0001
 title: Regulatory source hierarchy
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0001
 title: Ecosystem boundaries
-status: draft
+status: approved
 authority: normative
 owner: integration-owner
 created: 2026-09-12

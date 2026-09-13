@@ -1,7 +1,7 @@
 ---
 id: REQ-DOC-0008
 title: Negative and abuse requirements
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

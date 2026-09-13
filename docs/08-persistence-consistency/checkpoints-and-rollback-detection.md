@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0011
 title: Checkpoints and rollback detection
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

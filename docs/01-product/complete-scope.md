@@ -1,7 +1,7 @@
 ---
 id: PROD-DOC-0003
 title: Complete product scope
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

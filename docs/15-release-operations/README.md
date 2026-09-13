@@ -1,7 +1,7 @@
 ---
 id: RELEASE-INDEX
 title: Release and operations documentation index
-status: proposed
+status: approved
 authority: informative
 owner: release-owner
 created: 2026-09-12

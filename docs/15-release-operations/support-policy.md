@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0017
 title: Support policy
-status: draft
+status: approved
 authority: normative
 owner: product-owner
 created: 2026-09-12

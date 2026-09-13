@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0018
 title: Codex implementation phase prompts
-status: draft
+status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-13

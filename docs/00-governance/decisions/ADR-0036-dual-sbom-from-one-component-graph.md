@@ -1,7 +1,7 @@
 ---
 id: ADR-0036
 title: Reconciled CycloneDX and SPDX from one component graph
-status: proposed
+status: accepted
 authority: decision
 owner: supply-chain-owner
 created: 2026-09-12

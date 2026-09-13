@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0011
 title: Limits cancellation and ownership contracts
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12

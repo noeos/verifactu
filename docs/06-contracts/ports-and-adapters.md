@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0007
 title: Ports and adapters
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

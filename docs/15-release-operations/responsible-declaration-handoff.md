@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0013
 title: Responsible declaration handoff
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

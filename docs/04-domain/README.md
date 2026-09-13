@@ -1,7 +1,7 @@
 ---
 id: DOM-INDEX
 title: Fiscal domain documentation
-status: draft
+status: approved
 authority: normative
 owner: domain-owner
 created: 2026-09-12

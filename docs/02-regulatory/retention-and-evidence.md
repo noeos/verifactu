@@ -1,7 +1,7 @@
 ---
 id: REG-DOC-0009
 title: Regulatory retention and evidence
-status: draft
+status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12

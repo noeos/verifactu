@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0011
 title: Fault injection
-status: draft
+status: approved
 authority: normative
 owner: reliability-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: GOV-004
 title: Single-maintainer governance
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

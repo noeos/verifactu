@@ -1,7 +1,7 @@
 ---
 id: RELEASE-DOC-0006
 title: Stable release
-status: draft
+status: approved
 authority: normative
 owner: release-owner
 created: 2026-09-12

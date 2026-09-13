@@ -1,7 +1,7 @@
 ---
 id: ADR-0021
 title: Separation of official and internal integrity claims
-status: proposed
+status: accepted
 authority: decision
 owner: architecture-owner
 created: 2026-09-12

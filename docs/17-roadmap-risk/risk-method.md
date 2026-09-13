@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0008
 title: Risk assessment method
-status: draft
+status: approved
 authority: normative
 owner: risk-owner
 created: 2026-09-12

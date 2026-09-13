@@ -1,7 +1,7 @@
 ---
 id: REF-DOC-0010
 title: Diagram index
-status: draft
+status: approved
 authority: informative
 owner: documentation-owner
 created: 2026-09-12

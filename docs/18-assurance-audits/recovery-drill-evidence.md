@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0016
 title: Recovery drill evidence
-status: draft
+status: approved
 authority: normative
 owner: operations-owner
 created: 2026-09-12

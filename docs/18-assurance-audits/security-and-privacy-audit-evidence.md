@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0012
 title: Security and privacy audit evidence
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

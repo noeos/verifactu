@@ -1,7 +1,7 @@
 ---
 id: QA-DOC-0013
 title: Security testing
-status: draft
+status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12

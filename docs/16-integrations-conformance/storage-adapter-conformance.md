@@ -1,7 +1,7 @@
 ---
 id: INTEGRATION-DOC-0009
 title: Storage adapter conformance
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0016
 title: Completion dashboard and status language
-status: draft
+status: approved
 authority: normative
 owner: documentation-owner
 created: 2026-09-12

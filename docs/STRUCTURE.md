@@ -1,7 +1,7 @@
 ---
 id: DOCS-STRUCTURE
 title: Documentation structure and planning method
-status: draft
+status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11

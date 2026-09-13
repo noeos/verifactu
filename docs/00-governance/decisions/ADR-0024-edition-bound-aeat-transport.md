@@ -1,7 +1,7 @@
 ---
 id: ADR-0024
 title: Edition-bound AEAT transport and durable orchestration
-status: proposed
+status: accepted
 authority: decision
 owner: integration-owner
 created: 2026-09-12

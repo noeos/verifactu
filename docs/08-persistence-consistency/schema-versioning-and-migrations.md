@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0012
 title: Storage schema versioning and migrations
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

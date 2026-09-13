@@ -1,7 +1,7 @@
 ---
 id: ASSURANCE-DOC-0014
 title: Supply-chain and release audit evidence
-status: draft
+status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12

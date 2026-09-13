@@ -1,7 +1,7 @@
 ---
 id: ARCH-DOC-0001
 title: Architecture description and viewpoints
-status: draft
+status: approved
 authority: normative
 owner: architecture-owner
 created: 2026-09-12

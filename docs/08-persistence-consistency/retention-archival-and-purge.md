@@ -1,7 +1,7 @@
 ---
 id: PERSIST-DOC-0013
 title: Retention archival and purge
-status: draft
+status: approved
 authority: normative
 owner: persistence-owner
 created: 2026-09-12

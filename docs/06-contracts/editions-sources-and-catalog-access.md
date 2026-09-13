@@ -1,7 +1,7 @@
 ---
 id: CONTRACT-DOC-0013
 title: Edition source and catalogue access
-status: draft
+status: approved
 authority: normative
 owner: api-owner
 created: 2026-09-12
