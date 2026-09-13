@@ -98,3 +98,24 @@ no bypass actor (`REV-078`); exact subjects and retained locators (`REV-079`);
 direct evidence rather than Scorecard inference (`REV-080`); and explicit
 organization visibility limits (`REV-081`). The full historical ledger retains
 all other assignments to their implementation phases.
+
+## Post-approval correction
+
+The completion audit after PR `#5` found that the original workflow emitted the
+same required context names for branch `push`, `pull_request` and manual events.
+GitHub binds a required check to context and App, not to the event that produced
+it; therefore a successful run for the same SHA on a different event could make
+the PR result ambiguous. This invalidated the P1 context-producer claim until
+correction, even though both live negative probes happened to fail on both
+events.
+
+Corrective PR `#6` limits the workflow to `pull_request` and `push` on `main`.
+The governance validator now rejects wildcard branch pushes, manual events or
+any third trigger. Push of correction commit
+`01e001eb1b4a3f7b72573e2dc0c101b5f7f68d2c` produced zero runs and zero checks;
+opening PR `#6` produced exactly three checks, all from the single
+`pull_request` run `34755972167`, and its effective-state audit passed 68/68
+comparisons with redacted-report SHA-256
+`f18e7123057c9083fc06d79ff69c5566a58fa801061c0eed20d8a33051589450`.
+P1 approval is re-established only by the protected native squash of PR `#6`
+and its final main-push and effective-state read-backs.

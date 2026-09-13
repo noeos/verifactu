@@ -51,24 +51,24 @@ Historical detail belongs in phase records below.
 | Field | Current value |
 | --- | --- |
 | Roadmap | Eight phases P1–P8; P2 is next. |
-| Current phase | None; P1 closes through PR `#5`, then P2 intake may begin. |
-| Phase status | P1 `evidence-complete` upon protected merge of PR `#5`; P2 remains `planned`. |
-| Last evidence-complete phase | `P1` — governed bootstrap and effective protection. |
+| Current phase | `P1` corrective closure; PR `#6` removes cross-event context ambiguity. |
+| Phase status | P1 is re-established as `evidence-complete` only by protected merge and final read-back of PR `#6`; P2 remains `planned`. |
+| Last evidence-complete phase | None while the post-closure P1 finding is open; PR `#6` re-establishes P1. |
 | Local repository | Documentation/governance only: 411 current Markdown documents before this handoff update, 117 immutable historical files and no product source. |
-| Protected `main` SHA | P1 evidence subject `57a062c7d907287eb25461bea560f42d9dd8b87c`; PR `#5` result must be derived at P2 intake. |
-| GitHub effective state | 68/68 policy comparisons passed at `2026-09-13T11:47:26Z`; repository protection has no bypass; organization-level visibility limits remain explicit. |
+| Protected `main` SHA | `ff99ed6e8ced56337d2c32dbf27ad5e738550640`, tree `8310fd68d3ca6a5c63e6ef9a12fe09e94a2baddf`; corrective PR `#6` result is derived at P2 intake. |
+| GitHub effective state | 68/68 policy comparisons passed on corrective head `01e001eb1b4a3f7b72573e2dc0c101b5f7f68d2c`; exactly one PR run produced its three contexts; organization visibility limits remain explicit. |
 | Toolchain/lock | Planned profiles only; no admitted implementation manifest/lock evidence yet. |
 | Regulatory edition | No implemented edition selected or generated yet. |
 | Verification Engine | Planned integration baseline must be independently re-observed/admitted. |
 | Public packages | Not implemented or published. |
 | External gates | Legal/CRA review, AEAT access/certificates, npm ownership/OIDC, performance runner and independent review must be observed. Facturacion is not built; only its versioned contract and maintained synthetic host are in current scope. |
-| Immediate instruction | Merge PR `#5` only after its final-head checks pass; P2 must re-observe its squash SHA, branch deletion and effective controls before creating source. |
+| Immediate instruction | Merge corrective PR `#6` only after final checks, then verify native squash, main-only push run, automatic branch deletion and effective state before P2. |
 
 ## Phase ledger
 
 | Phase | Status | Input `main` | Closure `main` | Closure PR | Summary |
 | --- | --- | --- | --- | --- | --- |
-| P1 | evidence-complete | no remote commit | derived by P2 intake | `#5` | Bootstrap, enforcement probes, protected squash, planning approval and effective-state audit complete. |
+| P1 | evidence-complete after PR `#6` read-back | no remote commit | derived by P2 intake | `#5`, correction `#6` | Bootstrap, enforcement probes, planning approval and event-isolated required contexts. |
 | P2 | planned | — | — | — | Executable engineering/CI/build foundation. |
 | P3 | planned | — | — | — | Official sources, editions, contracts and oracles. |
 | P4 | planned | — | — | — | Deterministic fiscal core, artifacts and verification. |
@@ -79,8 +79,9 @@ Historical detail belongs in phase records below.
 
 ## Active-phase working record
 
-No phase is active after protected merge of the P1 closure. P2 starts with a new
-working record only after its intake reconciles this handoff with Git and GitHub.
+No phase is active after protected merge and final read-back of corrective PR
+`#6`. P2 starts with a new working record only after its intake reconciles this
+handoff with Git and GitHub.
 
 ## Required phase-record schema
 
@@ -322,3 +323,33 @@ Append corrections in this form:
   Verification Engine exact release admission, future-Facturacion synthetic host
   contract, stable performance runner, signing/account recovery and independent
   assessment. Absence retains the exact downstream block; it is not waived.
+
+### AMD-P1-001 — 2026-09-13
+
+- Statement corrected: the PR `#5` closure treated successful required contexts
+  as unambiguous although `governance.yml` produced identical context/App pairs
+  on branch push, pull request and manual dispatch.
+- Correct value and reason: required PR contexts must be emitted only by the
+  `pull_request` event; `push` is restricted to `main` for post-squash
+  verification and manual dispatch is absent. GitHub required checks bind
+  context and App, not event, so another event for the same SHA must not be able
+  to satisfy or mask the PR result.
+- Discovered by / actor: Codex completion audit after protected merge of PR `#5`.
+- Evidence locator and digest: corrective commit
+  `01e001eb1b4a3f7b72573e2dc0c101b5f7f68d2c` had zero run/check producers when
+  pushed as `fix/p1-context-isolation`; PR `#6` then produced exactly three
+  successful checks from sole `pull_request` run `34755972167`. Effective-state
+  audit passed 68/68; redacted JSON SHA-256
+  `f18e7123057c9083fc06d79ff69c5566a58fa801061c0eed20d8a33051589450`.
+- Affected requirements, phases, releases and claims: P1-W3, P1-W5, P1-W6,
+  P1-W7, ADR-0032, ADR-0033, `REPO-DOC-0013`, `REPO-DOC-0014`,
+  `REPO-DOC-0015`; P2 and every later protected change depend on the correction.
+- Evidence/exits invalidated: P1's producer-isolation and effective required-path
+  claims were reopened; repository settings, ruleset parameters, signature/DCO,
+  destructive probes, archive identity and documentation approval evidence were
+  not invalidated.
+- Remediation and protected PR: PR `#6` restricts triggers and adds maintained
+  negative fixtures rejecting wildcard branch push and any third/manual event.
+  P1 returns to `evidence-complete` only after its final-head checks, native
+  signed/DCO squash, `main` push run, automatic branch deletion and full
+  effective-state read-back pass. P2 derives the resulting SHA and tree.

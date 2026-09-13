@@ -250,6 +250,21 @@ def validate_workflow_text(path: Path, text: str) -> set[str]:
             continue
         if "@" not in used or not SHA_RE.fullmatch(used.rsplit("@", 1)[1]):
             raise PolicyError(f"{path}: Action is not pinned to a full SHA: {used}")
+    if not re.search(r"^  pull_request:\s*$", text, re.MULTILINE):
+        raise PolicyError(f"{path}: pull_request trigger is required")
+    if "on:\n" not in text or "\npermissions:" not in text:
+        raise PolicyError(f"{path}: workflow trigger or permissions boundary is missing")
+    trigger_block = text.split("on:\n", 1)[1].split("\npermissions:", 1)[0]
+    events = set(re.findall(r"^  ([a-z_]+):\s*$", trigger_block, re.MULTILINE))
+    if events != {"pull_request", "push"}:
+        raise PolicyError(f"{path}: only pull_request and main push may produce required contexts")
+    main_push = re.search(
+        r"^  push:\s*\n    branches:\s*\n      - main\s*$",
+        text,
+        re.MULTILINE,
+    )
+    if not main_push or re.search(r"^      - [\"']?\*", text, re.MULTILINE):
+        raise PolicyError(f"{path}: push trigger must target only main")
     names = set(re.findall(r"^\s{4}name:\s*(Required · .+?)\s*$", text, re.MULTILINE))
     return names
 
@@ -342,6 +357,22 @@ def self_test() -> dict[str, object]:
         "privileged-event",
         lambda: validate_workflow_text(Path("fixture.yml"), "permissions: {}\npull_request_target:\n"),
         "privileged event",
+    )
+    expect_failure(
+        "branch-push-context-duplication",
+        lambda: validate_workflow_text(
+            Path("fixture.yml"),
+            "on:\n  pull_request:\n  push:\n    branches:\n      - \"**\"\n\npermissions: {}\n",
+        ),
+        "push trigger must target only main",
+    )
+    expect_failure(
+        "manual-context-duplication",
+        lambda: validate_workflow_text(
+            Path("fixture.yml"),
+            "on:\n  pull_request:\n  push:\n    branches:\n      - main\n  workflow_dispatch:\n\npermissions: {}\n",
+        ),
+        "only pull_request and main push",
     )
     with tempfile.TemporaryDirectory(prefix="verifactu-governance-") as directory:
         root = Path(directory)
