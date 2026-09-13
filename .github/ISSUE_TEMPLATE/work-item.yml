@@ -1,0 +1,50 @@
+name: Governed work item
+description: Propose a documentation, governance, research or implementation change without sensitive data.
+title: "[WORK] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This public form must contain only synthetic, non-sensitive information.
+        Security vulnerabilities belong in private vulnerability reporting.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Change class
+      options:
+        - Documentation
+        - Governance or CI
+        - Research or source update
+        - Product implementation (only when its roadmap phase is open)
+        - Corrective finding
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Exact objective and explicit omissions
+      description: State one coherent outcome, what is excluded and why.
+    validations:
+      required: true
+  - type: textarea
+    id: traceability
+    attributes:
+      label: Governing traceability
+      description: List phase/work IDs, requirements, ADRs, controls, risks and historical findings.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance and evidence
+      description: State positive/negative checks, exact subjects, evidence and recovery conditions.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public-data safety
+      options:
+        - label: I included no secret, credential, private key, exploit detail or real fiscal, personal, customer or production data.
+          required: true

@@ -43,6 +43,66 @@ REQUIRED_CONTEXTS = {
     "Required · documentation and traceability",
     "Required · required-check closure",
 }
+COMMUNITY_FILE_CONTRACT = {
+    "README.md": (
+        r"documentation-only, governed repository",
+        r"It does not yet contain product source",
+        r"Facturación is a future client application\. It has not\s+been built",
+        r"docs/17-roadmap-risk/implementation-roadmap\.md",
+        r"No licence to\s+copy, modify or distribute",
+    ),
+    "CONTRIBUTING.md": (
+        r"git commit -S -s",
+        r"zero required approving reviews",
+        r"no\s+`CODEOWNERS`",
+        r"GitHub native squash",
+        r"SECURITY\.md",
+    ),
+    "SECURITY.md": (
+        r"no released or implemented VeriFactu product version",
+        r"github\.com/noeos/verifactu/security/advisories/new",
+        r"Never publish or attach real fiscal/customer records",
+        r"synthetic reproduction",
+        r"coordinated disclosure",
+    ),
+    "LICENSE": (
+        r"no licence grant",
+        r"All rights reserved",
+        r"No licence is granted",
+        r"Developer Certificate of Origin",
+        r"Distribution of product code or packages is\s+forbidden",
+    ),
+    "NOTICE": (
+        r"no product\s+implementation or distributable package",
+        r"visibility grants no licence",
+        r"No third-party software is bundled for distribution in P1",
+        r"canonical licence graph",
+        r"pre-distribution legal decisions",
+    ),
+    ".github/PULL_REQUEST_TEMPLATE.md": (
+        r"Issue/work ID",
+        r"Explicit omissions",
+        r"Legal/regulatory",
+        r"Negative/adversarial fixtures",
+        r"Rollback and residual state",
+        r"admitted SSH signature",
+        r"canonical DCO",
+        r"native squash merge",
+    ),
+    ".github/ISSUE_TEMPLATE/config.yml": (
+        r"blank_issues_enabled:\s*false",
+        r"github\.com/noeos/verifactu/security/advisories/new",
+        r"Never disclose vulnerability details",
+    ),
+    ".github/ISSUE_TEMPLATE/work-item.yml": (
+        r"name:\s*Governed work item",
+        r"one coherent outcome",
+        r"Governing traceability",
+        r"Acceptance and evidence",
+        r"I included no secret, credential, private key",
+        r"required:\s*true",
+    ),
+}
 
 
 class PolicyError(Exception):
@@ -238,6 +298,33 @@ def validate_allowed_signers(root: Path) -> str:
     return hashlib.sha256(decoded).hexdigest()
 
 
+def validate_community_files(root: Path) -> dict[str, str]:
+    digests: dict[str, str] = {}
+    for name, required_patterns in COMMUNITY_FILE_CONTRACT.items():
+        path = root / name
+        if not path.is_file():
+            raise PolicyError(f"required root community file is missing: {name}")
+        data = path.read_bytes()
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise PolicyError(f"{name}: file is not UTF-8") from exc
+        if "\r" in text:
+            raise PolicyError(f"{name}: CR characters are forbidden")
+        if re.search(r"(?<!`)\b(?:TODO|TBD|FIXME)\b(?!`)", text):
+            raise PolicyError(f"{name}: unresolved placeholder is forbidden")
+        if path.suffix == ".md":
+            if not re.search(r"^#\s+\S", text, re.MULTILINE):
+                raise PolicyError(f"{name}: missing level-one heading")
+            for target in LINK_RE.findall(text):
+                validate_link(root, path, target)
+        for pattern in required_patterns:
+            if not re.search(pattern, text, re.IGNORECASE):
+                raise PolicyError(f"{name}: required community contract is absent: {pattern}")
+        digests[name] = hashlib.sha256(data).hexdigest()
+    return digests
+
+
 def validate_workflow_text(path: Path, text: str) -> set[str]:
     if "pull_request_target:" in text or "workflow_run:" in text:
         raise PolicyError(f"{path}: privileged event is forbidden in P1")
@@ -322,6 +409,7 @@ def validate_repo(root: Path) -> dict[str, object]:
     doc_count, doc_digest = validate_documents(root)
     archive_count, archive_digest = validate_archive(root)
     signer_material_digest = validate_allowed_signers(root)
+    community_digests = validate_community_files(root)
     validate_workflows(root)
     validate_github_policy(root)
     return {
@@ -332,6 +420,7 @@ def validate_repo(root: Path) -> dict[str, object]:
         "historicalArchiveFiles": archive_count,
         "historicalArchiveAggregateSha256": archive_digest,
         "allowedSignerPublicMaterialSha256": signer_material_digest,
+        "rootCommunityFileSha256": community_digests,
         "requiredContexts": sorted(REQUIRED_CONTEXTS),
         "productSourcePresent": False,
         "codeownersPresent": False,
@@ -377,6 +466,13 @@ def self_test() -> dict[str, object]:
         ),
         "only pull_request and main push",
     )
+    with tempfile.TemporaryDirectory(prefix="verifactu-community-") as directory:
+        root = Path(directory)
+        expect_failure(
+            "missing-root-community-file",
+            lambda: validate_community_files(root),
+            "required root community file is missing: README.md",
+        )
     with tempfile.TemporaryDirectory(prefix="verifactu-governance-") as directory:
         root = Path(directory)
         (root / "docs").mkdir()

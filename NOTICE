@@ -1,0 +1,25 @@
+VeriFactu repository notice
+
+This repository currently contains governed planning documentation, immutable
+historical inputs and bootstrap governance/audit scripts. It contains no product
+implementation or distributable package.
+
+Copyright (c) 2026 the respective copyright holders. All rights reserved.
+Repository visibility grants no licence; consult LICENSE.
+
+Documents identify and link external authorities, standards, tools and prior
+artifacts for research and traceability. Those references do not transfer
+ownership, endorsement or redistribution rights. The immutable
+docs/previous-docs archive is historical input only and is not normative.
+
+No third-party software is bundled for distribution in P1. The GitHub workflow
+invokes an exact admitted GitHub-owned Action by immutable commit reference; it
+does not relicense or vendor that Action. Future dependencies, official source
+materials, generated output and packaged artifacts must be admitted into the
+canonical licence graph and reproduce every applicable notice before
+distribution.
+
+The project licence and final copyright/attribution inventory remain deliberate
+pre-distribution legal decisions. This notice must be regenerated from the exact
+distributed component graph before any release; absence from this P1 notice is
+not a waiver of any right or obligation.
