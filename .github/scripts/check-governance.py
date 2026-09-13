@@ -293,6 +293,9 @@ def validate_github_policy(root: Path) -> None:
         "shaPinningRequired": True,
         "defaultWorkflowPermissions": "read",
         "canApprovePullRequestReviews": False,
+        "forkPullRequestApproval": "all_external_contributors",
+        "artifactAndLogRetentionDays": 90,
+        "reusableWorkflowAccess": "not-applicable-public",
     }:
         raise PolicyError("GitHub Actions policy is not the P1 least-privilege state")
     main = policy["mainRuleset"]

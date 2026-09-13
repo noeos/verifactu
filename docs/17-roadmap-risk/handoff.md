@@ -51,24 +51,24 @@ Historical detail belongs in phase records below.
 | Field | Current value |
 | --- | --- |
 | Roadmap | Eight phases P1–P8; P2 is next. |
-| Current phase | `P1` corrective closure; PR `#7` removes incomplete endpoint pagination and audit false-green behavior. |
-| Phase status | P1 is re-established as `evidence-complete` only by protected merge and final read-back of PR `#7`; P2 remains `planned`. |
-| Last evidence-complete phase | None while the post-closure P1 audit finding is open; PR `#7` re-establishes P1. |
+| Current phase | `P1` corrective closure; PR `#8` versions remaining applicable Actions settings. |
+| Phase status | P1 is re-established as `evidence-complete` only by protected merge and final read-back of PR `#8`; P2 remains `planned`. |
+| Last evidence-complete phase | None while the Actions-surface P1 finding is open; PR `#8` re-establishes P1. |
 | Local repository | Documentation/governance only: 411 current Markdown documents before this handoff update, 117 immutable historical files and no product source. |
-| Protected `main` SHA | `c5697e33297daab98bc77de3202e7ca4d0fa290f`, tree `2f1aca1fa336ad3e48bbb113502e10f05a4f4b9d`; corrective PR `#7` result is derived at P2 intake. |
-| GitHub effective state | Link-paginated audit passes 71/71 on `c5697e33297daab98bc77de3202e7ca4d0fa290f`; Dependabot/secret alert surfaces are readable and CodeQL remains explicitly P2/not-configured. |
+| Protected `main` SHA | `844853ef02296a537d5744dca74a6dc62fe51aba`, tree `ad760935bd0fc1973948acbbef2c048e91e6d35a`; corrective PR `#8` result is derived at P2 intake. |
+| GitHub effective state | Link-paginated 71-check baseline is retained; fork workflow approval is now `all_external_contributors`, retention is 90 days and public reusable-workflow access is explicitly not applicable. |
 | Toolchain/lock | Planned profiles only; no admitted implementation manifest/lock evidence yet. |
 | Regulatory edition | No implemented edition selected or generated yet. |
 | Verification Engine | Planned integration baseline must be independently re-observed/admitted. |
 | Public packages | Not implemented or published. |
 | External gates | Legal/CRA review, AEAT access/certificates, npm ownership/OIDC, performance runner and independent review must be observed. Facturacion is not built; only its versioned contract and maintained synthetic host are in current scope. |
-| Immediate instruction | Merge corrective PR `#7` only after final checks and retained audit, then verify native squash, main-only push run, automatic branch deletion and full 71-check state before P2. |
+| Immediate instruction | Merge corrective PR `#8` only after final checks and retained successor audit, then verify native squash, main-only push run, branch deletion and full state before P2. |
 
 ## Phase ledger
 
 | Phase | Status | Input `main` | Closure `main` | Closure PR | Summary |
 | --- | --- | --- | --- | --- | --- |
-| P1 | evidence-complete after PR `#7` read-back | no remote commit | derived by P2 intake | `#5`, corrections `#6`, `#7` | Bootstrap, probes, planning approval, isolated contexts and complete fail-closed GitHub audit. |
+| P1 | evidence-complete after PR `#8` read-back | no remote commit | derived by P2 intake | `#5`, corrections `#6`–`#8` | Bootstrap, probes, approval, isolated contexts and complete fail-closed GitHub/Actions state. |
 | P2 | planned | — | — | — | Executable engineering/CI/build foundation. |
 | P3 | planned | — | — | — | Official sources, editions, contracts and oracles. |
 | P4 | planned | — | — | — | Deterministic fiscal core, artifacts and verification. |
@@ -80,7 +80,7 @@ Historical detail belongs in phase records below.
 ## Active-phase working record
 
 No phase is active after protected merge and final read-back of corrective PR
-`#7`. P2 starts with a new working record only after its intake reconciles this
+`#8`. P2 starts with a new working record only after its intake reconciles this
 handoff with Git and GitHub.
 
 ## Required phase-record schema
@@ -389,3 +389,28 @@ Append corrections in this form:
   PR's final-head audit is retained and its signed/DCO native squash, main-only
   run, branch deletion and 71-check final-main audit all pass. P2 derives the
   resulting SHA and tree.
+
+### AMD-P1-003 — 2026-09-13
+
+- Statement corrected: the P1 machine policy and audit omitted three Actions
+  settings named by `REPO-DOC-0012`: external-fork workflow approval,
+  artifact/log retention and reusable-workflow access applicability.
+- Correct value and reason: every external contributor requires workflow
+  approval (`all_external_contributors`); retention is 90 days, GitHub's maximum
+  for a public repository; reusable-workflow repository access is
+  `not-applicable` because the endpoint is private/internal-only.
+- Discovered by / actor: Codex semantic completion audit after PR `#7`.
+- Evidence locator and digest: GitHub read-back changed fork approval from
+  `first_time_contributors` to `all_external_contributors`; retention returned
+  `{days: 90, maximum_allowed_days: 90}`; access returned the documented `422`
+  applicability response. PR `#8` and its successor retained report bind the
+  exact final subjects and digest.
+- Affected requirements, phases, releases and claims: P1-W4, P1-W5, P1-W7,
+  ADR-0032, `REPO-DOC-0012`, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and future
+  untrusted-contribution workflows.
+- Evidence/exits invalidated: completeness of the prior GitHub/Actions audit;
+  all other P1 evidence remains valid.
+- Remediation and protected PR: PR `#8` versions and audits the three surfaces,
+  retains the complete redacted successor report and requires final protected
+  squash, main-only checks, branch deletion and effective-state read-back before
+  P1 returns to `evidence-complete`.
