@@ -1,0 +1,152 @@
+{
+  "$schema": "./tree.schema.json",
+  "schemaVersion": 1,
+  "policyId": "REPO-TREE-0001",
+  "rootFiles": [
+    ".editorconfig",
+    ".gitattributes",
+    ".gitignore",
+    ".node-version",
+    ".npmrc",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "SECURITY.md",
+    "package-lock.json",
+    "package.json",
+    "tsconfig.json"
+  ],
+  "pathClasses": [
+    { "prefix": ".github/", "owner": "repository-owner", "artifactClass": "governance", "visibility": "internal" },
+    { "prefix": "benchmarks/", "owner": "performance-owner", "artifactClass": "benchmark", "visibility": "internal" },
+    {
+      "prefix": "config/",
+      "owner": "repository-owner",
+      "artifactClass": "canonical-configuration",
+      "visibility": "internal"
+    },
+    {
+      "prefix": "docs/",
+      "owner": "documentation-owner",
+      "artifactClass": "governed-documentation",
+      "visibility": "public"
+    },
+    {
+      "prefix": "editions/",
+      "owner": "regulatory-owner",
+      "artifactClass": "immutable-edition",
+      "visibility": "package-candidate"
+    },
+    {
+      "prefix": "evidence/schemas/",
+      "owner": "assurance-owner",
+      "artifactClass": "evidence-schema",
+      "visibility": "internal"
+    },
+    { "prefix": "fixtures/", "owner": "quality-owner", "artifactClass": "fixture", "visibility": "public" },
+    {
+      "prefix": "internal/",
+      "owner": "architecture-owner",
+      "artifactClass": "private-component",
+      "visibility": "private"
+    },
+    {
+      "prefix": "packages/adapter-kit/",
+      "owner": "integration-owner",
+      "artifactClass": "public-package-source",
+      "visibility": "package-candidate"
+    },
+    {
+      "prefix": "packages/cli/",
+      "owner": "api-owner",
+      "artifactClass": "public-package-source",
+      "visibility": "package-candidate"
+    },
+    {
+      "prefix": "packages/verifactu/",
+      "owner": "api-owner",
+      "artifactClass": "public-package-source",
+      "visibility": "package-candidate"
+    },
+    {
+      "prefix": "schemas/",
+      "owner": "api-owner",
+      "artifactClass": "generated-public-schema",
+      "visibility": "package-candidate"
+    },
+    {
+      "prefix": "scripts/",
+      "owner": "repository-owner",
+      "artifactClass": "thin-task-launcher",
+      "visibility": "internal"
+    },
+    { "prefix": "tests/", "owner": "quality-owner", "artifactClass": "cross-cutting-test", "visibility": "internal" },
+    {
+      "prefix": "tooling/",
+      "owner": "repository-owner",
+      "artifactClass": "owned-engineering-tool",
+      "visibility": "internal"
+    }
+  ],
+  "requiredDirectories": [
+    ".github/ISSUE_TEMPLATE",
+    ".github/evidence",
+    ".github/policy",
+    ".github/scripts",
+    ".github/workflows",
+    "benchmarks/baselines",
+    "benchmarks/profiles",
+    "benchmarks/workloads",
+    "config/admission",
+    "config/packages",
+    "config/repository",
+    "config/toolchain",
+    "config/typescript",
+    "docs/previous-docs",
+    "editions",
+    "evidence/schemas",
+    "fixtures/adversarial",
+    "fixtures/compatibility",
+    "fixtures/official",
+    "fixtures/synthetic",
+    "internal/contract-generation",
+    "internal/independent-oracles",
+    "internal/protocol-harness",
+    "internal/source-import",
+    "internal/test-support",
+    "internal/xades-provider",
+    "internal/xml-provider",
+    "packages/adapter-kit/src",
+    "packages/adapter-kit/test",
+    "packages/cli/src",
+    "packages/cli/test",
+    "packages/verifactu/src",
+    "packages/verifactu/test",
+    "schemas",
+    "scripts",
+    "tests/contract",
+    "tests/e2e",
+    "tests/integration",
+    "tests/packaging",
+    "tests/performance",
+    "tests/policy",
+    "tests/security",
+    "tooling"
+  ],
+  "forbiddenTopLevel": ["common", "helpers", "misc", "src", "utils"],
+  "forbiddenTrackedSegments": [
+    ".cache",
+    ".env",
+    ".nyc_output",
+    ".stryker-tmp",
+    "coverage",
+    "dist",
+    "downloads",
+    "node_modules",
+    "tmp"
+  ],
+  "caseInsensitive": true,
+  "unicodeNormalization": "NFKC",
+  "allowSymlinks": false
+}

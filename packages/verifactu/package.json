@@ -1,0 +1,36 @@
+{
+  "name": "@noeos/verifactu",
+  "version": "0.0.0-development",
+  "private": true,
+  "description": "Private P2 package shell for the future Noeos VeriFactu library.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.14.0 <23 || >=24.0.0 <25"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "dependencies": {
+    "@noeos/verification-engine": "1.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noeos/verifactu.git",
+    "directory": "packages/verifactu"
+  }
+}

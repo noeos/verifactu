@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/toolchain-profiles-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyId",
+    "reviewedAt",
+    "nodeReleaseKeyring",
+    "profiles",
+    "npmDistributions",
+    "typescript",
+    "pythonReference",
+    "environment"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "TOOLCHAIN-0001" },
+    "reviewedAt": { "type": "string", "format": "date-time" },
+    "nodeReleaseKeyring": { "type": "object" },
+    "profiles": {
+      "type": "object",
+      "required": ["node-22-minimum", "node-22-latest", "node-24-primary", "node-26-current"]
+    },
+    "npmDistributions": { "type": "object", "required": ["10.9.2", "11.19.1", "12.0.2"] },
+    "typescript": { "type": "object", "required": ["version", "source"] },
+    "pythonReference": {
+      "type": "object",
+      "required": ["version", "distribution", "releaseTag", "ubuntu2404X64Sha256"]
+    },
+    "environment": { "type": "object", "required": ["timezone", "locale", "sourceDateEpoch", "umask"] }
+  }
+}

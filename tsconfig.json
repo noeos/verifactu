@@ -1,0 +1,4 @@
+{
+  "files": [],
+  "references": [{ "path": "./packages/verifactu" }, { "path": "./packages/adapter-kit" }, { "path": "./packages/cli" }]
+}

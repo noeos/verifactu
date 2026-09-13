@@ -1,9 +1,10 @@
 # VeriFactu
 
-VeriFactu is currently a **documentation-only, governed repository**. Phase P1
-establishes the planning baseline and the effective Git/GitHub controls required
-before product implementation starts. It does not yet contain product source,
-publishable packages, a fiscal runtime, a CLI, regulatory editions or a release.
+VeriFactu is a governed product repository executing Phase P2 of its approved
+implementation roadmap. It now contains an admitted engineering toolchain, the
+canonical task graph and exactly three private package shells. Those shells expose
+no fiscal behavior, public bindings or command-line executable; there is still no
+publishable package, regulatory edition or release.
 
 The intended final product is a complete TypeScript library, CLI and adapter kit
 for the Spanish VERI*FACTU and NO VERI*FACTU domain. Its approved scope,
@@ -37,10 +38,12 @@ repeat failures but has no current normative authority.
 
 ## Current development state
 
-Only governance policy, documentation validation, commit signature/DCO checks
-and read-only GitHub effective-state auditing are executable in P1. Start no
-product work until the P1 exit evidence on protected `main` is complete, then
-follow P2 and later phases in dependency order.
+P1 governance is effective on protected `main`. P2 adds executable repository,
+toolchain, package, formatting, lint, type and falsification controls before any
+fiscal capability is introduced. The private `0.0.0-development` shells are
+structural inputs, not claims of an implemented library, CLI or adapter kit.
+Follow P2 and later phases in dependency order; fiscal behavior begins only at
+the expressly gated phase in the roadmap.
 
 All changes use an issue-linked short-lived branch, SSH-signed and DCO-signed-off
 commits, the complete required-check set, and native squash merge. Direct pushes,

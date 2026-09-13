@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/task-report-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "registryId", "task", "taskVersion", "result", "subject", "startedAt", "durationMs", "inputCount", "inputDigest", "outputCount", "outputDigest", "commandDigest", "stdoutSha256", "stderrSha256", "network", "environmentNames"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "registryId": { "const": "TASK-GRAPH-0001" },
+    "task": { "type": "string" },
+    "taskVersion": { "type": "integer", "minimum": 1 },
+    "result": { "const": "passed" },
+    "subject": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|uncommitted)$" },
+    "startedAt": { "type": "string" },
+    "durationMs": { "type": "integer", "minimum": 0 },
+    "inputCount": { "type": "integer", "minimum": 1 },
+    "inputDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "outputCount": { "type": "integer", "minimum": 0 },
+    "outputDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commandDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "stdoutSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "stderrSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "network": { "enum": ["denied", "prepare-only"] },
+    "environmentNames": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+  }
+}

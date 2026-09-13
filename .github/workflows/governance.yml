@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Check out the exact subject
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -63,6 +63,22 @@ jobs:
           python3 .github/scripts/audit-github.py --self-test
       - name: Validate documentation and governance policy
         run: python3 .github/scripts/check-governance.py
+      - name: Set up the admitted primary Node runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Install the locked workspace without lifecycle or optional code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Verify dependency registry signatures and attestations
+        run: node node_modules/npm/bin/npm-cli.js audit signatures --omit=optional
+      - name: Execute the canonical P2 foundation gate
+        env:
+          LANG: C.UTF-8
+          LC_ALL: C.UTF-8
+          SOURCE_DATE_EPOCH: "0"
+          TZ: UTC
+        run: node tooling/tasks/run-task.mjs --task gate:foundation
 
   required-check-closure:
     name: Required · required-check closure

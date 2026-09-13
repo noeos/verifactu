@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/task-graph-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "registryId", "reportSchema", "tasks", "profiles"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "registryId": { "const": "TASK-GRAPH-0001" },
+    "reportSchema": { "type": "string" },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version",
+          "owner",
+          "description",
+          "dependencies",
+          "inputs",
+          "outputs",
+          "workingDirectory",
+          "toolProfile",
+          "command",
+          "environment",
+          "network",
+          "secrets",
+          "timeoutMs",
+          "concurrencyLocks",
+          "selectionClass",
+          "reportSchema",
+          "zeroWork"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*)+$" },
+          "version": { "type": "integer", "minimum": 1 },
+          "owner": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 12 },
+          "dependencies": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+          "inputs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+          "outputs": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+          "workingDirectory": { "const": "." },
+          "toolProfile": { "enum": ["node-supported", "node-primary"] },
+          "command": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["executable", "arguments"],
+            "properties": {
+              "executable": { "enum": ["node", "npm", "typescript", "prettier", "eslint"] },
+              "arguments": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "environment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["passThrough", "fixed"],
+            "properties": {
+              "passThrough": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+              },
+              "fixed": { "type": "object", "additionalProperties": { "type": "string" } }
+            }
+          },
+          "network": { "enum": ["denied", "prepare-only"] },
+          "secrets": { "const": "denied" },
+          "timeoutMs": { "type": "integer", "minimum": 1000, "maximum": 1800000 },
+          "concurrencyLocks": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+          "selectionClass": {
+            "enum": [
+              "bootstrap",
+              "generate",
+              "format",
+              "lint",
+              "types",
+              "unit",
+              "contract",
+              "integration",
+              "e2e",
+              "security",
+              "performance",
+              "package",
+              "sbom",
+              "provenance-rehearsal",
+              "docs",
+              "github-audit",
+              "closure"
+            ]
+          },
+          "reportSchema": { "type": "string" },
+          "zeroWork": { "const": "fail" }
+        }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } }
+    }
+  }
+}

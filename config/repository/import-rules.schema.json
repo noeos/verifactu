@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/import-rules-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyId",
+    "productionRoots",
+    "packageRules",
+    "globallyForbiddenSpecifiers",
+    "forbiddenProductionSegments",
+    "forbidDynamicNonLiteralImports",
+    "forbidCycles",
+    "undeclaredExternalFails"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "ARCH-IMPORT-0001" },
+    "productionRoots": { "type": "array", "minItems": 3, "uniqueItems": true, "items": { "type": "string" } },
+    "packageRules": { "type": "object", "minProperties": 3 },
+    "globallyForbiddenSpecifiers": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "forbiddenProductionSegments": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "forbidDynamicNonLiteralImports": { "const": true },
+    "forbidCycles": { "const": true },
+    "undeclaredExternalFails": { "const": true }
+  }
+}
