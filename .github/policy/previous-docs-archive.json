@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "sha256(path + NUL + decimal-size + NUL + sha256(bytes) + LF)",
+  "root": "docs/previous-docs",
+  "fileCount": 117,
+  "aggregateSha256": "99641c59c5e5bc32c08dfc337912301b8a7c1f91f08976673eb52396f41c93a1"
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "repository": "noeos/verifactu",
+  "visibility": "public",
+  "defaultBranch": "main",
+  "features": {
+    "issues": true,
+    "projects": false,
+    "wiki": false,
+    "discussions": false
+  },
+  "merge": {
+    "squash": true,
+    "mergeCommit": false,
+    "rebase": false,
+    "autoMerge": false,
+    "deleteBranchOnMerge": true,
+    "webCommitSignoffRequired": true
+  },
+  "actions": {
+    "enabled": true,
+    "allowedActions": "selected",
+    "githubOwnedAllowed": true,
+    "verifiedAllowed": false,
+    "patternsAllowed": [],
+    "shaPinningRequired": true,
+    "defaultWorkflowPermissions": "read",
+    "canApprovePullRequestReviews": false
+  },
+  "security": {
+    "dependabotAlerts": true,
+    "dependabotSecurityUpdates": true,
+    "privateVulnerabilityReporting": true,
+    "secretScanning": true,
+    "secretScanningPushProtection": true,
+    "secretScanningNonProviderPatterns": false,
+    "secretScanningValidityChecks": false
+  },
+  "mainRuleset": {
+    "name": "Protect main",
+    "target": "branch",
+    "enforcement": "active",
+    "include": ["refs/heads/main"],
+    "exclude": [],
+    "bypassActors": [],
+    "rules": {
+      "deletion": true,
+      "nonFastForward": true,
+      "requiredLinearHistory": true,
+      "requiredSignatures": true,
+      "pullRequest": {
+        "requiredApprovingReviewCount": 0,
+        "dismissStaleReviewsOnPush": false,
+        "requireCodeOwnerReview": false,
+        "requireLastPushApproval": false,
+        "requiredReviewThreadResolution": true,
+        "requireExtraApprovalForUnattributedChanges": false,
+        "allowedMergeMethods": ["squash"]
+      },
+      "requiredStatusChecks": {
+        "strict": true,
+        "doNotEnforceOnCreate": false,
+        "contexts": [
+          "Required · governance signatures and DCO",
+          "Required · documentation and traceability",
+          "Required · required-check closure"
+        ]
+      }
+    }
+  },
+  "tagRuleset": {
+    "name": "Protect release tags",
+    "target": "tag",
+    "enforcement": "active",
+    "include": ["refs/tags/v*"],
+    "exclude": [],
+    "bypassActors": [],
+    "rules": ["deletion", "update", "non_fast_forward", "required_signatures"]
+  },
+  "forbidden": {
+    "codeowners": true,
+    "classicBranchProtection": true,
+    "environmentsBeforeReleaseDesign": true,
+    "repositoryDeployKeys": true,
+    "repositoryWebhooks": true,
+    "repositoryRunners": true,
+    "persistentRepositorySecrets": true
+  }
+}
