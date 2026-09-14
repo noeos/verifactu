@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/external-inputs-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "policyId", "inputs"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "EXTERNAL-INPUTS-0001" },
+    "inputs": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "url", "filename", "sha256", "maximumBytes", "mediaType", "license", "purpose"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]+$" },
+          "url": { "type": "string", "pattern": "^https://" },
+          "filename": { "type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]+$" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "maximumBytes": { "type": "integer", "minimum": 1, "maximum": 10000000 },
+          "mediaType": { "type": "string" },
+          "license": { "type": "string" },
+          "purpose": { "type": "string", "minLength": 12 }
+        }
+      }
+    }
+  }
+}

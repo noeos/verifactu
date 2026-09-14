@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/provenance-rehearsal-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyId",
+    "statementType",
+    "predicateType",
+    "buildType",
+    "builderId",
+    "signed",
+    "publishable",
+    "claimedSlsaLevel"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "PROVENANCE-REHEARSAL-0001" },
+    "statementType": { "const": "https://in-toto.io/Statement/v1" },
+    "predicateType": { "const": "https://slsa.dev/provenance/v1" },
+    "buildType": { "const": "https://noeos.dev/buildtypes/verifactu-p2-rehearsal/v1" },
+    "builderId": { "const": "https://noeos.dev/builders/verifactu-p2-rehearsal/v1" },
+    "signed": { "const": false },
+    "publishable": { "const": false },
+    "claimedSlsaLevel": { "const": "none" }
+  }
+}

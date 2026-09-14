@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only, paginated and redacted GitHub effective-state auditor for P1."""
+"""Read-only, paginated and redacted GitHub effective-state auditor."""
 
 from __future__ import annotations
 
@@ -238,7 +238,12 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     selected = value(selected_obs, "selected actions")
     assert_equal(checks, "actions.githubOwnedAllowed", policy["actions"]["githubOwnedAllowed"], selected.get("github_owned_allowed"))
     assert_equal(checks, "actions.verifiedAllowed", policy["actions"]["verifiedAllowed"], selected.get("verified_allowed"))
-    assert_equal(checks, "actions.patternsAllowed", policy["actions"]["patternsAllowed"], selected.get("patterns_allowed") or [])
+    assert_equal(
+        checks,
+        "actions.patternsAllowed",
+        sorted(policy["actions"]["patternsAllowed"]),
+        sorted(selected.get("patterns_allowed") or []),
+    )
     fork_approval = value(fork_approval_obs, "fork PR contributor approval")
     assert_equal(checks, "actions.forkPullRequestApproval", policy["actions"]["forkPullRequestApproval"], fork_approval.get("approval_policy"))
     retention = value(retention_obs, "artifact and log retention")
@@ -258,7 +263,7 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     assert_equal(checks, "security.secretScanningValidityChecks", policy["security"]["secretScanningValidityChecks"], status("secret_scanning_validity_checks"))
     assert_equal(checks, "security.dependabotAlertsReadable", "verified", observations["dependabotAlerts"].get("state"))
     assert_equal(checks, "security.secretScanningAlertsReadable", "verified", observations["secretScanningAlerts"].get("state"))
-    assert_equal(checks, "security.codeScanningBeforeP2", "not-found", observations["codeScanningAlerts"].get("state"))
+    assert_equal(checks, "security.codeScanningAlertsReadable", "verified", observations["codeScanningAlerts"].get("state"))
 
     by_name = {item["name"]: item for item in detailed_rulesets}
     assert_equal(

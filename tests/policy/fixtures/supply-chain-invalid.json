@@ -1,0 +1,11 @@
+{
+  "$schema": "./supply-chain-invalid.schema.json",
+  "schemaVersion": 1,
+  "fixtures": [
+    { "id": "mutable-action", "expectedCode": "MUTABLE_ACTION" },
+    { "id": "mutable-dependency", "expectedCode": "INTEGRITY_MISSING" },
+    { "id": "package-content-leak", "expectedCode": "PACKAGE_CONTENT_LEAK" },
+    { "id": "nonreproducible-output", "expectedCode": "NONREPRODUCIBLE_OUTPUT" },
+    { "id": "unadmitted-regulatory-edition", "expectedCode": "UNADMITTED_REGULATORY_EDITION" }
+  ]
+}

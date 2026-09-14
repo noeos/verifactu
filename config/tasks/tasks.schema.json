@@ -50,8 +50,9 @@
             "additionalProperties": false,
             "required": ["executable", "arguments"],
             "properties": {
-              "executable": { "enum": ["node", "npm", "typescript", "prettier", "eslint"] },
-              "arguments": { "type": "array", "items": { "type": "string" } }
+              "executable": { "enum": ["node", "npm", "typescript", "prettier", "eslint", "python"] },
+              "arguments": { "type": "array", "items": { "type": "string" } },
+              "childEntrypoints": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
             }
           },
           "environment": {

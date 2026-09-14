@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { PolicyFailure, assert, main, validateJsonFile } from "../../tooling/lib/policy.mjs";
 import {
@@ -92,7 +92,7 @@ async function run() {
     process.execPath,
     [
       "--import",
-      path.join(root, "tooling/tasks/network-guard.mjs"),
+      pathToFileURL(path.join(root, "tooling/tasks/network-guard.mjs")).href,
       path.join(root, "tests/policy/fixtures/task-runner/network-attempt.mjs"),
     ],
     { encoding: "utf8", env: { ...process.env } },

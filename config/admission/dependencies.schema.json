@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/dependency-admission-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyId",
+    "lockfileSha256",
+    "expectedPackageEntries",
+    "registry",
+    "integrity",
+    "lifecycle",
+    "optionalCode",
+    "allowedLicenses",
+    "runtime"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "policyId": { "const": "DEPENDENCY-ADMISSION-0001" },
+    "lockfileSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "expectedPackageEntries": { "type": "integer", "minimum": 1 },
+    "registry": { "const": "https://registry.npmjs.org/" },
+    "integrity": { "const": "sha512-required-except-workspace-links-and-admitted-bundled-members" },
+    "lifecycle": { "const": "all-install-scripts-denied" },
+    "optionalCode": { "const": "locked-but-omitted-from-install-build-test-and-package" },
+    "allowedLicenses": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "integrity",
+        "sha1",
+        "sha256",
+        "license",
+        "dependencies",
+        "installScripts",
+        "nativeCode",
+        "optionalCode"
+      ],
+      "properties": {
+        "name": { "const": "@noeos/verification-engine" },
+        "version": { "const": "1.0.1" },
+        "integrity": { "type": "string" },
+        "sha1": { "type": "string" },
+        "sha256": { "type": "string" },
+        "license": { "const": "Apache-2.0" },
+        "dependencies": { "const": 0 },
+        "installScripts": { "const": false },
+        "nativeCode": { "const": false },
+        "optionalCode": { "const": false }
+      }
+    }
+  }
+}

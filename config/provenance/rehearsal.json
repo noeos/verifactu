@@ -1,0 +1,12 @@
+{
+  "$schema": "./rehearsal.schema.json",
+  "schemaVersion": 1,
+  "policyId": "PROVENANCE-REHEARSAL-0001",
+  "statementType": "https://in-toto.io/Statement/v1",
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "buildType": "https://noeos.dev/buildtypes/verifactu-p2-rehearsal/v1",
+  "builderId": "https://noeos.dev/builders/verifactu-p2-rehearsal/v1",
+  "signed": false,
+  "publishable": false,
+  "claimedSlsaLevel": "none"
+}

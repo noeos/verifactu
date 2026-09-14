@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { assert, fail } from "../lib/policy.mjs";
 
 export function validateTaskGraph(registry) {
@@ -10,6 +12,13 @@ export function validateTaskGraph(registry) {
       "UNSAFE_ARGUMENT",
       `task ${task.id} contains an unsafe argument`,
     );
+    for (const entrypoint of task.command.childEntrypoints ?? []) {
+      assert(
+        entrypoint.length > 0 && !path.isAbsolute(entrypoint) && !entrypoint.split(/[\\/]/).includes(".."),
+        "UNSAFE_CHILD_ENTRYPOINT",
+        `task ${task.id} declares unsafe child entrypoint ${entrypoint}`,
+      );
+    }
     assert(
       task.network === "denied" || task.selectionClass === "bootstrap",
       "NETWORK_POLICY",

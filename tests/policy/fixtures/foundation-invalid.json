@@ -51,6 +51,11 @@
       "expectedCode": "PATH_SHADOW",
       "execPath": "/admitted/node",
       "resolved": "/shadow/node"
+    },
+    {
+      "id": "hand-edited-generated",
+      "control": "checked-in-generation",
+      "expectedCode": "STALE_OR_HAND_EDITED_GENERATED"
     }
   ]
 }

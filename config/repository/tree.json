@@ -5,6 +5,7 @@
   "rootFiles": [
     ".editorconfig",
     ".gitattributes",
+    ".gitleaksignore",
     ".gitignore",
     ".node-version",
     ".npmrc",
@@ -24,6 +25,12 @@
       "prefix": "config/",
       "owner": "repository-owner",
       "artifactClass": "canonical-configuration",
+      "visibility": "internal"
+    },
+    {
+      "prefix": "config/generated/",
+      "owner": "repository-owner",
+      "artifactClass": "generated-checked-in-configuration",
       "visibility": "internal"
     },
     {
@@ -99,6 +106,8 @@
     "benchmarks/profiles",
     "benchmarks/workloads",
     "config/admission",
+    "config/ci",
+    "config/generated",
     "config/packages",
     "config/repository",
     "config/toolchain",

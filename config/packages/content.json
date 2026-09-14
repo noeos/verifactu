@@ -1,0 +1,64 @@
+{
+  "$schema": "./content.schema.json",
+  "schemaVersion": 1,
+  "policyId": "PACKAGE-CONTENT-0001",
+  "packages": [
+    {
+      "directory": "packages/verifactu",
+      "name": "@noeos/verifactu",
+      "entry": "src/index.ts",
+      "formats": ["esm", "cjs"],
+      "tarball": "noeos-verifactu-0.0.0-development.tgz",
+      "allowedFiles": [
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+        "dist/cjs/index.js",
+        "dist/cjs/index.js.map",
+        "dist/cjs/package.json",
+        "dist/esm/index.js",
+        "dist/esm/index.js.map",
+        "dist/types/index.d.ts",
+        "dist/types/index.d.ts.map",
+        "package.json"
+      ]
+    },
+    {
+      "directory": "packages/adapter-kit",
+      "name": "@noeos/verifactu-adapter-kit",
+      "entry": "src/index.ts",
+      "formats": ["esm", "cjs"],
+      "tarball": "noeos-verifactu-adapter-kit-0.0.0-development.tgz",
+      "allowedFiles": [
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+        "dist/cjs/index.js",
+        "dist/cjs/index.js.map",
+        "dist/cjs/package.json",
+        "dist/esm/index.js",
+        "dist/esm/index.js.map",
+        "dist/types/index.d.ts",
+        "dist/types/index.d.ts.map",
+        "package.json"
+      ]
+    },
+    {
+      "directory": "packages/cli",
+      "name": "@noeos/verifactu-cli",
+      "entry": "src/main.ts",
+      "formats": ["esm"],
+      "tarball": "noeos-verifactu-cli-0.0.0-development.tgz",
+      "allowedFiles": [
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+        "dist/esm/main.js",
+        "dist/esm/main.js.map",
+        "dist/types/main.d.ts",
+        "dist/types/main.d.ts.map",
+        "package.json"
+      ]
+    }
+  ]
+}

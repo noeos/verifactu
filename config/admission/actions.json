@@ -1,0 +1,87 @@
+{
+  "$schema": "./actions.schema.json",
+  "schemaVersion": 1,
+  "policyId": "ACTION-ADMISSION-0001",
+  "actions": [
+    {
+      "repository": "actions/checkout",
+      "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "release": "v7.0.1",
+      "license": "MIT",
+      "permissions": ["contents:read"],
+      "purpose": "Check out an explicitly bound commit without persisted credentials."
+    },
+    {
+      "repository": "actions/setup-node",
+      "sha": "249970729cb0ef3589644e2896645e5dc5ba9c38",
+      "release": "v6.0.0",
+      "license": "MIT",
+      "permissions": ["contents:read"],
+      "purpose": "Install exact supported Node matrix runtimes and read-only npm cache."
+    },
+    {
+      "repository": "actions/setup-python",
+      "sha": "ece7cb06caefa5fff74198d8649806c4678c61a1",
+      "release": "v6.0.0",
+      "license": "MIT",
+      "permissions": ["contents:read"],
+      "purpose": "Install the exact Python reference runtime for independent SPDX validation."
+    },
+    {
+      "repository": "actions/upload-artifact",
+      "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+      "release": "v7.0.0",
+      "license": "MIT",
+      "permissions": [],
+      "purpose": "Upload bounded non-secret evidence with explicit retention."
+    },
+    {
+      "repository": "actions/download-artifact",
+      "sha": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+      "release": "v8.0.0",
+      "license": "MIT",
+      "permissions": [],
+      "purpose": "Download exact evidence artifacts inside closure jobs."
+    },
+    {
+      "repository": "actions/dependency-review-action",
+      "sha": "2031cfc080254a8a887f58cffee85186f0e49e48",
+      "release": "v4.9.0",
+      "license": "MIT",
+      "permissions": ["contents:read"],
+      "purpose": "Review dependency changes on pull requests against severity and licence policy."
+    },
+    {
+      "repository": "github/codeql-action",
+      "sha": "b96794f015dfd88f77b49b1c93e0fa7110f94c63",
+      "release": "v4",
+      "license": "MIT",
+      "permissions": ["contents:read", "security-events:write"],
+      "purpose": "Initialize, analyze and upload CodeQL results for JavaScript and TypeScript."
+    },
+    {
+      "repository": "ossf/scorecard-action",
+      "sha": "2d1146689b8cda280b9bc96326124645441f03bc",
+      "release": "v2.4.4",
+      "license": "Apache-2.0",
+      "permissions": ["contents:read", "security-events:write", "id-token:write"],
+      "purpose": "Produce scheduled OpenSSF Scorecard evidence outside required closure."
+    },
+    {
+      "repository": "google/osv-scanner-action",
+      "sha": "90b209d0ea55cea1da9fc0c4e65782cc6acb6e2e",
+      "release": "v2.2.2",
+      "license": "Apache-2.0",
+      "permissions": ["contents:read"],
+      "purpose": "Scan the exact lockfile graph against the OSV vulnerability database."
+    },
+    {
+      "repository": "actions/attest",
+      "sha": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "release": "v4",
+      "license": "MIT",
+      "permissions": ["attestations:write", "id-token:write"],
+      "purpose": "Reserved for protected release attestations; never invoked by P2 rehearsal."
+    }
+  ]
+}

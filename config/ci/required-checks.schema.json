@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "registryId", "contexts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "registryId": { "const": "REQUIRED-CHECKS-0001" },
+    "contexts": {
+      "type": "array",
+      "minItems": 17,
+      "maxItems": 17,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["context", "workflow", "job", "producer", "task", "report", "runner", "runtime", "timeoutMinutes"],
+        "properties": {
+          "context": { "type": "string", "pattern": "^Required · " },
+          "workflow": { "enum": ["ci.yml", "conformance.yml", "security.yml"] },
+          "job": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+          "producer": {
+            "enum": [
+              "python-policy",
+              "canonical-task",
+              "canonical-task-matrix",
+              "github-action",
+              "admitted-tool",
+              "check-run-closure"
+            ]
+          },
+          "task": { "type": "string", "minLength": 3 },
+          "report": { "const": "github-check-run" },
+          "runner": { "enum": ["ubuntu-24.04", "windows-2025", "macos-15"] },
+          "runtime": { "type": "string", "minLength": 3 },
+          "timeoutMinutes": { "type": "integer", "minimum": 5, "maximum": 30 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,141 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "43 2 * * 1"
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    name: Required · dependency review
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Review pull-request dependency changes
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          fail-on-severity: moderate
+          allow-licenses: Apache-2.0, Artistic-2.0, BSD-2-Clause, BSD-3-Clause, BlueOak-1.0.0, CC-BY-3.0, CC0-1.0, ISC, MIT
+          comment-summary-in-pr: never
+      - name: Set up the admitted primary runtime for non-PR audit
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install and audit the complete lock on non-PR events
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          npm ci --ignore-scripts --omit=optional
+          node node_modules/npm/bin/npm-cli.js audit --omit=optional --audit-level=moderate
+
+  codeql:
+    name: Required · CodeQL
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write
+    timeout-minutes: 30
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Initialize CodeQL without manual build ambiguity
+        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+      - name: Analyze the exact checked-out subject
+        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          category: /language:javascript-typescript
+
+  secret-scan:
+    name: Required · secret scan
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out complete history without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Prepare the exact digest-bound scanner distribution
+        run: node tooling/tasks/run-task.mjs --task prepare:external-inputs --evidence-dir evidence/runs/secret-scan
+      - name: Scan complete history with the admitted secret scanner
+        run: node tooling/security/run-gitleaks.mjs
+
+  osv:
+    name: Required · OSV
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Scan the exact npm lock graph
+        uses: google/osv-scanner-action/osv-scanner-action@90b209d0ea55cea1da9fc0c4e65782cc6acb6e2e # v2.2.2
+        with:
+          scan-args: |-
+            --lockfile=package-lock.json
+
+  npm-admission:
+    name: Required · npm audit signatures and licenses
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Verify registry signatures and attestations
+        run: node node_modules/npm/bin/npm-cli.js audit signatures --omit=optional
+      - name: Enforce registry, integrity, lifecycle and licence admission
+        run: node tooling/tasks/run-task.mjs --task policy:supply-chain --evidence-dir evidence/runs/npm-admission

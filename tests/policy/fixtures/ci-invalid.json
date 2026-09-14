@@ -1,0 +1,8 @@
+{
+  "$schema": "./ci-invalid.schema.json",
+  "schemaVersion": 1,
+  "fixtures": [
+    { "id": "missing-required-job", "expectedCode": "MISSING_REQUIRED_JOB" },
+    { "id": "missing-check-report", "expectedCode": "MISSING_REQUIRED_CHECK_REPORT" }
+  ]
+}

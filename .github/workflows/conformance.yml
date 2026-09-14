@@ -1,0 +1,62 @@
+name: Conformance
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 3 * * 2"
+
+permissions: {}
+
+concurrency:
+  group: conformance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regulatory-contracts:
+    name: Required · regulatory sources and generated contracts
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Prove the exact P2 regulatory and generated state
+        run: node tooling/tasks/run-task.mjs --task policy:regulatory --evidence-dir evidence/runs/regulatory
+
+  integration-conformance:
+    name: Required · integration conformance
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Exercise only admitted tarballs in a clean offline consumer
+        run: node tooling/tasks/run-task.mjs --task integration:tarball-consumers --evidence-dir evidence/runs/integration
