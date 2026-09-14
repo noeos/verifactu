@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: repository-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-14
 sources: [SRC-0052]
 decisions: [ADR-0030, ADR-0032, ADR-0033]
 historical-inputs: [REV-058, REV-075, REV-079, REV-080, REV-082]
@@ -19,7 +19,7 @@ historical-inputs: [REV-058, REV-075, REV-079, REV-080, REV-082]
 | `conformance.yml` | PR-safe, main, schedule | regulatory, format, state/crash and adapter contracts |
 | `security.yml` | PR-safe/main/schedule | dependency review, CodeQL, secrets, OSV, npm/licence, fuzz |
 | `performance.yml` | PR smoke; trusted schedule/manual | correctness-guarded budgets/stress/soak |
-| `github-audit.yml` | trusted schedule/manual/policy | read-only effective state and alerts |
+| `github-audit.yml` | schedule/manual, ephemeral token | collector self-test plus explicit token-authority boundary; never a full administrative-state claim |
 | `scorecard.yml` | schedule/policy | pinned JSON/SARIF signal, not closure |
 | `release-candidate.yml` | protected rehearsal | non-publishing candidate/evidence only until Lot 4 |
 
@@ -32,3 +32,8 @@ YAML orchestrates canonical tasks and never embeds competing build/test logic.
 PR and main runs bind the actual checked-out SHA; pull-request merge refs cannot
 be misreported as head. Scheduled failures create findings and visible owner
 notifications, not silent badges.
+
+Full GitHub desired/effective read-back remains a maintainer-authenticated,
+read-only closure operation because the ephemeral workflow token cannot read
+repository administration. Its redacted report is committed through the same
+protected PR process; no persistent PAT is allowed as a shortcut.

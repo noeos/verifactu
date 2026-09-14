@@ -374,7 +374,7 @@
     },
     {
       "id": "prepare:external-inputs",
-      "version": 1,
+      "version": 2,
       "owner": "supply-chain-owner",
       "description": "Fetch only explicitly admitted external inputs and verify exact digests before use.",
       "dependencies": ["bootstrap:toolchain"],
@@ -460,7 +460,7 @@
     },
     {
       "id": "policy:supply-chain-negative",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "description": "Falsify Action, dependency, package, reproducibility and regulatory admission controls.",
       "dependencies": ["bootstrap:toolchain"],
