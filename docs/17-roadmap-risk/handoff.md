@@ -505,8 +505,7 @@ Append corrections in this form:
   `0b92a2e8ccc7040b80438ffbd6101205eeaf62fb`.
 - Closure main SHA / tree: derived and independently read back by P3 intake;
   embedding a commit's own identity in that commit is impossible.
-- Closure PR: dedicated branch `docs/10-p2-closure`; GitHub number is added to
-  this record after the first signed branch publication.
+- Closure PR: `#24`, dedicated branch `docs/10-p2-closure`.
 - Roadmap revision: `ROADMAP-DOC-0004` as present in protected main
   `baa92d948912593d0dc5cb5ed361a4bd645f885c`; P2-W1–P2-W8 and every stated
   exit criterion were evaluated without reducing scope.
@@ -549,13 +548,13 @@ Append corrections in this form:
 
 ### Work packages and protected history
 
-| Work ID             | Issue | Branch                                 | PR                               | branch commits/signers/DCO                                                                                           | squash SHA                                                              | result                                               |
-| ------------------- | ----- | -------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
-| P2-W1–W3            | `#10` | `build/10-p2-tree-toolchain-packages`  | `#11`                            | `4df6866a08af373bce0e40ca45d3f36b777d8c79`; GitHub-verified SSH signature, matching DCO                              | `ce837b97cb526e690d49705960e3cd8b40e91b7e`; verified GitHub GPG and DCO | pass                                                 |
-| P2-W4–W8            | `#10` | `build/10-p2-ci-build-supply-chain`    | `#12`                            | `8f2c7e2`, `1e1d7ce`, `c01abba`, `596a194`, `11e99c4`, `ad248a4`; every commit GitHub-verified SSH with matching DCO | `38b43f95a2637438af915a1edcd349dbd6206987`; verified GitHub GPG and DCO | pass after retained portability/security corrections |
-| P2-W6/W8 correction | `#10` | `fix/10-p2-rehearsal-audit-boundaries` | `#13`                            | `7667753dcc4d80cfbcf90a7d123f6f5fe821370a`; GitHub-verified SSH and DCO                                              | `c583bcf3d3f46576de53a0bb296f6cf706d61b28`; verified GitHub GPG and DCO | pass                                                 |
-| P2-W7 completion    | `#10` | `build/10-p2-dependabot-flow`          | `#14`                            | `5fea8a93b82acb3cd645cb59ba7adfa1e724e0ff`; GitHub-verified SSH and DCO                                              | `baa92d948912593d0dc5cb5ed361a4bd645f885c`; verified GitHub GPG and DCO | pass                                                 |
-| P2 closure          | `#10` | `docs/10-p2-closure`                   | assigned after first publication | recorded after final-head publication; every human commit must be verified SSH and DCO                               | derived by P3 intake                                                    | pending only protected closure mechanics             |
+| Work ID             | Issue | Branch                                 | PR    | branch commits/signers/DCO                                                                                                                                          | squash SHA                                                              | result                                               |
+| ------------------- | ----- | -------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| P2-W1–W3            | `#10` | `build/10-p2-tree-toolchain-packages`  | `#11` | `4df6866a08af373bce0e40ca45d3f36b777d8c79`; GitHub-verified SSH signature, matching DCO                                                                             | `ce837b97cb526e690d49705960e3cd8b40e91b7e`; verified GitHub GPG and DCO | pass                                                 |
+| P2-W4–W8            | `#10` | `build/10-p2-ci-build-supply-chain`    | `#12` | `8f2c7e2`, `1e1d7ce`, `c01abba`, `596a194`, `11e99c4`, `ad248a4`; every commit GitHub-verified SSH with matching DCO                                                | `38b43f95a2637438af915a1edcd349dbd6206987`; verified GitHub GPG and DCO | pass after retained portability/security corrections |
+| P2-W6/W8 correction | `#10` | `fix/10-p2-rehearsal-audit-boundaries` | `#13` | `7667753dcc4d80cfbcf90a7d123f6f5fe821370a`; GitHub-verified SSH and DCO                                                                                             | `c583bcf3d3f46576de53a0bb296f6cf706d61b28`; verified GitHub GPG and DCO | pass                                                 |
+| P2-W7 completion    | `#10` | `build/10-p2-dependabot-flow`          | `#14` | `5fea8a93b82acb3cd645cb59ba7adfa1e724e0ff`; GitHub-verified SSH and DCO                                                                                             | `baa92d948912593d0dc5cb5ed361a4bd645f885c`; verified GitHub GPG and DCO | pass                                                 |
+| P2 closure          | `#10` | `docs/10-p2-closure`                   | `#24` | `a9a6951fb3558c9b30f443971d1af83304f6f1f5` plus this final record commit, whose self-SHA is derived from the PR head; every human commit must verify as SSH and DCO | derived by P3 intake                                                    | pending only protected closure mechanics             |
 
 Every merged implementation branch was automatically deleted. There was no
 direct `main` push, merge commit, rebase, bypass actor, CODEOWNERS requirement,
