@@ -1,4 +1,4 @@
-name: GitHub effective-state audit
+name: GitHub audit authority guard
 
 on:
   schedule:
@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  readback:
-    name: Audit · read-only effective GitHub state
+  authority-boundary:
+    name: Audit · collector and token authority boundary
     runs-on: ubuntu-24.04
     permissions:
       actions: read
@@ -29,15 +29,15 @@ jobs:
           ref: main
       - name: Exercise audit-negative fixtures
         run: python3 .github/scripts/audit-github.py --self-test
-      - name: Read back effective repository state
+      - name: Prove the ephemeral token cannot claim administrative read-back
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 .github/scripts/audit-github.py --subject-sha "$GITHUB_SHA" --output evidence/tmp/github-effective-state.json
-      - name: Retain the redacted bounded report
+        run: python3 .github/scripts/audit-github.py --actions-token-boundary --output evidence/tmp/github-token-boundary.json
+      - name: Retain the bounded authority report
         if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
         with:
-          name: github-effective-state-${{ github.run_id }}
-          path: evidence/tmp/github-effective-state.json
+          name: github-token-boundary-${{ github.run_id }}
+          path: evidence/tmp/github-token-boundary.json
           if-no-files-found: error
           retention-days: 14

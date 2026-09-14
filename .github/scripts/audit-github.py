@@ -116,6 +116,38 @@ def assert_equal(checks: list[dict[str, object]], name: str, expected, observed)
     checks.append({"name": name, "result": "passed" if observed == expected else "failed", "expected": expected, "observed": observed})
 
 
+def evaluate_actions_token_boundary(repository: str, metadata: dict[str, object], administration: dict[str, object]) -> dict[str, object]:
+    checks: list[dict[str, object]] = []
+    assert_equal(checks, "actionsToken.repositoryMetadataReadable", "verified", metadata.get("state"))
+    assert_equal(
+        checks,
+        "actionsToken.administrationDenied",
+        ("inaccessible", 403),
+        (administration.get("state"), administration.get("httpStatus")),
+    )
+    return {
+        "schemaVersion": 1,
+        "repository": repository,
+        "result": "passed" if all(check["result"] == "passed" for check in checks) else "failed",
+        "claim": "authority-boundary-only; not an effective-state audit",
+        "checks": checks,
+        "observations": {
+            "repositoryMetadata": count_observation(metadata),
+            "repositoryAdministration": count_observation(administration),
+        },
+    }
+
+
+def actions_token_boundary(policy_path: Path) -> dict[str, object]:
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    repository = policy["repository"]
+    return evaluate_actions_token_boundary(
+        repository,
+        run_gh(f"repos/{repository}"),
+        run_gh(f"repos/{repository}/actions/permissions"),
+    )
+
+
 def normalize_ruleset(ruleset: dict[str, object]) -> dict[str, object]:
     rules = ruleset.get("rules") or []
     rule_types = [rule.get("type") for rule in rules]
@@ -391,6 +423,22 @@ def self_test() -> dict[str, object]:
     else:
         raise AuditError("inconsistent pagination fixture unexpectedly passed")
 
+    denied = evaluate_actions_token_boundary(
+        "noeos/verifactu",
+        {"state": "verified", "endpoint": "repos/noeos/verifactu"},
+        {"state": "inaccessible", "httpStatus": 403, "endpoint": "repos/noeos/verifactu/actions/permissions"},
+    )
+    if denied["result"] != "passed":
+        raise AuditError("expected Actions token authority boundary was not accepted")
+    overclaimed = evaluate_actions_token_boundary(
+        "noeos/verifactu",
+        {"state": "verified", "endpoint": "repos/noeos/verifactu"},
+        {"state": "verified", "endpoint": "repos/noeos/verifactu/actions/permissions"},
+    )
+    if overclaimed["result"] != "failed":
+        raise AuditError("an Actions token with unexpected administration access was silently accepted")
+    tests.append("actions-token-authority-boundary")
+
     return {"schemaVersion": 1, "result": "passed", "negativeFixtures": tests}
 
 
@@ -400,17 +448,25 @@ def main() -> int:
     parser.add_argument("--policy", type=Path)
     parser.add_argument("--subject-sha")
     parser.add_argument("--output", type=Path)
-    parser.add_argument("--self-test", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--self-test", action="store_true")
+    mode.add_argument("--actions-token-boundary", action="store_true")
     args = parser.parse_args()
     root = args.root.resolve()
     policy = args.policy or root / ".github/policy/github.json"
     try:
-        report = self_test() if args.self_test else audit(root, policy.resolve(), args.subject_sha)
+        if args.self_test:
+            report = self_test()
+        elif args.actions_token_boundary:
+            report = actions_token_boundary(policy.resolve())
+        else:
+            report = audit(root, policy.resolve(), args.subject_sha)
     except (AuditError, OSError, json.JSONDecodeError, subprocess.SubprocessError) as exc:
         print(json.dumps({"schemaVersion": 1, "result": "error", "diagnostic": str(exc)}, sort_keys=True))
         return 2
     rendered = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered, encoding="utf-8")
     print(rendered, end="")
     return 0 if report["result"] == "passed" else 1
