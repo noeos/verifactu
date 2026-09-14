@@ -82,6 +82,26 @@
       "mediaType": "application/ld+json",
       "license": "Community-Spec-1.0",
       "purpose": "Official JSON-LD context resolved locally during SPDX semantic validation."
+    },
+    {
+      "id": "gitleaks-checksums-8.30.1",
+      "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_checksums.txt",
+      "filename": "gitleaks-8.30.1-checksums.txt",
+      "sha256": "061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae",
+      "maximumBytes": 10000,
+      "mediaType": "text/plain",
+      "license": "MIT",
+      "purpose": "Publisher checksum manifest independently binding the admitted Gitleaks release asset."
+    },
+    {
+      "id": "gitleaks-linux-x64-8.30.1",
+      "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+      "filename": "gitleaks-8.30.1-linux-x64.tar.gz",
+      "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+      "maximumBytes": 9000000,
+      "mediaType": "application/gzip",
+      "license": "MIT",
+      "purpose": "Exact Linux x64 Gitleaks CLI used by the required complete-history secret scan."
     }
   ]
 }

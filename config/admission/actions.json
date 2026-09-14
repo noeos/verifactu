@@ -68,14 +68,6 @@
       "purpose": "Produce scheduled OpenSSF Scorecard evidence outside required closure."
     },
     {
-      "repository": "gitleaks/gitleaks-action",
-      "sha": "ff98106e4c7b2bc287b24eaf42907196329070c7",
-      "release": "v2",
-      "license": "LicenseRef-Gitleaks-Action-EULA",
-      "permissions": ["contents:read", "pull-requests:read"],
-      "purpose": "Scan complete checked-out history for secret patterns without repository writes."
-    },
-    {
       "repository": "google/osv-scanner-action",
       "sha": "90b209d0ea55cea1da9fc0c4e65782cc6acb6e2e",
       "release": "v2.2.2",

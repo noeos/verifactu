@@ -23,7 +23,6 @@
     "githubOwnedAllowed": true,
     "verifiedAllowed": false,
     "patternsAllowed": [
-      "gitleaks/gitleaks-action@*",
       "google/osv-scanner-action/*@*",
       "ossf/scorecard-action@*"
     ],

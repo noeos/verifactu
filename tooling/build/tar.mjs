@@ -55,7 +55,7 @@ function parseOctal(buffer) {
   return text ? Number.parseInt(text, 8) : 0;
 }
 
-export function parseTarGzip(compressed, maximumExpandedBytes = 20 * 1024 * 1024) {
+export function parseTarGzip(compressed, maximumExpandedBytes = 20 * 1024 * 1024, requiredPrefix = "package/") {
   const tar = gunzipSync(compressed, { maxOutputLength: maximumExpandedBytes });
   const entries = [];
   const names = new Set();
@@ -72,7 +72,11 @@ export function parseTarGzip(compressed, maximumExpandedBytes = 20 * 1024 * 1024
     const size = parseOctal(header.subarray(124, 136));
     const mode = parseOctal(header.subarray(100, 108));
     assert(
-      name.startsWith("package/") && !name.startsWith("/") && !name.includes("\\") && !name.split("/").includes(".."),
+      (!requiredPrefix || name.startsWith(requiredPrefix)) &&
+        name.length > 0 &&
+        !name.startsWith("/") &&
+        !name.includes("\\") &&
+        !name.split("/").includes(".."),
       "TAR_PATH_UNSAFE",
       `unsafe tar entry: ${name}`,
     );

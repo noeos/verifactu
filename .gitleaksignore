@@ -1,0 +1,3 @@
+# Reviewed false positive: prose in the immutable P1 implementation-roadmap matrix,
+# not a credential. The fingerprint binds the exact introducing commit, path, rule and line.
+c40f5d6e4e2dc8debe0b365790f9a112d27af663:docs/17-roadmap-risk/implementation-roadmap.md:generic-api-key:375

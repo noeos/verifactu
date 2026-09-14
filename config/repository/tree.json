@@ -5,6 +5,7 @@
   "rootFiles": [
     ".editorconfig",
     ".gitattributes",
+    ".gitleaksignore",
     ".gitignore",
     ".node-version",
     ".npmrc",

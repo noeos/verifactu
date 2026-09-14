@@ -20,7 +20,14 @@
           "workflow": { "enum": ["ci.yml", "conformance.yml", "security.yml"] },
           "job": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
           "producer": {
-            "enum": ["python-policy", "canonical-task", "canonical-task-matrix", "github-action", "check-run-closure"]
+            "enum": [
+              "python-policy",
+              "canonical-task",
+              "canonical-task-matrix",
+              "github-action",
+              "admitted-tool",
+              "check-run-closure"
+            ]
           },
           "task": { "type": "string", "minLength": 3 },
           "report": { "const": "github-check-run" },

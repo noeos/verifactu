@@ -21,7 +21,7 @@
           "url": { "type": "string", "pattern": "^https://" },
           "filename": { "type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]+$" },
           "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-          "maximumBytes": { "type": "integer", "minimum": 1, "maximum": 5000000 },
+          "maximumBytes": { "type": "integer", "minimum": 1, "maximum": 10000000 },
           "mediaType": { "type": "string" },
           "license": { "type": "string" },
           "purpose": { "type": "string", "minLength": 12 }
