@@ -140,6 +140,29 @@
       "zeroWork": "fail"
     },
     {
+      "id": "policy:governance",
+      "version": 1,
+      "owner": "repository-owner",
+      "description": "Validate documentation metadata, links, IDs, governance, workflows, Dependabot and repository phase claims.",
+      "dependencies": ["bootstrap:toolchain"],
+      "inputs": [".github/**", "config/ci/**", "docs/**", "packages/**", "*.md", "LICENSE"],
+      "outputs": [],
+      "workingDirectory": ".",
+      "toolProfile": "node-primary",
+      "command": {
+        "executable": "python",
+        "arguments": [".github/scripts/check-governance.py"]
+      },
+      "environment": { "passThrough": ["VERIFACTU_PYTHON"], "fixed": {} },
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutMs": 120000,
+      "concurrencyLocks": [],
+      "selectionClass": "docs",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail"
+    },
+    {
       "id": "format:check",
       "version": 1,
       "owner": "repository-owner",
@@ -282,12 +305,13 @@
     },
     {
       "id": "gate:p2",
-      "version": 1,
+      "version": 2,
       "owner": "repository-owner",
       "description": "Close every admitted P2 engineering, build, packaging, SBOM and provenance rehearsal control.",
       "dependencies": [
         "gate:foundation",
         "generate:checked-in",
+        "policy:governance",
         "policy:regulatory",
         "policy:ci",
         "policy:supply-chain",
