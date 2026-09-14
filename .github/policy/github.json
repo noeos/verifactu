@@ -24,7 +24,7 @@
     "verifiedAllowed": false,
     "patternsAllowed": [
       "gitleaks/gitleaks-action@*",
-      "google/osv-scanner-action@*",
+      "google/osv-scanner-action/*@*",
       "ossf/scorecard-action@*"
     ],
     "shaPinningRequired": true,

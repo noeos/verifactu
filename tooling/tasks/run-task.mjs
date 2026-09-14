@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
 import { lstat, mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import Ajv2020 from "ajv/dist/2020.js";
 
@@ -151,7 +151,10 @@ export function commandFor(root, task) {
   );
   const target = targets[task.command.executable];
   const requested = target === null ? task.command.arguments : [target, ...task.command.arguments];
-  const guard = task.network === "denied" ? ["--import", path.join(root, "tooling/tasks/network-guard.mjs")] : [];
+  const guard =
+    task.network === "denied"
+      ? ["--import", pathToFileURL(path.join(root, "tooling/tasks/network-guard.mjs")).href]
+      : [];
   return { executable: process.execPath, arguments: [...guard, ...requested] };
 }
 

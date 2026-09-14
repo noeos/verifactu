@@ -407,7 +407,7 @@ def validate_github_policy(root: Path) -> None:
         "verifiedAllowed": False,
         "patternsAllowed": [
             "gitleaks/gitleaks-action@*",
-            "google/osv-scanner-action@*",
+            "google/osv-scanner-action/*@*",
             "ossf/scorecard-action@*",
         ],
         "shaPinningRequired": True,

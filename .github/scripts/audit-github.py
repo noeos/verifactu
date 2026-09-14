@@ -238,7 +238,12 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     selected = value(selected_obs, "selected actions")
     assert_equal(checks, "actions.githubOwnedAllowed", policy["actions"]["githubOwnedAllowed"], selected.get("github_owned_allowed"))
     assert_equal(checks, "actions.verifiedAllowed", policy["actions"]["verifiedAllowed"], selected.get("verified_allowed"))
-    assert_equal(checks, "actions.patternsAllowed", policy["actions"]["patternsAllowed"], selected.get("patterns_allowed") or [])
+    assert_equal(
+        checks,
+        "actions.patternsAllowed",
+        sorted(policy["actions"]["patternsAllowed"]),
+        sorted(selected.get("patterns_allowed") or []),
+    )
     fork_approval = value(fork_approval_obs, "fork PR contributor approval")
     assert_equal(checks, "actions.forkPullRequestApproval", policy["actions"]["forkPullRequestApproval"], fork_approval.get("approval_policy"))
     retention = value(retention_obs, "artifact and log retention")
