@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only, paginated and redacted GitHub effective-state auditor for P1."""
+"""Read-only, paginated and redacted GitHub effective-state auditor."""
 
 from __future__ import annotations
 
@@ -263,7 +263,7 @@ def audit(root: Path, policy_path: Path, subject_sha: str | None) -> dict[str, o
     assert_equal(checks, "security.secretScanningValidityChecks", policy["security"]["secretScanningValidityChecks"], status("secret_scanning_validity_checks"))
     assert_equal(checks, "security.dependabotAlertsReadable", "verified", observations["dependabotAlerts"].get("state"))
     assert_equal(checks, "security.secretScanningAlertsReadable", "verified", observations["secretScanningAlerts"].get("state"))
-    assert_equal(checks, "security.codeScanningBeforeP2", "not-found", observations["codeScanningAlerts"].get("state"))
+    assert_equal(checks, "security.codeScanningAlertsReadable", "verified", observations["codeScanningAlerts"].get("state"))
 
     by_name = {item["name"]: item for item in detailed_rulesets}
     assert_equal(
