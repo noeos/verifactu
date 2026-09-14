@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: supply-chain-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-14
 decisions: [ADR-0031, ADR-0034]
 historical-inputs: [REV-070, REV-073, REV-075]
 ---
@@ -18,10 +18,22 @@ compatibility. Security updates are not delayed by grouping. Lockfile-only
 updates still undergo source, integrity, licence, scripts/native and transitive
 diff review.
 
-Bots never auto-merge, approve, bypass or weaken checks. Their commits have
-verified platform/bot identity and an explicit DCO policy compatible with actual
-authorship; they cannot inherit the human's attestation. Maintainer regeneration
-is SSH-signed/DCO and preserves the bot PR attribution.
+The admitted configuration is `.github/dependabot.yml`: npm runs Monday at
+`05:17` and GitHub Actions Tuesday at `05:47`, both in `Europe/Madrid`, both at
+the repository root and each limited to five open version-update PRs. Automatic
+rebases are disabled so an already reviewed head cannot change silently. npm uses
+`increase-if-necessary`; no registry credential, assignee/reviewer, update group,
+ignore rule or alternate target branch is admitted.
+
+Bots never auto-merge, approve, bypass or weaken checks. GitHub documents that
+Dependabot signs its own commits, but its configuration has no DCO-signoff option;
+`commit-message` controls only prefix and dependency scope. Therefore a bot PR is
+an untrusted update proposal and all 17 contexts are emitted, but it is not
+mergeable if its exact commit lacks a truthful author signoff accepted by the
+repository policy. The maintainer independently regenerates/adopts the exact
+change on a new branch, links the originating bot PR and dependency diff, and
+creates an SSH-signed/DCO commit. Bot authorship or a human attestation is never
+fabricated, and the bot branch is never rewritten to disguise provenance.
 
 Every update regenerates dependency inventory, dual SBOM, licences/notices,
 package allowlists where affected and runs the complete compatibility/security

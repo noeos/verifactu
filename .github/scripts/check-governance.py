@@ -66,6 +66,43 @@ WORKFLOW_EVENTS = {
     "scorecard.yml": {"schedule", "workflow_dispatch"},
     "release-candidate.yml": {"workflow_dispatch"},
 }
+DEPENDABOT_CONFIG = '''version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:17"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 5
+    rebase-strategy: "disabled"
+    versioning-strategy: "increase-if-necessary"
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "05:47"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 5
+    rebase-strategy: "disabled"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+'''
 COMMUNITY_FILE_CONTRACT = {
     "README.md": (
         r"governed product repository executing Phase P2",
@@ -396,6 +433,26 @@ def validate_workflows(root: Path) -> None:
         raise PolicyError(f"required context drift: expected {sorted(REQUIRED_CONTEXTS)}, observed {sorted(observed)}")
 
 
+def validate_dependabot_text(text: str) -> None:
+    if text != DEPENDABOT_CONFIG:
+        raise PolicyError("Dependabot configuration differs from the admitted two-ecosystem contract")
+    if any(token in text for token in ("registries:", "assignees:", "reviewers:", "groups:", "target-branch:")):
+        raise PolicyError("Dependabot configuration adds an unadmitted trust or aggregation surface")
+
+
+def validate_dependabot(root: Path) -> str:
+    path = root / ".github/dependabot.yml"
+    if not path.is_file():
+        raise PolicyError("required Dependabot configuration is missing")
+    data = path.read_bytes()
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise PolicyError("Dependabot configuration is not UTF-8") from exc
+    validate_dependabot_text(text)
+    return hashlib.sha256(data).hexdigest()
+
+
 def validate_github_policy(root: Path) -> None:
     policy = json.loads((root / ".github/policy/github.json").read_text(encoding="utf-8"))
     if policy.get("schemaVersion") != 1 or policy.get("repository") != "noeos/verifactu":
@@ -445,6 +502,7 @@ def validate_repo(root: Path) -> dict[str, object]:
     signer_material_digest = validate_allowed_signers(root)
     community_digests = validate_community_files(root)
     validate_workflows(root)
+    dependabot_digest = validate_dependabot(root)
     validate_github_policy(root)
     return {
         "schemaVersion": 1,
@@ -455,6 +513,7 @@ def validate_repo(root: Path) -> dict[str, object]:
         "historicalArchiveAggregateSha256": archive_digest,
         "allowedSignerPublicMaterialSha256": signer_material_digest,
         "rootCommunityFileSha256": community_digests,
+        "dependabotConfigSha256": dependabot_digest,
         "requiredContexts": sorted(REQUIRED_CONTEXTS),
         "phase": "P2",
         "productSourcePresent": True,
@@ -503,6 +562,16 @@ def self_test() -> dict[str, object]:
             {"pull_request", "push"},
         ),
         "event contract differs",
+    )
+    expect_failure(
+        "dependabot-missing-ecosystem",
+        lambda: validate_dependabot_text(DEPENDABOT_CONFIG.replace('  - package-ecosystem: "github-actions"\n', "")),
+        "two-ecosystem contract",
+    )
+    expect_failure(
+        "dependabot-unadmitted-registry",
+        lambda: validate_dependabot_text(DEPENDABOT_CONFIG + "registries:\n"),
+        "two-ecosystem contract",
     )
     with tempfile.TemporaryDirectory(prefix="verifactu-community-") as directory:
         root = Path(directory)
