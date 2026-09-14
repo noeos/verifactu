@@ -1,0 +1,40 @@
+name: Performance
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "11 4 * * 3"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: performance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-smoke:
+    name: Performance · correctness-guarded build smoke
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Execute correctness-guarded isolated samples
+        run: node tooling/tasks/run-task.mjs --task performance:build-smoke --evidence-dir evidence/runs/performance

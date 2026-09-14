@@ -12,13 +12,11 @@ import { topologicalSelection, validateTaskGraph } from "./validate-graph.mjs";
 
 const RUNNER_EXCLUSIONS = new Set([
   ".agents",
-  ".cache",
   ".codex",
   ".git",
   ".nyc_output",
   ".stryker-tmp",
   "coverage",
-  "dist",
   "downloads",
   "node_modules",
   "tmp",
@@ -62,7 +60,6 @@ async function inventory(directory, root = directory) {
     else if (
       entry.isFile() &&
       !entry.name.endsWith(".log") &&
-      !entry.name.endsWith(".tgz") &&
       !entry.name.endsWith(".tsbuildinfo") &&
       !/\.pyc$/.test(entry.name)
     ) {
@@ -143,6 +140,10 @@ export function commandFor(root, task) {
     prettier: "node_modules/prettier/bin/prettier.cjs",
     eslint: "node_modules/eslint/bin/eslint.js",
   };
+  if (task.command.executable === "python") {
+    assert(process.env.VERIFACTU_PYTHON, "MISSING_PYTHON", `task ${task.id} requires VERIFACTU_PYTHON`);
+    return { executable: process.env.VERIFACTU_PYTHON, arguments: task.command.arguments };
+  }
   assert(
     Object.hasOwn(targets, task.command.executable),
     "UNDECLARED_TOOL",
@@ -183,6 +184,12 @@ function controlledEnvironment(root, taskDirectory, task) {
   environment.VERIFACTU_REPOSITORY_ROOT = root;
   environment.VERIFACTU_TASK_REPORT_DIRECTORY = path.dirname(taskDirectory);
   environment.VERIFACTU_TASK_DEPENDENCIES = JSON.stringify(task.dependencies);
+  environment.VERIFACTU_ALLOWED_CHILD_ENTRYPOINTS = JSON.stringify(
+    (task.command.childEntrypoints ?? []).map((entrypoint) => path.resolve(root, entrypoint)),
+  );
+  for (const name of ["GITHUB_RUN_ATTEMPT", "GITHUB_RUN_ID", "GITHUB_SHA"]) {
+    if (process.env[name] !== undefined) environment[name] = process.env[name];
+  }
   return environment;
 }
 

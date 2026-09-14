@@ -41,7 +41,30 @@ AUTHORITIES = {
 REQUIRED_CONTEXTS = {
     "Required · governance signatures and DCO",
     "Required · documentation and traceability",
+    "Required · regulatory sources and generated contracts",
+    "Required · quality and policy",
+    "Required · ubuntu-24.04 · Node 22.14.0",
+    "Required · ubuntu-24.04 · Node 22.23.2",
+    "Required · ubuntu-24.04 · Node 24.21.0",
+    "Required · windows-2025 · Node 24.21.0",
+    "Required · macos-15 · Node 24.21.0",
+    "Required · package reproducibility",
+    "Required · integration conformance",
+    "Required · dependency review",
+    "Required · CodeQL",
+    "Required · secret scan",
+    "Required · OSV",
+    "Required · npm audit signatures and licenses",
     "Required · required-check closure",
+}
+WORKFLOW_EVENTS = {
+    "ci.yml": {"pull_request", "push", "workflow_dispatch"},
+    "conformance.yml": {"pull_request", "push", "schedule"},
+    "security.yml": {"pull_request", "push", "schedule"},
+    "performance.yml": {"pull_request", "push", "schedule", "workflow_dispatch"},
+    "github-audit.yml": {"schedule", "workflow_dispatch"},
+    "scorecard.yml": {"schedule", "workflow_dispatch"},
+    "release-candidate.yml": {"workflow_dispatch"},
 }
 COMMUNITY_FILE_CONTRACT = {
     "README.md": (
@@ -327,45 +350,49 @@ def validate_community_files(root: Path) -> dict[str, str]:
     return digests
 
 
-def validate_workflow_text(path: Path, text: str) -> set[str]:
+def validate_workflow_text(path: Path, text: str, expected_events: set[str]) -> list[str]:
     if "pull_request_target:" in text or "workflow_run:" in text:
         raise PolicyError(f"{path}: privileged event is forbidden for required untrusted checks")
     if not re.search(r"^permissions:\s*\{\}\s*$", text, re.MULTILINE):
         raise PolicyError(f"{path}: top-level permissions must be empty")
-    if re.search(r"\b(?:id-token|attestations|packages|deployments|security-events):\s*write\b", text):
-        raise PolicyError(f"{path}: privileged write permission is forbidden in P1")
+    if re.search(r"\b(?:id-token|attestations|packages|deployments):\s*write\b", text):
+        raise PolicyError(f"{path}: release-capable write permission is forbidden in P2")
+    if "security-events: write" in text and path.name not in {"security.yml", "scorecard.yml"}:
+        raise PolicyError(f"{path}: security-events write is outside the admitted scanner workflows")
     for used in USES_RE.findall(text):
         if used.startswith("./"):
             continue
         if "@" not in used or not SHA_RE.fullmatch(used.rsplit("@", 1)[1]):
             raise PolicyError(f"{path}: Action is not pinned to a full SHA: {used}")
-    if not re.search(r"^  pull_request:\s*$", text, re.MULTILINE):
-        raise PolicyError(f"{path}: pull_request trigger is required")
     if "on:\n" not in text or "\npermissions:" not in text:
         raise PolicyError(f"{path}: workflow trigger or permissions boundary is missing")
     trigger_block = text.split("on:\n", 1)[1].split("\npermissions:", 1)[0]
     events = set(re.findall(r"^  ([a-z_]+):\s*$", trigger_block, re.MULTILINE))
-    if events != {"pull_request", "push"}:
-        raise PolicyError(f"{path}: only pull_request and main push may produce required contexts")
-    main_push = re.search(
-        r"^  push:\s*\n    branches:\s*\n      - main\s*$",
-        text,
-        re.MULTILINE,
-    )
-    if not main_push or re.search(r"^      - [\"']?\*", text, re.MULTILINE):
-        raise PolicyError(f"{path}: push trigger must target only main")
-    names = set(re.findall(r"^\s{4}name:\s*(Required · .+?)\s*$", text, re.MULTILINE))
+    if events != expected_events:
+        raise PolicyError(f"{path}: event contract differs: expected {sorted(expected_events)}, observed {sorted(events)}")
+    if "push" in events:
+        main_push = re.search(
+            r"^  push:\s*\n    branches:\s*\n      - main\s*$",
+            text,
+            re.MULTILINE,
+        )
+        if not main_push or re.search(r"^      - [\"']?\*", text, re.MULTILINE):
+            raise PolicyError(f"{path}: push trigger must target only main")
+    names = re.findall(r"^\s+(?:-\s+)?(?:name|context):\s*[\"']?(Required · .+?)[\"']?\s*$", text, re.MULTILINE)
     return names
 
 
 def validate_workflows(root: Path) -> None:
     paths = sorted((root / ".github/workflows").glob("*.yml"))
-    if paths != [root / ".github/workflows/governance.yml"]:
-        raise PolicyError("the current protected increment must contain exactly the governance workflow")
-    observed: set[str] = set()
+    expected_paths = sorted(root / ".github/workflows" / name for name in WORKFLOW_EVENTS)
+    if paths != expected_paths:
+        raise PolicyError(f"workflow set differs: expected {[path.name for path in expected_paths]}, observed {[path.name for path in paths]}")
+    observed: list[str] = []
     for path in paths:
-        observed |= validate_workflow_text(path, path.read_text(encoding="utf-8"))
-    if observed != REQUIRED_CONTEXTS:
+        observed.extend(validate_workflow_text(path, path.read_text(encoding="utf-8"), WORKFLOW_EVENTS[path.name]))
+    if len(observed) != len(set(observed)):
+        raise PolicyError("a required context has more than one workflow producer")
+    if set(observed) != REQUIRED_CONTEXTS:
         raise PolicyError(f"required context drift: expected {sorted(REQUIRED_CONTEXTS)}, observed {sorted(observed)}")
 
 
@@ -378,7 +405,11 @@ def validate_github_policy(root: Path) -> None:
         "allowedActions": "selected",
         "githubOwnedAllowed": True,
         "verifiedAllowed": False,
-        "patternsAllowed": [],
+        "patternsAllowed": [
+            "gitleaks/gitleaks-action@*",
+            "google/osv-scanner-action@*",
+            "ossf/scorecard-action@*",
+        ],
         "shaPinningRequired": True,
         "defaultWorkflowPermissions": "read",
         "canApprovePullRequestReviews": False,
@@ -448,12 +479,12 @@ def self_test() -> dict[str, object]:
 
     expect_failure(
         "mutable-action-reference",
-        lambda: validate_workflow_text(Path("fixture.yml"), "permissions: {}\n    uses: actions/checkout@v7\n"),
+        lambda: validate_workflow_text(Path("fixture.yml"), "permissions: {}\n    uses: actions/checkout@v7\n", set()),
         "full SHA",
     )
     expect_failure(
         "privileged-event",
-        lambda: validate_workflow_text(Path("fixture.yml"), "permissions: {}\npull_request_target:\n"),
+        lambda: validate_workflow_text(Path("fixture.yml"), "permissions: {}\npull_request_target:\n", set()),
         "privileged event",
     )
     expect_failure(
@@ -461,6 +492,7 @@ def self_test() -> dict[str, object]:
         lambda: validate_workflow_text(
             Path("fixture.yml"),
             "on:\n  pull_request:\n  push:\n    branches:\n      - \"**\"\n\npermissions: {}\n",
+            {"pull_request", "push"},
         ),
         "push trigger must target only main",
     )
@@ -469,8 +501,9 @@ def self_test() -> dict[str, object]:
         lambda: validate_workflow_text(
             Path("fixture.yml"),
             "on:\n  pull_request:\n  push:\n    branches:\n      - main\n  workflow_dispatch:\n\npermissions: {}\n",
+            {"pull_request", "push"},
         ),
-        "only pull_request and main push",
+        "event contract differs",
     )
     with tempfile.TemporaryDirectory(prefix="verifactu-community-") as directory:
         root = Path(directory)

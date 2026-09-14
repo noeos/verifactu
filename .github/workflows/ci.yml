@@ -1,0 +1,201 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commit-policy:
+    name: Required · governance signatures and DCO
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    timeout-minutes: 10
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Exercise policy-negative fixtures
+        run: python3 .github/scripts/check-commit-policy.py --self-test
+      - name: Verify the exact commit range
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          POLICY_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          POLICY_EVENT: ${{ github.event_name }}
+          POLICY_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          POLICY_REF: ${{ github.event.pull_request.head.ref && format('refs/heads/{0}', github.event.pull_request.head.ref) || github.ref }}
+        run: >-
+          python3 .github/scripts/check-commit-policy.py
+          --event "$POLICY_EVENT"
+          --base "$POLICY_BASE_SHA"
+          --head "$POLICY_HEAD_SHA"
+          --ref "$POLICY_REF"
+          --repository "$GITHUB_REPOSITORY"
+
+  documentation-policy:
+    name: Required · documentation and traceability
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Exercise governance-negative fixtures
+        run: |
+          python3 .github/scripts/check-governance.py --self-test
+          python3 .github/scripts/audit-github.py --self-test
+      - name: Validate documentation and governance policy
+        run: python3 .github/scripts/check-governance.py
+
+  quality-policy:
+    name: Required · quality and policy
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary Node runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Set up the admitted Python reference runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.0.0
+        with:
+          python-version: 3.13.15
+      - name: Install locked JavaScript tooling without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Install the hash-locked SPDX semantic validator
+        run: >-
+          python -m pip install --require-hashes --only-binary=:all:
+          -r config/toolchain/requirements-spdx.lock
+      - name: Execute the complete canonical P2 gate
+        env:
+          VERIFACTU_PYTHON: ${{ env.pythonLocation }}/bin/python
+        run: node tooling/tasks/run-task.mjs --task gate:p2 --evidence-dir evidence/runs/quality-policy
+
+  supported-runtime:
+    name: ${{ matrix.context }}
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        include:
+          - context: Required · ubuntu-24.04 · Node 22.14.0
+            os: ubuntu-24.04
+            node: 22.14.0
+          - context: Required · ubuntu-24.04 · Node 22.23.2
+            os: ubuntu-24.04
+            node: 22.23.2
+          - context: Required · ubuntu-24.04 · Node 24.21.0
+            os: ubuntu-24.04
+            node: 24.21.0
+          - context: Required · windows-2025 · Node 24.21.0
+            os: windows-2025
+            node: 24.21.0
+          - context: Required · macos-15 · Node 24.21.0
+            os: macos-15
+            node: 24.21.0
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the exact admitted runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Execute the portable canonical gate
+        run: node tooling/tasks/run-task.mjs --task gate:platform --evidence-dir evidence/runs/platform
+
+  package-reproducibility:
+    name: Required · package reproducibility
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install the exact lock without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Compare independent clean raw outputs
+        run: node tooling/tasks/run-task.mjs --task package:reproducibility --evidence-dir evidence/runs/reproducibility
+
+  required-check-closure:
+    name: Required · required-check closure
+    if: ${{ always() }}
+    needs:
+      - commit-policy
+      - documentation-policy
+      - quality-policy
+      - supported-runtime
+      - package-reproducibility
+    runs-on: ubuntu-24.04
+    permissions:
+      checks: read
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up the admitted primary runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.0.0
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install validator dependencies without optional or lifecycle code
+        run: npm ci --ignore-scripts --omit=optional
+      - name: Reject failed, missing or incomplete required reports
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          POLICY_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          LOCAL_PREREQUISITE_RESULTS: >-
+            {"commit-policy":"${{ needs.commit-policy.result }}","documentation-policy":"${{ needs.documentation-policy.result }}","quality-policy":"${{ needs.quality-policy.result }}","supported-runtime":"${{ needs.supported-runtime.result }}","package-reproducibility":"${{ needs.package-reproducibility.result }}"}
+        run: node tooling/ci/close-required-checks.mjs

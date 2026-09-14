@@ -27,6 +27,12 @@
       "visibility": "internal"
     },
     {
+      "prefix": "config/generated/",
+      "owner": "repository-owner",
+      "artifactClass": "generated-checked-in-configuration",
+      "visibility": "internal"
+    },
+    {
       "prefix": "docs/",
       "owner": "documentation-owner",
       "artifactClass": "governed-documentation",
@@ -99,6 +105,8 @@
     "benchmarks/profiles",
     "benchmarks/workloads",
     "config/admission",
+    "config/ci",
+    "config/generated",
     "config/packages",
     "config/repository",
     "config/toolchain",

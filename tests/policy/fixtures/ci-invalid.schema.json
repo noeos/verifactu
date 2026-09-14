@@ -8,13 +8,14 @@
     "schemaVersion": { "const": 1 },
     "fixtures": {
       "type": "array",
-      "minItems": 10,
+      "minItems": 2,
+      "maxItems": 2,
       "items": {
         "type": "object",
-        "required": ["id", "control", "expectedCode"],
+        "additionalProperties": false,
+        "required": ["id", "expectedCode"],
         "properties": {
           "id": { "type": "string" },
-          "control": { "type": "string" },
           "expectedCode": { "type": "string" }
         }
       }

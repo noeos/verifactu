@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "generator": "tooling/generation/check-generated.mjs",
+  "source": "config/toolchain/profiles.json",
+  "sourceSha256": "54cd53a817d031ba389b0102fba9b9732ca0b077af87cb467940f4daacc1ecf7",
+  "profiles": [
+    { "id": "node-22-minimum", "node": "22.14.0", "npm": "11.19.1", "status": "required" },
+    { "id": "node-22-latest", "node": "22.23.2", "npm": "11.19.1", "status": "required" },
+    { "id": "node-24-primary", "node": "24.21.0", "npm": "11.19.1", "status": "required" },
+    { "id": "node-26-current", "node": "26.8.2", "npm": "12.0.2", "status": "informational" }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "$schema": "./required-checks.schema.json",
+  "schemaVersion": 1,
+  "registryId": "REQUIRED-CHECKS-0001",
+  "contexts": [
+    {
+      "context": "Required · governance signatures and DCO",
+      "workflow": "ci.yml",
+      "job": "commit-policy",
+      "producer": "python-policy",
+      "task": ".github/scripts/check-commit-policy.py",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "python-system",
+      "timeoutMinutes": 10
+    },
+    {
+      "context": "Required · documentation and traceability",
+      "workflow": "ci.yml",
+      "job": "documentation-policy",
+      "producer": "python-policy",
+      "task": ".github/scripts/check-governance.py",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "python-system",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · regulatory sources and generated contracts",
+      "workflow": "conformance.yml",
+      "job": "regulatory-contracts",
+      "producer": "canonical-task",
+      "task": "policy:regulatory",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 15
+    },
+    {
+      "context": "Required · quality and policy",
+      "workflow": "ci.yml",
+      "job": "quality-policy",
+      "producer": "canonical-task",
+      "task": "gate:p2",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 30
+    },
+    {
+      "context": "Required · ubuntu-24.04 · Node 22.14.0",
+      "workflow": "ci.yml",
+      "job": "supported-runtime",
+      "producer": "canonical-task-matrix",
+      "task": "gate:platform",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "22.14.0",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · ubuntu-24.04 · Node 22.23.2",
+      "workflow": "ci.yml",
+      "job": "supported-runtime",
+      "producer": "canonical-task-matrix",
+      "task": "gate:platform",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "22.23.2",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · ubuntu-24.04 · Node 24.21.0",
+      "workflow": "ci.yml",
+      "job": "supported-runtime",
+      "producer": "canonical-task-matrix",
+      "task": "gate:platform",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · windows-2025 · Node 24.21.0",
+      "workflow": "ci.yml",
+      "job": "supported-runtime",
+      "producer": "canonical-task-matrix",
+      "task": "gate:platform",
+      "report": "github-check-run",
+      "runner": "windows-2025",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · macos-15 · Node 24.21.0",
+      "workflow": "ci.yml",
+      "job": "supported-runtime",
+      "producer": "canonical-task-matrix",
+      "task": "gate:platform",
+      "report": "github-check-run",
+      "runner": "macos-15",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · package reproducibility",
+      "workflow": "ci.yml",
+      "job": "package-reproducibility",
+      "producer": "canonical-task",
+      "task": "package:reproducibility",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · integration conformance",
+      "workflow": "conformance.yml",
+      "job": "integration-conformance",
+      "producer": "canonical-task",
+      "task": "integration:tarball-consumers",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 20
+    },
+    {
+      "context": "Required · dependency review",
+      "workflow": "security.yml",
+      "job": "dependency-review",
+      "producer": "github-action",
+      "task": "dependency-review",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "action",
+      "timeoutMinutes": 15
+    },
+    {
+      "context": "Required · CodeQL",
+      "workflow": "security.yml",
+      "job": "codeql",
+      "producer": "github-action",
+      "task": "codeql",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "action",
+      "timeoutMinutes": 30
+    },
+    {
+      "context": "Required · secret scan",
+      "workflow": "security.yml",
+      "job": "secret-scan",
+      "producer": "github-action",
+      "task": "gitleaks",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "action",
+      "timeoutMinutes": 15
+    },
+    {
+      "context": "Required · OSV",
+      "workflow": "security.yml",
+      "job": "osv",
+      "producer": "github-action",
+      "task": "osv-scanner",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "action",
+      "timeoutMinutes": 15
+    },
+    {
+      "context": "Required · npm audit signatures and licenses",
+      "workflow": "security.yml",
+      "job": "npm-admission",
+      "producer": "canonical-task",
+      "task": "policy:supply-chain",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 15
+    },
+    {
+      "context": "Required · required-check closure",
+      "workflow": "ci.yml",
+      "job": "required-check-closure",
+      "producer": "check-run-closure",
+      "task": "tooling/ci/close-required-checks.mjs",
+      "report": "github-check-run",
+      "runner": "ubuntu-24.04",
+      "runtime": "24.21.0",
+      "timeoutMinutes": 15
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { PolicyFailure, assert, main, readJson, validateJsonFile } from "../../tooling/lib/policy.mjs";
+import { expectedToolchainSummary, validateGeneratedDocument } from "../../tooling/generation/check-generated.mjs";
 import { validateP2Manifest } from "../../tooling/packages/check-shells.mjs";
 import { validateGraph } from "../../tooling/repository/check-imports.mjs";
 import { validatePaths } from "../../tooling/repository/check-tree.mjs";
@@ -116,6 +117,12 @@ async function run() {
   passed.push(
     await expectCode("path-shadow", fixtures.get("path-shadow").expectedCode, () =>
       assertExecutableResolution(fixtures.get("path-shadow").execPath, fixtures.get("path-shadow").resolved),
+    ),
+  );
+  const expectedGenerated = await expectedToolchainSummary(root);
+  passed.push(
+    await expectCode("hand-edited-generated", fixtures.get("hand-edited-generated").expectedCode, () =>
+      validateGeneratedDocument({ ...expectedGenerated, sourceSha256: "0".repeat(64) }, expectedGenerated),
     ),
   );
   assert(passed.length === fixtureDoc.fixtures.length, "FIXTURE_COVERAGE", "every declared fixture must execute");

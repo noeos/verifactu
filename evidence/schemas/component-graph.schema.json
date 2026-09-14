@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/component-graph-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "graphId", "sourceLockSha256", "root", "nodes", "edges", "omissions"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "graphId": { "const": "COMPONENT-GRAPH-0001" },
+    "sourceLockSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "root": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ref", "kind", "name", "version", "scope", "license", "source"],
+        "properties": {
+          "ref": { "type": "string" },
+          "kind": { "enum": ["workspace", "npm", "action", "tool", "data"] },
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "scope": { "enum": ["root", "runtime", "development", "build", "external-data"] },
+          "license": { "type": "string" },
+          "source": { "type": "string" },
+          "purl": { "type": "string" },
+          "integrity": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "artifact": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["filename", "sha256"],
+            "properties": {
+              "filename": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "relationship"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "relationship": { "const": "dependsOn" }
+        }
+      }
+    },
+    "omissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class", "reason"],
+        "properties": { "class": { "type": "string" }, "reason": { "type": "string" } }
+      }
+    }
+  }
+}
