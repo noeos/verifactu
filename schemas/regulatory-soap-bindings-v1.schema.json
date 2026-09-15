@@ -1,0 +1,397 @@
+{
+  "$id": "https://noeos.dev/schemas/regulatory-soap-bindings-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceSnapshotId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "wsdl": {
+      "additionalProperties": false,
+      "properties": {
+        "bindings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "operations": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "inputUse": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "outputUse": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "soapAction": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "soapAction",
+                    "inputUse",
+                    "outputUse"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "soap": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "style": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "transport": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "style",
+                    "transport"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "type": {
+                "additionalProperties": false,
+                "properties": {
+                  "lexical": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "localName": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lexical",
+                  "namespace",
+                  "localName"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "type",
+              "soap",
+              "operations"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "messages": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "parts": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "element": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "lexical": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "localName": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "lexical",
+                        "namespace",
+                        "localName"
+                      ],
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "type": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "lexical": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "localName": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "lexical",
+                        "namespace",
+                        "localName"
+                      ],
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "element",
+                    "type"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "name",
+              "parts"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "portTypes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "operations": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "input": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "lexical": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "localName": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "lexical",
+                        "namespace",
+                        "localName"
+                      ],
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "output": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "lexical": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "localName": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "lexical",
+                        "namespace",
+                        "localName"
+                      ],
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "input",
+                    "output"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "name",
+              "operations"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "services": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ports": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "address": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "binding": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "lexical": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "localName": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "lexical",
+                        "namespace",
+                        "localName"
+                      ],
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "binding",
+                    "address"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "name",
+              "ports"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "sourceId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sourceSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "targetNamespace": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceId",
+        "sourceSha256",
+        "name",
+        "targetNamespace",
+        "messages",
+        "portTypes",
+        "bindings",
+        "services"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "sourceSnapshotId",
+    "wsdl"
+  ],
+  "title": "Noeos VeriFactu generated WSDL SOAP bindings",
+  "type": "object"
+}

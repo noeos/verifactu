@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/regulatory-source-plan-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "planId", "observedAt", "allowedOrigins", "sources", "blockedSources"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "planId": { "const": "RRSIF-SOURCE-PLAN-2026-09-15" },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "allowedOrigins": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^https://[a-z0-9.-]+$" }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "blockedSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/blockedSource" }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]+$" },
+    "identifier": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]+$" },
+    "requirement": { "type": "string", "pattern": "^(REG|SEC|PRIV|PROD|FUNC|OPS|PERF)-[0-9]{4}$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sourceId",
+        "title",
+        "authority",
+        "role",
+        "url",
+        "path",
+        "kind",
+        "accept",
+        "maximumBytes",
+        "bytes",
+        "sha256",
+        "sha512",
+        "lastModified",
+        "licenseId",
+        "redistribution",
+        "dependencies",
+        "requiredFor"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "sourceId": { "type": "string", "pattern": "^SRC-[0-9]{4}$" },
+        "title": { "type": "string", "minLength": 8 },
+        "authority": { "enum": ["BOE", "AEAT", "W3C"] },
+        "role": { "enum": ["binding", "delegated-technical", "interpretive", "normative-standard", "license"] },
+        "url": { "type": "string", "pattern": "^https://" },
+        "path": {
+          "type": "string",
+          "pattern": "^(legal|technical|licenses)/[A-Za-z0-9][A-Za-z0-9._/-]+$"
+        },
+        "kind": { "enum": ["html", "pdf", "xml", "xsd", "wsdl"] },
+        "accept": { "type": "string", "minLength": 3 },
+        "maximumBytes": { "type": "integer", "minimum": 1, "maximum": 16000000 },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 16000000 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "sha512": { "type": "string", "pattern": "^[0-9a-f]{128}$" },
+        "lastModified": { "type": ["string", "null"] },
+        "licenseId": { "$ref": "#/$defs/identifier" },
+        "redistribution": { "enum": ["allowed-with-attribution", "allowed-free-unaltered", "official-legal-text"] },
+        "dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "requiredFor": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/requirement" }
+        }
+      }
+    },
+    "blockedSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "sourceId", "title", "url", "observedAt", "reasonCode", "diagnostic", "requiredFor", "blocks"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "sourceId": { "type": "string", "pattern": "^SRC-[0-9]{4}$" },
+        "title": { "type": "string", "minLength": 8 },
+        "url": { "type": "string", "pattern": "^https://" },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "reasonCode": {
+          "enum": [
+            "TLS_CERTIFICATE_VALIDATION_FAILED",
+            "OFFICIAL_PAGE_HAS_NO_ARTIFACT_LINK",
+            "UNEXPECTED_OFFICIAL_RESPONSE"
+          ]
+        },
+        "diagnostic": { "type": "string", "minLength": 20 },
+        "requiredFor": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/requirement" }
+        },
+        "blocks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } }
+      }
+    }
+  }
+}

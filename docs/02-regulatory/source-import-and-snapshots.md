@@ -5,9 +5,9 @@ status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-15
 review-by: 2026-10-12
-decisions: [ADR-0006, ADR-0009, ADR-0012]
+decisions: [ADR-0006, ADR-0009, ADR-0012, ADR-0054]
 requirements: [REG-0070, REG-0071, REG-0072, SEC-0070]
 historical-inputs: [REV-004, REV-005, REV-006, REV-008, REV-009, REV-012, REV-037, REV-049]
 ---
@@ -40,6 +40,11 @@ through the candidate's approved mapping. Remote resolution during compile or
 validation is forbidden. Cycles, namespace/location mismatch, duplicate logical
 identity and missing dependency block import.
 
+Every file below `editions/source-snapshots/**/sources/` is marked `binary` in
+`.gitattributes`. Git therefore neither diffs, merges nor normalizes the acquired
+byte stream as text; the committed blob, source manifest and working file must
+have the same SHA-256 and SHA-512 identities on every platform.
+
 ## Snapshot manifest
 
 The manifest records source ID, publisher, title/version/date, authority,
@@ -66,3 +71,31 @@ Fixtures cover oversized/truncated/HTML responses, zip bombs, traversal,
 duplicate files, poisoned import URLs, DTD/entities, invalid encodings,
 namespace substitution, changed bytes under same version and generator that
 silently skips a source. Each must fail with a specific diagnostic.
+
+## P3 implementation state
+
+`internal/source-import/acquire.mjs` is the only networked preparation step. It
+accepts the schema-validated closed plan, exact HTTPS origins, manual redirects,
+identity-only content encoding, 30-second request deadlines and per-source
+streamed byte caps. It writes temporary files with incremental SHA-256/SHA-512,
+checks media magic and exact length, synchronizes them and atomically publishes
+only a complete quarantine. Custody records requested/final URL, selected
+headers, runtime, DNS/proxy/TLS/encoding policy and the acquisition-artifact
+digest. `promote.mjs` runs offline, authenticates that digest, accepts only
+regular non-symlink files, rechecks both content digests, records its own tool
+identity and atomically publishes a complete new snapshot. Both stages use
+exclusive locks and refuse existing destinations. Production packages import
+neither component.
+
+`policy:regulatory-source-negative` replays a complete 37-source acquisition from
+the immutable snapshot without network and falsifies HTTP status, redirect,
+declared/streamed size, media magic, digest drift, case-insensitive path collision,
+dependency cycle, open licence, forbidden content encoding, partial-acquisition
+rollback, immutable quarantine/snapshot destinations, post-acquisition mutation
+and missing file. Archive depth/decompression controls remain fail-closed by
+absence: the current plan admits no archive kind; admitting one first requires a
+bounded archive implementation and its zip-bomb/link/device/path test suite.
+
+The snapshot is blocked because seven mandatory observations are unavailable.
+Structural XSD/WSDL extraction is permitted under ADR-0054 only to produce an
+equally blocked candidate; `creationAllowed` remains false throughout.

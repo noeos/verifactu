@@ -1,0 +1,395 @@
+{
+  "$id": "https://noeos.dev/schemas/regulatory-field-constraints-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "schemas": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "complexTypes": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "documentation": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "utf8Bytes": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "utf8Bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "mixed": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "mixed",
+                "documentation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "elementFormDefault": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "elements": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "choiceDepth": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "context": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "documentation": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "utf8Bytes": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "utf8Bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "inlineFacets": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "enumeration",
+                          "length",
+                          "maxLength",
+                          "minLength",
+                          "pattern"
+                        ]
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "maxOccurs": {
+                  "type": "string"
+                },
+                "minOccurs": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ref": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lexical": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "localName": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "lexical",
+                    "namespace",
+                    "localName"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "type": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lexical": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "localName": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "lexical",
+                    "namespace",
+                    "localName"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "context",
+                "name",
+                "ref",
+                "type",
+                "minOccurs",
+                "maxOccurs",
+                "choiceDepth",
+                "inlineFacets",
+                "documentation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "simpleTypes": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "base": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lexical": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "localName": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "lexical",
+                    "namespace",
+                    "localName"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "documentation": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "utf8Bytes": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "utf8Bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "facets": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "enumeration",
+                          "length",
+                          "maxLength",
+                          "minLength",
+                          "pattern"
+                        ]
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "base",
+                "facets",
+                "documentation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sourceId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourceSha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "targetNamespace": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "topLevelElements": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ref": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lexical": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "localName": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "lexical",
+                    "namespace",
+                    "localName"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "type": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lexical": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "localName": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "lexical",
+                    "namespace",
+                    "localName"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "ref",
+                "type"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sourceId",
+          "sourceSha256",
+          "targetNamespace",
+          "elementFormDefault",
+          "topLevelElements",
+          "simpleTypes",
+          "complexTypes",
+          "elements"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "sourceSnapshotId": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "sourceSnapshotId",
+    "schemas"
+  ],
+  "title": "Noeos VeriFactu generated XSD field constraints",
+  "type": "object"
+}

@@ -1,0 +1,510 @@
+{
+  "$id": "https://noeos.dev/schemas/regulatory-edition-descriptor-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "active"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "additionalProperties": false,
+            "properties": {
+              "approverRole": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "decidedAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "decisionId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]+$",
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "sha256"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "decisionId",
+              "decidedAt",
+              "approverRole",
+              "evidence"
+            ],
+            "type": "object"
+          },
+          "blockers": {
+            "maxItems": 0,
+            "type": "array"
+          },
+          "creationAllowed": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "not": {
+              "const": "active"
+            }
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "creationAllowed": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "discovered",
+              "imported",
+              "generated-unverified",
+              "candidate",
+              "blocked"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "approved",
+              "active",
+              "sunset",
+              "historical",
+              "revoked-for-generation"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "additionalProperties": false,
+            "properties": {
+              "approverRole": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "decidedAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "decisionId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]+$",
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "sha256"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "decisionId",
+              "decidedAt",
+              "approverRole",
+              "evidence"
+            ],
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "approval": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "approverRole": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "decidedAt": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "decisionId": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]+$",
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "decisionId",
+            "decidedAt",
+            "approverRole",
+            "evidence"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "blockers": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "blocks": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "diagnostic": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "observedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reasonCode": {
+            "enum": [
+              "TLS_CERTIFICATE_VALIDATION_FAILED",
+              "OFFICIAL_PAGE_HAS_NO_ARTIFACT_LINK",
+              "UNEXPECTED_OFFICIAL_RESPONSE"
+            ]
+          },
+          "requiredFor": {
+            "items": {
+              "pattern": "^(REG|SEC|PRIV|PROD|FUNC|OPS|PERF)-[0-9]{4}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "sourceId": {
+            "pattern": "^SRC-[0-9]{4}$",
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "pattern": "^https://",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sourceId",
+          "title",
+          "url",
+          "observedAt",
+          "reasonCode",
+          "diagnostic",
+          "requiredFor",
+          "blocks"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "contracts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "path": {
+            "pattern": "^contracts/[A-Za-z0-9][A-Za-z0-9._/-]+\\.json$",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "creationAllowed": {
+      "type": "boolean"
+    },
+    "editionId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "generator": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]+$",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "configurationSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "primaryRuntime": {
+          "pattern": "^node [0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "artifacts",
+        "configurationSha256",
+        "primaryRuntime"
+      ],
+      "type": "object"
+    },
+    "historicalVerificationAvailable": {
+      "type": "boolean"
+    },
+    "immutable": {
+      "const": true
+    },
+    "outputClosureSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "publicSchemas": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "path": {
+            "pattern": "^\\.\\./\\.\\./schemas/[A-Za-z0-9][A-Za-z0-9._-]+\\.json$",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "reason": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^\\.\\./source-snapshots/[A-Za-z0-9.+_-]+/snapshot\\.json$",
+          "type": "string"
+        },
+        "snapshotSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sourceClosureSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sourceManifestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "snapshotSha256",
+        "sourceManifestSha256",
+        "sourceClosureSha256"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "enum": [
+        "discovered",
+        "imported",
+        "generated-unverified",
+        "candidate",
+        "blocked",
+        "approved",
+        "active",
+        "sunset",
+        "historical",
+        "revoked-for-generation"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "editionId",
+    "status",
+    "immutable",
+    "creationAllowed",
+    "historicalVerificationAvailable",
+    "sourceSnapshot",
+    "generator",
+    "contracts",
+    "publicSchemas",
+    "outputClosureSha256",
+    "blockers",
+    "approval",
+    "reason"
+  ],
+  "title": "Noeos VeriFactu immutable regulatory edition descriptor",
+  "type": "object"
+}

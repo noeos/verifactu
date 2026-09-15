@@ -1,0 +1,63 @@
+{
+  "$schema": "./contract-generation.schema.json",
+  "schemaVersion": 1,
+  "generatorId": "RRSIF-CONTRACT-GENERATOR-0001",
+  "sourceSnapshotId": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "candidateEditionId": "rrsif-2026-09-15-candidate.c0c6eb21f6d2",
+  "limits": {
+    "maximumBytes": 2000000,
+    "maximumDepth": 64,
+    "maximumNodes": 100000,
+    "maximumAttributesPerElement": 128,
+    "maximumTextBytes": 8000000
+  },
+  "doctypeNeutralization": {
+    "sourceId": "W3C-XMLDSIG-XSD",
+    "sha256": "d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d"
+  },
+  "importAliases": [
+    {
+      "location": "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd",
+      "namespace": "http://www.w3.org/2000/09/xmldsig#",
+      "sourceId": "W3C-XMLDSIG-XSD"
+    }
+  ],
+  "supportedElements": {
+    "http://schemas.xmlsoap.org/wsdl/": [
+      "binding",
+      "definitions",
+      "input",
+      "message",
+      "operation",
+      "output",
+      "part",
+      "port",
+      "portType",
+      "service",
+      "types"
+    ],
+    "http://schemas.xmlsoap.org/wsdl/soap/": ["address", "binding", "body", "operation"],
+    "http://www.w3.org/2001/XMLSchema": [
+      "annotation",
+      "any",
+      "attribute",
+      "choice",
+      "complexContent",
+      "complexType",
+      "documentation",
+      "element",
+      "enumeration",
+      "extension",
+      "import",
+      "length",
+      "maxLength",
+      "minLength",
+      "pattern",
+      "restriction",
+      "schema",
+      "sequence",
+      "simpleContent",
+      "simpleType"
+    ]
+  }
+}

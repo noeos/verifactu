@@ -2,7 +2,9 @@ VeriFactu repository notice
 
 This repository currently contains governed planning documentation, immutable
 historical inputs, engineering controls and three private P2 package shells.
-Those shells expose no product behavior and are not distributable packages.
+Those shells expose no product behavior and are not distributable packages. P3
+adds a blocked regulatory source snapshot and generated structural contracts; it
+does not add fiscal product behavior.
 
 Copyright (c) 2026 the respective copyright holders. All rights reserved.
 Repository visibility grants no licence; consult LICENSE.
@@ -12,15 +14,31 @@ artifacts for research and traceability. Those references do not transfer
 ownership, endorsement or redistribution rights. The immutable
 docs/previous-docs archive is historical input only and is not normative.
 
+The P3 snapshot at
+`editions/source-snapshots/rrsif-2026-09-15+src.c0c6eb21f6d2` preserves exact BOE,
+AEAT and W3C source bytes for traceability. Its `source-manifest.json` identifies
+origin, digest, authority, redistribution decision and licence object for each
+file. BOE material remains official public-sector information. AEAT web material
+is attributed to the Agencia Estatal de Administración Tributaria with each
+available update date retained in the manifest; its contents have not been
+altered. Reproduced AEAT manuals/publications are unaltered and carry the notice:
+“Publicación informativa cedida gratuitamente por la Agencia Tributaria”.
+
+The W3C XML Signature schema retains its original notices. The full applicable
+W3C Software Notice and License is preserved verbatim at
+`editions/source-snapshots/rrsif-2026-09-15+src.c0c6eb21f6d2/sources/licenses/w3c-xmldsig-software-notice.html`.
+No W3C source bytes were modified; parser-time DTD neutralization occurs only in
+memory after digest verification.
+
 No third-party software is bundled for distribution in P2. Development
-dependencies and the Verification Engine package are locked engineering inputs,
-not redistributed release contents. GitHub workflows invoke admitted Actions by
-immutable commit references; this does not relicense or vendor those Actions.
-Future official source materials, generated output and packaged artifacts must
-be admitted into the canonical licence graph and reproduce every applicable
-notice before distribution.
+dependencies and the Verification Engine package are locked
+engineering inputs, not redistributed release contents. GitHub workflows invoke
+admitted Actions by immutable commit references; this does not relicense or
+vendor those Actions. Generated output and future packaged artifacts must remain
+in the canonical licence graph and reproduce every applicable notice before
+distribution.
 
 The project licence and final copyright/attribution inventory remain deliberate
 pre-distribution legal decisions. This notice must be regenerated from the exact
-distributed component graph before any release; absence from this P2 notice is
+distributed component graph before any release; absence from this P3 notice is
 not a waiver of any right or obligation.

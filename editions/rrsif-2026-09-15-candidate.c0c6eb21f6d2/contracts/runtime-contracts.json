@@ -1,0 +1,154 @@
+{
+  "bundleId": "contracts.rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "coverage": {
+    "blockedSourceIds": [
+      "AEAT-HASH-SPECIFICATION-PDF",
+      "AEAT-QR-SPECIFICATION-PDF",
+      "AEAT-RECORD-DESIGN-PAYLOAD",
+      "AEAT-SIGNATURE-SPECIFICATION-PDF",
+      "AEAT-VALIDATION-CATALOGUE-PAYLOAD",
+      "EURLEX-CRA-OFFICIAL-TEXT",
+      "EURLEX-GDPR-OFFICIAL-TEXT"
+    ],
+    "creationAllowed": false,
+    "semantic": "blocked-mandatory-aeat-record-design-and-validation-catalogue-unavailable",
+    "structural": "complete-for-admitted-xsd-wsdl-graph"
+  },
+  "documents": [
+    {
+      "doctypeNeutralized": false,
+      "kind": "wsdl",
+      "nodeCount": 67,
+      "sha256": "05919120708ff7650612fa6683c9336eaf919335d9a4db10e86759190af48602",
+      "sourceId": "AEAT-SISTEMA-FACTURACION-WSDL",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 936,
+      "sha256": "ee4c1655175644de44c4c25055ffeb8e5f4bb4bc3834ce8254d4222ef18c8aa1",
+      "sourceId": "AEAT-SUMINISTRO-INFORMACION-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroInformacion.xsd"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 14,
+      "sha256": "26bacfc6229d1a314758753244219ba207b2dcc8e2a22f7ab60b8ab6bae877e1",
+      "sourceId": "AEAT-SUMINISTRO-LR-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroLR.xsd"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 73,
+      "sha256": "82acf80f785643caac13087aae66808ed721a13f08ca5218cf8ae81b695549ef",
+      "sourceId": "AEAT-RESPUESTA-SUMINISTRO-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/RespuestaSuministro.xsd"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 31,
+      "sha256": "bf2cdb8fc4b95b291757a72b76d8fffca06a6d30d9329122ca2fd6b2d5f8f1b1",
+      "sourceId": "AEAT-CONSULTA-LR-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/ConsultaLR.xsd"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 127,
+      "sha256": "de35063acb8d9ba0d6ae51acc6b595de9c2b12333250e95e13108ef5f2670d45",
+      "sourceId": "AEAT-RESPUESTA-CONSULTA-LR-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/RespuestaConsultaLR.xsd"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 603,
+      "sha256": "241ce3fa3f01dc81a4495692b92152c48c0760e46de31f06551225270133ae54",
+      "sourceId": "AEAT-EVENTOS-SIF-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/EventosSIF.xsd"
+    },
+    {
+      "doctypeNeutralized": false,
+      "kind": "xsd",
+      "nodeCount": 54,
+      "sha256": "8f47af4f3c49d29b6a62aed261c09f171e855ad6d6bb72ef3fc0b147dc9572f0",
+      "sourceId": "AEAT-RESPUESTA-NOVERIFACTU-XSD",
+      "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/RespuestaValRegistNoVeriFactu.xsd"
+    },
+    {
+      "doctypeNeutralized": true,
+      "kind": "xsd",
+      "nodeCount": 158,
+      "sha256": "d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d",
+      "sourceId": "W3C-XMLDSIG-XSD",
+      "targetNamespace": "http://www.w3.org/2000/09/xmldsig#"
+    }
+  ],
+  "generator": {
+    "artifacts": [
+      {
+        "path": "internal/contract-generation/catalogue-access.mjs",
+        "sha256": "517377ca79c6675e65577e3cf3a67ea73000f31db43a22eea4f496b4f80d43d5"
+      },
+      {
+        "path": "internal/contract-generation/generate-contracts.mjs",
+        "sha256": "87c57cb0820d1fff3736041cbe22475a93053eb251218f2a737b1903a909a502"
+      },
+      {
+        "path": "internal/contract-generation/xml-parser.mjs",
+        "sha256": "2473559b649a7b01c4d149f31c7db9947fd3748e05d474d8b1b296909f3ae748"
+      }
+    ],
+    "configurationSha256": "db2de6827a9f8e2a899df09463b60c4e0bb3739c4b2291b6d57f702328a2189d",
+    "id": "RRSIF-CONTRACT-GENERATOR-0001",
+    "primaryRuntime": "node 24.21.0"
+  },
+  "schemaVersion": 1,
+  "sourceSnapshot": {
+    "id": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+    "snapshotSha256": "422104851ef34b2c2baf0029fb801b89d1957052a15b78ce74a9171cf3179db2",
+    "sourceClosureSha256": "2be623953f8ac58a35b5f686bc8d144e9998c2499756e4df00fb56500b1bf49f",
+    "sourceManifestSha256": "b70fee25ac863a41141af9f04116b3f7ad87a1d847afefae64620a0fc901d84f"
+  },
+  "stages": [
+    {
+      "failureMode": "reject-length-or-sha256-drift",
+      "id": "authenticated-bytes",
+      "input": "immutable-source-snapshot",
+      "output": "digest-verified-technical-documents",
+      "status": "enforced"
+    },
+    {
+      "failureMode": "reject-active-content-ambiguity-or-resource-overflow",
+      "id": "hostile-xml",
+      "input": "digest-verified-technical-documents",
+      "output": "bounded-namespace-aware-trees",
+      "status": "enforced"
+    },
+    {
+      "failureMode": "reject-unsupported-or-unresolved-structure",
+      "id": "structural-contract",
+      "input": "closed-offline-xsd-wsdl-graph",
+      "output": "field-catalogue-and-soap-contracts",
+      "status": "enforced"
+    },
+    {
+      "failureMode": "block-while-official-authority-is-unavailable",
+      "id": "semantic-overlay",
+      "input": "mandatory-aeat-record-design-and-validation-catalogue",
+      "output": "no-output",
+      "status": "blocked"
+    },
+    {
+      "failureMode": "not-implemented-before-p3-readiness",
+      "id": "fiscal-domain",
+      "input": "approved-regulatory-edition",
+      "output": "p4-runtime-domain-contracts",
+      "status": "downstream"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "$id": "https://noeos.dev/schemas/regulatory-catalogues-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "catalogues": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourceId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "targetNamespace": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "sourceId",
+          "targetNamespace",
+          "name",
+          "values"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceSnapshotId": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "sourceSnapshotId",
+    "catalogues"
+  ],
+  "title": "Noeos VeriFactu generated XSD catalogues",
+  "type": "object"
+}

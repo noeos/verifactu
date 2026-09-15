@@ -1,0 +1,227 @@
+{
+  "approval": null,
+  "blockers": [
+    {
+      "blocks": [
+        "fresh GDPR byte snapshot; later legal review remains required"
+      ],
+      "diagnostic": "Automated retrieval returned a small varying HTML interstitial rather than stable official act bytes, so no digest was admitted.",
+      "id": "EURLEX-GDPR-OFFICIAL-TEXT",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "UNEXPECTED_OFFICIAL_RESPONSE",
+      "requiredFor": [
+        "PRIV-0001",
+        "PRIV-0002",
+        "PRIV-0003",
+        "PRIV-0004"
+      ],
+      "sourceId": "SRC-0027",
+      "title": "EUR-Lex GDPR official text observation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+    },
+    {
+      "blocks": [
+        "fresh CRA byte snapshot; P7 legal applicability review remains required"
+      ],
+      "diagnostic": "Automated retrieval returned a small varying HTML interstitial rather than stable official act bytes, so no digest was admitted.",
+      "id": "EURLEX-CRA-OFFICIAL-TEXT",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "UNEXPECTED_OFFICIAL_RESPONSE",
+      "requiredFor": [
+        "SEC-0030",
+        "SEC-0031"
+      ],
+      "sourceId": "SRC-0077",
+      "title": "EUR-Lex Cyber Resilience Act official text observation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj"
+    },
+    {
+      "blocks": [
+        "complete field-source coverage",
+        "approved regulatory edition",
+        "P4 readiness"
+      ],
+      "diagnostic": "The current official page is reachable but exposes no record-design artifact or content beyond the navigation shell.",
+      "id": "AEAT-RECORD-DESIGN-PAYLOAD",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "OFFICIAL_PAGE_HAS_NO_ARTIFACT_LINK",
+      "requiredFor": [
+        "REG-0011",
+        "REG-0018"
+      ],
+      "sourceId": "SRC-0018",
+      "title": "AEAT record-design authoritative payload",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/disenos-registro.html"
+    },
+    {
+      "blocks": [
+        "complete semantic-rule coverage",
+        "approved regulatory edition",
+        "P4 readiness"
+      ],
+      "diagnostic": "The current official page is reachable but exposes no downloadable validation catalogue or substantive rule content.",
+      "id": "AEAT-VALIDATION-CATALOGUE-PAYLOAD",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "OFFICIAL_PAGE_HAS_NO_ARTIFACT_LINK",
+      "requiredFor": [
+        "REG-0011",
+        "REG-0018"
+      ],
+      "sourceId": "SRC-0021",
+      "title": "AEAT validation and error catalogue payload",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/documento-validaciones-errores.html"
+    },
+    {
+      "blocks": [
+        "hash contract",
+        "approved regulatory edition",
+        "P4 readiness"
+      ],
+      "diagnostic": "The exact PDF link published by the current AEAT page fails default certificate validation because its issuer signature algorithm is below the admitted security level; verification was not disabled.",
+      "id": "AEAT-HASH-SPECIFICATION-PDF",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "TLS_CERTIFICATE_VALIDATION_FAILED",
+      "requiredFor": [
+        "REG-0011",
+        "REG-0018",
+        "REG-0021"
+      ],
+      "sourceId": "SRC-0023",
+      "title": "AEAT fingerprint specification PDF",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf"
+    },
+    {
+      "blocks": [
+        "XAdES profile contract",
+        "approved regulatory edition",
+        "P4 readiness"
+      ],
+      "diagnostic": "The exact PDF link published by the current AEAT page fails default certificate validation because its issuer signature algorithm is below the admitted security level; verification was not disabled.",
+      "id": "AEAT-SIGNATURE-SPECIFICATION-PDF",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "TLS_CERTIFICATE_VALIDATION_FAILED",
+      "requiredFor": [
+        "REG-0011",
+        "REG-0018",
+        "REG-0023",
+        "SEC-0011",
+        "SEC-0012"
+      ],
+      "sourceId": "SRC-0024",
+      "title": "AEAT electronic-signature specification PDF",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Espec-Tecnicas/EspecTecGenerFirmaElectRfact.pdf"
+    },
+    {
+      "blocks": [
+        "QR contract",
+        "approved regulatory edition",
+        "P4 readiness"
+      ],
+      "diagnostic": "The exact PDF link published by the current AEAT page fails default certificate validation because its issuer signature algorithm is below the admitted security level; verification was not disabled.",
+      "id": "AEAT-QR-SPECIFICATION-PDF",
+      "observedAt": "2026-09-15T13:16:10Z",
+      "reasonCode": "TLS_CERTIFICATE_VALIDATION_FAILED",
+      "requiredFor": [
+        "REG-0011",
+        "REG-0018",
+        "REG-0025"
+      ],
+      "sourceId": "SRC-0025",
+      "title": "AEAT QR and collation specification PDF",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf"
+    }
+  ],
+  "contracts": [
+    {
+      "bytes": 6199,
+      "path": "contracts/runtime-contracts.json",
+      "sha256": "f37497ecd2cf2466c6e9b20ea9c328a20d31fb9213a08dacf07c56e657169ee2"
+    },
+    {
+      "bytes": 776531,
+      "path": "contracts/schema-graph.json",
+      "sha256": "cc36946963b62a1f08902bc1f45fb3d6eb6008c52de420ad2f05cf5399fa30e4"
+    },
+    {
+      "bytes": 450753,
+      "path": "contracts/field-constraints.json",
+      "sha256": "f61ad311cf5a983a057dca3eb21d0af4c7afe5758e880c01b45c864eeadd8e0a"
+    },
+    {
+      "bytes": 22139,
+      "path": "contracts/catalogues.json",
+      "sha256": "0199396443f97a19fd672436a6637ee2c1b8465fa6a45206f8c05ca3337d5c7c"
+    },
+    {
+      "bytes": 10578,
+      "path": "contracts/soap-bindings.json",
+      "sha256": "b65260c2e56e5894526b7aa806486a926898c5a38937f917e732734913174d3c"
+    }
+  ],
+  "creationAllowed": false,
+  "editionId": "rrsif-2026-09-15-candidate.c0c6eb21f6d2",
+  "generator": {
+    "artifacts": [
+      {
+        "path": "internal/contract-generation/catalogue-access.mjs",
+        "sha256": "517377ca79c6675e65577e3cf3a67ea73000f31db43a22eea4f496b4f80d43d5"
+      },
+      {
+        "path": "internal/contract-generation/generate-contracts.mjs",
+        "sha256": "87c57cb0820d1fff3736041cbe22475a93053eb251218f2a737b1903a909a502"
+      },
+      {
+        "path": "internal/contract-generation/xml-parser.mjs",
+        "sha256": "2473559b649a7b01c4d149f31c7db9947fd3748e05d474d8b1b296909f3ae748"
+      }
+    ],
+    "configurationSha256": "db2de6827a9f8e2a899df09463b60c4e0bb3739c4b2291b6d57f702328a2189d",
+    "id": "RRSIF-CONTRACT-GENERATOR-0001",
+    "primaryRuntime": "node 24.21.0"
+  },
+  "historicalVerificationAvailable": true,
+  "immutable": true,
+  "outputClosureSha256": "ddf049864e2ef8312c09ed4244f228670a903b8336ac264ee4cbf82b2604c2ed",
+  "publicSchemas": [
+    {
+      "bytes": 6658,
+      "path": "../../schemas/regulatory-contract-bundle-v1.schema.json",
+      "sha256": "9ac04474f01fa9edd9090410072aa06ab97267582fac5a88ea3f3bf8203735e0"
+    },
+    {
+      "bytes": 12061,
+      "path": "../../schemas/regulatory-edition-descriptor-v1.schema.json",
+      "sha256": "31e126207d73367f784986a8e98513d47b41a3c7702efa3086dac2c17e85f23f"
+    },
+    {
+      "bytes": 3056,
+      "path": "../../schemas/regulatory-schema-graph-v1.schema.json",
+      "sha256": "e090a755f036697e6716ec3c670313f20f1e3e58f42d0ba1ec6aafccad6dcc9d"
+    },
+    {
+      "bytes": 11476,
+      "path": "../../schemas/regulatory-field-constraints-v1.schema.json",
+      "sha256": "c173734461b0335c96129f2e011c155a897cfcd9b26c3932078e29e68c5dd5ac"
+    },
+    {
+      "bytes": 1241,
+      "path": "../../schemas/regulatory-catalogues-v1.schema.json",
+      "sha256": "99c084f7e2b46694b17c723a30e8ddeb48f2b5726e4ed89923b478c9f481fec7"
+    },
+    {
+      "bytes": 11470,
+      "path": "../../schemas/regulatory-soap-bindings-v1.schema.json",
+      "sha256": "184633fd5abeea4fc69247ec965923d1961342989233d5096d07eb666d3dc2a4"
+    }
+  ],
+  "reason": "Structural contracts are generated from the closed official XSD/WSDL graph, but mandatory semantic, hash, signature and QR authorities remain unavailable. This candidate cannot create fiscal artifacts.",
+  "schemaVersion": 1,
+  "sourceSnapshot": {
+    "id": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+    "path": "../source-snapshots/rrsif-2026-09-15+src.c0c6eb21f6d2/snapshot.json",
+    "snapshotSha256": "422104851ef34b2c2baf0029fb801b89d1957052a15b78ce74a9171cf3179db2",
+    "sourceClosureSha256": "2be623953f8ac58a35b5f686bc8d144e9998c2499756e4df00fb56500b1bf49f",
+    "sourceManifestSha256": "b70fee25ac863a41141af9f04116b3f7ad87a1d847afefae64620a0fc901d84f"
+  },
+  "status": "candidate"
+}

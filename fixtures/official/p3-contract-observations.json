@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "classification": "derived-observations-over-digest-pinned-official-bytes",
+  "sourceSnapshotId": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "expected": {
+    "technicalDocumentCount": 9,
+    "schemaCount": 8,
+    "importCount": 13,
+    "fieldDeclarationCount": 416,
+    "catalogueCount": 45,
+    "soapServiceCount": 2
+  },
+  "authorityLimit": "Counts prove lossless import coverage only; they do not supply missing semantic validation, hash, signature or QR rules."
+}
