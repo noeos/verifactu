@@ -1,0 +1,1206 @@
+{
+  "checkProducers": {
+    "contexts": {
+      "Required · CodeQL": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065337/job/104066783747",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · OSV": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065337/job/104066783212",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · dependency review": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065337/job/104066783578",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · documentation and traceability": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066792817",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · governance signatures and DCO": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066792654",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · integration conformance": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065121/job/104066783298",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · macos-15 · Node 24.21.0": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066793256",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · npm audit signatures and licenses": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065337/job/104066783589",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · package reproducibility": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066792807",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · quality and policy": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066793095",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · regulatory sources and generated contracts": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065121/job/104066782980",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · required-check closure": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104067195923",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · secret scan": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065337/job/104066783538",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · ubuntu-24.04 · Node 22.14.0": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066793078",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · ubuntu-24.04 · Node 22.23.2": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066792936",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · ubuntu-24.04 · Node 24.21.0": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066793193",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "Required · windows-2025 · Node 24.21.0": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "detailsUrl": "https://github.com/noeos/verifactu/actions/runs/34871065235/job/104066793067",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      }
+    },
+    "state": "verified",
+    "subjectSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+  },
+  "checks": [
+    {
+      "expected": "noeos/verifactu",
+      "name": "repository.identity",
+      "observed": "noeos/verifactu",
+      "result": "passed"
+    },
+    {
+      "expected": "public",
+      "name": "repository.visibility",
+      "observed": "public",
+      "result": "passed"
+    },
+    {
+      "expected": "main",
+      "name": "repository.defaultBranch",
+      "observed": "main",
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "features.issues",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "features.projects",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "features.wiki",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "features.discussions",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "merge.squash",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "merge.mergeCommit",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "merge.rebase",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "merge.autoMerge",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "merge.deleteBranchOnMerge",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "merge.webCommitSignoffRequired",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "actions.enabled",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": "selected",
+      "name": "actions.allowedActions",
+      "observed": "selected",
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "actions.shaPinningRequired",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": "read",
+      "name": "actions.defaultWorkflowPermissions",
+      "observed": "read",
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "actions.canApprovePullRequestReviews",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "actions.githubOwnedAllowed",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "actions.verifiedAllowed",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": ["google/osv-scanner-action/*@*", "ossf/scorecard-action@*"],
+      "name": "actions.patternsAllowed",
+      "observed": ["google/osv-scanner-action/*@*", "ossf/scorecard-action@*"],
+      "result": "passed"
+    },
+    {
+      "expected": "all_external_contributors",
+      "name": "actions.forkPullRequestApproval",
+      "observed": "all_external_contributors",
+      "result": "passed"
+    },
+    {
+      "expected": 90,
+      "name": "actions.artifactAndLogRetentionDays",
+      "observed": 90,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "actions.artifactAndLogRetentionMaximum",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": "not-applicable",
+      "name": "actions.reusableWorkflowAccess",
+      "observed": "not-applicable",
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "security.dependabotAlerts",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "security.dependabotSecurityUpdates",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "security.privateVulnerabilityReporting",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "security.secretScanning",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "security.secretScanningPushProtection",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "security.secretScanningNonProviderPatterns",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "security.secretScanningValidityChecks",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": "verified",
+      "name": "security.dependabotAlertsReadable",
+      "observed": "verified",
+      "result": "passed"
+    },
+    {
+      "expected": "verified",
+      "name": "security.secretScanningAlertsReadable",
+      "observed": "verified",
+      "result": "passed"
+    },
+    {
+      "expected": "verified",
+      "name": "security.codeScanningAlertsReadable",
+      "observed": "verified",
+      "result": "passed"
+    },
+    {
+      "expected": ["Protect main", "Protect release tags"],
+      "name": "rulesets.names",
+      "observed": ["Protect main", "Protect release tags"],
+      "result": "passed"
+    },
+    {
+      "expected": "branch",
+      "name": "mainRuleset.target",
+      "observed": "branch",
+      "result": "passed"
+    },
+    {
+      "expected": "active",
+      "name": "mainRuleset.enforcement",
+      "observed": "active",
+      "result": "passed"
+    },
+    {
+      "expected": ["refs/heads/main"],
+      "name": "mainRuleset.include",
+      "observed": ["refs/heads/main"],
+      "result": "passed"
+    },
+    {
+      "expected": [],
+      "name": "mainRuleset.exclude",
+      "observed": [],
+      "result": "passed"
+    },
+    {
+      "expected": [],
+      "name": "mainRuleset.bypassActors",
+      "observed": [],
+      "result": "passed"
+    },
+    {
+      "expected": "never",
+      "name": "mainRuleset.currentUserCanBypass",
+      "observed": "never",
+      "result": "passed"
+    },
+    {
+      "expected": [
+        "deletion",
+        "non_fast_forward",
+        "required_linear_history",
+        "required_signatures",
+        "pull_request",
+        "required_status_checks"
+      ],
+      "name": "mainRuleset.ruleTypes",
+      "observed": [
+        "deletion",
+        "non_fast_forward",
+        "required_linear_history",
+        "required_signatures",
+        "pull_request",
+        "required_status_checks"
+      ],
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "mainRuleset.pullRequest.requiredApprovingReviewCount",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "mainRuleset.pullRequest.dismissStaleReviewsOnPush",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "mainRuleset.pullRequest.requireCodeOwnerReview",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "mainRuleset.pullRequest.requireLastPushApproval",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "mainRuleset.pullRequest.requiredReviewThreadResolution",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "mainRuleset.pullRequest.requireExtraApprovalForUnattributedChanges",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": ["squash"],
+      "name": "mainRuleset.pullRequest.allowedMergeMethods",
+      "observed": ["squash"],
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "mainRuleset.requiredStatusChecks.strict",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": false,
+      "name": "mainRuleset.requiredStatusChecks.doNotEnforceOnCreate",
+      "observed": false,
+      "result": "passed"
+    },
+    {
+      "expected": [
+        "Required · CodeQL",
+        "Required · OSV",
+        "Required · dependency review",
+        "Required · documentation and traceability",
+        "Required · governance signatures and DCO",
+        "Required · integration conformance",
+        "Required · macos-15 · Node 24.21.0",
+        "Required · npm audit signatures and licenses",
+        "Required · package reproducibility",
+        "Required · quality and policy",
+        "Required · regulatory sources and generated contracts",
+        "Required · required-check closure",
+        "Required · secret scan",
+        "Required · ubuntu-24.04 · Node 22.14.0",
+        "Required · ubuntu-24.04 · Node 22.23.2",
+        "Required · ubuntu-24.04 · Node 24.21.0",
+        "Required · windows-2025 · Node 24.21.0"
+      ],
+      "name": "mainRuleset.requiredStatusChecks.contexts",
+      "observed": [
+        "Required · CodeQL",
+        "Required · OSV",
+        "Required · dependency review",
+        "Required · documentation and traceability",
+        "Required · governance signatures and DCO",
+        "Required · integration conformance",
+        "Required · macos-15 · Node 24.21.0",
+        "Required · npm audit signatures and licenses",
+        "Required · package reproducibility",
+        "Required · quality and policy",
+        "Required · regulatory sources and generated contracts",
+        "Required · required-check closure",
+        "Required · secret scan",
+        "Required · ubuntu-24.04 · Node 22.14.0",
+        "Required · ubuntu-24.04 · Node 22.23.2",
+        "Required · ubuntu-24.04 · Node 24.21.0",
+        "Required · windows-2025 · Node 24.21.0"
+      ],
+      "result": "passed"
+    },
+    {
+      "expected": "tag",
+      "name": "tagRuleset.target",
+      "observed": "tag",
+      "result": "passed"
+    },
+    {
+      "expected": "active",
+      "name": "tagRuleset.enforcement",
+      "observed": "active",
+      "result": "passed"
+    },
+    {
+      "expected": ["refs/tags/v*"],
+      "name": "tagRuleset.include",
+      "observed": ["refs/tags/v*"],
+      "result": "passed"
+    },
+    {
+      "expected": [],
+      "name": "tagRuleset.exclude",
+      "observed": [],
+      "result": "passed"
+    },
+    {
+      "expected": [],
+      "name": "tagRuleset.bypassActors",
+      "observed": [],
+      "result": "passed"
+    },
+    {
+      "expected": "never",
+      "name": "tagRuleset.currentUserCanBypass",
+      "observed": "never",
+      "result": "passed"
+    },
+    {
+      "expected": ["deletion", "update", "non_fast_forward", "required_signatures"],
+      "name": "tagRuleset.ruleTypes",
+      "observed": ["deletion", "update", "non_fast_forward", "required_signatures"],
+      "result": "passed"
+    },
+    {
+      "expected": "not-found",
+      "name": "classicMainProtection.absent",
+      "observed": "not-found",
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.teams.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.invitations.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.hooks.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.deployKeys.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.repositoryRunners.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.actionsSecrets.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.dependabotSecrets.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.actionsVariables.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 0,
+      "name": "forbiddenSurface.environments.count",
+      "observed": 0,
+      "result": "passed"
+    },
+    {
+      "expected": 1,
+      "name": "singleMaintainer.collaboratorCount",
+      "observed": 1,
+      "result": "passed"
+    },
+    {
+      "expected": true,
+      "name": "branch.main.present",
+      "observed": true,
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · CodeQL",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · OSV",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · dependency review",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · documentation and traceability",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · governance signatures and DCO",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · integration conformance",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · macos-15 · Node 24.21.0",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · npm audit signatures and licenses",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · package reproducibility",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · quality and policy",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · regulatory sources and generated contracts",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · required-check closure",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · secret scan",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · ubuntu-24.04 · Node 22.14.0",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · ubuntu-24.04 · Node 22.23.2",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · ubuntu-24.04 · Node 24.21.0",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    },
+    {
+      "expected": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "name": "checkProducer.Required · windows-2025 · Node 24.21.0",
+      "observed": {
+        "app": "github-actions",
+        "conclusion": "success",
+        "headSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c"
+      },
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    {
+      "httpStatus": 403,
+      "state": "inaccessible",
+      "surface": "organizationActionsPermissions"
+    },
+    {
+      "httpStatus": 404,
+      "state": "not-found",
+      "surface": "organizationRulesets"
+    },
+    {
+      "httpStatus": 403,
+      "state": "inaccessible",
+      "surface": "organizationRunners"
+    },
+    {
+      "httpStatus": 403,
+      "state": "inaccessible",
+      "surface": "organizationSecrets"
+    },
+    {
+      "httpStatus": 403,
+      "state": "inaccessible",
+      "surface": "organizationVariables"
+    },
+    {
+      "httpStatus": 404,
+      "state": "not-found",
+      "surface": "organizationHooks"
+    }
+  ],
+  "observedAt": "2026-09-14T22:19:21Z",
+  "repository": "noeos/verifactu",
+  "result": "passed",
+  "rulesets": [
+    {
+      "bypassActors": [],
+      "currentUserCanBypass": "never",
+      "enforcement": "active",
+      "exclude": [],
+      "include": ["refs/heads/main"],
+      "name": "Protect main",
+      "pullRequest": {
+        "allowed_merge_methods": ["squash"],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+          "allowed_actors": [],
+          "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": false,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 0,
+        "required_review_thread_resolution": true,
+        "required_reviewers": []
+      },
+      "requiredStatusChecks": {
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "Required · governance signatures and DCO"
+          },
+          {
+            "context": "Required · documentation and traceability"
+          },
+          {
+            "context": "Required · regulatory sources and generated contracts"
+          },
+          {
+            "context": "Required · quality and policy"
+          },
+          {
+            "context": "Required · ubuntu-24.04 · Node 22.14.0"
+          },
+          {
+            "context": "Required · ubuntu-24.04 · Node 22.23.2"
+          },
+          {
+            "context": "Required · ubuntu-24.04 · Node 24.21.0"
+          },
+          {
+            "context": "Required · windows-2025 · Node 24.21.0"
+          },
+          {
+            "context": "Required · macos-15 · Node 24.21.0"
+          },
+          {
+            "context": "Required · package reproducibility"
+          },
+          {
+            "context": "Required · integration conformance"
+          },
+          {
+            "context": "Required · dependency review"
+          },
+          {
+            "context": "Required · CodeQL"
+          },
+          {
+            "context": "Required · secret scan"
+          },
+          {
+            "context": "Required · OSV"
+          },
+          {
+            "context": "Required · npm audit signatures and licenses"
+          },
+          {
+            "context": "Required · required-check closure"
+          }
+        ],
+        "strict_required_status_checks_policy": true
+      },
+      "ruleTypes": [
+        "deletion",
+        "non_fast_forward",
+        "required_linear_history",
+        "required_signatures",
+        "pull_request",
+        "required_status_checks"
+      ],
+      "target": "branch"
+    },
+    {
+      "bypassActors": [],
+      "currentUserCanBypass": "never",
+      "enforcement": "active",
+      "exclude": [],
+      "include": ["refs/tags/v*"],
+      "name": "Protect release tags",
+      "pullRequest": null,
+      "requiredStatusChecks": null,
+      "ruleTypes": ["deletion", "update", "non_fast_forward", "required_signatures"],
+      "target": "tag"
+    }
+  ],
+  "schemaVersion": 1,
+  "signalNote": "Alert counts are observations, not conformance constants or proof of absence.",
+  "subjectSha": "baa92d948912593d0dc5cb5ed361a4bd645f885c",
+  "surfaceObservations": {
+    "actionsSecrets": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/actions/secrets",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "8cd981a659e02c3591c81d01a25bd2b59e980217dac663b062140e632de8c31a",
+      "state": "verified"
+    },
+    "actionsVariables": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/actions/variables",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "2ce9f1466656cd2968a9bd6da1d4fb3487b394f794ba91ac268708addd0ebb7f",
+      "state": "verified"
+    },
+    "artifactAndLogRetention": {
+      "emptyResponseBody": false,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/artifact-and-log-retention",
+      "pageDocuments": 1,
+      "paginated": false,
+      "sha256": "c442a43edd5cf6d7110c96e43860888e18bafa4586118fe0267b75780cbdb463",
+      "state": "verified"
+    },
+    "classicMainProtection": {
+      "diagnostic": "gh: Branch not protected (HTTP 404)",
+      "endpoint": "repos/noeos/verifactu/branches/main/protection",
+      "httpStatus": 404,
+      "paginated": false,
+      "state": "not-found"
+    },
+    "codeScanningAlerts": {
+      "count": 6,
+      "endpoint": "repos/noeos/verifactu/code-scanning/alerts?state=open&per_page=100",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "2f7d0a542601c2206eba382cf2ba305950e5e2d6e3acfa1add3c27c718196f1e",
+      "state": "verified"
+    },
+    "collaborators": {
+      "count": 1,
+      "endpoint": "repos/noeos/verifactu/collaborators",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "7d2d3ad8e9baf780689b5e03b890f96f98628d54b19f6cf9042bc4bc291518d7",
+      "state": "verified"
+    },
+    "dependabotAlerts": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/dependabot/alerts?state=open&per_page=100",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "state": "verified"
+    },
+    "dependabotAlertsEnabled": {
+      "emptyResponseBody": true,
+      "endpoint": "repos/noeos/verifactu/vulnerability-alerts",
+      "pageDocuments": 1,
+      "paginated": false,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "state": "verified"
+    },
+    "dependabotSecrets": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/dependabot/secrets",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "8cd981a659e02c3591c81d01a25bd2b59e980217dac663b062140e632de8c31a",
+      "state": "verified"
+    },
+    "dependabotSecurityUpdates": {
+      "emptyResponseBody": false,
+      "endpoint": "repos/noeos/verifactu/automated-security-fixes",
+      "pageDocuments": 1,
+      "paginated": false,
+      "sha256": "0ff62c42295fc2725047cf32340e12c912af1d99c7ea5ec8902519de6ae3a477",
+      "state": "verified"
+    },
+    "deployKeys": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/keys",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "state": "verified"
+    },
+    "environments": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/environments",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "a96111929536c1533c11cdcbf059a2db0a9520ac1b52fb53d76f7e11e3e906a8",
+      "state": "verified"
+    },
+    "forkPullRequestApproval": {
+      "emptyResponseBody": false,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/fork-pr-contributor-approval",
+      "pageDocuments": 1,
+      "paginated": false,
+      "sha256": "9e1d311f9e8df080b0bbe40f03f338e85b91fc7fdc74c703927ef237fdda4528",
+      "state": "verified"
+    },
+    "hooks": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/hooks",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "state": "verified"
+    },
+    "invitations": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/invitations",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "state": "verified"
+    },
+    "organizationActionsPermissions": {
+      "diagnostic": "gh: You must be an org admin or have the actions policies fine-grained permission. (HTTP 403)\ngh: This API operation needs the \"admin:org\" scope. To request it, run:  gh auth refresh -h github.com -s admin:org",
+      "endpoint": "orgs/noeos/actions/permissions",
+      "httpStatus": 403,
+      "paginated": true,
+      "state": "inaccessible"
+    },
+    "organizationAppInstallations": {
+      "count": 0,
+      "endpoint": "orgs/noeos/installations",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "9bc991204f1cf96cba744a117cbbd33a678f78a8515c7e0aff373870fc397517",
+      "state": "verified"
+    },
+    "organizationHooks": {
+      "diagnostic": "gh: Not Found (HTTP 404)\ngh: This API operation needs the \"admin:org_hook\" scope. To request it, run:  gh auth refresh -h github.com -s admin:org_hook",
+      "endpoint": "orgs/noeos/hooks",
+      "httpStatus": 404,
+      "paginated": true,
+      "state": "not-found"
+    },
+    "organizationMetadata": {
+      "emptyResponseBody": false,
+      "endpoint": "orgs/noeos",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "17502a92b4307230619ad5a9f8db5d828ad612084deb616f828510378f8be83a",
+      "state": "verified"
+    },
+    "organizationRulesets": {
+      "diagnostic": "gh: Not Found (HTTP 404)\ngh: This API operation needs the \"admin:org\" scope. To request it, run:  gh auth refresh -h github.com -s admin:org",
+      "endpoint": "orgs/noeos/rulesets",
+      "httpStatus": 404,
+      "paginated": true,
+      "state": "not-found"
+    },
+    "organizationRunners": {
+      "diagnostic": "gh: You must be an org admin or have the runners and runner groups fine-grained permission. (HTTP 403)\ngh: This API operation needs the \"admin:org\" scope. To request it, run:  gh auth refresh -h github.com -s admin:org",
+      "endpoint": "orgs/noeos/actions/runners",
+      "httpStatus": 403,
+      "paginated": true,
+      "state": "inaccessible"
+    },
+    "organizationSecrets": {
+      "diagnostic": "gh: You must be an org admin or have the actions secrets fine-grained permission. (HTTP 403)\ngh: This API operation needs the \"admin:org\" scope. To request it, run:  gh auth refresh -h github.com -s admin:org",
+      "endpoint": "orgs/noeos/actions/secrets",
+      "httpStatus": 403,
+      "paginated": true,
+      "state": "inaccessible"
+    },
+    "organizationVariables": {
+      "diagnostic": "gh: You must be an org admin or have the actions variables fine-grained permission. (HTTP 403)\ngh: This API operation needs the \"admin:org\" scope. To request it, run:  gh auth refresh -h github.com -s admin:org",
+      "endpoint": "orgs/noeos/actions/variables",
+      "httpStatus": 403,
+      "paginated": true,
+      "state": "inaccessible"
+    },
+    "privateVulnerabilityReporting": {
+      "emptyResponseBody": false,
+      "endpoint": "repos/noeos/verifactu/private-vulnerability-reporting",
+      "pageDocuments": 1,
+      "paginated": false,
+      "sha256": "26b3426b2593763c96d0890b4a77a0bbf66d13fc512b0c6b138a23c290f30a2a",
+      "state": "verified"
+    },
+    "repositoryRunners": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/actions/runners",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "15d67a2c40c7d15b5c983f3fc7731b443f21aa98e462927ef97d22125649780f",
+      "state": "verified"
+    },
+    "reusableWorkflowAccess": {
+      "diagnostic": "gh: Access policy only applies to internal and private repositories. (HTTP 422)",
+      "endpoint": "repos/noeos/verifactu/actions/permissions/access",
+      "httpStatus": 422,
+      "paginated": false,
+      "state": "not-applicable"
+    },
+    "secretScanningAlerts": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/secret-scanning/alerts?state=open&per_page=100",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "state": "verified"
+    },
+    "subjectCheckRuns": {
+      "count": 24,
+      "endpoint": "repos/noeos/verifactu/commits/baa92d948912593d0dc5cb5ed361a4bd645f885c/check-runs?per_page=100",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "22a3d21846f970bc1e76508b8151d972d00853e09453050356d416e201b3f3a7",
+      "state": "verified"
+    },
+    "teams": {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/teams",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "state": "verified"
+    },
+    "workflows": {
+      "count": 8,
+      "endpoint": "repos/noeos/verifactu/actions/workflows",
+      "pageDocuments": 1,
+      "paginated": true,
+      "sha256": "d4612ef7c3d0131c41b84a38d9d8782fa0a8157ae6ef014fd1f5599ce87477b9",
+      "state": "verified"
+    }
+  }
+}
