@@ -61,7 +61,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/repository/check-tree.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/repository/check-tree.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -81,7 +84,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/repository/check-imports.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/repository/check-imports.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -101,7 +107,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/packages/check-shells.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/packages/check-shells.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -129,7 +138,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tests/policy/foundation-negative.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/policy/foundation-negative.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -305,7 +317,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/tasks/close-gate.mjs", "gate:foundation"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/tasks/close-gate.mjs", "gate:foundation"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -338,7 +353,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/tasks/close-gate.mjs", "gate:p2"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/tasks/close-gate.mjs", "gate:p2"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -358,7 +376,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tests/policy/ci-negative.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/policy/ci-negative.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -378,7 +399,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/ci/check-required-registry.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/ci/check-required-registry.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -406,7 +430,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/tasks/close-gate.mjs", "gate:platform"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/tasks/close-gate.mjs", "gate:platform"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -426,7 +453,10 @@
       "outputs": [".cache/admission/**"],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/admission/prepare-external-inputs.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/admission/prepare-external-inputs.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "prepare-only",
       "secrets": "denied",
@@ -454,7 +484,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/generation/check-generated.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/generation/check-generated.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -480,7 +513,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/repository/check-regulatory-state.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/repository/check-regulatory-state.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -506,7 +542,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/admission/check-supply-chain.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/admission/check-supply-chain.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -532,7 +571,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tests/policy/supply-chain-negative.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/policy/supply-chain-negative.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -552,7 +594,10 @@
       "outputs": ["packages/*/dist/**"],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/build/build-packages.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/build/build-packages.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -572,7 +617,10 @@
       "outputs": [".cache/packages/*.tgz"],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tooling/build/pack-packages.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/build/pack-packages.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -592,7 +640,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/build/check-reproducibility.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/build/check-reproducibility.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -642,7 +693,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/build/check-performance.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/build/check-performance.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -669,7 +723,10 @@
       "outputs": [".cache/supply-chain/component-graph.json"],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/sbom/generate-component-graph.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/sbom/generate-component-graph.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -689,7 +746,10 @@
       "outputs": [".cache/supply-chain/bom.cdx.json", ".cache/supply-chain/bom.spdx.json"],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/sbom/generate-sboms.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/sbom/generate-sboms.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -727,7 +787,10 @@
           ".cache/admission/spdx-3.0.1-model.ttl"
         ]
       },
-      "environment": { "passThrough": ["VERIFACTU_PYTHON"], "fixed": { "PYTHONDONTWRITEBYTECODE": "1" } },
+      "environment": {
+        "passThrough": ["VERIFACTU_PYTHON"],
+        "fixed": { "PYTHONDONTWRITEBYTECODE": "1" }
+      },
       "network": "denied",
       "secrets": "denied",
       "timeoutMs": 180000,
@@ -754,7 +817,10 @@
       "outputs": [".cache/supply-chain/provenance.rehearsal.intoto.json"],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/provenance/rehearse-provenance.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/provenance/rehearse-provenance.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -781,7 +847,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tests/policy/regulatory-source-negative.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/policy/regulatory-source-negative.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -808,7 +877,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tests/security/p3-xml-parser.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/security/p3-xml-parser.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -837,7 +909,10 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-supported",
-      "command": { "executable": "node", "arguments": ["tests/contract/p3-contract-generation.mjs"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/contract/p3-contract-generation.mjs"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -857,7 +932,125 @@
       "outputs": [],
       "workingDirectory": ".",
       "toolProfile": "node-primary",
-      "command": { "executable": "node", "arguments": ["tooling/tasks/close-gate.mjs", "gate:p3-contracts"] },
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/tasks/close-gate.mjs", "gate:p3-contracts"]
+      },
+      "environment": { "passThrough": [], "fixed": {} },
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutMs": 10000,
+      "concurrencyLocks": [],
+      "selectionClass": "closure",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail"
+    },
+    {
+      "id": "oracle:regulatory-independent",
+      "version": 1,
+      "owner": "quality-owner",
+      "description": "Independently authenticate and parse the complete admitted source closure and challenge every generated P3 contract surface.",
+      "dependencies": ["contract:regulatory-generation"],
+      "inputs": [
+        "config/regulatory/contract-generation.json",
+        "editions/source-snapshots/**",
+        "editions/rrsif-2026-09-15-candidate.c0c6eb21f6d2/**",
+        "fixtures/adversarial/p3-oracle-seeded-defects.json",
+        "internal/independent-oracles/regulatory_contract_oracle.py",
+        "schemas/regulatory-*.schema.json"
+      ],
+      "outputs": [],
+      "workingDirectory": ".",
+      "toolProfile": "node-primary",
+      "command": {
+        "executable": "python",
+        "arguments": ["internal/independent-oracles/regulatory_contract_oracle.py"]
+      },
+      "environment": {
+        "passThrough": ["VERIFACTU_PYTHON"],
+        "fixed": { "PYTHONDONTWRITEBYTECODE": "1" }
+      },
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutMs": 60000,
+      "concurrencyLocks": [],
+      "selectionClass": "contract",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail"
+    },
+    {
+      "id": "policy:p3-traceability-negative",
+      "version": 1,
+      "owner": "quality-owner",
+      "description": "Falsify incomplete, unsafe or falsely closed P3 requirement and historical-finding mappings.",
+      "dependencies": ["bootstrap:toolchain"],
+      "inputs": [
+        "config/regulatory/p3-*.json",
+        "config/tasks/tasks.json",
+        "tests/policy/p3-traceability-negative.mjs",
+        "tooling/lib/**",
+        "tooling/repository/check-p3-traceability.mjs"
+      ],
+      "outputs": [],
+      "workingDirectory": ".",
+      "toolProfile": "node-supported",
+      "command": {
+        "executable": "node",
+        "arguments": ["tests/policy/p3-traceability-negative.mjs"]
+      },
+      "environment": { "passThrough": [], "fixed": {} },
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutMs": 30000,
+      "concurrencyLocks": [],
+      "selectionClass": "unit",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail"
+    },
+    {
+      "id": "policy:p3-traceability",
+      "version": 1,
+      "owner": "regulatory-owner",
+      "description": "Close every P3-scoped requirement and historical finding against real sources, contracts, blockers and executable controls.",
+      "dependencies": ["oracle:regulatory-independent", "policy:p3-traceability-negative"],
+      "inputs": [
+        "config/regulatory/**",
+        "config/tasks/tasks.json",
+        "editions/rrsif-2026-09-15-candidate.c0c6eb21f6d2/**",
+        "schemas/regulatory-*.schema.json",
+        "tooling/lib/**",
+        "tooling/repository/check-p3-traceability.mjs"
+      ],
+      "outputs": [],
+      "workingDirectory": ".",
+      "toolProfile": "node-supported",
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/repository/check-p3-traceability.mjs"]
+      },
+      "environment": { "passThrough": [], "fixed": {} },
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutMs": 30000,
+      "concurrencyLocks": [],
+      "selectionClass": "contract",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail"
+    },
+    {
+      "id": "gate:p3",
+      "version": 1,
+      "owner": "regulatory-owner",
+      "description": "Close all executable P3 custody, contract, independent-oracle and traceability controls without claiming unavailable fiscal semantics.",
+      "dependencies": ["gate:p2", "gate:p3-contracts", "policy:p3-traceability"],
+      "inputs": ["config/tasks/**", "evidence/schemas/task-report.schema.json"],
+      "outputs": [],
+      "workingDirectory": ".",
+      "toolProfile": "node-primary",
+      "command": {
+        "executable": "node",
+        "arguments": ["tooling/tasks/close-gate.mjs", "gate:p3"]
+      },
       "environment": { "passThrough": [], "fixed": {} },
       "network": "denied",
       "secrets": "denied",
@@ -871,6 +1064,7 @@
   "profiles": {
     "foundation": ["gate:foundation"],
     "p2": ["gate:p2"],
-    "p3-contracts": ["gate:p3-contracts"]
+    "p3-contracts": ["gate:p3-contracts"],
+    "p3": ["gate:p3"]
   }
 }

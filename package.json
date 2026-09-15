@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/noeos/verifactu#readme",
   "scripts": {
-    "check": "node tooling/tasks/run-task.mjs --task gate:p2",
+    "check": "node tooling/tasks/run-task.mjs --task gate:p3",
     "check:foundation": "node tooling/tasks/run-task.mjs --task gate:foundation",
     "format:check": "node tooling/tasks/run-task.mjs --task format:check",
     "lint": "node tooling/tasks/run-task.mjs --task lint:all",

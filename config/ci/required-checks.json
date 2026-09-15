@@ -30,7 +30,7 @@
       "workflow": "conformance.yml",
       "job": "regulatory-contracts",
       "producer": "canonical-task",
-      "task": "gate:p3-contracts",
+      "task": "gate:p3",
       "report": "github-check-run",
       "runner": "ubuntu-24.04",
       "runtime": "24.21.0",

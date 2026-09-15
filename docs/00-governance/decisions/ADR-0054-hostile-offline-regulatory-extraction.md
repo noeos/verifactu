@@ -37,7 +37,11 @@ change invalidates the exception.
 Generated structure preserves namespace declarations, expanded QNames, order,
 cardinality, choices, facets, imports, service/binding/operation/endpoint data
 and documentation digests. It does not infer absent cross-field rules or legal
-semantics. The candidate cannot exit P3 until a separately implemented oracle
-challenges source identities, imports, fields, catalogues and SOAP surface and
-catches maintained seeded defects. New authoritative bytes create a successor
-source snapshot and candidate; published identities are never rewritten.
+semantics. The separately implemented Python/Expat oracle authenticates all 37
+source objects, reconstructs all nine technical documents and challenges source
+and document identities, imports, fields, facets, catalogues, SOAP actions and
+addresses, output digests and blocked creation state. Ten maintained seeded
+defects prove its sensitivity. This closes the independent structural control,
+but not the unavailable-authority blocker or P3 formal exit. New authoritative
+bytes create a successor source snapshot and candidate; published identities are
+never rewritten.
