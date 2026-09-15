@@ -93,10 +93,10 @@ jobs:
         run: >-
           python -m pip install --require-hashes --only-binary=:all:
           -r config/toolchain/requirements-spdx.lock
-      - name: Execute the complete canonical P2 gate
+      - name: Execute the complete canonical P3 gate
         env:
           VERIFACTU_PYTHON: ${{ env.pythonLocation }}/bin/python
-        run: node tooling/tasks/run-task.mjs --task gate:p2 --evidence-dir evidence/runs/quality-policy
+        run: node tooling/tasks/run-task.mjs --task gate:p3 --evidence-dir evidence/runs/quality-policy
 
   supported-runtime:
     name: ${{ matrix.context }}

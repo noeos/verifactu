@@ -1,0 +1,19 @@
+{
+  "defects": [
+    {
+      "expectedDiscrepancy": "source-snapshot-binding",
+      "id": "source-snapshot-binding"
+    },
+    { "expectedDiscrepancy": "document-identity", "id": "document-identity" },
+    { "expectedDiscrepancy": "import-closure", "id": "import-closure" },
+    { "expectedDiscrepancy": "field-cardinality", "id": "field-cardinality" },
+    { "expectedDiscrepancy": "simple-type-facet", "id": "simple-type-facet" },
+    { "expectedDiscrepancy": "catalogue-value", "id": "catalogue-value" },
+    { "expectedDiscrepancy": "soap-action", "id": "soap-action" },
+    { "expectedDiscrepancy": "soap-address", "id": "soap-address" },
+    { "expectedDiscrepancy": "artifact-digest", "id": "artifact-digest" },
+    { "expectedDiscrepancy": "creation-state", "id": "creation-state" }
+  ],
+  "oracle": "p3-independent-regulatory-oracle",
+  "schemaVersion": 1
+}

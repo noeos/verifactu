@@ -1,0 +1,88 @@
+{
+  "$schema": "./p3-historical-findings.schema.json",
+  "schemaVersion": 1,
+  "registerId": "P3-HISTORICAL-FINDINGS-0001",
+  "subject": "rrsif-2026-09-15-candidate.c0c6eb21f6d2",
+  "findings": [
+    {
+      "id": "REV-001",
+      "disposition": "adopted-blocked",
+      "requirements": ["REG-0011", "REG-0018"],
+      "controls": ["contract:regulatory-generation", "policy:p3-traceability"],
+      "blockerIds": ["AEAT-RECORD-DESIGN-PAYLOAD", "AEAT-VALIDATION-CATALOGUE-PAYLOAD"],
+      "continuation": "P4",
+      "residualRisk": "The structural graph is complete, but no complete fiscal runtime model can be proved without the official semantic sources.",
+      "reopenTrigger": "Any acquired record-design or validation source, structural generator change or P4 domain-model change reopens comparison."
+    },
+    {
+      "id": "REV-002",
+      "disposition": "adopted-blocked",
+      "requirements": ["REG-0011", "REG-0018"],
+      "controls": ["policy:regulatory", "policy:p3-traceability"],
+      "blockerIds": ["AEAT-VALIDATION-CATALOGUE-PAYLOAD"],
+      "continuation": "P4",
+      "residualRisk": "Forty-five XSD enumerations are not the unavailable complete AEAT business-validation and error catalogue.",
+      "reopenTrigger": "Publication or acquisition of authoritative validation/error material requires a new snapshot, overlay and oracle set."
+    },
+    {
+      "id": "REV-003",
+      "disposition": "adopted-downstream",
+      "requirements": ["REG-0001", "REG-0060"],
+      "controls": [],
+      "blockerIds": [],
+      "continuation": "P4",
+      "residualRisk": "P3 intentionally generates no fiscal identities, tax breakdown values or multi-taxpayer runtime state.",
+      "reopenTrigger": "P4 domain construction must reproduce this finding and add positive, boundary and cross-context regression evidence."
+    },
+    {
+      "id": "REV-004",
+      "disposition": "adopted-blocked",
+      "requirements": ["REG-0010", "REG-0011", "REG-0012"],
+      "controls": ["policy:regulatory", "generate:checked-in", "oracle:regulatory-independent"],
+      "blockerIds": ["AEAT-RECORD-DESIGN-PAYLOAD", "AEAT-VALIDATION-CATALOGUE-PAYLOAD"],
+      "continuation": "P4",
+      "residualRisk": "Every available type and constraint byte is pinned, but the source map cannot be called complete while mandatory authorities are absent.",
+      "reopenTrigger": "Any source, generator, public schema, edition descriptor or blocker-state change invalidates the P3 evidence."
+    },
+    {
+      "id": "REV-005",
+      "disposition": "adopted-blocked",
+      "requirements": ["REG-0011", "REG-0018"],
+      "controls": ["contract:regulatory-generation", "policy:p3-traceability"],
+      "blockerIds": ["AEAT-VALIDATION-CATALOGUE-PAYLOAD"],
+      "continuation": "P4",
+      "residualRisk": "Generated XSD structure is validated, while cross-field, temporal, applicability and AEAT error semantics remain unavailable.",
+      "reopenTrigger": "An authoritative semantic rule source or any proposed hand-authored overlay requires source citation and independent challenge."
+    },
+    {
+      "id": "REV-006",
+      "disposition": "verified-prevented-p3-scope",
+      "requirements": ["REG-0012", "REG-0031", "REG-0070", "REG-0071", "REG-0072"],
+      "controls": ["policy:regulatory-source-negative", "generate:checked-in", "contract:regulatory-generation"],
+      "blockerIds": [],
+      "continuation": null,
+      "residualRisk": "Scheduled monitoring and later published-edition support remain P7 concerns; current import, custody and regeneration are closed.",
+      "reopenTrigger": "Source-plan, source byte, acquisition policy, dependency graph, generator or monitoring-contract changes reopen this disposition."
+    },
+    {
+      "id": "REV-008",
+      "disposition": "adopted-downstream",
+      "requirements": ["REG-0071", "REG-0072", "SEC-0010", "SEC-0016"],
+      "controls": ["security:regulatory-xml", "contract:regulatory-generation", "oracle:regulatory-independent"],
+      "blockerIds": [],
+      "continuation": "P4",
+      "residualRisk": "P3 proves complete offline XSD graph extraction, not validation of fiscal XML emitted by code that does not yet exist.",
+      "reopenTrigger": "P4 must validate real emitted XML against the immutable graph; any serializer or XSD-backend change reopens the finding."
+    },
+    {
+      "id": "REV-019",
+      "disposition": "adopted-downstream",
+      "requirements": ["REG-0011", "SEC-0003"],
+      "controls": ["oracle:regulatory-independent", "generate:checked-in"],
+      "blockerIds": [],
+      "continuation": "P4",
+      "residualRisk": "The independent oracle closes P3 source/contract identity only; fiscal prepared/committed artifact identity is not implemented.",
+      "reopenTrigger": "P4 artifact framing, custody or Verification Engine evidence code must add an independent exact-byte oracle before closure."
+    }
+  ]
+}

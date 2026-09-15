@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noeos.dev/schemas/p3-historical-findings-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "registerId", "subject", "findings"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "registerId": { "const": "P3-HISTORICAL-FINDINGS-0001" },
+    "subject": { "const": "rrsif-2026-09-15-candidate.c0c6eb21f6d2" },
+    "findings": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "disposition",
+          "requirements",
+          "controls",
+          "blockerIds",
+          "continuation",
+          "residualRisk",
+          "reopenTrigger"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^REV-[0-9]{3}$" },
+          "disposition": {
+            "enum": ["verified-prevented-p3-scope", "adopted-blocked", "adopted-downstream"]
+          },
+          "requirements": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string" }
+          },
+          "controls": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+            }
+          },
+          "blockerIds": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9-]+$" }
+          },
+          "continuation": { "type": ["string", "null"], "pattern": "^P[4-8]$" },
+          "residualRisk": { "type": "string", "minLength": 20 },
+          "reopenTrigger": { "type": "string", "minLength": 20 }
+        }
+      }
+    }
+  }
+}

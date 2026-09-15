@@ -1,0 +1,204 @@
+{
+  "$schema": "./p3-traceability.schema.json",
+  "schemaVersion": 1,
+  "matrixId": "P3-TRACEABILITY-0001",
+  "sourceSnapshotId": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "candidateEditionId": "rrsif-2026-09-15-candidate.c0c6eb21f6d2",
+  "requirements": [
+    {
+      "id": "REG-0010",
+      "status": "preventive",
+      "sourceIds": ["BOE-ORDER-HAC-1177-2024", "BOE-RD-1007-2023"],
+      "contractPaths": ["edition.json", "schemas/regulatory-edition-descriptor-v1.schema.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": [],
+      "nextPhase": "P4",
+      "rationale": "The only edition is an immutable candidate with creationAllowed false; P4 must bind every future fiscal artifact to an approved edition."
+    },
+    {
+      "id": "REG-0011",
+      "status": "blocked",
+      "sourceIds": ["AEAT-SISTEMA-FACTURACION-WSDL", "AEAT-SUMINISTRO-INFORMACION-XSD"],
+      "contractPaths": ["contracts/runtime-contracts.json", "contracts/schema-graph.json"],
+      "oracleControls": ["contract:regulatory-generation", "oracle:regulatory-independent"],
+      "blockerIds": ["AEAT-RECORD-DESIGN-PAYLOAD", "AEAT-VALIDATION-CATALOGUE-PAYLOAD"],
+      "nextPhase": "P4",
+      "rationale": "Available structural inputs and outputs are pinned, but unavailable mandatory semantic sources prevent complete edition closure."
+    },
+    {
+      "id": "REG-0012",
+      "status": "enforced",
+      "sourceIds": ["AEAT-TECHNICAL-INDEX"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory-source-negative", "contract:regulatory-generation"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Content-bound immutable destinations and changed-input invalidation reject mutation and require a successor identity."
+    },
+    {
+      "id": "REG-0016",
+      "status": "downstream",
+      "sourceIds": ["BOE-RD-1007-2023-CONSOLIDATED"],
+      "contractPaths": ["schemas/regulatory-edition-descriptor-v1.schema.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": [],
+      "nextPhase": "P4",
+      "rationale": "The descriptor rejects creation for the current candidate; runtime sunset and revocation behavior belongs to the P4 fiscal core."
+    },
+    {
+      "id": "REG-0017",
+      "status": "enforced",
+      "sourceIds": ["AEAT-PORTAL", "BOE-RD-1007-2023"],
+      "contractPaths": ["contracts/runtime-contracts.json", "edition.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Authority roles and blocked observations distinguish binding text, delegated technical material, interpretation and missing evidence."
+    },
+    {
+      "id": "REG-0018",
+      "status": "enforced",
+      "sourceIds": ["AEAT-RECORD-DESIGN-PAGE", "AEAT-VALIDATION-DISCOVERY-PAGE"],
+      "contractPaths": ["contracts/runtime-contracts.json", "edition.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": ["AEAT-RECORD-DESIGN-PAYLOAD", "AEAT-VALIDATION-CATALOGUE-PAYLOAD"],
+      "nextPhase": null,
+      "rationale": "Unresolved official semantics are explicit blockers and mechanically force candidate status and creationAllowed false."
+    },
+    {
+      "id": "REG-0021",
+      "status": "blocked",
+      "sourceIds": ["AEAT-HASH-DISCOVERY-PAGE"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": ["AEAT-HASH-SPECIFICATION-PDF"],
+      "nextPhase": "P4",
+      "rationale": "The official hash specification cannot be acquired with admitted TLS, so no hash algorithm or chain semantics are invented."
+    },
+    {
+      "id": "REG-0023",
+      "status": "blocked",
+      "sourceIds": ["AEAT-SIGNATURE-DISCOVERY-PAGE"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": ["AEAT-SIGNATURE-SPECIFICATION-PDF"],
+      "nextPhase": "P4",
+      "rationale": "The official signature profile cannot be acquired with admitted TLS, so no XAdES behavior is generated or claimed."
+    },
+    {
+      "id": "REG-0025",
+      "status": "blocked",
+      "sourceIds": ["AEAT-QR-DISCOVERY-PAGE"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": ["AEAT-QR-SPECIFICATION-PDF"],
+      "nextPhase": "P4",
+      "rationale": "The official QR specification cannot be acquired with admitted TLS, so no payload, rendering or wording behavior is invented."
+    },
+    {
+      "id": "REG-0030",
+      "status": "downstream",
+      "sourceIds": ["AEAT-PORTAL", "AEAT-TECHNICAL-INDEX"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory-source-negative"],
+      "blockerIds": [],
+      "nextPhase": "P7",
+      "rationale": "P3 performs and records a current observation; scheduled daily monitoring and monthly human review remain release-operations work."
+    },
+    {
+      "id": "REG-0031",
+      "status": "enforced",
+      "sourceIds": ["AEAT-TECHNICAL-INDEX"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory-source-negative", "contract:regulatory-generation"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Digest drift fails before promotion and cannot alter the immutable source snapshot or generated candidate in place."
+    },
+    {
+      "id": "REG-0070",
+      "status": "enforced",
+      "sourceIds": ["AEAT-TECHNICAL-INDEX"],
+      "contractPaths": ["contracts/runtime-contracts.json"],
+      "oracleControls": ["policy:regulatory-source-negative", "security:regulatory-xml"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Acquisition and parsing enforce exact origins, no redirects, timeouts, streamed byte caps and structural resource limits."
+    },
+    {
+      "id": "REG-0071",
+      "status": "enforced",
+      "sourceIds": ["AEAT-SISTEMA-FACTURACION-WSDL", "W3C-XMLDSIG-XSD"],
+      "contractPaths": ["contracts/schema-graph.json"],
+      "oracleControls": ["contract:regulatory-generation", "oracle:regulatory-independent"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "All thirteen imports resolve from a digest-pinned offline graph; remote, absent, traversing and namespace-mismatched imports fail."
+    },
+    {
+      "id": "REG-0072",
+      "status": "enforced",
+      "sourceIds": ["AEAT-SISTEMA-FACTURACION-WSDL"],
+      "contractPaths": [
+        "contracts/runtime-contracts.json",
+        "contracts/field-constraints.json",
+        "contracts/catalogues.json",
+        "contracts/soap-bindings.json"
+      ],
+      "oracleControls": ["generate:checked-in", "contract:regulatory-generation"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Network-denied clean regeneration is byte-identical and a changed official input invalidates the generated result."
+    },
+    {
+      "id": "SEC-0010",
+      "status": "enforced",
+      "sourceIds": ["W3C-XMLDSIG-XSD"],
+      "contractPaths": ["contracts/schema-graph.json"],
+      "oracleControls": ["security:regulatory-xml", "oracle:regulatory-independent"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "DTD, entities, XInclude, active instructions, remote resolution and unbounded XML resources are rejected before interpretation."
+    },
+    {
+      "id": "SEC-0011",
+      "status": "blocked",
+      "sourceIds": ["W3C-XMLDSIG-XSD", "AEAT-SIGNATURE-DISCOVERY-PAGE"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["security:regulatory-xml"],
+      "blockerIds": ["AEAT-SIGNATURE-SPECIFICATION-PDF"],
+      "nextPhase": "P4",
+      "rationale": "XMLDSig structure is imported, but the unavailable official XAdES profile blocks signature verification semantics and claims."
+    },
+    {
+      "id": "SEC-0012",
+      "status": "blocked",
+      "sourceIds": ["W3C-XMLDSIG-XSD", "AEAT-SIGNATURE-DISCOVERY-PAGE"],
+      "contractPaths": ["edition.json"],
+      "oracleControls": ["policy:regulatory"],
+      "blockerIds": ["AEAT-SIGNATURE-SPECIFICATION-PDF"],
+      "nextPhase": "P4",
+      "rationale": "No cryptographic allowlist is inferred from structural XMLDSig alone while the binding AEAT profile is unavailable."
+    },
+    {
+      "id": "SEC-0016",
+      "status": "enforced",
+      "sourceIds": ["AEAT-SISTEMA-FACTURACION-WSDL"],
+      "contractPaths": ["contracts/schema-graph.json", "contracts/soap-bindings.json"],
+      "oracleControls": ["security:regulatory-xml", "contract:regulatory-generation"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Media magic, XML structure, expanded attribute identity, namespaces, imports and unsupported constructs fail before generated state."
+    },
+    {
+      "id": "SEC-0070",
+      "status": "enforced",
+      "sourceIds": ["AEAT-TECHNICAL-INDEX", "W3C-XMLDSIG-XSD"],
+      "contractPaths": ["contracts/runtime-contracts.json"],
+      "oracleControls": ["policy:regulatory-source-negative", "security:regulatory-xml"],
+      "blockerIds": [],
+      "nextPhase": null,
+      "rationale": "Downloaded bytes remain quarantined until length, dual digest, media identity, regular-file custody and hostile parser controls pass."
+    }
+  ]
+}
