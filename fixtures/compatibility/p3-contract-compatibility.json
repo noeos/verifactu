@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "sourceSnapshotId": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "requiredProfiles": ["node-22-minimum", "node-22-latest", "node-24-primary"],
+  "expectByteIdenticalGeneration": true,
+  "expectedSoap": { "messages": 4, "portTypes": 2, "bindings": 2, "services": 2, "ports": 8 }
+}

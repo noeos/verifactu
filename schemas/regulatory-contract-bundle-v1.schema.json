@@ -1,0 +1,298 @@
+{
+  "$id": "https://noeos.dev/schemas/regulatory-contract-bundle-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bundleId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "blockedSourceIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "creationAllowed": {
+          "const": false
+        },
+        "semantic": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "structural": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "structural",
+        "semantic",
+        "creationAllowed",
+        "blockedSourceIds"
+      ],
+      "type": "object"
+    },
+    "documents": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "doctypeNeutralized": {
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "xsd",
+              "wsdl"
+            ]
+          },
+          "nodeCount": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "sourceId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "targetNamespace": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId",
+          "kind",
+          "sha256",
+          "targetNamespace",
+          "nodeCount",
+          "doctypeNeutralized"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "generator": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]+$",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "configurationSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "primaryRuntime": {
+          "pattern": "^node [0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "artifacts",
+        "configurationSha256",
+        "primaryRuntime"
+      ],
+      "type": "object"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "snapshotSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sourceClosureSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sourceManifestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "snapshotSha256",
+        "sourceManifestSha256",
+        "sourceClosureSha256"
+      ],
+      "type": "object"
+    },
+    "stages": {
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "authenticated-bytes"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "maxContains": 1,
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "hostile-xml"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "maxContains": 1,
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "structural-contract"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "maxContains": 1,
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "semantic-overlay"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "maxContains": 1,
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "fiscal-domain"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "maxContains": 1,
+          "minContains": 1
+        }
+      ],
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "failureMode": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "enum": [
+              "authenticated-bytes",
+              "hostile-xml",
+              "structural-contract",
+              "semantic-overlay",
+              "fiscal-domain"
+            ]
+          },
+          "input": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "output": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "enforced",
+              "blocked",
+              "downstream"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "input",
+          "output",
+          "failureMode"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "bundleId",
+    "sourceSnapshot",
+    "generator",
+    "stages",
+    "coverage",
+    "documents"
+  ],
+  "title": "Noeos VeriFactu generated regulatory contract bundle",
+  "type": "object"
+}

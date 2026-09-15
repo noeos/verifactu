@@ -1,0 +1,25 @@
+{
+  "blockedSourceIds": [
+    "AEAT-HASH-SPECIFICATION-PDF",
+    "AEAT-QR-SPECIFICATION-PDF",
+    "AEAT-RECORD-DESIGN-PAYLOAD",
+    "AEAT-SIGNATURE-SPECIFICATION-PDF",
+    "AEAT-VALIDATION-CATALOGUE-PAYLOAD",
+    "EURLEX-CRA-OFFICIAL-TEXT",
+    "EURLEX-GDPR-OFFICIAL-TEXT"
+  ],
+  "creationAllowed": false,
+  "immutable": true,
+  "observedAt": "2026-09-15T13:16:10Z",
+  "reason": "Mandatory official sources are unavailable. Bounded structural contract extraction may produce a blocked candidate, but no edition may be approved or create fiscal artifacts.",
+  "schemaVersion": 1,
+  "snapshotId": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "sourceClosureSha256": "2be623953f8ac58a35b5f686bc8d144e9998c2499756e4df00fb56500b1bf49f",
+  "sourceCount": 37,
+  "sourceManifest": {
+    "path": "source-manifest.json",
+    "sha256": "b70fee25ac863a41141af9f04116b3f7ad87a1d847afefae64620a0fc901d84f"
+  },
+  "sourcePlanSha256": "c0c6eb21f6d2025003b21f2d9c85429ea455d4461240cfb438b259ac37ab7b2f",
+  "status": "blocked"
+}

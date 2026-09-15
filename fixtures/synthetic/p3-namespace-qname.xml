@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:t="urn:noeos:synthetic" targetNamespace="urn:noeos:synthetic">
+  <element name="Root" type="t:RootType"/>
+  <complexType name="RootType"><sequence><element name="Value" type="string"/></sequence></complexType>
+</schema>

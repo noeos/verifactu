@@ -1,0 +1,140 @@
+{
+  "$defs": {
+    "node": {
+      "additionalProperties": false,
+      "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/$defs/node"
+          },
+          "type": "array"
+        },
+        "documentation": {
+          "additionalProperties": false,
+          "properties": {
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "utf8Bytes": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "utf8Bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "namespaceDeclarations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "name",
+        "namespaceDeclarations",
+        "attributes",
+        "children"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://noeos.dev/schemas/regulatory-schema-graph-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "documents": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "document": {
+            "$ref": "#/$defs/node"
+          },
+          "sourceId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourceSha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId",
+          "sourceSha256",
+          "document"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "imports": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "namespace": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourceId": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "location",
+          "namespace",
+          "sourceId"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceSnapshotId": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "sourceSnapshotId",
+    "imports",
+    "documents"
+  ],
+  "title": "Noeos VeriFactu normalized regulatory schema graph",
+  "type": "object"
+}

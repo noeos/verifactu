@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    { "id": "bytes-over-limit", "expectedCode": "XML_BYTES_LIMIT" },
+    { "id": "depth-over-limit", "expectedCode": "XML_DEPTH_LIMIT" },
+    { "id": "nodes-over-limit", "expectedCode": "XML_NODE_LIMIT" },
+    { "id": "attributes-over-limit", "expectedCode": "XML_ATTRIBUTE_LIMIT" },
+    { "id": "text-over-limit", "expectedCode": "XML_TEXT_LIMIT" }
+  ]
+}

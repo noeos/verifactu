@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -9,6 +11,7 @@ import {
   assertDiscoveredInputs,
   assertFreshOutputs,
   commandFor,
+  resolveSubject,
 } from "../../tooling/tasks/run-task.mjs";
 import { validateTaskGraph } from "../../tooling/tasks/validate-graph.mjs";
 import { validateClosureReports } from "../../tooling/tasks/validate-reports.mjs";
@@ -105,7 +108,24 @@ async function run() {
   );
   passed.push("undeclared-network");
   assert(passed.length === document.fixtures.length, "FIXTURE_COVERAGE", "every task-runner fixture must execute");
-  return { fixtureCount: document.fixtures.length, passed };
+  const temporary = await mkdtemp(path.join(os.tmpdir(), "verifactu-linked-worktree-"));
+  const subject = "0123456789abcdef0123456789abcdef01234567";
+  try {
+    const checkout = path.join(temporary, "checkout");
+    const common = path.join(temporary, "repository.git");
+    const worktree = path.join(common, "worktrees", "checkout");
+    await mkdir(path.join(common, "refs", "heads"), { recursive: true });
+    await mkdir(worktree, { recursive: true });
+    await mkdir(checkout, { recursive: true });
+    await writeFile(path.join(checkout, ".git"), `gitdir: ${worktree}\n`);
+    await writeFile(path.join(worktree, "commondir"), "../..\n");
+    await writeFile(path.join(worktree, "HEAD"), "ref: refs/heads/fixture\n");
+    await writeFile(path.join(common, "refs", "heads", "fixture"), `${subject}\n`);
+    assert((await resolveSubject(checkout)) === subject, "WORKTREE_SUBJECT_MISMATCH", "linked worktree SHA differs");
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+  return { fixtureCount: document.fixtures.length, passed, positiveCases: ["linked-worktree-subject"] };
 }
 
 await main("task-runner-negative-fixtures", run);

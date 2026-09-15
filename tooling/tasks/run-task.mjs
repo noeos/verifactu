@@ -116,14 +116,33 @@ export function assertFreshOutputs(inputTimes, outputTimes, taskId) {
   assert(stale.length === 0, "STALE_OUTPUT", `task ${taskId} left stale outputs: ${stale.join(", ")}`);
 }
 
-async function resolveSubject(root) {
-  const head = (await readFile(path.join(root, ".git/HEAD"), "utf8")).trim();
+async function gitDirectories(root) {
+  const dotGit = path.join(root, ".git");
+  const stat = await lstat(dotGit).catch(() => null);
+  assert(stat?.isDirectory() || stat?.isFile(), "GIT_METADATA_INVALID", ".git must be a directory or gitdir file");
+  let gitDirectory = dotGit;
+  if (stat.isFile()) {
+    const marker = (await readFile(dotGit, "utf8")).trim();
+    const match = /^gitdir: (.+)$/.exec(marker);
+    assert(match, "GIT_METADATA_INVALID", ".git file has no valid gitdir marker");
+    gitDirectory = path.resolve(root, match[1]);
+  }
+  const commonMarker = (await readFile(path.join(gitDirectory, "commondir"), "utf8").catch(() => "")).trim();
+  const commonDirectory = commonMarker === "" ? gitDirectory : path.resolve(gitDirectory, commonMarker);
+  return { gitDirectory, commonDirectory };
+}
+
+export async function resolveSubject(root) {
+  const { gitDirectory, commonDirectory } = await gitDirectories(root);
+  const head = (await readFile(path.join(gitDirectory, "HEAD"), "utf8")).trim();
   if (/^[0-9a-f]{40}$/.test(head)) return head;
   if (!head.startsWith("ref: ")) return "uncommitted";
   const reference = head.slice(5);
-  const loose = await readFile(path.join(root, ".git", reference), "utf8").catch(() => "");
+  const worktreeLoose = await readFile(path.join(gitDirectory, reference), "utf8").catch(() => "");
+  if (/^[0-9a-f]{40}\s*$/.test(worktreeLoose)) return worktreeLoose.trim();
+  const loose = await readFile(path.join(commonDirectory, reference), "utf8").catch(() => "");
   if (/^[0-9a-f]{40}\s*$/.test(loose)) return loose.trim();
-  const packed = await readFile(path.join(root, ".git/packed-refs"), "utf8").catch(() => "");
+  const packed = await readFile(path.join(commonDirectory, "packed-refs"), "utf8").catch(() => "");
   return (
     packed
       .split(/\r?\n/)

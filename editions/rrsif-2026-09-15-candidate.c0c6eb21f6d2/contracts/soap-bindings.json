@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "sourceSnapshotId": "rrsif-2026-09-15+src.c0c6eb21f6d2",
+  "wsdl": {
+    "bindings": [
+      {
+        "name": "sfVerifactu",
+        "operations": [
+          {
+            "inputUse": "literal",
+            "name": "RegFactuSistemaFacturacion",
+            "outputUse": "literal",
+            "soapAction": ""
+          },
+          {
+            "inputUse": "literal",
+            "name": "ConsultaFactuSistemaFacturacion",
+            "outputUse": "literal",
+            "soapAction": ""
+          }
+        ],
+        "soap": [
+          {
+            "style": "document",
+            "transport": "http://schemas.xmlsoap.org/soap/http"
+          }
+        ],
+        "type": {
+          "lexical": "sfWdsl:sfPortTypeVerifactu",
+          "localName": "sfPortTypeVerifactu",
+          "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+        }
+      },
+      {
+        "name": "sfRequerimiento",
+        "operations": [
+          {
+            "inputUse": "literal",
+            "name": "RegFactuSistemaFacturacion",
+            "outputUse": "literal",
+            "soapAction": ""
+          }
+        ],
+        "soap": [
+          {
+            "style": "document",
+            "transport": "http://schemas.xmlsoap.org/soap/http"
+          }
+        ],
+        "type": {
+          "lexical": "sfWdsl:sfPortTypePorRequerimiento",
+          "localName": "sfPortTypePorRequerimiento",
+          "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+        }
+      }
+    ],
+    "messages": [
+      {
+        "name": "EntradaRegFactuSistemaFacturacion",
+        "parts": [
+          {
+            "element": {
+              "lexical": "sfLR:RegFactuSistemaFacturacion",
+              "localName": "RegFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroLR.xsd"
+            },
+            "name": "RegFactuSistemaFacturacion",
+            "type": null
+          }
+        ]
+      },
+      {
+        "name": "EntradaConsultaFactuSistemaFacturacion",
+        "parts": [
+          {
+            "element": {
+              "lexical": "sfLRC:ConsultaFactuSistemaFacturacion",
+              "localName": "ConsultaFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/ConsultaLR.xsd"
+            },
+            "name": "ConsultaFactuSistemaFacturacion",
+            "type": null
+          }
+        ]
+      },
+      {
+        "name": "RespuestaRegFactuSistemaFacturacion",
+        "parts": [
+          {
+            "element": {
+              "lexical": "sfR:RespuestaRegFactuSistemaFacturacion",
+              "localName": "RespuestaRegFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/RespuestaSuministro.xsd"
+            },
+            "name": "RespuestaRegFactuSistemaFacturacion",
+            "type": null
+          }
+        ]
+      },
+      {
+        "name": "RespuestaConsultaFactuSistemaFacturacion",
+        "parts": [
+          {
+            "element": {
+              "lexical": "sfLRRC:RespuestaConsultaFactuSistemaFacturacion",
+              "localName": "RespuestaConsultaFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/RespuestaConsultaLR.xsd"
+            },
+            "name": "RespuestaConsultaFactuSistemaFacturacion",
+            "type": null
+          }
+        ]
+      }
+    ],
+    "name": null,
+    "portTypes": [
+      {
+        "name": "sfPortTypeVerifactu",
+        "operations": [
+          {
+            "input": {
+              "lexical": "sfWdsl:EntradaRegFactuSistemaFacturacion",
+              "localName": "EntradaRegFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "RegFactuSistemaFacturacion",
+            "output": {
+              "lexical": "sfWdsl:RespuestaRegFactuSistemaFacturacion",
+              "localName": "RespuestaRegFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            }
+          },
+          {
+            "input": {
+              "lexical": "sfWdsl:EntradaConsultaFactuSistemaFacturacion",
+              "localName": "EntradaConsultaFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "ConsultaFactuSistemaFacturacion",
+            "output": {
+              "lexical": "sfWdsl:RespuestaConsultaFactuSistemaFacturacion",
+              "localName": "RespuestaConsultaFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            }
+          }
+        ]
+      },
+      {
+        "name": "sfPortTypePorRequerimiento",
+        "operations": [
+          {
+            "input": {
+              "lexical": "sfWdsl:EntradaRegFactuSistemaFacturacion",
+              "localName": "EntradaRegFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "RegFactuSistemaFacturacion",
+            "output": {
+              "lexical": "sfWdsl:RespuestaRegFactuSistemaFacturacion",
+              "localName": "RespuestaRegFactuSistemaFacturacion",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            }
+          }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "sfVerifactu",
+        "ports": [
+          {
+            "address": "https://www1.agenciatributaria.gob.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfVerifactu",
+              "localName": "sfVerifactu",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaVerifactu"
+          },
+          {
+            "address": "https://www10.agenciatributaria.gob.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfVerifactu",
+              "localName": "sfVerifactu",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaVerifactuSello"
+          },
+          {
+            "address": "https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfVerifactu",
+              "localName": "sfVerifactu",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaVerifactuPruebas"
+          },
+          {
+            "address": "https://prewww10.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfVerifactu",
+              "localName": "sfVerifactu",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaVerifactuSelloPruebas"
+          }
+        ]
+      },
+      {
+        "name": "sfRequerimiento",
+        "ports": [
+          {
+            "address": "https://www1.agenciatributaria.gob.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/RequerimientoSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfRequerimiento",
+              "localName": "sfRequerimiento",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaRequerimiento"
+          },
+          {
+            "address": "https://www10.agenciatributaria.gob.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/RequerimientoSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfRequerimiento",
+              "localName": "sfRequerimiento",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaRequerimientoSello"
+          },
+          {
+            "address": "https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/RequerimientoSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfRequerimiento",
+              "localName": "sfRequerimiento",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaRequerimientoPruebas"
+          },
+          {
+            "address": "https://prewww10.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/RequerimientoSOAP",
+            "binding": {
+              "lexical": "sfWdsl:sfRequerimiento",
+              "localName": "sfRequerimiento",
+              "namespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+            },
+            "name": "SistemaRequerimientoSelloPruebas"
+          }
+        ]
+      }
+    ],
+    "sourceId": "AEAT-SISTEMA-FACTURACION-WSDL",
+    "sourceSha256": "05919120708ff7650612fa6683c9336eaf919335d9a4db10e86759190af48602",
+    "targetNamespace": "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SistemaFacturacion.wsdl"
+  }
+}

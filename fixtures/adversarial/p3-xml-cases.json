@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "doctype-xxe",
+      "path": "xml-doctype.xml",
+      "expectedCode": "XML_DOCTYPE_FORBIDDEN"
+    },
+    {
+      "id": "named-entity",
+      "path": "xml-entity.xml",
+      "expectedCode": "XML_ENTITY_FORBIDDEN"
+    },
+    {
+      "id": "xinclude",
+      "path": "xml-xinclude.xml",
+      "expectedCode": "XML_XINCLUDE_FORBIDDEN"
+    },
+    {
+      "id": "duplicate-attribute",
+      "path": "xml-duplicate-attribute.xml",
+      "expectedCode": "XML_ATTRIBUTE_DUPLICATE"
+    },
+    {
+      "id": "expanded-attribute-collision",
+      "path": "xml-namespace-confusion.xml",
+      "expectedCode": "XML_ATTRIBUTE_DUPLICATE"
+    },
+    {
+      "id": "processing-instruction",
+      "path": "xml-processing-instruction.xml",
+      "expectedCode": "XML_PROCESSING_INSTRUCTION_FORBIDDEN"
+    },
+    {
+      "id": "bare-ampersand",
+      "path": "xml-bare-ampersand.xml",
+      "expectedCode": "XML_ENTITY_MALFORMED"
+    },
+    {
+      "id": "malformed-numeric-reference",
+      "path": "xml-malformed-numeric-reference.xml",
+      "expectedCode": "XML_ENTITY_MALFORMED"
+    },
+    {
+      "id": "invalid-character-reference",
+      "path": "xml-invalid-character-reference.xml",
+      "expectedCode": "XML_CHARACTER_INVALID"
+    },
+    {
+      "id": "malformed-qname",
+      "path": "xml-malformed-qname.xml",
+      "expectedCode": "XML_NAME_INVALID"
+    },
+    {
+      "id": "reserved-namespace",
+      "path": "xml-reserved-namespace.xml",
+      "expectedCode": "XML_NAMESPACE_RESERVED"
+    },
+    {
+      "id": "cdata-terminator-in-text",
+      "path": "xml-cdata-terminator-in-text.xml",
+      "expectedCode": "XML_TEXT_MALFORMED"
+    },
+    {
+      "id": "malformed-namespace-prefix",
+      "path": "xml-malformed-namespace-prefix.xml",
+      "expectedCode": "XML_NAME_INVALID"
+    },
+    {
+      "id": "non-xml-whitespace",
+      "path": "xml-nonxml-whitespace.xml",
+      "expectedCode": "XML_NAME_INVALID"
+    }
+  ]
+}

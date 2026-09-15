@@ -5,9 +5,9 @@ status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-15
 review-by: 2026-10-12
-decisions: [ADR-0006, ADR-0009]
+decisions: [ADR-0006, ADR-0009, ADR-0054]
 requirements: [REG-0010, REG-0011]
 historical-inputs: [REV-004, REV-005, REV-006, REV-008, REV-012, REV-037, REV-039]
 ---
@@ -102,6 +102,44 @@ historical-inputs: [REV-004, REV-005, REV-006, REV-008, REV-012, REV-037, REV-03
 | `SRC-0081` | [OpenSSF OSPS Baseline](https://baseline.openssf.org/) | Versioned open-source project security-control mapping and maturity gaps; no blanket certification claim. |
 | `SRC-0082` | [CISA Known Exploited Vulnerabilities Catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | Exploitation-aware prioritization signal when applicable; not a substitute for reachability/impact analysis. |
 | `SRC-0083` | [OpenSSF Best Practices Badge](https://www.bestpractices.dev/en) | External project-practice self-assessment and badge evidence; unanswered or unmet criteria remain visible. |
+| `SRC-0084` | [Law 11/2021 original publication](https://www.boe.es/eli/es/l/2021/07/09/11/dof/spa/pdf) | Immutable enactment introducing the relevant anti-fraud mandate; retained separately from consolidated LGT text. |
+| `SRC-0085` | [AEAT reuse conditions](https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/aviso-legal/utilizacion-informacion-contenida-web-aeat.html) | Reuse permission, attribution, non-distortion and update-date obligations for portal material. |
+| `SRC-0086` | [AEAT publication/manual conditions](https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/aviso-legal/cesion-manuales-programas-ayuda.html) | Free unaltered distribution and prescribed attribution conditions for manuals. |
+| `SRC-0087` | [BOE legal notice and reuse conditions](https://www.boe.es/informacion/aviso_legal/index.php) | Reuse and official-text custody terms for BOE material. |
+| `SRC-0088` | [W3C software and document notice](https://www.w3.org/Consortium/Legal/copyright-software-19980720) | Redistribution identity for the imported XMLDSig schema. |
+
+## Executed observation on 2026-09-15
+
+The canonical plan is [`source-plan.json`](../../config/regulatory/source-plan.json).
+It retained 37 exact source observations into
+`rrsif-2026-09-15+src.c0c6eb21f6d2`; the manifest closes SHA-256, SHA-512,
+length, origin, authority, role, licence, dependencies and requirement links.
+The source-closure SHA-256 is
+`2be623953f8ac58a35b5f686bc8d144e9998c2499756e4df00fb56500b1bf49f`.
+The final network acquisition completed at `2026-09-15T13:43:41.422Z`; its
+custody file SHA-256 is
+`3797e1557223d13a0421101550d5313fca2e6b0d1c8e52b074727455a59c23e9`
+and its importer SHA-256 is
+`66792ae19d0725cdce2303c94655e683340f5142c59fb224c2a8a68a27ae7056`.
+Offline promotion produced source-manifest SHA-256
+`b70fee25ac863a41141af9f04116b3f7ad87a1d847afefae64620a0fc901d84f`
+with promoter SHA-256
+`8bff993ea07032c457d8e44501580ebc9480b7f567232a0c50f9ac4f0dfc87ec`.
+
+The AEAT portal was last modified on 2026-07-21 and its technical index on
+2026-03-26 when observed. Service specification 1.0.3 dated 2025-07-28 identifies
+the production WSDL/XSD locations. The closed technical graph contains one WSDL,
+seven AEAT XSD files and the imported W3C XMLDSig XSD. Current production
+`SuministroLR.xsd` and `EventosSIF.xsd` each differ by one byte from archived
+test-environment material in `previous-docs`; the production bytes prevail under
+ADR-0054.
+
+Seven observations remain explicit blockers: stable EUR-Lex GDPR and CRA bytes;
+substantive record-design and validation-catalogue payloads; and hash, signature
+and QR PDFs whose published host fails default TLS validation. GDPR/CRA affect
+later legal review. The five AEAT technical gaps block complete semantic coverage,
+edition approval, fiscal creation and P4 readiness. No cached historical copy,
+navigation shell or disabled TLS substitutes for those authorities.
 
 ## Record requirements
 

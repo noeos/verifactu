@@ -69,3 +69,4 @@ protected acceptance path and governance gates exist.
 | [ADR-0051](ADR-0051-complete-product-roadmap.md) | Deliver by dependency-driven increments without an MVP release. |
 | [ADR-0052](ADR-0052-assurance-independence-and-claim-language.md) | Distinguish self, tool, independent and authority evidence in every claim. |
 | [ADR-0053](ADR-0053-canonical-evidence-and-reference-graph.md) | Generate audits and references from one retained evidence graph. |
+| [ADR-0054](ADR-0054-hostile-offline-regulatory-extraction.md) | Extract only authenticated structure offline while unavailable authority keeps the edition blocked. |

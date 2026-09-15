@@ -35,8 +35,8 @@ jobs:
           cache: npm
       - name: Install the exact lock without optional or lifecycle code
         run: npm ci --ignore-scripts --omit=optional
-      - name: Prove the exact P2 regulatory and generated state
-        run: node tooling/tasks/run-task.mjs --task policy:regulatory --evidence-dir evidence/runs/regulatory
+      - name: Prove the exact P3 source and generated-contract state
+        run: node tooling/tasks/run-task.mjs --task gate:p3-contracts --evidence-dir evidence/runs/regulatory
 
   integration-conformance:
     name: Required · integration conformance

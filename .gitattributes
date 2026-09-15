@@ -11,3 +11,6 @@
 *.gz binary
 *.tgz binary
 *.wasm binary
+
+# Regulatory source custody is byte-exact. Never diff, merge or normalize it as text.
+/editions/source-snapshots/**/sources/** binary
