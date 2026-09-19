@@ -70,24 +70,24 @@ Historical detail belongs in phase records below.
 | Field                        | Initial value                                                                                                                                                                                                                              |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4. |
-| Current phase                | P1 closure candidate; P2 remains dependency-blocked until this dedicated closure PR is protected-squashed and read back. |
-| Phase status                 | P1 W1–W7 executed; evidence-complete is conditional on protected merge and final read-back of closure PR `#8`. |
-| Last evidence-complete phase | None until closure PR `#8` merges; the latest verified protected recovery point is `d9d133c1d7969f353d018618367cffc4574adaa0`. |
+| Current phase                | P1 audit-completeness correction; P2 remains dependency-blocked until corrective PR `#9` is protected-squashed and read back. |
+| Phase status                 | P1 W1–W7 and closure PR `#8` executed; completion reopened because the 76-control audit omitted nine required observation/comparison surfaces. |
+| Last evidence-complete phase | None until corrective PR `#9` merges and is read back; closure PR `#8` produced protected recovery point `e04fa9cc678264181700023c789567374cfe46c5`. |
 | Local repository             | Documentation-only governance baseline; no product source, generated regulatory contract, package or publication workflow exists. |
-| Protected `main` SHA         | `d9d133c1d7969f353d018618367cffc4574adaa0` before closure PR `#8`; one parent `8c9a462eaae32fedbdae25ef16215cbe51299d07`. |
-| GitHub effective state       | 76/76 read-only comparisons pass at `2026-09-19T18:13:03Z`; main ruleset `23705155`, tag ruleset `23705170`, no bypass, three App `15368` contexts. |
+| Protected `main` SHA         | `e04fa9cc678264181700023c789567374cfe46c5` before correction PR `#9`; tree `78b83e0d2623cb8b803c9997fdeb1246b2f2691f`, one parent `d9d133c1d7969f353d018618367cffc4574adaa0`. |
+| GitHub effective state       | Successor audit passes 85/85 at `2026-09-19T18:20:01Z`; main ruleset `23705155`, tag ruleset `23705170`, no bypass, three App `15368` contexts. |
 | Toolchain/lock               | Planned profiles are defined by the approved specifications; no implementation lock or executable toolchain evidence exists. |
 | Regulatory edition           | None active or approved for implementation. Source acquisition and edition generation belong to future phases. |
 | Verification Engine          | No implementation or admitted artifact is present. Future compatibility is a P4/P6 obligation. |
 | Public packages              | No package implementation or publication exists. Package shells and public surfaces are future P2/P6 work. |
 | External gates               | Source, legal, provider, performance, assurance and publication gates remain unobserved and must be scheduled or explicitly blocked. |
-| Immediate instruction        | Merge closure PR `#8` only after its final head passes all three contexts; then verify native squash identity/DCO/signature and automatic branch deletion before P2 intake. |
+| Immediate instruction        | Merge corrective PR `#9` only after its final head passes all three contexts; verify native squash identity/DCO/signature, branch deletion and a fresh 85-control audit before P2 intake. |
 
 ## Phase ledger
 
 | Phase | Status  | Input `main` | Closure `main` | Closure PR | Summary |
 | ----- | ------- | ------------ | -------------- | ---------- | ------- |
-| P1    | closure-candidate | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | derived by P2 intake | `#8` | W1–W7 executed; protected closure and final read-back remain. |
+| P1    | correction-candidate | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | derived by P2 intake | `#8`, correction `#9` | W1–W7/closure executed; audit completeness correction and final read-back remain. |
 | P2    | planned | P1 closure required | — | — | Executable repository, toolchain, CI, build and supply-chain foundation. |
 | P3    | planned | P2 closure required | — | — | Official sources, editions, generated contracts and independent oracles. |
 | P3-B  | planned | P1–P3 closure required | — | — | Assurance gate before the first P4 implementation commit. |
@@ -99,10 +99,10 @@ Historical detail belongs in phase records below.
 
 ## Initial working record
 
-P1 is the active closure. The repository contains planning authority and P1
+P1 is the active audit-completeness correction. The repository contains planning authority and P1
 governance controls only; no product implementation, generated edition, public
 package or release evidence is admitted. The next operational action is the
-protected squash and read-back of closure PR `#8`, followed by P2 intake from
+protected squash and read-back of corrective PR `#9`, followed by P2 intake from
 the resulting exact `main` SHA.
 
 ## Required phase-record schema
@@ -385,6 +385,43 @@ Append corrections in this form:
 - Evidence/exits invalidated:
 - Remediation and protected PR:
 ```
+
+### AMD-P1-CURRENT-001 — 2026-09-19
+
+- Statement corrected: closure PR `#8` treated a 76-control effective-state
+  audit as complete for `REPO-DOC-0021`, although it did not enumerate open
+  Code Scanning, Dependabot and secret-scanning alerts; branch inventory;
+  collaborator access; repository app-installation visibility; the exact
+  workflow run/event/path; or legacy status producers.
+- Correct value and reason: all surfaces named by the P1 audit authority must be
+  observed or explicitly classified. The successor collector adds those nine
+  comparisons and passes 85/85 for protected
+  `e04fa9cc678264181700023c789567374cfe46c5`, using closure head
+  `2b05645b2616d4f0946ba5ccab01f557bb02974b` for producer evidence.
+- Discovered by / actor: Codex requirement-by-requirement completion audit after
+  protected merge and read-back of PR `#8`.
+- Evidence locator and digest:
+  `.github/evidence/p1-effective-state-e04fa9c.json`, observed
+  `2026-09-19T18:20:01Z`, SHA-256
+  `c0b9e5a4c00ada5178157f3fde0c2166f34274aca530780c08a998539a470ebd`.
+  Code scanning is explicitly `404 no analysis found`; Dependabot and secret
+  scanning each have zero open alerts; only protected `main` exists; the sole
+  collaborator is the real owner/admin; repository installation visibility is
+  `404` unknown; the sole subject run is successful `pull_request` run
+  `35460659047` from `.github/workflows/governance.yml`; legacy statuses are
+  empty and cannot duplicate the required check producers.
+- Affected requirements, phases, releases and claims: P1-W4/W5/W7, REV-076,
+  REV-080, REV-081, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and every successor
+  phase consuming the GitHub audit.
+- Evidence/exits invalidated: the earlier 76-control report remains historical
+  evidence for its enumerated fields but is insufficient for P1 closure. PR
+  signature/DCO, negative enforcement, rulesets/settings and protected squash
+  evidence remain valid.
+- Remediation and protected PR: PR `#9` carries the expanded collector,
+  successor redacted report and this amendment. P1 becomes `evidence-complete`
+  only after its final-head contexts pass, GitHub native-squashes it, preserves
+  DCO with a valid signature, automatically deletes the branch and a fresh
+  85-control read-back passes.
 
 ## Retained execution record (non-authoritative)
 
