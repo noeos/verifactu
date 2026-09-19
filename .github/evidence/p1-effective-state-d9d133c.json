@@ -1,0 +1,836 @@
+{
+  "checks": [
+    {
+      "actual": "main",
+      "control": "repository.default_branch",
+      "expected": "main",
+      "result": "pass"
+    },
+    {
+      "actual": "public",
+      "control": "repository.visibility",
+      "expected": "public",
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "repository.has_issues",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.has_projects",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.has_wiki",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.has_discussions",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "repository.allow_squash_merge",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.allow_merge_commit",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.allow_rebase_merge",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.allow_auto_merge",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "repository.delete_branch_on_merge",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "repository.allow_update_branch",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": "PR_TITLE",
+      "control": "repository.squash_merge_commit_title",
+      "expected": "PR_TITLE",
+      "result": "pass"
+    },
+    {
+      "actual": "PR_BODY",
+      "control": "repository.squash_merge_commit_message",
+      "expected": "PR_BODY",
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "repository.web_commit_signoff_required",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": "enabled",
+      "control": "security.dependabot_security_updates",
+      "expected": "enabled",
+      "result": "pass"
+    },
+    {
+      "actual": "enabled",
+      "control": "security.secret_scanning",
+      "expected": "enabled",
+      "result": "pass"
+    },
+    {
+      "actual": "enabled",
+      "control": "security.secret_scanning_push_protection",
+      "expected": "enabled",
+      "result": "pass"
+    },
+    {
+      "actual": "disabled",
+      "control": "security.secret_scanning_validity_checks",
+      "expected": "capability-dependent; explicit",
+      "result": "pass"
+    },
+    {
+      "actual": "disabled",
+      "control": "security.secret_scanning_non_provider_patterns",
+      "expected": "capability-dependent; explicit",
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "actions.enabled",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": "selected",
+      "control": "actions.allowed_actions",
+      "expected": "selected",
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "actions.sha_pinning_required",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "actions.selected.github_owned_allowed",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "actions.selected.verified_allowed",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": [],
+      "control": "actions.selected.patterns_allowed",
+      "expected": [],
+      "result": "pass"
+    },
+    {
+      "actual": "read",
+      "control": "actions.default_workflow_permissions",
+      "expected": "read",
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "actions.can_approve_pull_request_reviews",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": "all_external_contributors",
+      "control": "actions.fork_approval",
+      "expected": "all_external_contributors",
+      "result": "pass"
+    },
+    {
+      "actual": 90,
+      "control": "actions.retention_days",
+      "expected": 90,
+      "result": "pass"
+    },
+    {
+      "actual": 422,
+      "control": "actions.external_workflow_access",
+      "expected": 422,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "security.private_vulnerability_reporting",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "security.automated_security_fixes",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": 204,
+      "control": "security.dependency_graph",
+      "expected": 204,
+      "result": "pass"
+    },
+    {
+      "actual": [
+        "immutable-release-tags",
+        "protected-main"
+      ],
+      "control": "rulesets.names",
+      "expected": [
+        "immutable-release-tags",
+        "protected-main"
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": "active",
+      "control": "rulesets.main.enforcement",
+      "expected": "active",
+      "result": "pass"
+    },
+    {
+      "actual": "branch",
+      "control": "rulesets.main.target",
+      "expected": "branch",
+      "result": "pass"
+    },
+    {
+      "actual": [],
+      "control": "rulesets.main.bypass",
+      "expected": [],
+      "result": "pass"
+    },
+    {
+      "actual": [
+        "~DEFAULT_BRANCH"
+      ],
+      "control": "rulesets.main.include",
+      "expected": [
+        "~DEFAULT_BRANCH"
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": [],
+      "control": "rulesets.main.exclude",
+      "expected": [],
+      "result": "pass"
+    },
+    {
+      "actual": "active",
+      "control": "rulesets.tags.enforcement",
+      "expected": "active",
+      "result": "pass"
+    },
+    {
+      "actual": "tag",
+      "control": "rulesets.tags.target",
+      "expected": "tag",
+      "result": "pass"
+    },
+    {
+      "actual": [],
+      "control": "rulesets.tags.bypass",
+      "expected": [],
+      "result": "pass"
+    },
+    {
+      "actual": [
+        "refs/tags/v*"
+      ],
+      "control": "rulesets.tags.include",
+      "expected": [
+        "refs/tags/v*"
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": [],
+      "control": "rulesets.tags.exclude",
+      "expected": [],
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.rule.deletion",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.rule.non_fast_forward",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.rule.required_linear_history",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.rule.required_signatures",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.rule.pull_request",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.rule.required_status_checks",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.tags.rule.deletion",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.tags.rule.non_fast_forward",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.tags.rule.required_signatures",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "rulesets.main.pull_request.required_approving_review_count",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "rulesets.main.pull_request.require_code_owner_review",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "rulesets.main.pull_request.require_last_push_approval",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.pull_request.required_review_thread_resolution",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": false,
+      "control": "rulesets.main.pull_request.require_extra_approval_for_unattributed_changes",
+      "expected": false,
+      "result": "pass"
+    },
+    {
+      "actual": [
+        "squash"
+      ],
+      "control": "rulesets.main.pull_request.allowed_merge_methods",
+      "expected": [
+        "squash"
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "rulesets.main.status.strict",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": [
+        [
+          "Required · documentation and traceability",
+          15368
+        ],
+        [
+          "Required · governance signatures and DCO",
+          15368
+        ],
+        [
+          "Required · required-check closure",
+          15368
+        ]
+      ],
+      "control": "rulesets.main.status.contexts",
+      "expected": [
+        [
+          "Required · documentation and traceability",
+          15368
+        ],
+        [
+          "Required · governance signatures and DCO",
+          15368
+        ],
+        [
+          "Required · required-check closure",
+          15368
+        ]
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": 404,
+      "control": "rulesets.classic_protection_absent",
+      "expected": 404,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/environments?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/actions/secrets?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/actions/variables?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/dependabot/secrets?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/hooks?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/keys?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/teams?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/invitations?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": 0,
+      "control": "empty.repos/noeos/verifactu/actions/runners?per_page=100",
+      "expected": 0,
+      "result": "pass"
+    },
+    {
+      "actual": [
+        [
+          "Governance",
+          "active"
+        ]
+      ],
+      "control": "workflows.exact",
+      "expected": [
+        [
+          "Governance",
+          "active"
+        ]
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": [
+        [
+          "Required · documentation and traceability",
+          15368,
+          "success"
+        ],
+        [
+          "Required · governance signatures and DCO",
+          15368,
+          "success"
+        ],
+        [
+          "Required · required-check closure",
+          15368,
+          "success"
+        ]
+      ],
+      "control": "checks.required_producers",
+      "expected": [
+        [
+          "Required · documentation and traceability",
+          15368,
+          "success"
+        ],
+        [
+          "Required · governance signatures and DCO",
+          15368,
+          "success"
+        ],
+        [
+          "Required · required-check closure",
+          15368,
+          "success"
+        ]
+      ],
+      "result": "pass"
+    },
+    {
+      "actual": true,
+      "control": "organization.two_factor_requirement_enabled",
+      "expected": true,
+      "result": "pass"
+    },
+    {
+      "actual": "read",
+      "control": "organization.default_repository_permission",
+      "expected": "read",
+      "result": "pass"
+    }
+  ],
+  "checksPassed": 76,
+  "checksTotal": 76,
+  "claim": "maintainer-authenticated read-only effective-state audit",
+  "explicitUnknownOrganizationSurfaces": [
+    {
+      "endpoint": "orgs/noeos/rulesets?per_page=100",
+      "state": "not-found",
+      "status": 404
+    },
+    {
+      "endpoint": "orgs/noeos/actions/permissions",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "endpoint": "orgs/noeos/actions/permissions/workflow",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "endpoint": "orgs/noeos/actions/permissions/artifact-and-log-retention",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "endpoint": "orgs/noeos/actions/runners?per_page=100",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "endpoint": "orgs/noeos/actions/secrets?per_page=100",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "endpoint": "orgs/noeos/actions/variables?per_page=100",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "endpoint": "orgs/noeos/hooks?per_page=100",
+      "state": "not-found",
+      "status": 404
+    }
+  ],
+  "limitations": [
+    "No response body containing secret, variable, hook, app, collaborator, or audit-log detail is retained.",
+    "Organization administrative 403/404 surfaces are explicit unknowns, not evidence of absence.",
+    "GitHub tag required-signature rules accept a lightweight tag pointing to a signed commit; annotated release-tag identity remains a later release gate.",
+    "This audit does not claim product implementation, external review, publication, or legal validation."
+  ],
+  "observations": [
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu",
+      "responseSha256": "9843e9dad1066d8d8be5f0094469ad4963f7856ad0e0b998c445c605ea4b4bfa",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/actions/permissions",
+      "responseSha256": "54bef949a70fbee875f20c8409d99b420648881899a8991880fd7cae8297b489",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/selected-actions",
+      "responseSha256": "e0d88f913a62fa1b7aa4904e725826017c7e7533ef1745e4fe47d4aad3289259",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/workflow",
+      "responseSha256": "5a5bd49dba23ca4ec10f9b87be05915e9ee35071997d432ef5d1bea805ff2d5b",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/fork-pr-contributor-approval",
+      "responseSha256": "d0fb401f225f712d52b9b761d0bef9152b7aec8f2dc51c45d11c7dc598ee66db",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/artifact-and-log-retention",
+      "responseSha256": "fd7edcc6b96b08405d49db9a863dc9b0946024e299ab84368f59b840ee170798",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/actions/permissions/access",
+      "responseSha256": "b57f4233ad8dcbe58c78ab9ed9bc2a222890d5f5c0a2eb28ce2b787201e5074c",
+      "state": "not-applicable",
+      "status": 422
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/private-vulnerability-reporting",
+      "responseSha256": "729399a7be9226eaa01281a8ecf0c86d27bdfda779e79ebc9b0594830ee5b3a8",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/automated-security-fixes",
+      "responseSha256": "422db3950f045e3b245edffefbbe0ef6071049471dbde64db1bcb2ca55ce4912",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/vulnerability-alerts",
+      "responseSha256": "0c8bd1776a3ff2c810335aa998cab1e420e6cf2ae13d2c3ea129c0ac29ea2f72",
+      "state": "verified",
+      "status": 204
+    },
+    {
+      "count": 2,
+      "endpoint": "repos/noeos/verifactu/rulesets",
+      "responseSha256": "31338e1f7c3d5995eadb7886a0139f5d46034de873068bdfaab9c5a59b2875bb",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "repos/noeos/verifactu/branches/main/protection",
+      "responseSha256": "1e3633f197d35376186219641e10902854b5de399bdd8b36c26f5733f6e81e25",
+      "state": "not-found",
+      "status": 404
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/environments?per_page=100",
+      "responseSha256": "147ce4e271d04bdc842a5edfe99236ca0022bfc12bf6a0ec567ac6f46fabe03d",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/actions/secrets?per_page=100",
+      "responseSha256": "af6e7f100e6b2e5eebdb500aeda50bff087b02ea0432960a56fe792bcf4dd862",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/actions/variables?per_page=100",
+      "responseSha256": "b9da1275d32557487dac1478f9c439db06efef03a921ce04c4a841cfe0e1e954",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/dependabot/secrets?per_page=100",
+      "responseSha256": "af6e7f100e6b2e5eebdb500aeda50bff087b02ea0432960a56fe792bcf4dd862",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/hooks?per_page=100",
+      "responseSha256": "a117288688ad59388f308b82aa30755bcd67d6461625521d70a42c11912dcc05",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/keys?per_page=100",
+      "responseSha256": "a117288688ad59388f308b82aa30755bcd67d6461625521d70a42c11912dcc05",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/teams?per_page=100",
+      "responseSha256": "a117288688ad59388f308b82aa30755bcd67d6461625521d70a42c11912dcc05",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/invitations?per_page=100",
+      "responseSha256": "a117288688ad59388f308b82aa30755bcd67d6461625521d70a42c11912dcc05",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 0,
+      "endpoint": "repos/noeos/verifactu/actions/runners?per_page=100",
+      "responseSha256": "f6a6c28195bd5676c1f47f3b7d6c9e425108371262e8f9757fc24ba96e6ff8d5",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 1,
+      "endpoint": "repos/noeos/verifactu/actions/workflows?per_page=100",
+      "responseSha256": "3396b3ffe193fe96f71e08b43b4c9d37bdca1c08105477130382d1c94524b48d",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": 3,
+      "endpoint": "repos/noeos/verifactu/commits/7aa71c87dce8d8a97b5a1a001b7f14ff576f7d77/check-runs?per_page=100",
+      "responseSha256": "8c8ca06e48ee8f742fef957b74ab055cddd2bcd5d9dc9509a3e66b1ea433b483",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos",
+      "responseSha256": "bc11b67bf1aa6e9d96d0a53e2ec4e7d4a73ec818ae99c52a5b0822d694e25dec",
+      "state": "verified",
+      "status": 200
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/rulesets?per_page=100",
+      "responseSha256": "44420564ba22088d90beb28f5adce71891f730f39f4605c0e5e35692534420df",
+      "state": "not-found",
+      "status": 404
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/actions/permissions",
+      "responseSha256": "41e3cd77b84f423818abec87ca47f31240cb35eda1139e5f326b8ff33c3d166b",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/actions/permissions/workflow",
+      "responseSha256": "076736c0f49295e73eae4a2dccd425416b8c1422c393aa8c25631969406638a7",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/actions/permissions/artifact-and-log-retention",
+      "responseSha256": "b89da964ce49758a11eabeef97d485975e9fe14d82d3a642071759bd99bca6c9",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/actions/runners?per_page=100",
+      "responseSha256": "e964a4ddaf809ec1d66b99f5e4b6da0a0761859112e5e2ea71e878d64353e5af",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/actions/secrets?per_page=100",
+      "responseSha256": "3e141511feff0f335a568ef3c645806027faee4ec7c63507be3cb73c4eef823d",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/actions/variables?per_page=100",
+      "responseSha256": "a56210364013d2e343d50aa7785b5cbafab7ad90fcf000a967906ba211244d3c",
+      "state": "inaccessible",
+      "status": 403
+    },
+    {
+      "count": null,
+      "endpoint": "orgs/noeos/hooks?per_page=100",
+      "responseSha256": "b9911a48626af6a10e7b48b83a39ba55ea1161b4a1b19e38e30967ec4be14f64",
+      "state": "not-found",
+      "status": 404
+    },
+    {
+      "count": 0,
+      "endpoint": "orgs/noeos/installations?per_page=100",
+      "responseSha256": "e2b4d251cda100230322239a3ba8ac25a9619c7c8be050cb1bc9e5c1e4ce7b5a",
+      "state": "verified",
+      "status": 200
+    }
+  ],
+  "observedAt": "2026-09-19T18:13:03Z",
+  "repository": "noeos/verifactu",
+  "requiredCheckSubject": "7aa71c87dce8d8a97b5a1a001b7f14ff576f7d77",
+  "schemaVersion": 1,
+  "status": "passed",
+  "subject": "d9d133c1d7969f353d018618367cffc4574adaa0"
+}
