@@ -94,7 +94,7 @@ def rule_map(ruleset: dict[str, Any]) -> dict[str, Any]:
     return {rule["type"]: rule.get("parameters", True) for rule in ruleset.get("rules", [])}
 
 
-def audit(subject: str) -> dict[str, Any]:
+def audit(subject: str, check_subject: str) -> dict[str, Any]:
     endpoints = [
         f"repos/{REPO}",
         f"repos/{REPO}/actions/permissions",
@@ -118,7 +118,7 @@ def audit(subject: str) -> dict[str, Any]:
         f"repos/{REPO}/invitations?per_page=100",
         f"repos/{REPO}/actions/runners?per_page=100",
         f"repos/{REPO}/actions/workflows?per_page=100",
-        f"repos/{REPO}/commits/{subject}/check-runs?per_page=100",
+        f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100",
         "orgs/noeos",
         "orgs/noeos/rulesets?per_page=100",
         "orgs/noeos/actions/permissions",
@@ -220,7 +220,7 @@ def audit(subject: str) -> dict[str, Any]:
     workflows = observed[f"repos/{REPO}/actions/workflows?per_page=100"]["body"] or {}
     workflow_rows = workflows.get("workflows", [])
     check(rows, "workflows.exact", [("Governance", "active")], sorted((item.get("name"), item.get("state")) for item in workflow_rows))
-    checks = observed[f"repos/{REPO}/commits/{subject}/check-runs?per_page=100"]["body"] or {}
+    checks = observed[f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100"]["body"] or {}
     producers = {(item.get("name"), (item.get("app") or {}).get("id"), item.get("conclusion")) for item in checks.get("check_runs", []) if item.get("name") in REQUIRED_CONTEXTS}
     check(rows, "checks.required_producers", {(name, 15368, "success") for name in REQUIRED_CONTEXTS}, producers)
 
@@ -239,6 +239,7 @@ def audit(subject: str) -> dict[str, Any]:
         "claim": "maintainer-authenticated read-only effective-state audit",
         "repository": REPO,
         "subject": subject,
+        "requiredCheckSubject": check_subject,
         "observedAt": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "status": "passed" if not failed else "failed",
         "checksPassed": len(rows) - len(failed),
@@ -270,9 +271,10 @@ def json_safe(value: Any) -> Any:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--subject", required=True)
+    parser.add_argument("--check-subject", help="PR head whose required producers are observed; defaults to subject")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    report = json_safe(audit(args.subject))
+    report = json_safe(audit(args.subject, args.check_subject or args.subject))
     encoded = json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
