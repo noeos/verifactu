@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "repository": "noeos/verifactu",
-  "observedAt": "2026-09-19T16:00:00Z",
+  "observationCompletedBefore": "2026-09-19T18:00:14Z",
   "inputMainSha": "fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0",
-  "inputMainTree": "445827818107df80bc5ae845ca3c042da71a0715",
+  "inputMainTree": "8f57a99980891ccc68701b94b94342f7ae0e02d6",
   "currentDocumentFiles": 418,
   "currentMarkdownFiles": 415,
   "currentDocumentationAggregateSha256": "a99b0dfc29e9da0d2a22f75bebbe9e782e215e74b72ee28da2ed00320eb5b3f8",

@@ -70,24 +70,24 @@ Historical detail belongs in phase records below.
 | Field                        | Initial value                                                                                                                                                                                                                              |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4. |
-| Current phase                | None; the project is before P1. |
-| Phase status                 | P1 is planned pending governed bootstrap; P2–P8 are planned and dependency-bound. |
-| Last evidence-complete phase | None in this repository baseline. |
-| Local repository             | Documentation-only baseline; no product source, generated contract, package, test or workflow implementation is admitted. |
-| Protected `main` SHA         | Not established by this handoff. The actual repository state must be inspected at P1 entry. |
-| GitHub effective state       | Not established by this handoff; effective settings and required checks must be read back during P1. |
+| Current phase                | P1 closure candidate; P2 remains dependency-blocked until this dedicated closure PR is protected-squashed and read back. |
+| Phase status                 | P1 W1–W7 executed; evidence-complete is conditional on protected merge and final read-back of closure PR `#8`. |
+| Last evidence-complete phase | None until closure PR `#8` merges; the latest verified protected recovery point is `d9d133c1d7969f353d018618367cffc4574adaa0`. |
+| Local repository             | Documentation-only governance baseline; no product source, generated regulatory contract, package or publication workflow exists. |
+| Protected `main` SHA         | `d9d133c1d7969f353d018618367cffc4574adaa0` before closure PR `#8`; one parent `8c9a462eaae32fedbdae25ef16215cbe51299d07`. |
+| GitHub effective state       | 76/76 read-only comparisons pass at `2026-09-19T18:13:03Z`; main ruleset `23705155`, tag ruleset `23705170`, no bypass, three App `15368` contexts. |
 | Toolchain/lock               | Planned profiles are defined by the approved specifications; no implementation lock or executable toolchain evidence exists. |
 | Regulatory edition           | None active or approved for implementation. Source acquisition and edition generation belong to future phases. |
 | Verification Engine          | No implementation or admitted artifact is present. Future compatibility is a P4/P6 obligation. |
 | Public packages              | No package implementation or publication exists. Package shells and public surfaces are future P2/P6 work. |
 | External gates               | Source, legal, provider, performance, assurance and publication gates remain unobserved and must be scheduled or explicitly blocked. |
-| Immediate instruction        | Start only P1 after governed bootstrap. Do not claim implementation, phase closure or evidence from this handoff. |
+| Immediate instruction        | Merge closure PR `#8` only after its final head passes all three contexts; then verify native squash identity/DCO/signature and automatic branch deletion before P2 intake. |
 
 ## Phase ledger
 
 | Phase | Status  | Input `main` | Closure `main` | Closure PR | Summary |
 | ----- | ------- | ------------ | -------------- | ---------- | ------- |
-| P1    | planned | not established | — | — | Governed bootstrap, effective protection and initial repository controls. |
+| P1    | closure-candidate | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | derived by P2 intake | `#8` | W1–W7 executed; protected closure and final read-back remain. |
 | P2    | planned | P1 closure required | — | — | Executable repository, toolchain, CI, build and supply-chain foundation. |
 | P3    | planned | P2 closure required | — | — | Official sources, editions, generated contracts and independent oracles. |
 | P3-B  | planned | P1–P3 closure required | — | — | Assurance gate before the first P4 implementation commit. |
@@ -99,10 +99,11 @@ Historical detail belongs in phase records below.
 
 ## Initial working record
 
-There is no active phase. The worktree contains planning authority only; no
-source implementation, generated edition, public package, executable campaign,
-protected closure or release evidence is admitted. The next operational action
-is the governed P1 bootstrap followed by an exact effective-state read-back.
+P1 is the active closure. The repository contains planning authority and P1
+governance controls only; no product implementation, generated edition, public
+package or release evidence is admitted. The next operational action is the
+protected squash and read-back of closure PR `#8`, followed by P2 intake from
+the resulting exact `main` SHA.
 
 ## Required phase-record schema
 
@@ -184,6 +185,190 @@ The closure `main` SHA cannot truthfully be embedded in the commit that creates
 it. The next phase derives that SHA from Git, verifies the record it contains and
 adds it to its input identity. External evidence may additionally bind the
 closure PR and resulting SHA.
+
+## Current P1 closure — governed bootstrap and effective protection
+
+### Identity and status
+
+- Status: `closure-candidate`; becomes `evidence-complete` only after protected
+  squash of PR `#8`, successful final-head contexts, GitHub-verified one-parent
+  squash/DCO read-back and automatic deletion of `docs/1-p1-closure`.
+- Started/closed (UTC): start timestamp was not retained; baseline observation
+  completed before issue `#1` at `2026-09-19T18:00:14Z`; closure is derived by
+  P2 intake. No more precise start value is guessed.
+- Input main SHA / tree: `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` /
+  `8f57a99980891ccc68701b94b94342f7ae0e02d6`.
+- Latest protected main SHA / tree before closure: `d9d133c1d7969f353d018618367cffc4574adaa0` /
+  `ffd1e3642d960475df62306d4c8f123a3bf101ec`.
+- Closure PR: `#8`, branch `docs/1-p1-closure`; its protected squash identity is
+  necessarily derived and verified after this record is committed.
+- Roadmap revision: `ROADMAP-DOC-0004` from the admitted documentation tree.
+- Documentation inventory: 418 current files, including 415 Markdown files;
+  intake aggregate SHA-256
+  `a99b0dfc29e9da0d2a22f75bebbe9e782e215e74b72ee28da2ed00320eb5b3f8`.
+  The closure-tree aggregate is derived by P2 because this record participates
+  in its own digest.
+
+### Readiness and sources
+
+- Prerequisites and evidence: issue `#1`; local and remote baseline; complete
+  current-document and 118-file archive inventory; signer fingerprint
+  `SHA256:65VbGskWghAQAXDbJ3/1hrWuYegZNLs/+S96BbNQCzI`; local SSH sign/verify;
+  GitHub user/repository/settings/history/API observations.
+- Re-observed mutable sources: repository and organization REST surfaces,
+  Actions checkout release `v7.0.1` at full SHA
+  `3d3c42e5aac5ba805825da76410c181273ba90b1`, npm registry, Verification
+  Engine repository/package, and the private empty-default-branch Facturacion
+  repository boundary.
+- Assumptions resolved/falsified: `main` initially contained only `LICENSE`;
+  all approved documentation was untracked; the prior closure records below are
+  retained non-authoritative history; GitHub tag signature enforcement accepts
+  a lightweight tag pointing at a signed commit and therefore does not prove an
+  annotated signed release tag.
+- Initial risks/blockers: no P1 blocker remains. Eight organization administrative
+  surfaces return `403`/`404` without `admin:org` and remain explicit unknowns,
+  not empty-state claims. They do not contradict the repository-level no-bypass
+  read-back. Bus factor remains one.
+
+### Work packages and protected history
+
+| Work ID | Issue | Branch / PR | branch commit or probe | protected squash / result |
+|---|---|---|---|---|
+| P1-W1–W5 bootstrap | `#1` | `docs/1-p1-governed-bootstrap` / `#2` | `75d10ff61a2aa3881534cf8badf41af6cf522ce2`, admitted SSH signer and DCO | one-time bootstrap exception landed the same exact green PR head directly as `75d10ff`; not accepted as protected-flow proof |
+| P1-W6 unsigned | `#1` | `probe/1-unsigned-commit` / `#3` | `538a66509f5f8488cc3bec6cb4e1138b96eda69e`, DCO present, signature absent | blocked; run `35460024650`; closed and branch deleted |
+| P1-W6 missing DCO | `#1` | `probe/1-missing-dco` / `#4` | `5c5ad2a3c1188cacd995757f9408d2d5b0a98227`, admitted SSH signer, DCO absent | blocked; run `35460026407`; closed and branch deleted |
+| P1-W2/W6 wrong signer | `#1` | `probe/1-unadmitted-signer` / `#5` | `89a4af5d7268683b8a70d1c309f3ddf5263d9c6c`, disposable unadmitted key and DCO | blocked; run `35460027565`; private fixture key destroyed, PR closed and branch deleted |
+| P1-W6 positive flow | `#1` | `ci/1-p1-effective-state-audit` / `#6` | `4d9c718e46e713c638799f2842816cdba1ef256e`, admitted SSH signer and DCO | `8c9a462eaae32fedbdae25ef16215cbe51299d07`; GitHub-verified one-parent squash, canonical DCO, branch deleted |
+| P1-W6 audit correction | `#1` | `fix/1-p1-audit-main-subject` / `#7` | `7aa71c87dce8d8a97b5a1a001b7f14ff576f7d77`, admitted SSH signer and DCO | `d9d133c1d7969f353d018618367cffc4574adaa0`; GitHub-verified one-parent squash, canonical DCO, branch deleted |
+| P1-W7 closure | `#1` | `docs/1-p1-closure` / `#8` | this signed+DCO closure range | derived by P2 intake after protected merge/read-back |
+
+### Implemented state
+
+- Components and behavior: dependency-free current-document/link/ID/archive/root
+  validator; trailer-aware whole-range SSH/DCO verifier; allowed-signers policy;
+  read-only Link-pagination-aware redacted GitHub auditor; always-run three-job
+  closure; governed PR/work-item templates and root community documents.
+- Paths created or changed: `.github/{ISSUE_TEMPLATE,PULL_REQUEST_TEMPLATE.md,
+  policy,scripts,workflows,evidence}`, root community/configuration files,
+  complete `docs/`, and this handoff. No product directory exists.
+- Public API/CLI/events/diagnostics: none; P1 scripts emit versioned JSON only.
+- Schemas/formats/editions/generated output: governance schemas and retained
+  historical archive only; no product schema or regulatory edition.
+- Persistence/migrations/compatibility: none.
+- Toolchain/dependencies/Actions: Python standard library, Git, OpenSSH, `gh`,
+  and GitHub-owned checkout pinned at the admitted full SHA; no package install.
+- GitHub effective state: repository public/default `main`; squash only; branch
+  auto-delete; Actions selected/GitHub-owned plus full-SHA enforcement; read-only
+  default token; all external contributors require workflow approval; 90-day
+  retention; dependency graph, Dependabot security updates, secret scanning,
+  push protection and private vulnerability reporting enabled. Validity checks
+  and non-provider scanning read back disabled and remain explicit capability
+  states. No environment, repository/Dependabot secret, variable, hook, deploy
+  key, team, pending invitation or self-hosted runner was observed.
+- Rulesets: main `23705155`; tag `23705170`; both active with empty bypass lists
+  and `current_user_can_bypass=never`. Main has zero approvals, no CODEOWNERS,
+  last-push or unattributed-change approval, squash-only PRs, conversation
+  resolution, linear/signed history, strict App `15368` checks and no delete/
+  force push. `v*` refs require signed subjects and cannot update/delete, with
+  the lightweight-tag limitation above retained for the later release gate.
+
+### Verification and evidence
+
+| Claim | Test/oracle | Subject | Result | Evidence locator |
+|---|---|---|---|---|
+| Documentation/archive/root policy | local and CI repository validator plus negative self-tests | PR heads `75d10ff`, `4d9c718`, `7aa71c8` and closure head | pass | PR runs `35459828051`, `35460317571`, `35460420961`; archive aggregate `0bdda50cfbccca9fe17c65c5ba5dd0d532374292c21a8cb7471930c5418a231e` |
+| Signature and DCO positive | local allowed-signers verification and exact PR ranges | `75d10ff`, `4d9c718`, `7aa71c8` | pass | same runs; GitHub App `15368` |
+| Unsigned / missing DCO / wrong signer | live disposable PRs | PRs `#3`, `#4`, `#5` | rejected; closure also failed | runs `35460024650`, `35460026407`, `35460027565` |
+| Direct protected update | fresh signed+DCO commit `5eef39c54245abf8f4964424d9c5aa543728a1f6` | `main` | rejected `GH013`: PR plus 3/3 checks required | terminal output retained in this execution record |
+| Force update | push initial `fa2998d` over protected `main` | `main` | rejected `GH013`: force push, PR and checks | terminal output retained in this execution record |
+| Delete default branch | Git delete push | `main` | rejected by GitHub default-branch protection | terminal output retained in this execution record |
+| Protected PR/squash/delete | native squash and API read-back | PRs `#6`, `#7` | pass | squashes `8c9a462`, `d9d133c`; both valid, one-parent, DCO-preserving; source refs `404` |
+| Effective settings/rules/producers | 76 exact authenticated read-only comparisons | protected `d9d133c`; check head `7aa71c8` | 76/76 pass | `.github/evidence/p1-effective-state-d9d133c.json`; SHA-256 `b3627f881996bfc048ddd4630b30050f73777c32683f602b7d1e31bc76dc79af` |
+
+- Coverage/mutation/fuzz: not applicable to absent product; policy checkers have
+  deterministic positive and named negative cases.
+- Security/privacy/supply chain: no private key, token, live certificate or
+  fiscal/personal fixture is retained. The wrong-signing-key fixture was created
+  in a private temporary directory and destroyed after commit-object creation.
+- Performance/reliability/recovery: five-minute bounded P1 jobs; product claims
+  are not made. Recovery is forward-only through signed+DCO protected PRs.
+- Package/tarball/integration: no VeriFactu package exists. Registry returned
+  `404` for all three planned names; this workstation is not npm-authenticated.
+  `@noeos/verification-engine` public latest is `1.0.1`; admission belongs to P2.
+- Legal/regulatory/external independence: owner/self and tool evidence only; no
+  legal, CRA, AEAT, provider or independent-assessment result is claimed.
+
+### Failures, corrections and review
+
+- First failures retained: invalid initial API shapes for public Advanced
+  Security and Actions booleans; initial main ruleset defaulted unattributed
+  approval to true and allowed all merge methods; the first direct probe reused
+  the already-green PR `#2` head and landed as the authorized bootstrap rather
+  than proving rejection; the first audit used the wrong workflows endpoint;
+  a lightweight signed-commit tag was creatable; and a first hand-written
+  baseline tree identity was caught as wrong before closure.
+- Root causes and affected variants: API capability/encoding assumptions;
+  omitted non-permissive rule parameters; an invalid negative-test subject;
+  endpoint path error; GitHub's tag signature semantics; and manual identity
+  transcription. No failed proof was promoted to pass.
+- Corrections/regressions: requests were reshaped and read back; main parameters
+  were explicitly set to false/squash; a fresh direct commit failed; the auditor
+  now uses `/actions/workflows`, follows `Link`, and separates protected/check
+  subjects; the tag limitation is explicit; Git-derived tree identity replaces
+  the erroneous value.
+- Temporary tag relaxation: the accidental disposable
+  `v0.0.0-p1-unsigned-probe` became undeletable. Ruleset history version
+  `50260095` records the exact-ref exclusion starting
+  `2026-09-19T18:06:05.020Z`; the tag was deleted; version `50260097` records
+  restoration with an empty exclusion list at `2026-09-19T18:06:07.236Z`.
+  Enforcement remained active, bypass actors remained empty, final read-back and
+  the committed audit confirm no relaxation remains.
+- Invalidated evidence rerun: all three contexts reran on PRs `#6` and `#7`;
+  final effective state passed 76/76 against `d9d133c`.
+- Review: project-owner lifecycle acceptance only; no independent human review,
+  fake reviewer, CODEOWNERS or approval is claimed.
+
+### Traceability and residual state
+
+- Closed on successful closure read-back: P1-W1 through P1-W7; GOV-001–GOV-012
+  operational P1 scope; ADR-0003/0004/0005/0031/0032/0033; REPO-DOC-0010–0017,
+  REPO-DOC-0020–0022 P1 scope.
+- Historical findings: REV-073 and REV-075–081 are implemented for current P1
+  scope. REV-078's release authorization semantics and REV-079's durable
+  long-term dossier remain mapped to later phases rather than overstated here.
+- Findings/risks: eight organization administrative surfaces are inaccessible;
+  bus factor one; GitHub tag rules do not establish annotated-tag identity;
+  validity checks/non-provider scanning are disabled; none is hidden as passing.
+- Exceptions: the one-time bootstrap ended when the fresh direct update was
+  rejected. The 2.216-second exact-tag exclusion above is closed and removed.
+- Remaining scope: every product, package, edition, full 17-context P2 CI,
+  supply-chain, external validation and release capability remains unimplemented.
+- Deviations: PR `#2` was not a native squash; it is the recorded bootstrap
+  exception. PRs `#6`, `#7` and closure `#8` provide the protected path proof.
+
+### Recovery and next phase
+
+- Recovery point: protected `d9d133c1d7969f353d018618367cffc4574adaa0`
+  before closure; any correction uses a new SSH-signed+DCO PR and native squash.
+- Exit evaluation: all P1 work packages and negative/positive paths pass subject
+  to closure PR `#8` itself. No product source, CODEOWNERS, approval fiction,
+  bypass actor, persistent secret, environment or temporary relaxation remains.
+- Next phase: P2 only after deriving PR `#8` squash/tree, checking its GitHub
+  verification, canonical DCO, one parent, exact three final-head successes,
+  source-ref `404`, clean local `main`, and a fresh 76-control audit.
+- P2 first observations: fetch/prune; inspect clean tree/history; rerun repository
+  and commit-policy self-tests; audit GitHub; then admit the exact toolchain,
+  semantic tree/task graph and all 17 producers before requiring them.
+- Priority reread: roadmap/handoff/P2 prompt, complete `05-architecture`,
+  `13-repository-ci`, `14-supply-chain-build`, applicable quality/security/
+  assurance documents, ADRs and mapped REV findings.
+- Long-lead items: legal/fiscal and CRA reviews not obtained; AEAT certificate,
+  authorization and portal access not observed; three npm names return public
+  `404` and ownership/OIDC/recovery are unverified; Verification Engine `1.0.1`
+  is discoverable but not admitted; private `noeos/facturacion` has no default
+  branch and remains a future product; no stable performance runner, production
+  signer/certificate provider, account/key recovery drill or independent
+  assessment exists. Each retains its roadmap gate.
 
 ## Amendments
 
