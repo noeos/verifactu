@@ -106,8 +106,12 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
         f"repos/{REPO}/private-vulnerability-reporting",
         f"repos/{REPO}/automated-security-fixes",
         f"repos/{REPO}/vulnerability-alerts",
+        f"repos/{REPO}/code-scanning/alerts?state=open&per_page=100",
+        f"repos/{REPO}/dependabot/alerts?state=open&per_page=100",
+        f"repos/{REPO}/secret-scanning/alerts?state=open&per_page=100",
         f"repos/{REPO}/rulesets",
         f"repos/{REPO}/branches/main/protection",
+        f"repos/{REPO}/branches?per_page=100",
         f"repos/{REPO}/environments?per_page=100",
         f"repos/{REPO}/actions/secrets?per_page=100",
         f"repos/{REPO}/actions/variables?per_page=100",
@@ -117,8 +121,12 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
         f"repos/{REPO}/teams?per_page=100",
         f"repos/{REPO}/invitations?per_page=100",
         f"repos/{REPO}/actions/runners?per_page=100",
+        f"repos/{REPO}/collaborators?affiliation=all&per_page=100",
+        f"repos/{REPO}/installations?per_page=100",
         f"repos/{REPO}/actions/workflows?per_page=100",
+        f"repos/{REPO}/actions/runs?head_sha={check_subject}&per_page=100",
         f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100",
+        f"repos/{REPO}/commits/{check_subject}/status",
         "orgs/noeos",
         "orgs/noeos/rulesets?per_page=100",
         "orgs/noeos/actions/permissions",
@@ -172,6 +180,9 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
     ):
         check(rows, key, True, (observed[endpoint]["body"] or {}).get("enabled"))
     check(rows, "security.dependency_graph", 204, observed[f"repos/{REPO}/vulnerability-alerts"]["status"])
+    check(rows, "security.code_scanning_not_configured", 404, observed[f"repos/{REPO}/code-scanning/alerts?state=open&per_page=100"]["status"])
+    check(rows, "security.dependabot_open_alerts", 0, observed[f"repos/{REPO}/dependabot/alerts?state=open&per_page=100"]["count"])
+    check(rows, "security.secret_scanning_open_alerts", 0, observed[f"repos/{REPO}/secret-scanning/alerts?state=open&per_page=100"]["count"])
 
     rulesets = observed[f"repos/{REPO}/rulesets"]["body"] or []
     by_name = {item.get("name"): api(f"repos/{REPO}/rulesets/{item['id']}")["body"] for item in rulesets}
@@ -205,6 +216,9 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
     contexts = {(item.get("context"), item.get("integration_id")) for item in status.get("required_status_checks", [])}
     check(rows, "rulesets.main.status.contexts", {(name, 15368) for name in REQUIRED_CONTEXTS}, contexts)
     check(rows, "rulesets.classic_protection_absent", 404, observed[f"repos/{REPO}/branches/main/protection"]["status"])
+    branches = observed[f"repos/{REPO}/branches?per_page=100"]["body"] or []
+    check(rows, "branches.exact", ["main"], sorted(item.get("name") for item in branches))
+    check(rows, "branches.main.ruleset_protected", True, next((item.get("protected") for item in branches if item.get("name") == "main"), None))
 
     for endpoint in (
         f"repos/{REPO}/environments?per_page=100", f"repos/{REPO}/actions/secrets?per_page=100",
@@ -223,6 +237,18 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
     checks = observed[f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100"]["body"] or {}
     producers = {(item.get("name"), (item.get("app") or {}).get("id"), item.get("conclusion")) for item in checks.get("check_runs", []) if item.get("name") in REQUIRED_CONTEXTS}
     check(rows, "checks.required_producers", {(name, 15368, "success") for name in REQUIRED_CONTEXTS}, producers)
+    runs = observed[f"repos/{REPO}/actions/runs?head_sha={check_subject}&per_page=100"]["body"] or {}
+    run_rows = runs.get("workflow_runs", [])
+    run_identity = {(item.get("head_sha"), item.get("event"), item.get("path"), item.get("conclusion")) for item in run_rows}
+    check(rows, "checks.sole_workflow_run", {(check_subject, "pull_request", ".github/workflows/governance.yml", "success")}, run_identity)
+    combined = observed[f"repos/{REPO}/commits/{check_subject}/status"]["body"] or {}
+    check(rows, "checks.legacy_status_producers", 0, combined.get("total_count"))
+
+    collaborators = observed[f"repos/{REPO}/collaborators?affiliation=all&per_page=100"]["body"] or []
+    collaborator_roles = sorted((item.get("login"), item.get("role_name")) for item in collaborators)
+    check(rows, "access.collaborators", [("ddavid07", "admin")], collaborator_roles)
+    repo_installations = observed[f"repos/{REPO}/installations?per_page=100"]
+    rows.append({"control": "access.repository_installations_visibility", "expected": "explicit inaccessible/not-found", "actual": {"state": repo_installations["state"], "status": repo_installations["status"]}, "result": "pass" if repo_installations["state"] in {"inaccessible", "not-found"} else "fail"})
 
     org = observed["orgs/noeos"]["body"] or {}
     check(rows, "organization.two_factor_requirement_enabled", True, org.get("two_factor_requirement_enabled"))
@@ -231,6 +257,8 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
     for endpoint in endpoints:
         if endpoint.startswith("orgs/noeos/") and observed[endpoint]["state"] in {"inaccessible", "not-found"}:
             unknowns.append({"endpoint": endpoint, "state": observed[endpoint]["state"], "status": observed[endpoint]["status"]})
+    if repo_installations["state"] in {"inaccessible", "not-found"}:
+        unknowns.append({"endpoint": repo_installations["endpoint"], "state": repo_installations["state"], "status": repo_installations["status"]})
 
     public_observations = [{key: value for key, value in item.items() if key != "body"} for item in observed.values()]
     failed = [row for row in rows if row["result"] != "pass"]
