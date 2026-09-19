@@ -1,0 +1,69 @@
+name: Governance
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+concurrency:
+  group: governance-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+  cancel-in-progress: true
+
+jobs:
+  signatures:
+    name: Required · governance signatures and DCO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact pull-request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify commit range, SSH signatures, and DCO
+        env:
+          P1_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          P1_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: python3 .github/scripts/verify_commits.py --self-test
+
+  documentation:
+    name: Required · documentation and traceability
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact pull-request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate governed repository and documentation
+        shell: bash
+        run: python3 .github/scripts/validate_repository.py --self-test
+
+  closure:
+    name: Required · required-check closure
+    if: ${{ always() }}
+    needs:
+      - signatures
+      - documentation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Require every leaf check to succeed
+        env:
+          SIGNATURES_RESULT: ${{ needs.signatures.result }}
+          DOCUMENTATION_RESULT: ${{ needs.documentation.result }}
+        shell: bash
+        run: |
+          test "$SIGNATURES_RESULT" = success
+          test "$DOCUMENTATION_RESULT" = success

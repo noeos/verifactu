@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "repository": "noeos/verifactu",
+  "defaultBranch": "main",
+  "visibility": "public",
+  "features": {
+    "issues": true,
+    "wiki": false,
+    "projects": false,
+    "discussions": false
+  },
+  "merge": {
+    "squash": true,
+    "mergeCommit": false,
+    "rebase": false,
+    "autoMerge": false,
+    "deleteBranchOnMerge": true
+  },
+  "actions": {
+    "enabled": true,
+    "allowedActions": "selected",
+    "githubOwnedAllowed": true,
+    "verifiedCreatorAllowed": false,
+    "patternsAllowed": ["actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"],
+    "shaPinningRequired": true,
+    "defaultWorkflowPermissions": "read",
+    "canApprovePullRequestReviews": false,
+    "forkApprovalPolicy": "all_external_contributors",
+    "retentionDays": 90
+  },
+  "requiredContexts": [
+    "Required · governance signatures and DCO",
+    "Required · documentation and traceability",
+    "Required · required-check closure"
+  ],
+  "mainRuleset": {
+    "name": "protected-main",
+    "enforcement": "active",
+    "bypassActors": [],
+    "target": "branch",
+    "include": ["~DEFAULT_BRANCH"],
+    "exclude": [],
+    "requiredApprovals": 0,
+    "requireCodeOwnerReview": false,
+    "requireLastPushApproval": false,
+    "requiredReviewThreadResolution": true,
+    "requiredSignatures": true,
+    "requiredLinearHistory": true,
+    "requiredPullRequest": true,
+    "requiredChecksStrict": true,
+    "allowForcePush": false,
+    "allowDeletion": false
+  },
+  "tagRuleset": {
+    "name": "immutable-release-tags",
+    "enforcement": "active",
+    "bypassActors": [],
+    "target": "tag",
+    "include": ["refs/tags/v*"],
+    "exclude": [],
+    "requiredSignatures": true,
+    "allowForcePush": false,
+    "allowDeletion": false
+  },
+  "forbidden": {
+    "codeowners": true,
+    "productSourceBeforeP1Exit": true,
+    "persistentRepositorySecrets": true,
+    "environmentsBeforeReleaseDesign": true,
+    "classicBranchProtection": true
+  }
+}

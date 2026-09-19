@@ -1,0 +1,1845 @@
+---
+id: ROADMAP-DOC-0017
+title: Implementation phase handoff
+status: approved
+authority: normative
+owner: project-owner
+created: 2026-09-13
+last-reviewed: 2026-09-19
+dependencies: [ROADMAP-DOC-0004, ROADMAP-DOC-0005, ROADMAP-DOC-0007, ROADMAP-DOC-0013]
+decisions: [ADR-0026, ADR-0031, ADR-0051, ADR-0053]
+historical-inputs: [REV-063, REV-074, REV-079, REV-080, REV-084]
+---
+
+# Implementation phase handoff
+
+## Purpose
+
+This file is the bounded, human-reviewable handoff between implementation phases.
+It records what is demonstrably true, what changed, what remains and how the next
+Codex context must resume. It never replaces inspection of Git, GitHub, package
+registries, official sources or retained evidence.
+
+The execution authority is
+[`implementation-roadmap.md`](implementation-roadmap.md). A handoff cannot waive
+its scope or gates. False, ambiguous, stale or secret-bearing entries are defects.
+
+## Initial baseline control — mandatory reading
+
+The retained prior-attempt lessons are available in
+[`previous-docs`](../previous-docs/). They inform requirements, risks, tests and
+future gates, but they do not establish a current phase, implementation state or
+release evidence. The current repository baseline is documentation-only.
+
+No P1 work has started. P1 may begin only after the approved documentation is
+committed through the governed bootstrap and the effective protected repository
+state is inspected. P2 and every later phase remain downstream of their exact
+prerequisites. The mandatory [`P3-B`](p3b-pre-p4-assurance.md) gate remains a
+future readiness control between P3 and P4; it is not evidence that P1–P3 have
+run.
+
+Any discrepancy between this initial baseline and the actual worktree, protected
+GitHub state, package registries, official sources or external authorities must
+be recorded before implementation proceeds. Missing, partial, stale, skipped or
+unknown evidence is `blocked`, never `passed`.
+
+## Mandatory operating rules
+
+1. At phase entry, compare this snapshot with the actual worktree, protected
+   `main`, remote settings, workflow state, packages and external inputs.
+2. If they differ, preserve this statement, add an amendment, assess impact and
+   correct the snapshot before implementation.
+3. Update the working record throughout a phase, but merge its final record in a
+   dedicated protected closure PR after all implementation PRs.
+4. Record exact IDs, SHAs, URLs, digests, versions, environments and timestamps.
+   Use `not-observed` or `blocked`, never guessed values.
+5. Link large/raw evidence by immutable locator and digest. Do not paste logs.
+6. Never record credentials, secret values, private keys, taxpayer/customer data,
+   private review material or unredacted payloads.
+7. A correction is an append-only amendment naming the old statement, reason,
+   actor, time, evidence and invalidated decisions. Do not silently rewrite a
+   closed phase record.
+8. Status is one of `planned`, `ready`, `active`, `blocked` or
+   `evidence-complete`. Only protected closure can establish the last state.
+
+## Current context capsule
+
+This capsule is intentionally short and MUST be refreshed by the active phase.
+Historical detail belongs in phase records below.
+
+| Field                        | Initial value                                                                                                                                                                                                                              |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4. |
+| Current phase                | None; the project is before P1. |
+| Phase status                 | P1 is planned pending governed bootstrap; P2–P8 are planned and dependency-bound. |
+| Last evidence-complete phase | None in this repository baseline. |
+| Local repository             | Documentation-only baseline; no product source, generated contract, package, test or workflow implementation is admitted. |
+| Protected `main` SHA         | Not established by this handoff. The actual repository state must be inspected at P1 entry. |
+| GitHub effective state       | Not established by this handoff; effective settings and required checks must be read back during P1. |
+| Toolchain/lock               | Planned profiles are defined by the approved specifications; no implementation lock or executable toolchain evidence exists. |
+| Regulatory edition           | None active or approved for implementation. Source acquisition and edition generation belong to future phases. |
+| Verification Engine          | No implementation or admitted artifact is present. Future compatibility is a P4/P6 obligation. |
+| Public packages              | No package implementation or publication exists. Package shells and public surfaces are future P2/P6 work. |
+| External gates               | Source, legal, provider, performance, assurance and publication gates remain unobserved and must be scheduled or explicitly blocked. |
+| Immediate instruction        | Start only P1 after governed bootstrap. Do not claim implementation, phase closure or evidence from this handoff. |
+
+## Phase ledger
+
+| Phase | Status  | Input `main` | Closure `main` | Closure PR | Summary |
+| ----- | ------- | ------------ | -------------- | ---------- | ------- |
+| P1    | planned | not established | — | — | Governed bootstrap, effective protection and initial repository controls. |
+| P2    | planned | P1 closure required | — | — | Executable repository, toolchain, CI, build and supply-chain foundation. |
+| P3    | planned | P2 closure required | — | — | Official sources, editions, generated contracts and independent oracles. |
+| P3-B  | planned | P1–P3 closure required | — | — | Assurance gate before the first P4 implementation commit. |
+| P4    | planned | P3-B closure required | — | — | Deterministic fiscal core and verification boundaries. |
+| P5    | planned | P4 closure required | — | — | Persistence, atomicity, AEAT protocol boundaries and recovery. |
+| P6    | planned | P5 closure required | — | — | Public products and ecosystem conformance. |
+| P7    | planned | P6 closure required | — | — | Whole-product assurance, external validation and release rehearsal. |
+| P8    | planned | P7 closure required | — | — | Stable publication, verification and support. |
+
+## Initial working record
+
+There is no active phase. The worktree contains planning authority only; no
+source implementation, generated edition, public package, executable campaign,
+protected closure or release evidence is admitted. The next operational action
+is the governed P1 bootstrap followed by an exact effective-state read-back.
+
+## Required phase-record schema
+
+Each closed phase appends one section using every heading below. A field with no
+event says `none` and why; headings are never deleted.
+
+```markdown
+## Pn closure — <phase title>
+
+### Identity and status
+
+- Status:
+- Started/closed (UTC):
+- Input main SHA / tree:
+- Closure main SHA / tree: derived by next-phase intake
+- Closure PR:
+- Roadmap revision:
+- Documentation inventory digest:
+
+### Readiness and sources
+
+- Prerequisites and their evidence:
+- Re-observed mutable sources/dependencies:
+- Assumptions resolved/falsified:
+- Initial risks/blockers:
+
+### Work packages and protected history
+
+| Work ID | Issue | Branch | PR | branch commits/signers/DCO | squash SHA | result |
+
+### Implemented state
+
+- Components and behavior:
+- Paths/files created, changed or removed:
+- Public API/CLI/events/diagnostics:
+- Schemas/formats/editions/generated output:
+- Persistence/migrations/compatibility:
+- Toolchain/dependencies/Actions:
+- GitHub/npm/external effective state:
+
+### Verification and evidence
+
+| Claim/requirement | test/oracle | canonical task/job | subject/environment | result | evidence locator/digest |
+
+- Coverage/mutation/fuzz results and justified scope:
+- Security/privacy/supply-chain results:
+- Performance/reliability/recovery results:
+- Package/tarball/integration matrix results:
+- Legal/regulatory/external observations and independence class:
+
+### Failures, corrections and review
+
+- First failures retained:
+- Root causes and affected variants:
+- Corrections/regressions:
+- Invalidated evidence rerun:
+- Review conversations and dispositions:
+
+### Traceability and residual state
+
+- Requirements/ADRs/controls closed:
+- REV findings disposed:
+- Current findings:
+- Risks/exceptions/open questions:
+- Explicit remaining committed scope:
+- Deviations from roadmap and authority:
+
+### Recovery and next phase
+
+- Recovery/revert point and verified procedure:
+- Exit-criteria evaluation:
+- Next phase and exact prerequisites:
+- Exact first commands/observations:
+- Priority documents to reread:
+- Long-lead items carried forward:
+```
+
+The closure `main` SHA cannot truthfully be embedded in the commit that creates
+it. The next phase derives that SHA from Git, verifies the record it contains and
+adds it to its input identity. External evidence may additionally bind the
+closure PR and resulting SHA.
+
+## Amendments
+
+Append corrections in this form:
+
+```markdown
+### AMD-<phase>-<sequence> — <UTC date>
+
+- Statement corrected:
+- Correct value and reason:
+- Discovered by / actor:
+- Evidence locator and digest:
+- Affected requirements, phases, releases and claims:
+- Evidence/exits invalidated:
+- Remediation and protected PR:
+```
+
+## Retained execution record (non-authoritative)
+
+The material below is retained in full so that no execution detail, correction,
+failure, evidence locator or lesson from the prior attempt is lost. It is not the
+current phase ledger, does not establish an implementation baseline and cannot
+authorize resumption. The initial baseline above is the only current status;
+future closures must create new exact-subject records under the approved roadmap.
+
+## Phase closure records
+
+## P1 closure — governed bootstrap and effective protection
+
+### Identity and status
+
+- Status: `evidence-complete` upon protected merge of PR `#5`.
+- Started/closed (UTC): `2026-09-13T11:14:42Z` / protected merge time of PR
+  `#5`, to be derived by P2 intake.
+- Input main SHA / tree: no remote commit / empty repository.
+- Closure main SHA / tree: derived by P2 intake; self-reference from this commit
+  is impossible and is not guessed.
+- Closure PR: `#5`, branch `docs/p1-closure`.
+- Roadmap revision: `ROADMAP-DOC-0004`; content baseline at
+  `57a062c7d907287eb25461bea560f42d9dd8b87c`.
+- Documentation inventory digest: pre-handoff approved candidate, 411 current
+  Markdown files, SHA-256
+  `52cb771f27f2abe36498ec55735529f47dd64f6314c46f934a4e12d0942c253e`;
+  P2 derives the final closure-tree inventory.
+
+### Readiness and sources
+
+- Prerequisites and their evidence: empty-history/local/remote/GitHub intake;
+  owner identity; usable SSH signer; documentation and archive inventory; issue
+  `#1`; all recorded in the initial signed bootstrap.
+- Re-observed mutable sources/dependencies: GitHub REST effective state,
+  `actions/checkout` official `v7.0.1` tag and Verification Engine governance
+  reference. Checkout resolved to full SHA
+  `3d3c42e5aac5ba805825da76410c181273ba90b1`.
+- Assumptions resolved/falsified: the remote was empty; GitHub selected the
+  first-pushed branch as default and was explicitly corrected to `main`; web DCO
+  is organization-enforced; installed `gh` lacks `--slurp`; new-branch push
+  events use a zero `before` SHA.
+- Initial risks/blockers: protection deadlock and fictional reviewers were
+  avoided by observing producers before enforcement and setting zero approvals,
+  no CODEOWNERS and no bypass. No P1 blocker remains.
+
+### Work packages and protected history
+
+| Work ID           | Issue | Branch                       | PR                  | branch commits/signers/DCO                                                                                                                           | squash SHA                                             | result                  |
+| ----------------- | ----- | ---------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------------------- |
+| P1-W1–W5          | `#1`  | `docs/governance-foundation` | bootstrap plus `#2` | `c40f5d6e4e2dc8debe0b365790f9a112d27af663`, `6b61669e2c487b2b449ef97cb8fb40785a92f60d`; admitted SSH signer and matching DCO                         | `57a062c7d907287eb25461bea560f42d9dd8b87c` for PR `#2` | pass                    |
+| P1-W6 unsigned    | `#1`  | `probe/unsigned-commit`      | `#3`, closed        | `b2d8158d303a15c9060680d9a8650d2b39db7f76`; deliberately unsigned, DCO present                                                                       | none                                                   | rejected as intended    |
+| P1-W6 missing DCO | `#1`  | `probe/missing-dco`          | `#4`, closed        | `d79ae2b4a1d47b15f1307651c05ee088da056327`; admitted SSH signer, deliberately no DCO                                                                 | none                                                   | rejected as intended    |
+| P1-W6/W7          | `#1`  | `docs/p1-closure`            | `#5`                | `bb897f7073f9b58eec44357780be26c3a72f1327`, `349692ed721eeb40e523a25ea799c706c8aa3689` and this handoff commit; admitted SSH signer and matching DCO | derived by P2 intake                                   | final closure candidate |
+
+### Implemented state
+
+- Components and behavior: dependency-free documentation/governance validator,
+  trailer-aware whole-range SSH/DCO validator, read-only paginated/redacted
+  GitHub auditor and an always-closed three-context workflow.
+- Paths/files created, changed or removed: `.github/policy/*`,
+  `.github/scripts/*`, `.github/workflows/governance.yml`, `.gitignore`, complete
+  `docs/`; transient Python bytecode was removed before publication.
+- Public API/CLI/events/diagnostics: no product API or CLI. Governance scripts
+  emit versioned JSON results and precise fail-closed diagnostics.
+- Schemas/formats/editions/generated output: governance schemas and immutable
+  previous-docs aggregate only; no regulatory edition or generated product
+  output.
+- Persistence/migrations/compatibility: none in P1.
+- Toolchain/dependencies/Actions: Python standard library, Git, OpenSSH and one
+  GitHub-owned checkout Action pinned to the admitted full SHA; no package
+  dependency or install step.
+- GitHub/npm/external effective state: `main` ruleset `23163524`, release-tag
+  ruleset `23163527`, squash-only, automatic branch deletion, full-SHA selected
+  Actions, read-only default workflow token and enabled repository security
+  controls. No npm/publication action occurred.
+
+### Verification and evidence
+
+| Claim/requirement              | test/oracle                                                | canonical task/job                          | subject/environment                                       | result                | evidence locator/digest                                                                                                   |
+| ------------------------------ | ---------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Bootstrap identity             | local and CI signature/DCO verification                    | `Required · governance signatures and DCO`  | `c40f5d6e4e2dc8debe0b365790f9a112d27af663`                | pass                  | run `34754555914`                                                                                                         |
+| Documentation/archive          | metadata, IDs, dependencies, links, archive digest         | `Required · documentation and traceability` | bootstrap and every accepted head                         | pass                  | 410 initial docs; 117 archive files; archive digest in `GOV-013`                                                          |
+| Required-check closure         | always-run dependency result assertion                     | `Required · required-check closure`         | bootstrap, PR and main push events                        | pass                  | runs `34754555914`, `34754932667`, `34754989598`                                                                          |
+| Positive protected flow        | signed PR, native squash verification and branch read-back | all three contexts                          | PR `#2` / main                                            | pass                  | squash `57a062c7d907287eb25461bea560f42d9dd8b87c`; head branch `404`                                                      |
+| Direct/force/delete protection | live Git pushes                                            | GitHub rules                                | `main`                                                    | rejected              | `GH013` direct/force diagnostics; default-branch deletion refusal; `GOV-013`                                              |
+| Unsigned rejection             | live negative PR                                           | signature/DCO plus closure jobs             | PR `#3`                                                   | rejected/blocked      | run `34755046577`                                                                                                         |
+| Missing-DCO rejection          | live negative PR                                           | signature/DCO plus closure jobs             | PR `#4`                                                   | rejected/blocked      | run `34755154669`                                                                                                         |
+| New-branch range regression    | zero-before positive branch event                          | all three contexts                          | `349692ed721eeb40e523a25ea799c706c8aa3689`                | pass                  | run `34755507436`; disposable branch deleted                                                                              |
+| Effective GitHub policy        | 68 exact read-only comparisons                             | `audit-github.py`                           | protected main `57a062c7d907287eb25461bea560f42d9dd8b87c` | pass, zero mismatches | observed `2026-09-13T11:47:26Z`; redacted JSON SHA-256 `b29e02105091b27d168d128f877a52eebfa67269f4ca960ca4f8b984ccc471a9` |
+
+- Coverage/mutation/fuzz results and justified scope: not applicable to the
+  absent product; policy self-tests cover all material P1 false-pass classes.
+- Security/privacy/supply-chain results: no secret/private key retained; Actions
+  has empty top-level permissions, no privileged event/write permission, one
+  admitted full-SHA Action and no persistent repository secret.
+- Performance/reliability/recovery results: policy tasks complete within bounded
+  5/10-minute jobs; product performance is not a P1 claim.
+- Package/tarball/integration matrix results: not applicable; no packages exist.
+- Legal/regulatory/external observations and independence class: owner/self and
+  tool evidence only; no legal, AEAT or independent validation claimed.
+
+### Failures, corrections and review
+
+- First failures retained: local diff gate found three surplus final blank lines;
+  prepublication review found generated bytecode staged; `gh --slurp` was absent;
+  GitHub returned `422` when a repository patch attempted to restate inherited
+  web DCO; an audit report contained a non-serializable set; and new-branch run
+  `34755419567` failed on zero `before` SHA.
+- Root causes and affected variants: input formatting; transient local output;
+  CLI-version assumption; organization inheritance; JSON normalization error;
+  and conflation of an empty-history bootstrap with a new branch based on main.
+- Corrections/regressions: normalized files; removed bytecode and ignored it;
+  implemented explicit REST pagination; omitted the immutable inherited field
+  and read it back as enabled; sorted ruleset names; distinguished `404` from
+  authorization denial; resolved new-branch base via authenticated default-branch
+  API and verified the full ancestral range.
+- Invalidated evidence rerun: all local fixtures/gates, effective-state audit,
+  PR checks and the dedicated new-branch run `34755507436` passed after fixes.
+- Review conversations and dispositions: project-owner approval is represented
+  by the lifecycle transition and `GOV-013`; zero additional human approval is
+  required or fabricated.
+
+### Traceability and residual state
+
+- Requirements/ADRs/controls closed: P1-W1 through P1-W7; ADR-0003/0004/0005/
+  0031/0032/0033 governance scope; GOV-001 through GOV-013.
+- REV findings disposed: REV-073 and REV-075–081 have explicit P1 dispositions
+  in `GOV-013`; every other historical finding remains mapped in the ledger.
+- Current findings: none material in P1 scope.
+- Risks/exceptions/open questions: no exception accepted. Organization Actions,
+  runner, secret and variable surfaces returned `403`; organization rulesets and
+  hooks returned `404` and are not treated as proof of absence.
+- Explicit remaining committed scope: all P2–P8 implementation, assurance,
+  external and release work remains; documentation approval is not implementation.
+- Deviations from roadmap and authority: none. The false-red correction added a
+  maintained full-range new-branch behavior rather than weakening a check.
+
+### Recovery and next phase
+
+- Recovery/revert point and verified procedure: protected main evidence point
+  `57a062c7d907287eb25461bea560f42d9dd8b87c`; any correction is a new signed+DCO
+  PR and native squash. No bypass or history rewrite is available.
+- Exit-criteria evaluation: effective desired state matches 68/68 comparisons;
+  negative and positive paths behave as required; documentation is accepted;
+  no product source/CODEOWNERS/bypass/approval fiction or temporary relaxation
+  remains. P1 passes upon protected merge of PR `#5`.
+- Next phase and exact prerequisites: P2, only after deriving PR `#5` squash SHA,
+  verifying its GitHub signature/DCO/one-PR mapping, confirming automatic branch
+  deletion, rerunning all three checks and auditing effective state.
+- Exact first commands/observations: `git fetch --prune origin`; switch to clean
+  `main`; inspect `git status`, signed log and tree; run both policy self-tests and
+  repository validation; run the GitHub auditor against the derived main SHA;
+  compare ruleset IDs/contexts/producers and reopen P1 on any mismatch.
+- Priority documents to reread: implementation roadmap/handoff/P2 prompt,
+  `05-architecture`, complete `13-repository-ci`, `14-supply-chain-build`,
+  applicable quality/assurance docs, ADRs and mapped historical findings.
+- Long-lead items carried forward: legal/RRSIF and CRA review, AEAT
+  authorization/certificates/portal, three npm names and OIDC custody,
+  Verification Engine exact release admission, future-Facturacion synthetic host
+  contract, stable performance runner, signing/account recovery and independent
+  assessment. Absence retains the exact downstream block; it is not waived.
+
+### AMD-P1-001 — 2026-09-13
+
+- Statement corrected: the PR `#5` closure treated successful required contexts
+  as unambiguous although `governance.yml` produced identical context/App pairs
+  on branch push, pull request and manual dispatch.
+- Correct value and reason: required PR contexts must be emitted only by the
+  `pull_request` event; `push` is restricted to `main` for post-squash
+  verification and manual dispatch is absent. GitHub required checks bind
+  context and App, not event, so another event for the same SHA must not be able
+  to satisfy or mask the PR result.
+- Discovered by / actor: Codex completion audit after protected merge of PR `#5`.
+- Evidence locator and digest: corrective commit
+  `01e001eb1b4a3f7b72573e2dc0c101b5f7f68d2c` had zero run/check producers when
+  pushed as `fix/p1-context-isolation`; PR `#6` then produced exactly three
+  successful checks from sole `pull_request` run `34755972167`. Effective-state
+  audit passed 68/68; redacted JSON SHA-256
+  `f18e7123057c9083fc06d79ff69c5566a58fa801061c0eed20d8a33051589450`.
+- Affected requirements, phases, releases and claims: P1-W3, P1-W5, P1-W6,
+  P1-W7, ADR-0032, ADR-0033, `REPO-DOC-0013`, `REPO-DOC-0014`,
+  `REPO-DOC-0015`; P2 and every later protected change depend on the correction.
+- Evidence/exits invalidated: P1's producer-isolation and effective required-path
+  claims were reopened; repository settings, ruleset parameters, signature/DCO,
+  destructive probes, archive identity and documentation approval evidence were
+  not invalidated.
+- Remediation and protected PR: PR `#6` restricts triggers and adds maintained
+  negative fixtures rejecting wildcard branch push and any third/manual event.
+  P1 returns to `evidence-complete` only after its final-head checks, native
+  signed/DCO squash, `main` push run, automatic branch deletion and full
+  effective-state read-back pass. P2 derives the resulting SHA and tree.
+
+### AMD-P1-002 — 2026-09-13
+
+- Statement corrected: audits before PR `#7` claimed complete paginated endpoint
+  coverage although numeric `page` traversal failed for Dependabot alerts and
+  that signal error did not affect the overall result.
+- Correct value and reason: every P1-required security surface must be readable
+  and every paginated response must follow GitHub's actual `Link` pagination;
+  malformed, inconsistent or inaccessible required data fails the audit.
+- Discovered by / actor: Codex requirement-by-requirement completion audit after
+  protected merge and final read-back of PR `#6`.
+- Evidence locator and digest: first corrected local execution against protected
+  main `c5697e33297daab98bc77de3202e7ca4d0fa290f` passed 71/71 checks at
+  `2026-09-13T13:59:37Z`; Dependabot and secret-scanning alerts were verified
+  with count zero, code scanning was explicitly `not-found`, and the redacted
+  JSON SHA-256 was
+  `9592427f77c5e7372de36fef3180acb184a65ff160a60a7bc9654560263db2f1`.
+  The committed corrective auditor then produced 71/71 passing comparisons for
+  exact PR `#7` subject `6237e2282cf8543346264ba1f5eefe072636d937`
+  at `2026-09-13T14:02:50Z`; the complete redacted report is retained at
+  `.github/evidence/p1-effective-state-6237e22.json` with SHA-256
+  `995b6488d33be0e06bdd423cb3c4c6bf32bff236cd84951195b3ff1934bd940e`.
+- Affected requirements, phases, releases and claims: P1-W4, P1-W5, P1-W7,
+  REV-076, `REPO-DOC-0012`, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and every
+  later phase relying on GitHub drift evidence.
+- Evidence/exits invalidated: earlier 68-check GitHub audit closure reports are
+  retained as historical but no longer sufficient; signing/DCO, branch/tag
+  rules, destructive/invalid probes, documentation approval and context
+  isolation remain valid.
+- Remediation and protected PR: PR `#7` replaces numeric pagination with
+  GitHub-Link traversal, adds four deterministic pagination fixtures, promotes
+  required signal readability to conformance checks, and clarifies effective
+  security capability states. P1 returns to `evidence-complete` only after the
+  PR's final-head audit is retained and its signed/DCO native squash, main-only
+  run, branch deletion and 71-check final-main audit all pass. P2 derives the
+  resulting SHA and tree.
+
+### AMD-P1-003 — 2026-09-13
+
+- Statement corrected: the P1 machine policy and audit omitted three Actions
+  settings named by `REPO-DOC-0012`: external-fork workflow approval,
+  artifact/log retention and reusable-workflow access applicability.
+- Correct value and reason: every external contributor requires workflow
+  approval (`all_external_contributors`); retention is 90 days, GitHub's maximum
+  for a public repository; reusable-workflow repository access is
+  `not-applicable` because the endpoint is private/internal-only.
+- Discovered by / actor: Codex semantic completion audit after PR `#7`.
+- Evidence locator and digest: GitHub read-back changed fork approval from
+  `first_time_contributors` to `all_external_contributors`; retention returned
+  `{days: 90, maximum_allowed_days: 90}`; access returned the documented `422`
+  applicability response. Exact PR `#8` subject
+  `a55f3ee1951c5478590f00c740f6658febee6f29` passed 75/75 comparisons at
+  `2026-09-13T14:15:25Z`; its complete redacted report is retained at
+  `.github/evidence/p1-effective-state-a55f3ee.json` with SHA-256
+  `dec1d1b6e19854c3d285cf4a3a40498cd5b19f04b2ab15662924a47f6b2fe3c5`.
+- Affected requirements, phases, releases and claims: P1-W4, P1-W5, P1-W7,
+  ADR-0032, `REPO-DOC-0012`, `REPO-DOC-0021`, `ASSURANCE-DOC-0010` and future
+  untrusted-contribution workflows.
+- Evidence/exits invalidated: completeness of the prior GitHub/Actions audit;
+  all other P1 evidence remains valid.
+- Remediation and protected PR: PR `#8` versions and audits the three surfaces,
+  retains the complete redacted successor report and requires final protected
+  squash, main-only checks, branch deletion and effective-state read-back before
+  P1 returns to `evidence-complete`.
+
+### AMD-P1-004 — 2026-09-13
+
+- Statement corrected: P1 was treated as complete although the roadmap's P1
+  path-effects matrix explicitly requires root community files, `REPO-DOC-0001`
+  requires `README.md`, `SECURITY.md`, `CONTRIBUTING.md`, `LICENSE` and `NOTICE`,
+  and `REPO-DOC-0009` requires a PR template with change/omission, impact,
+  evidence and rollback fields. None existed on protected `main`.
+- Correct value and reason: P1 has the five root files, a governed PR template
+  and one non-sensitive structured work-item form with private security routing.
+  The repository is described truthfully as documentation-only; Facturación is
+  an unbuilt future consumer; no product, release, support-version or compliance
+  claim is made. Because no distribution licence has been selected or legally
+  reviewed, `LICENSE` reserves rights and blocks distribution instead of
+  inventing an open-source grant. DCO records provenance but is not represented
+  as a licence.
+- Discovered by / actor: Codex requirement-by-requirement completion audit after
+  PR `#8`, comparing the P1 phase matrix, repository tree contract and actual
+  protected tree.
+- Evidence locator and digest: signed+DCO branch commit
+  `812ad206baa7df75273d546ab3abce4f3f7903f9`, tree
+  `6646ec54892e751c3c8bad8d1094e150d3f371f4`, in PR `#9`; sole
+  `pull_request` run `34763062255` produced the three exact successful required
+  contexts. A read-only effective-state audit at `2026-09-13T14:35:25Z` passed
+  75/75 comparisons with zero mismatch; redacted transient-report SHA-256
+  `94de41e7c1fb3f3da2acd67204fdfe83064ef95a5c8e06366f4c71c7229dd159`.
+  The governance report binds SHA-256 for every mandatory artifact:
+  `README.md` `472aeca6a43ea1981a42a9c9e7b1e29ae54e2e502bef701f290ead07b9608e5f`,
+  `CONTRIBUTING.md` `2d3eb13bd25d68b91e8fd12db87ec035422348275a752d2eb7b0d015855cb21d`,
+  `SECURITY.md` `c05599c3076ccfee2dd62fd4af69497e0c86daddc749404bbcf100c36683acf4`,
+  `LICENSE` `7e1de9c15443eee92da435265af15813a36e7e4d34a11095142d43d32e7d3dff`,
+  `NOTICE` `fbccd2b807ea0ba8278d633f088d79b1997783748f5b82f162d494a5a1b56e6c`,
+  PR template `28efab4958199b48361f037c903a9cdab3681447057d6d91db6e7c91e01a248b`,
+  issue config `03a26f3208f89d1647ad922ff81fa126478f0e235131f38b3c7b016b0262696b`
+  and work-item form
+  `aba4639a605aae6c401c7366ac63f14ce78c8fac30b232e5c5336ce875ecbfb8`.
+- Affected requirements, phases, releases and claims: P1-W7,
+  `ROADMAP-DOC-0004`, `REPO-DOC-0001`, `REPO-DOC-0009`, `REPO-DOC-0016`,
+  `BUILD-DOC-0012`, `RELEASE-DOC-0017`, `RELEASE-DOC-0019`, ADR-0003,
+  ADR-0004, ADR-0030 and ADR-0031. P2 and every public contribution or release
+  depend on the corrected repository contract.
+- Evidence/exits invalidated: P1 artifact/completeness and handoff closure were
+  reopened. Prior signature/DCO probes, protection/settings read-backs,
+  context-isolation proof, archive identity and documentation semantics remain
+  valid.
+- Remediation and protected PR: PR `#9` adds the eight governed artifacts and a
+  dependency-free validator that fails on absence, CR/non-UTF-8, unresolved
+  placeholders, broken Markdown links or missing mandatory declarations and
+  emits each digest. Its negative fixture proves a missing root artifact fails.
+  This amendment is the dedicated corrective handoff commit; self-identifying
+  its own commit or eventual squash SHA is impossible without changing that
+  identity. P1 returns to `evidence-complete` only after this final PR head passes
+  all three contexts, GitHub native-squashes it with verified signature and DCO,
+  its `main` run passes, the branch is automatically deleted and the 75-control
+  read-back passes. P2 intake derives and records the resulting immutable
+  squash SHA/tree.
+
+## P2 closure — executable engineering, CI, build and supply-chain foundation
+
+### Identity and status
+
+- Status: `closure candidate`; all P2 implementation and pre-closure evidence is
+  complete. `evidence-complete` requires this record's protected merge, all 17
+  documentation-path contexts, branch deletion and final `main` read-back.
+- Started/closed (UTC): issue `#10` opened `2026-09-13T15:26:45Z`; closed time is
+  the protected merge time of this closure PR and is derived by P3 intake.
+- Input main SHA / tree:
+  `2c67a80837b9ac170e786701a16394252c7fdfea` /
+  `6d2929da32b6400d3dfac37bd419d12199a98e95`, the final P1 closure read back
+  before any P2 source was admitted.
+- Implementation-complete main SHA / tree:
+  `baa92d948912593d0dc5cb5ed361a4bd645f885c` /
+  `0b92a2e8ccc7040b80438ffbd6101205eeaf62fb`.
+- Closure main SHA / tree: derived and independently read back by P3 intake;
+  embedding a commit's own identity in that commit is impossible.
+- Closure PR: `#24`, dedicated branch `docs/10-p2-closure`.
+- Roadmap revision: `ROADMAP-DOC-0004` as present in protected main
+  `baa92d948912593d0dc5cb5ed361a4bd645f885c`; P2-W1–P2-W8 and every stated
+  exit criterion were evaluated without reducing scope.
+- Documentation inventory digest: pre-handoff baseline, 411 current Markdown
+  documents, SHA-256
+  `d0ba69776a52abe8cd7766eb8c1af9202c35e70b504775a2550072e6a19b7864`;
+  117 immutable historical files, SHA-256
+  `99641c59c5e5bc32c08dfc337912301b8a7c1f91f08976673eb52396f41c93a1`.
+  This record changes the current aggregate, so P3 intake derives the final
+  closure-tree value instead of recording a self-invalidating digest.
+
+### Readiness and sources
+
+- Prerequisites and their evidence: P1 was reopened through four semantic
+  completion audits, then established at exact protected SHA `2c67a808...` with
+  clean worktree, verified native squash/DCO, no source branch, three passing P1
+  contexts and complete effective GitHub read-back. Issue `#10` bounded P2 and
+  explicitly prohibited fiscal behavior, release credentials and publication.
+- Re-observed mutable sources/dependencies: Node release manifests, detached
+  signatures and release-key repository; npm registry metadata/signatures;
+  TypeScript; Python reference distribution; all admitted Action tags and SHAs;
+  public `@noeos/verification-engine@1.0.1`; official CycloneDX 1.7 and SPDX
+  3.0.1 schemas/model/context; Gitleaks 8.30.1 release checksums/archive; GitHub
+  effective repository/ruleset/security/producer state. Mutable bytes are never
+  trusted by URL or tag alone: exact digests live in `config/admission/` and
+  `config/toolchain/`.
+- Assumptions resolved/falsified: package shells can be real build/package
+  subjects without inventing fiscal exports; required checks must be 17 distinct
+  leaf contexts rather than a single umbrella; a canonical DAG needs executable
+  IO/network/tool/report enforcement, not script-name convention; an Actions
+  token cannot perform administrative read-back; release-asset download failures
+  need bounded status-aware retry; GitHub Dependabot signs commits but has no
+  configuration control for the required DCO trailer, so bot PRs are untrusted
+  proposals and never an auto-merge path.
+- Initial risks/blockers: the deleted predecessor had false-positive tasks,
+  workspace-only package tests, loose exports/imports, mutable or incomplete
+  dependency trust, divergent SBOM inputs, ambiguous GitHub producers and
+  incomplete CI portability. Each class received an executable control and a
+  falsifying fixture before closure. No P2 blocker remains.
+
+### Work packages and protected history
+
+| Work ID             | Issue | Branch                                 | PR    | branch commits/signers/DCO                                                                                                                                          | squash SHA                                                              | result                                               |
+| ------------------- | ----- | -------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| P2-W1–W3            | `#10` | `build/10-p2-tree-toolchain-packages`  | `#11` | `4df6866a08af373bce0e40ca45d3f36b777d8c79`; GitHub-verified SSH signature, matching DCO                                                                             | `ce837b97cb526e690d49705960e3cd8b40e91b7e`; verified GitHub GPG and DCO | pass                                                 |
+| P2-W4–W8            | `#10` | `build/10-p2-ci-build-supply-chain`    | `#12` | `8f2c7e2`, `1e1d7ce`, `c01abba`, `596a194`, `11e99c4`, `ad248a4`; every commit GitHub-verified SSH with matching DCO                                                | `38b43f95a2637438af915a1edcd349dbd6206987`; verified GitHub GPG and DCO | pass after retained portability/security corrections |
+| P2-W6/W8 correction | `#10` | `fix/10-p2-rehearsal-audit-boundaries` | `#13` | `7667753dcc4d80cfbcf90a7d123f6f5fe821370a`; GitHub-verified SSH and DCO                                                                                             | `c583bcf3d3f46576de53a0bb296f6cf706d61b28`; verified GitHub GPG and DCO | pass                                                 |
+| P2-W7 completion    | `#10` | `build/10-p2-dependabot-flow`          | `#14` | `5fea8a93b82acb3cd645cb59ba7adfa1e724e0ff`; GitHub-verified SSH and DCO                                                                                             | `baa92d948912593d0dc5cb5ed361a4bd645f885c`; verified GitHub GPG and DCO | pass                                                 |
+| P2 closure          | `#10` | `docs/10-p2-closure`                   | `#24` | `a9a6951fb3558c9b30f443971d1af83304f6f1f5` plus this final record commit, whose self-SHA is derived from the PR head; every human commit must verify as SSH and DCO | derived by P3 intake                                                    | pending only protected closure mechanics             |
+
+Every merged implementation branch was automatically deleted. There was no
+direct `main` push, merge commit, rebase, bypass actor, CODEOWNERS requirement,
+approval fiction or history rewrite.
+
+### Implemented state
+
+- Components and behavior: exact semantic repository allowlist and ownership;
+  import/export/builtin/cycle boundaries; independently admitted tool profiles;
+  three package shells; typed task DAG and evidence schema; deterministic
+  generation, formatting, linting, strict type checking and repository/API/
+  package/document policy; 17-context CI/security/conformance matrix; bounded
+  external-input preparation; clean reproducible builds and tarballs; offline
+  tarball consumers; one reconciled component graph; CycloneDX/SPDX generation
+  and validation; non-publishing provenance rehearsal; effective GitHub auditor,
+  authority-boundary guard, Scorecard signal and Dependabot intake.
+- Paths/files created, changed or removed: P2 admitted 682 pre-closure tracked
+  paths across `.github/`, `benchmarks/`, `config/`, `docs/`, `editions/`,
+  `evidence/`, `fixtures/`, `internal/`, `packages/`, `schemas/`, `scripts/`,
+  `tests/`, `tooling/` and exact root control files. The machine tree contract is
+  `config/repository/tree.json`; unknown roots, case collisions and forbidden
+  generated/vendored placement fail closed.
+- Public API/CLI/events/diagnostics: exactly three package names exist, but their
+  P2 source modules export `{}` and the CLI has no `bin`; public export count is
+  zero. Policy errors use stable codes such as `IMPORT_CYCLE`, `ZERO_WORK`,
+  `UNDECLARED_NETWORK`, `PACKAGE_CONTENT_LEAK` and `MISSING_REQUIRED_JOB`.
+- Schemas/formats/editions/generated output: versioned JSON schemas govern tree,
+  imports, packages, toolchains, task/report graph, CI contexts, Actions,
+  dependencies, external inputs and rehearsal provenance. Only the toolchain
+  summary is checked in as generated output. No regulatory source, edition,
+  fiscal schema, official vector or generated fiscal contract exists in P2.
+- Persistence/migrations/compatibility: none; no database, queue, transport,
+  tenant, certificate, taxpayer or AEAT state exists. Portability is exercised on
+  Ubuntu 24.04, Windows 2025 and macOS 15 plus Node floor/LTS/primary profiles.
+- Toolchain/dependencies/Actions: required Node `22.14.0`, `22.23.2` and
+  `24.21.0`; informational Node `26.8.2`; npm `11.19.1`; TypeScript `5.9.3`;
+  Python `3.13.15`; exact npm lock SHA-256
+  `5c14655a889f4f84723e8062ec9070f5f6f381e26bc38cb511b5b65dac200a54`
+  with 248 package entries. Ten admitted Actions are full-SHA pinned:
+  checkout `3d3c42e`, setup-node `2499707`, setup-python `ece7cb0`,
+  upload-artifact `043fb46`, download-artifact `3e5f45b`, dependency-review
+  `2031cfc`, CodeQL `b96794f`, Scorecard `2d11466`, OSV `90b209d` and reserved,
+  unused-in-P2 attest `1e69f48`.
+- GitHub/npm/external effective state: `main` ruleset `23163524` and tag ruleset
+  `23163527` are active with no bypass; squash-only, required signatures, thread
+  resolution, strict 17-context closure, branch auto-delete and zero reviews/
+  no CODEOWNERS remain intentional for the sole developer. Default workflow
+  permission is read; write scopes are isolated to exact security events. There
+  are no repository Actions/Dependabot secrets, variables, environments,
+  deploy keys, webhooks or teams. Publication remains forbidden.
+- Canonical task/check registry: `TASK-GRAPH-0001` contains 29 typed tasks.
+  `gate:p2` version 2 executes and retains 28 reports; `gate:platform` is the
+  separate portable matrix root. Every task declares owner, dependencies,
+  inputs, outputs, working directory, exact tool profile/command, environment,
+  network, secrets, timeout, locks, selection class, report schema and zero-work
+  behavior. All execution tasks deny secrets; only `prepare:external-inputs`
+  permits bounded `prepare-only` network.
+- Package state: `@noeos/verifactu`, `@noeos/verifactu-adapter-kit` and
+  `@noeos/verifactu-cli` are private `0.0.0-development`, `sideEffects:false`,
+  with closed `files` and conditional exports. Core alone admits public
+  Verification Engine `1.0.1`; adapter and CLI depend only on the exact workspace
+  core. Tarballs contain only `dist`, `package.json`, `README.md`, `LICENSE` and
+  `NOTICE`; CLI has no CJS surface or executable in P2.
+
+### Verification and evidence
+
+| Claim/requirement                                      | test/oracle                                                                                | canonical task/job                                                                | subject/environment                                     | result                                                                         | evidence locator/digest                                                                                                                                                                                                     |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exact tree, imports, toolchain and three honest shells | schema/policy plus 10 foundation falsifiers                                                | `gate:foundation`                                                                 | PR `#11`, required OS/runtime matrix thereafter         | pass                                                                           | branch `4df6866`; squash `ce837b9`                                                                                                                                                                                          |
+| Typed acyclic execution and no false success           | registry/schema, atomic snapshots, tool/network/report checks and 9 task-runner falsifiers | `gate:p2` v2                                                                      | `baa92d9`, Ubuntu 24.04 / Node 24.21.0 / Python 3.13.15 | pass, 28 reports                                                               | run `34902355808`; `gate-p2.json` SHA-256 `8ea65f9f7257e3240feabd82cc3661ebf7f8940daeb72d5b7e7512bcd4dd536b`                                                                                                                |
+| All protected contexts on implementation PR            | exact check registry and always-run closure                                                | 17 `Required ·` contexts                                                          | PR `#14` head `5fea8a9`                                 | 17/17 pass                                                                     | CI `34870501394`, Security `34870500818`, Conformance `34870501414`, Performance `34870501078`                                                                                                                              |
+| All protected contexts on `main`                       | exact producer-to-subject audit                                                            | 17 `Required ·` contexts                                                          | `baa92d9`                                               | 17/17 pass                                                                     | CI `34871065235`, Security `34871065337`, Conformance `34871065121`, Performance `34871065225`                                                                                                                              |
+| Effective GitHub and producer state                    | 89 fail-closed comparisons, paginated/redacted collection                                  | `audit-github.py`                                                                 | `baa92d9`, observed `2026-09-14T22:19:21Z`              | 89/89 pass, 17/17 producers                                                    | `.github/evidence/p2-effective-state-baa92d9.json`, canonical-format SHA-256 `4c4f1744e4507ddd501d53c88050a8da1b79111bb4d4ad600ee2dcb53f459953`                                                                             |
+| Reproducible closed packages                           | two independent clean outputs, tar allowlists and clean offline consumers                  | `package:reproducibility`, `integration:tarball-consumers`                        | `baa92d9` release rehearsal                             | pass                                                                           | core `752f913153e6116837b07b0d2dba87a4ae3ea04f87ae205324e836192e26d9c9`; adapter `1e2652f80ba2bb77bbd5d5e8511c79c48b3009be2f5a6b328a6083e9f90a8e2e`; CLI `fce1cd5b6cce76c1d14ecf4834ef5165da8878b3c05efcf0489cabcfec65e819` |
+| Runtime dependency from public bytes                   | exact tgz digest, manifest/lock/licence/native/lifecycle checks and clean consumer         | `prepare:external-inputs`, `policy:supply-chain`, `integration:tarball-consumers` | `@noeos/verification-engine@1.0.1`                      | pass                                                                           | SHA-256 `74e2449b5bab61ee62bdedc0355567461b33eadf15338f7d3265207bd28395f8`                                                                                                                                                  |
+| One dependency/tool/Action/data graph                  | lock/manifests/tarballs/Actions/reference runtimes/external inputs reconciliation          | `sbom:component-graph`                                                            | `baa92d9`                                               | 270 nodes, 494 edges                                                           | graph SHA-256 `f85e6a76cea6d11ff99e7a44ebfe3aef1952099b858d541311b5a47347fc034e`                                                                                                                                            |
+| Valid reconciled SBOMs                                 | official pinned schemas plus independent SPDX SHACL/OWL pass                               | `sbom:documents`, `sbom:spdx-shacl`                                               | CycloneDX 1.7 / SPDX 3.0.1                              | pass                                                                           | CycloneDX `dddc113fc643fd223ceb2b09d4a50dcb4660a694b399c0e0f629adf32cb8b295`; SPDX `62b97480e2bba4a1a8d0a87159bd631a5ec3e326031d7e49046b8ffbd53168a1`                                                                       |
+| Honest provenance preparation                          | subject/material/byproduct reconciliation and schema                                       | `provenance:rehearsal`                                                            | `baa92d9`, run `34902355808`                            | pass; unsigned, nonpublishable, claimed SLSA level `none`                      | three subjects, four resolved dependencies, two byproducts; SHA-256 `6f5f0ee6f689eb988a4de1fc9d35fe7f71199b6438f37ea4cec33c15951c3579`                                                                                      |
+| Actions-token authority boundary                       | repository read succeeds, administration returns expected 403                              | `github-audit.yml`                                                                | protected main                                          | pass; explicitly not an effective-state audit                                  | run `34902355866`, artifact `10370498979`, JSON SHA-256 `37a319596b327c96b2cb51456705d62eae5b2139b937776abc51b08db953e074`                                                                                                  |
+| Scorecard is a scoped signal                           | non-badge SARIF, security upload and retained artifact                                     | `scorecard.yml`                                                                   | post-Dependabot main                                    | pass                                                                           | run `34902355826`, artifact `10370773004`, SARIF SHA-256 `694db3ef1a880d774f89dfcb395244dd6002dc8fae57af03af698366baaa4206`                                                                                                 |
+| Dependabot untrusted path                              | live npm and github-actions proposals                                                      | all 17 required contexts per bot head                                             | PRs `#15`–`#23`                                         | 17/17 contexts emitted on every PR; expected policy/DCO failures prevent merge | exact heads and check-run URLs retained by GitHub; `#15`–`#17`, `#19`–`#21`, `#23`: 13 pass/4 fail; `#18`: 4/13; `#22`: 3/14                                                                                                |
+
+- Coverage/mutation/fuzz results and justified scope: P2 deliberately contains no
+  fiscal production branch, state machine or parser to measure; no percentage,
+  mutation or fuzz claim is made. Instead, every material foundation control is
+  falsified: 10 tree/import/package/toolchain/generated fixtures, 9 DAG/IO/tool/
+  network/report fixtures, 2 missing-CI fixtures, 5 admission/package/
+  reproducibility/edition fixtures, 4 bounded-download retry fixtures and 11
+  governance/document/workflow fixtures. Functional coverage, mutation and fuzz
+  campaigns become mandatory as P3/P4 introduce parsers and fiscal logic.
+- Security/privacy/supply-chain results: exact 248-entry lock; 98 registry
+  artifacts plus admitted bundled/optional entries reconciled; zero lifecycle
+  scripts executed; optional code omitted; npm audit/signatures/licences, OSV,
+  dependency review, CodeQL and complete-history Gitleaks pass. Open Dependabot
+  and secret-scanning alert counts are zero. No credential, customer, taxpayer,
+  certificate or private payload was used or retained.
+- Performance/reliability/recovery results: correctness-guarded isolated build
+  smoke passes on every PR/main path and run `34902355808`; it is not represented
+  as a stable production benchmark. Builds use clean temporary roots,
+  `SOURCE_DATE_EPOCH=0`, deterministic ordering/modes and exact output comparison.
+  Bounded external downloads retry at most three times only for transport errors
+  or HTTP 408/425/429/500/502/503/504; 404 and all non-transient errors fail
+  immediately, exhaustion fails closed and diagnostics redact query strings.
+- Package/tarball/integration matrix results: all three tarballs are independently
+  reproducible and allowlist-clean; clean consumers have no workspace/sibling
+  access, install core with the exact public Verification Engine tarball, and
+  exercise only admitted empty P2 import surfaces. Windows/macOS/Linux matrix
+  proves task/path portability, not fiscal interoperability.
+- Legal/regulatory/external observations and independence class: licenses and
+  notices for admitted npm, Actions, tools and schema inputs are machine
+  reconciled, but this is internal/tool evidence, not independent legal advice.
+  No RRSIF/VERI*FACTU compliance claim, supported regulatory edition, AEAT
+  connectivity or production release exists. Legal/RRSIF, CRA and independent
+  technical assessment gates remain external and cannot be simulated by Codex.
+
+### Failures, corrections and review
+
+- First failures retained: PR `#12` exposed platform-dependent Action/path,
+  Gitleaks distribution, Windows network-fixture and TypeScript-root assumptions;
+  each failure remains in GitHub history and led to separate signed corrections.
+  Manual audit run `34857522741` failed when its ephemeral token correctly lacked
+  repository-administration permission. Initial rehearsal run `34857523972`
+  failed on a transient GitHub release-asset HTTP 504. Neither was rerun blindly
+  or deleted.
+- Root causes and affected variants: policy conflated scheduled-token authority
+  with maintainer read-back; downloader treated every non-2xx response as final;
+  some initial commands assumed one OS/path form; the first completeness audit
+  omitted the explicitly required Dependabot configuration and live bot path.
+- Corrections/regressions: PR `#12` made tool resolution, fixtures and all matrix
+  paths portable and promoted readable CodeQL state. PR `#13` separated the
+  scheduled authority-boundary proof from authenticated local administrative
+  audit, retained rehearsal artifacts under `always()`, and implemented bounded
+  status-aware retry with response cancellation and query redaction. PR `#14`
+  added exact two-ecosystem Dependabot policy plus missing-ecosystem/unadmitted-
+  registry fixtures and the canonical `policy:governance` gate dependency.
+- Invalidated evidence rerun: corrected authority run `34859293489`, corrected
+  rehearsal `34859294246`, PR `#14` 17-context population, all four `baa92d9`
+  push workflows, final rehearsal `34902355808`, guard `34902355866`, Scorecard
+  `34902355826` and final 89/89 effective audit supersede invalidated evidence.
+- Review conversations and dispositions: project-owner approved the governing
+  documentation and P2 objective before execution. No external code review was
+  present or invented; rules require zero approvals for a single developer and
+  every material conclusion is backed by executable checks/read-back. Open bot
+  PRs are proposals to assess in their own signed+DCO maintainer branches, never
+  approvals or accepted changes.
+
+### Traceability and residual state
+
+- Requirements/ADRs/controls closed: P2-W1–P2-W8; ADR-0029–ADR-0038;
+  `REPO-DOC-0001`–`REPO-DOC-0022`; `BUILD-DOC-0001`–`BUILD-DOC-0019`;
+  applicable architecture, quality, security, performance and assurance
+  requirements. Closure means their P2 foundation controls exist and pass; it
+  does not claim later fiscal/product/release exits.
+- REV findings disposed: REV-056 has an honest zero-fiscal-code denominator and
+  future coverage gate; REV-063 binds reports/check producers to exact subjects;
+  REV-065 safe-inspects extracted closed tarballs; REV-066 uses clean consumers;
+  REV-067 compares isolated builds; REV-068 validates reconciled CycloneDX/SPDX;
+  REV-069 inventories transitive/tool/Action/data licenses; REV-070 reconciles
+  manifest/lock/install/tarball inventories; REV-071 enforces exact tool path,
+  version and digest; REV-072 enforces tree/module/export/import boundaries;
+  REV-075 full-SHA admits Actions and effective settings; REV-076 paginates and
+  binds 17 producers; REV-077 preserves usable zero-review/no-CODEOWNERS solo
+  governance; REV-078 gives no routine tag/environment/admin bypass; REV-079
+  unifies local/CI/rehearsal task evidence; REV-080 retains Scorecard only as a
+  scoped signal.
+- Current findings: six open Code Scanning records are Scorecard signals, not
+  CodeQL defects: new-project age, zero human approvals/CODEOWNERS by approved
+  solo governance, no fuzzing before parser/fiscal code, historical commits from
+  before SAST, no OpenSSF Best Practices badge effort and non-maximal review
+  settings. The DependencyUpdateTool signal was closed by the post-Dependabot
+  rerun. Signals remain visible and are not dismissed or misrepresented.
+- Risks/exceptions/open questions: nine Dependabot proposals `#15`–`#23` remain
+  open and untrusted; each needs independent version/compatibility/security/
+  license/toolchain admission and a maintainer-authored SSH+DCO PR if accepted.
+  Organization-admin surfaces unavailable to the repository-scoped audit remain
+  six explicit limitations (403/404), never interpreted as absence. No risk
+  acceptance or exception was used to pass P2.
+- Explicit remaining committed scope: P3 official sources/editions/contracts/
+  independent oracles; P4 fiscal core; P5 durable operation/AEAT; P6 public API,
+  CLI and adapters; P7 whole-product assurance; P8 stable publication/support.
+  Facturacion is not built and is not a P2 integration target.
+- Deviations from roadmap and authority: none in product scope or exit strength.
+  Two corrective increments and the separately protected Dependabot completion
+  were added after completion audits found authority/retry/admission omissions;
+  they increased evidence and control strength without implementing P3 behavior.
+
+### Recovery and next phase
+
+- Recovery/revert point and verified procedure: immutable implementation point
+  `baa92d948912593d0dc5cb5ed361a4bd645f885c`; recovery is a new bounded,
+  signed+DCO protected PR and native squash. Direct push, force push, protected
+  branch/tag deletion and bypass are unavailable. Rebuild from a clean clone,
+  exact toolchain and lock, run `gate:p2`, compare tarball/SBOM digests and repeat
+  the authenticated effective-state audit.
+- Exit-criteria evaluation: clean installs and all supported task roots pass;
+  cycles, duplicate producers/tasks/reports, undeclared IO/network/tools,
+  zero-work, stale output and hand edits are rejected; all 17 contexts are
+  observed on human implementation, `main` and live Dependabot paths, with no
+  workflow path filters; this closure must supply the final docs/evidence-only
+  observation. Tarballs are closed/reproducible and clean-consumed; component
+  graph/SBOM/provenance are reconciled; adversarial fixtures and post-change
+  89/89 GitHub audit pass. Only this closure PR's checks/mechanics and final-main
+  read-back remain self-referentially pending.
+- Next phase and exact prerequisites: P3 only after deriving this closure's
+  squash SHA/tree, verifying GitHub-native signature plus DCO and one-parent
+  history, confirming branch deletion/issue `#10` closure, observing all four
+  post-squash workflows and rerunning the 89-control authenticated audit on the
+  resulting exact SHA. Any mismatch reopens P2.
+- Exact first commands/observations: `git fetch --prune origin`; switch to clean
+  `main`; inspect `git status`, signed log, parent and tree; verify the closure PR
+  and deleted ref by GitHub API; run `npm ci --ignore-scripts --omit=optional`
+  under admitted Node `24.21.0`; install the hash-locked Python requirements;
+  execute `node tooling/tasks/run-task.mjs --task gate:p2`; run
+  `python3 .github/scripts/audit-github.py --subject-sha <closure-sha>`; compare
+  registry, 17 producers, alerts, open proposals and retained evidence.
+- Priority documents to reread: this handoff and implementation roadmap;
+  `docs/02-regulatory/`, `docs/03-requirements/`,
+  `docs/07-formats-cryptography/official-field-and-contract-generation.md`,
+  `docs/11-quality-testing/official-vectors-and-independent-oracles.md`,
+  `docs/13-repository-ci/`, `docs/14-supply-chain-build/`, applicable ADRs and
+  REV-001–REV-006, REV-008 and REV-019.
+- Long-lead items carried forward: official-source applicability/licence review,
+  legal RRSIF/VERI*FACTU and CRA opinions, AEAT authorization/certificates/test
+  endpoint, npm namespace/OIDC custody, stable performance runner, independent
+  oracle/technical/security assessment and account/signing recovery. Their
+  absence blocks only the mapped downstream exits and is never silently waived.
+
+## P3 blocked closure — official sources, editions, contracts and independent oracles
+
+### Identity and status
+
+- Status: `blocked`. P3-W1–P3-W6 safe implementation and executable evidence are
+  complete; the phase is not `evidence-complete`, no edition is approved and P4
+  is not ready because five mandatory AEAT authorities remain unavailable.
+- Started/closed (UTC): issue `#25` bounded P3; implementation merged through PR
+  `#26` at `2026-09-15T20:53:49Z` and PR `#27` at
+  `2026-09-15T21:18:52Z`. This record closes the safe implementation interval,
+  not the external blockers.
+- Input main SHA / tree:
+  `50078eee5363c579ec8a9dca047d5cfc490b00c2` /
+  `0d9177371099ac288e0248d70632da639345f526`, the final P2 closure.
+- Implementation-complete main SHA / tree:
+  `5d23cb7324874127686db0cff403170452c361fa` /
+  `224bfc2d10b91512b7ac0391261c710bcb850a86`.
+- Closure main SHA / tree: derived by resumed P3/P4 intake after this protected
+  closure PR; a commit cannot embed its own identity.
+- Closure PR: dedicated `docs/25-p3-closure` branch and protected PR derived from
+  this record.
+- Roadmap revision: `ROADMAP-DOC-0004`, P3-W1–P3-W6, with no reduction of source,
+  custody, parser, generation, vector, oracle, drift or freeze scope.
+- Documentation inventory digest: before this amendment, 412 current Markdown
+  documents aggregate to SHA-256
+  `73879525a80c29cf1f93b7f3045ea513b7f32949db5aae61421b313fc53ffe57`;
+  117 immutable historical files remain unchanged. The next intake derives the
+  final closure aggregate to avoid a self-invalidating statement.
+
+### Readiness and sources
+
+- Prerequisites and evidence: P2 closure PR `#24` is native-squashed at
+  `50078eee5363c579ec8a9dca047d5cfc490b00c2`, signature-valid, DCO preserving
+  and branch-deleted. Its four post-merge workflows passed before P3 acquisition.
+  P3 used admitted Node `24.21.0`, npm `11.19.1`, Python `3.13.15` and
+  hash-locked `pyshacl 0.40.1` environments.
+- Re-observed mutable sources: bounded observation at `2026-09-15T13:16:10Z`
+  covered BOE, AEAT, EUR-Lex and W3C authorities. Only authenticated,
+  media-checked, size-bounded, no-redirect results entered quarantine; runtime
+  generation and all oracles subsequently ran offline.
+- Assumptions resolved/falsified: the production AEAT WSDL/XSD graph is
+  structurally closable, but XSD enumerations do not replace the unavailable
+  business-validation catalogue; a reachable page is not an authoritative
+  payload; failed TLS is not permission to weaken validation; a separate parser
+  can challenge the JavaScript generator without importing it; a blocked
+  candidate is evidence, not authority to create fiscal artifacts.
+- Initial risks/blockers: stale/partial authority, archive/current ambiguity,
+  XML active content/exhaustion, remote/traversing imports, unsupported silent
+  loss, generator/oracle common cause, hand-edited output, incomplete licences
+  and false downstream completion. Controls fail closed for each class. Five
+  external AEAT blockers remain.
+
+### Work packages and protected history
+
+| Work ID            | Issue | Branch                             | PR                       | branch commits/signers/DCO                                                                                          | squash SHA                                                                 | result                                          |
+| ------------------ | ----- | ---------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- |
+| P3-W1–W4           | `#25` | `build/25-p3-regulatory-contracts` | `#26`                    | `c0c0e2054e862eab122f2d4484fadbd4b3a289e6`; GitHub-verified SSH and DCO                                             | `577429df451e55a021b97a233b7b3af52fcf3164`; valid GitHub signature and DCO | pass; blocked candidate retained                |
+| P3-W5–W6           | `#25` | `build/25-p3-independent-oracles`  | `#27`                    | `0b8c0d7f295149812b684a34023a6ea1ff7a5400`, `b6e303ece22e82344090d379a891a373d5fa0e52`; GitHub-verified SSH and DCO | `5d23cb7324874127686db0cff403170452c361fa`; valid GitHub signature and DCO | pass after CI environment correction            |
+| P3 blocked closure | `#25` | `docs/25-p3-closure`               | derived from this record | verified SSH+DCO required                                                                                           | derived by resumed intake                                                  | records blockers; cannot establish P4 readiness |
+
+Both implementation branches were automatically deleted after native squash.
+There was no direct `main` push, bypass, force push, approval fiction,
+CODEOWNERS requirement or second-person approval requirement.
+
+### Implemented state
+
+- Source custody: immutable snapshot
+  `rrsif-2026-09-15+src.c0c6eb21f6d2`, 37 regular non-symlink objects,
+  manifest SHA-256
+  `b70fee25ac863a41141af9f04116b3f7ad87a1d847afefae64620a0fc901d84f`
+  and closure SHA-256
+  `2be623953f8ac58a35b5f686bc8d144e9998c2499756e4df00fb56500b1bf49f`.
+  Every object has exact length, SHA-256/SHA-512, authority, role, URL,
+  dependencies, licence and redistribution disposition.
+- Licence closure references exactly `AEAT-MANUAL-TERMS`, `AEAT-REUSE-TERMS`,
+  `BOE-REUSE-TERMS` and `W3C-SOFTWARE-DOCUMENT-NOTICE`; no unknown licence was
+  silently accepted.
+- Edition/contracts: immutable candidate
+  `rrsif-2026-09-15-candidate.c0c6eb21f6d2`, five contracts, six public strict
+  JSON Schemas and output closure
+  `ddf049864e2ef8312c09ed4244f228670a903b8336ac264ee4cbf82b2604c2ed`.
+  Status is `candidate`, `immutable=true`, `creationAllowed=false`, approval null.
+- Generator: `RRSIF-CONTRACT-GENERATOR-0001`, configuration
+  `db2de6827a9f8e2a899df09463b60c4e0bb3739c4b2291b6d57f702328a2189d`;
+  catalogue access `517377ca...43d5`, generator `87c57cb0...502` and hostile
+  parser `2473559b...748`. It closes 13 imports, 8 XSDs, one WSDL, 416 element
+  declarations, 45 catalogues and 2 SOAP services.
+- Hostile boundary: digest verification precedes parsing. DTD/entity/XInclude/
+  processing instruction, invalid character/QName/namespace, duplicate expanded
+  attribute, remote/path escape, missing import, namespace mismatch and every
+  byte/depth/node/attribute/text overflow reject. Only the exact W3C XMLDSig DTD
+  is stripped by a bounded scanner without expansion or retrieval.
+- Independent oracle: Python `3.13.15` stdlib Expat implementation
+  `e37f92be9fc6fd09874a8b462c79e5c4d369d40f313f82c5e1277213757296a8`,
+  seed manifest
+  `b22ebd92bb0142cb9fb2c5ef55277ab66dff219ae78613d92881a4e8bc46076e`.
+  It imports no production parser/generator, authenticates all 37 objects and
+  reconstructs document/import/field/facet/catalogue/SOAP/artifact/state results.
+- Task/CI state: `TASK-GRAPH-0001` has 37 tasks; `gate:p3` executes 36 reports.
+  CI quality, regulatory Conformance and non-publishing rehearsal use the same
+  gate with pinned Python and hash-locked SPDX validation. The 17 required
+  context names and zero-review solo governance remain unchanged.
+- Product boundary: no fiscal domain, hash, XAdES, QR, XML emission, persistence,
+  AEAT transport, public API or CLI behavior was implemented. Three package
+  shells still expose zero public bindings; publication remains forbidden.
+
+### Verification and evidence
+
+| Claim                                  | test/oracle                                   | task/job                                                | subject/environment                          | result                                                   | evidence                                                                                       |
+| -------------------------------------- | --------------------------------------------- | ------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Bounded custody/licences               | 21 source cases                               | `policy:regulatory-source-negative`                     | snapshot `rrsif-2026-09-15+src.c0c6eb21f6d2` | pass; 37 sources, 7 blockers, 4 licences                 | PR `#26`; closure `2be62395...49f`                                                             |
+| Hostile offline import                 | 20 XML cases                                  | `security:regulatory-xml`                               | 9 technical documents                        | pass; no network                                         | PRs `#26`/`#27` reports                                                                        |
+| Deterministic generation               | 16 generation/invalidation cases              | `contract:regulatory-generation`, `generate:checked-in` | Node `24.21.0`                               | pass; two byte-identical runs, no diff                   | output `ddf04986...c2ed`                                                                       |
+| Independent challenge                  | Python/Expat plus 10 seeds                    | `oracle:regulatory-independent`                         | Python `3.13.15`, Expat `2.8.2`              | pass; 10/10 defects detected                             | oracle `e37f92be...296a8`; seeds `b22ebd92...6076e`                                            |
+| Requirement/predecessor accountability | matrices plus 9 falsifiers                    | `policy:p3-traceability`                                | 19 requirements, 8 findings                  | pass; 10 enforced, 1 preventive, 6 blocked, 2 downstream | matrices `850d3c11...5eaf`, `118bf5cc...0fb`                                                   |
+| Complete repository gate               | all inherited/P3 controls                     | `gate:p3`                                               | clean Node `24.21.0` / Python `3.13.15`      | pass; 36 reports                                         | PR `#27` CI/Conformance                                                                        |
+| Protected exact-head closure           | required checks plus Performance/inner CodeQL | 17 `Required ·` contexts                                | PR `#27` head `b6e303e`                      | 17/17 plus both additional checks pass                   | CI `35024695609`, Security `35024695586`, Conformance `35024695585`, Performance `35024695699` |
+
+- Coverage/mutation/fuzz scope: 20 XML, 21 source, 16 generation, 10 oracle and
+  9 traceability cases plus inherited foundation/supply-chain falsifiers. Ten
+  oracle mutations cover each independent critical comparison. No percentage or
+  fiscal mutation claim is made because P4 fiscal code does not exist.
+- Security/privacy/supply chain: parsing/generation is offline; no secrets or
+  personal/fiscal production data exist; full-history secret scan, CodeQL, OSV,
+  dependency review, npm audit/signatures/licences and SBOM/SHACL pass. P3 adds
+  no dependency.
+- Performance/reliability/recovery: the gate includes correctness-guarded clean
+  builds, reproducible packages/SBOM/provenance and bounded parser inputs. These
+  are not represented as production fiscal throughput or recovery evidence.
+- Independence: official custody is first party; the Python oracle is
+  implementation-independent, not organizationally or legally independent. No
+  legal compliance, external AEAT conformance or assessment claim is made.
+
+### Failures, corrections and review
+
+- Retained failures: local gate first used the stdlib-only Python wrapper and
+  failed inherited SPDX SHACL because `pyshacl` was intentionally absent; the
+  full locked wrapper passed. PR `#27` first head exposed that promoted
+  Conformance installed Python but not the hash-locked SPDX validator.
+- Root cause: promoting Conformance from `gate:p3-contracts` to `gate:p3` made
+  inherited P2 SPDX semantics transitive. CI quality and release rehearsal
+  already installed it; Conformance did not.
+- Correction/regression: signed+DCO `b6e303e` added the identical
+  `--require-hashes --only-binary=:all:` install. The new exact head reran every
+  context; regulatory Conformance passed in 78 seconds and the failed run remains.
+- Review: the owner authorized P3 execution. No external review was invented;
+  zero approvals are approved solo governance. Merges depended on executable
+  checks, verified signatures/DCO and exact read-back.
+
+### Traceability and residual state
+
+- P3 matrix: `REG-0010/11/12/16/17/18/21/23/25/30/31/70/71/72` and
+  `SEC-0010/11/12/16/70` map to sources, blockers, contracts and task IDs.
+  the prior extraction record and its non-claim boundary.
+- Historical findings: REV-006 is verified prevented for P3 custody/regeneration;
+  REV-001/002/004/005 remain blocked; REV-003/008/019 continue to P4. No finding
+  is deleted or globally claimed fixed.
+- Mandatory blockers: `AEAT-RECORD-DESIGN-PAYLOAD` and
+  `AEAT-VALIDATION-CATALOGUE-PAYLOAD` expose no authoritative artifact;
+  `AEAT-HASH-SPECIFICATION-PDF`, `AEAT-SIGNATURE-SPECIFICATION-PDF` and
+  `AEAT-QR-SPECIFICATION-PDF` fail the admitted TLS certificate chain. TLS was
+  not disabled and archived bytes were not substituted.
+- Other observations: fresh EUR-Lex GDPR/CRA snapshots returned unstable
+  interstitial content and remain blockers for later mapped phases; they do not
+  grant or remove P3/P4 authority.
+- Exit evaluation: origin/digest/licence is complete for admitted bytes;
+  generation, unsupported rejection, seeded oracle and no live runtime source
+  pass. Mandatory-source completeness fails, so P3 remains blocked, no edition
+  is approved and `creationAllowed=false` remains mandatory.
+
+### Recovery and next phase
+
+- Recovery point: protected `5d23cb7`. Recovery uses a scoped SSH-signed+DCO PR
+  and native squash; immutable snapshot/candidate directories are never edited.
+- Invalidation: any source plan/byte/dependency/licence/parser/generator/schema/
+  oracle/seed/matrix/blocker change requires a successor identity and full rerun.
+- Unblock procedure: re-observe with normal TLS and bounded acquisition; admit
+  all five authorities into a new quarantine closure; resolve licences and
+  dependencies; promote a successor snapshot/candidate; generate only sourced
+  semantic/hash/signature/QR contracts; add independent vectors/oracles; rerun
+  all negative/drift gates; merge a new protected closure.
+- P4 MUST NOT start while blocked. It becomes ready only after zero mandatory
+  AEAT blockers, an approved edition with explicit creation policy, complete
+  requirement-to-contract/oracle mapping and protected final-main read-back. No
+  deadline or exception can waive these facts.
+- Resume by fetching/pruning `main`; verify closure PR/signature/DCO/deleted
+  branch/post-merge workflows; run `gate:p3`; perform bounded source observation;
+  compare all identities before creating a successor. If authority is still
+  unavailable, refresh the observation and retain `blocked` without P4 code.
+
+### Amendment P3-001 — closure identity read-back
+
+- Superseded statement: the P3 work-package table above names the PR `#26`
+  branch as `build/25-p3-regulatory-contracts`; GitHub's immutable PR record
+  proves its actual head branch was `build/25-p3-source-custody`.
+- Reason and actor: final requirement-by-requirement completion audit by Codex
+  compared the handoff with GitHub after PR `#28` merged and detected the naming
+  mismatch. No source, contract, test or phase-status evidence is affected.
+- Correct identity: PR `#26`, head
+  `c0c0e2054e862eab122f2d4484fadbd4b3a289e6`, branch
+  `build/25-p3-source-custody`, squash
+  `577429df451e55a021b97a233b7b3af52fcf3164`; the remote branch is deleted.
+- Closure read-back: PR `#28`, head
+  `64ff30a6bba67c167b0ee193fc1bfe035a4ab57e`, branch
+  `docs/25-p3-closure`, squash
+  `3e58deeccc1ea35c88da32dad9336b33df28c170`, tree
+  `1b6b57e4960ca42210356f87c3eec0c8b898e205`, one parent `5d23cb7`; GitHub
+  verifies the native squash signature and retained DCO, and the branch is
+  deleted.
+- Final-main evidence: push runs CI `35025796522`, Security `35025796626`,
+  Conformance `35025796503` and Performance `35025796520` all completed
+  successfully on exact SHA `3e58dee`. Issue `#25` remains open by design as the
+  authoritative external-blocker record.
+- Disposition: current capsule and phase ledger now contain the derived closure
+  identity. P3 remains `blocked`; this amendment does not approve an edition,
+  authorize fiscal creation or make P4 ready.
+
+### Amendment P3-002 — 2026-09-16 source-observation correction
+
+- Statement corrected: the blocked-source summary stated that the record-design
+  and validation discovery pages exposed no authoritative artifact link. The
+  immutable captured pages and a fresh P4 intake observation both contain an
+  explicit AEAT link to the corresponding payload on the legacy
+  `www.agenciatributaria.es` host.
+- Correct value and reason: both linked HTML payloads are unavailable through
+  the admitted channel because normal TLS validation fails before HTTP with
+  curl exit `60`, OpenSSL verify result `68` and `CA signature digest algorithm
+too weak`. The three linked hash, signature and QR payloads fail identically.
+  This corrects the first two reason descriptions; it does not remove a blocker.
+- Discovered by / actor: Codex P4 intake on `2026-09-16T06:10:39Z`, while
+  validating observed reality against the handoff before implementation.
+- Evidence locator and digest: the five authenticated discovery-page byte
+  lengths and SHA-256 values, target diagnostics and alternate-host `404`
+  observations are recorded in
+  [`open-questions-and-blockers.md`](open-questions-and-blockers.md).
+  Fresh `gate:p3` executed 36 reports successfully on protected SHA
+  `3ed7436d4898f80b1d39365b9381232f1851ee28` with Node `24.21.0`, npm
+  `11.19.1` and Python `3.13.15`; its result still reports seven blocked sources,
+  six blocked requirements and `creationAllowed=false`.
+- Affected requirements, phases, releases and claims: `REG-0011`, `REG-0018`,
+  `REG-0021`, `REG-0023`, `REG-0025`, `FUN-0010`–`FUN-0019`, P3 and P4. P3
+  remains `blocked`; P4 remains `planned` and not ready; no release or fiscal
+  creation claim is authorized.
+
+### Amendment P3-004 — 2026-09-16 semantic extraction and activation closure
+
+- Superseded current statements: the active capsule and Amendment P3-003 said
+  that the admitted AEAT workbook, validation/error catalogue, fingerprint,
+  XAdES/PKI and QR authorities were still pending. That was true at the
+  successor-custody transition and remains immutable historical evidence; it is
+  no longer the current P3 state.
+- Active successor: `rrsif-2026-09-16-active.dc3f7e967b00`, derived from the
+  immutable snapshot `rrsif-2026-09-16+src.e29c003123dc` and overlay digest
+  `dc3f7e967b00250cd62b60fc80dd6aaca515e91497ece15a3c95ae8a94e0403c`.
+  The descriptor is immutable, `status=active`, `creationAllowed=true`, has
+  explicit decision `P3-ACTIVATION-0001` and no creation blockers. The former
+  candidate remains immutable, unapproved and non-creating.
+- Semantic contract: `contracts/semantic-overlay.json` contains the complete
+  11-sheet record-design workbook extraction, 247 live error codes, 12
+  source-located validation groups, temporal cutover, three official SHA-256
+  fingerprint preimage/digest vectors, XAdES-EPES target/reference/transform/
+  algorithm/policy/certificate contract, authenticated signature-example
+  identities and QR endpoint/content/rendering contract. Official statements,
+  Noeos hardening and downstream P4 implementation are explicitly separated.
+- Independent evidence: the Python 3.13.15 stdlib/Expat oracle authenticates 44
+  source objects, reconstructs 416 structural declarations and 45 catalogues,
+  independently parses the workbook/error catalogue/signature examples,
+  recomputes all three fingerprint vectors and detects 17/17 seeded defects.
+  `generate:checked-in`, regulatory state and the nine traceability falsifiers
+  pass; traceability reports 19 requirements, zero pending/blocked P3 statuses,
+  five verified-prevented historical findings and three downstream findings.
+- Schema compatibility: the historical v1 public bundle schema is untouched;
+  the active edition uses the new strict v2 bundle schema so immutable historical
+  descriptor identities remain valid. Six active public schemas remain closed;
+  lifecycle negatives prove inactive editions cannot authorize creation.
+- Boundary: this transition authorizes P4 to implement edition-bound fiscal
+  behavior. It does not claim that packages, XML/XSD runtime validation,
+  fingerprint/chaining runtime, XAdES/PKI provider, QR renderer, Verification
+  Engine adapter, AEAT transport, legal declaration or product publication are
+  complete. Those claims remain owned by P4–P8 and their evidence gates.
+- Protected closure mechanics: this amendment must be merged through a
+  GitHub-protected SSH-signed+DCO PR with final-head required checks, squash to
+  `main`, automatic branch deletion and post-merge read-back. The exact PR,
+  squash/tree identities and workflow run IDs are appended after GitHub closes
+  that transition; until then P4 source remains unstarted.
+- Evidence/exits invalidated: the historical snapshot stays immutable, but its
+  `OFFICIAL_PAGE_HAS_NO_ARTIFACT_LINK` explanation must not be repeated as the
+  current cause. P3 completion and every P4 exit remain unsatisfied until a
+  successor snapshot admits all five payload bytes and closes their dependent
+  contracts and independent oracles.
+- Remediation and protected PR: this append-only correction plus the live
+  blocker summary enter through issue `#25` and a signed+DCO protected PR. The
+  resulting squash SHA, checks and branch deletion are derived by the next
+  intake; no P4 production source is added by this correction.
+
+### Amendment P3-003 — 2026-09-16 successor source custody
+
+- Statements superseded: Amendment P3-002 correctly described the OpenSSL TLS
+  failure observed at `2026-09-16T06:10:39Z`, but its live conclusion that five
+  AEAT authorities were unavailable is no longer current. The historical
+  snapshot/candidate and earlier prose remain immutable evidence of what was
+  known then; they are not rewritten or presented as the selected edition.
+- Discovery and decision: Microsoft Edge and the Microsoft-signed Windows
+  `curl.exe` 8.21.0 Schannel backend validated the legacy host through their
+  ordinary platform trust path. A new versioned importer was admitted rather
+  than weakening OpenSSL, disabling verification, copying browser cache or
+  replacing the authoritative origin. The acquisition requires
+  `ssl_verify_result=0`, TLS 1.2 or later, no proxy, no redirect, exact media and
+  magic, bounded bytes and both SHA-256/SHA-512.
+- Transport identity: `windows-curl-schannel-v1`; executable 818,512 bytes,
+  SHA-256
+  `73d24149ff289afc49ec41f08918ef9faa727d39ad993e929757dc2ddafab805`;
+  Authenticode status `Valid`, signer `Microsoft Windows`, thumbprint
+  `DC91E564D5BC1E3A8E02D6A8508682ABEA8A2443`. Configuration SHA-256 is
+  `249f5f72e7576e64b9a3332846a092146be531edf60ea99f646752e43671928c`.
+- Tool identities: Schannel acquisition
+  `d6c8cd3b235980dd15b780682946ac2456407fb6ccd13f76fc8218139c4554f7`;
+  offline promotion
+  `e64168a41ad66aac3cfde1241ba3e16bfb1232122ea06ff1ef9cacad15c4aab0`;
+  successor generator
+  `b2f2dd9b28abf6fa980b13241ab1b780036fb8ec8ff785fafb4d9e8b0e4a8cd8`.
+  Each identity is authenticated by the succeeding transition before bytes are
+  admitted or generated.
+- Source transition: plan canonical SHA-256
+  `e29c003123dc49b62854a32874c5ea1805177b6997a113e1dfbadb4596ef3b32`
+  produced immutable snapshot
+  `rrsif-2026-09-16+src.e29c003123dc`, descriptor SHA-256
+  `29cb6c94a11df22957e09fb16e51d25429e5729a905bae7dc0cc1575e19cc36d`,
+  with 44 sources and closure
+  `70d5d94c33f9bd307d8d36f6fe806bccb08e7cad4808af555d16d057b954de5b`,
+  manifest
+  `d85dc6012cb46c9b7ba11012bc5566916b125a3f78a96a8e22b7cc267da2b64d`
+  and custody evidence
+  `b07610260f2f48fc749e77dad3b9a2506c79acccf424a3452db471cd35751878`.
+  It adds the record workbook, validation PDF, live error properties, hash PDF,
+  signature PDF/examples ZIP and QR PDF, and admits the observed updated
+  consolidated RD 1007/2023 bytes. Promotion normalizes every retained data file
+  to mode `0644`, preventing executable-bit inheritance from the Windows source
+  mount.
+- Candidate transition: generator `RRSIF-CONTRACT-GENERATOR-0002` produced
+  `rrsif-2026-09-16-candidate.e29c003123dc`, descriptor SHA-256
+  `7a4503ab03b2d271c944fbdd1523349e9b1b955d875780922d63d4e2e72b1a93`
+  and output closure
+  `ba88247d8095ad4b26228975c1ddb55cc85ec88a531ac12ab373a5c70471a499`.
+  Its structural counts remain nine technical documents, thirteen imports, 416
+  fields, 45 catalogues and two SOAP services. It is immutable, unapproved and
+  `creationAllowed=false`.
+- Cross-runtime determinism correction: the first PR head exposed that generator
+  v2 recorded the executing Node version, so the compatibility jobs produced
+  different canonical bytes under Node `22.14.0` and `22.23.2`. The admitted
+  primary runtime is now an explicit, schema-validated configuration input
+  (`node 24.21.0`) shared by both generator stages; it is not ambient process
+  state. Configuration SHA-256 is
+  `60091b8b335c05119abcfb4754e20dfd93856491bcd2050cc1081376816e6b8b`.
+- Executable evidence: `policy:regulatory-source-negative` passes 25 cases over
+  37 historical and 44 successor sources; `security:regulatory-xml` passes 20;
+  `contract:regulatory-generation` passes 16 with byte-identical no-network
+  generation; the independent Python/Expat oracle authenticates all 44 sources,
+  reports zero baseline differences and detects 10/10 seeded defects; the nine
+  traceability falsifiers pass. Full `gate:p3` passes 36 reports on Node
+  `24.21.0` and Python `3.13.15`.
+- Correct status and residual work: acquisition is no longer an external P3
+  blocker. The two deferred EUR-Lex observations map only to later legal phases.
+  P3 is `active`, not evidence-complete: source-located semantic/error,
+  fingerprint, XAdES/PKI and QR extraction, independent vectors/attacks and an
+  explicit approved/active edition transition remain. No P4 source, fiscal
+  artifact authority, publication or legal compliance claim is created here.
+- Invalidated instruction: do not keep re-observing the five AEAT payloads as
+  unavailable and do not begin P4. Resume by verifying the protected
+  successor-custody PR/signature/DCO/checks/branch deletion, then complete the
+  remaining P3 semantic and activation work in separate signed+DCO vertical
+  PRs. The successor-custody squash SHA and post-merge runs are self-referential
+  here and must be added by the next protected intake.
+
+### Amendment P3-005 — 2026-09-16 protected semantic activation closure
+
+- Protected identity: PR `#32` carried signed+DCO head
+  `7bdd185d55f3aee97a428204638fa4d7b7961a6a` from branch
+  `build/25-p3-semantic-edition-activation`. GitHub merged it with protected
+  squash as `608f74b366aaaec21b24e3b322618a2d0ac6e1e2`; the native GitHub
+  signature and DCO are valid and the source branch was automatically deleted.
+- Final-main read-back: protected `main` is exactly
+  `608f74b366aaaec21b24e3b322618a2d0ac6e1e2`, tree
+  `b755d2dbdb3c3c4b272d413e502acba4ae3ff023`, with sole parent
+  `70abda6ff11e288d8bf2a7a1c106e7e6e82befbc`. The local checkout fast-forwarded
+  to that object without uncommitted implementation changes before this
+  append-only handoff update.
+- Required evidence: CI run `35135106587`, Security run `35135106687`,
+  Conformance run `35135106786` and Performance run `35135106662` completed
+  successfully on the PR head; the inner CodeQL check was also successful
+  (`104925640990`). The required-check closure job
+  `104925867120` passed after all required contexts completed.
+- Closure result: P3 is now protected `evidence-complete` for source custody,
+  semantic contract generation, active-edition lifecycle and independent
+  oracle scope. The 17-seed oracle baseline remains zero-difference and all
+  17 seeded defects are detected. This amendment does not claim fiscal runtime,
+  XML/XSD runtime provider, XAdES/PKI, QR implementation, Verification Engine
+  adapter, AEAT transport, publication or legal certification.
+- Next-phase authorization: P4 may start from this exact `main` head. Its first
+  context must re-read the complete handoff and roadmap, assert the active
+  edition identity and rerun the P3 gates before adding production source.
+  Facturacion does not exist and is not an input or integration dependency.
+
+## P4 closure — deterministic fiscal core and verification boundaries
+
+### Identity and status
+
+- Status: `evidence-complete` for the P4 scope in `implementation-roadmap.md`.
+- Started/closed (UTC): `2026-09-16T18:58:32Z` / `2026-09-16T19:29:52Z` protected merge; handoff closure follows in a dedicated PR.
+- Input main SHA / tree: `608f74b366aaaec21b24e3b322618a2d0ac6e1e2` / `b755d2dbdb3c3c4b272d413e502acba4ae3ff023`.
+- Closure implementation SHA / tree: `b6ffbe95b4d33038fc19e2c77d493295dcc88ff2` / `c2ac8b5978d6be66ccf8e60ae83aae1dd44645c7`.
+- Closure handoff SHA / tree: `fd4b81640332a0d4f2169155d0f6f2d37ea0c1b6` / `2fd9fc9f1fa44f554e0cc94d4963f27c0a9a4a45` (protected PR `#38`).
+- Closure PR: implementation PRs `#34`–`#37`; this handoff is the protected closure PR for the phase.
+- Roadmap revision: `ROADMAP-DOC-0004`, P4-A through P4-G.
+- Documentation inventory digest: derived by the closure task; no secrets or payloads are embedded here.
+
+### Readiness and sources
+
+- Prerequisites and evidence: protected P3 semantic activation (`#32`), active edition `rrsif-2026-09-16-active.dc3f7e967b00`, source snapshot `rrsif-2026-09-16+src.e29c003123dc`, and admitted `@noeos/verification-engine@1.0.1` tarball SHA-256 `74e2449b5bab61ee62bdedc0355567461b33eadf15338f7d3265207bd28395f8`.
+- Re-observed mutable sources/dependencies: GitHub protected state, package lock, edition descriptor and public Verification Engine exports were re-read before each protected PR; no private/internal Engine import is used.
+- Assumptions resolved/falsified: Facturacion is not built and is not a dependency; all clock, randomness, storage, network and key material enter through explicit ports; QR/XSD/signing backends cannot silently elevate their own results.
+- Initial risks/blockers: historical semantic omissions, ambient authority, byte drift, XML entity/namespace attacks, signature wrapping and public-export drift were converted into bounded contracts and negative tests.
+
+### Work packages and protected history
+
+| Work ID       | Issue      | Branch                      | PR    | branch commits/signers/DCO                                                                      | squash SHA                                 | result |
+| ------------- | ---------- | --------------------------- | ----- | ----------------------------------------------------------------------------------------------- | ------------------------------------------ | ------ |
+| P4-A          | roadmap P4 | `build/27-p4a-domain-core`  | `#34` | `3c5bb56e5d3b4e35bf9d3f3a0d7fb20bf63c40c9`, SSH+DCO                                             | `0e3ffaf88cd60ad0d06658f7b387c287ab66fc27` | pass   |
+| P4-B/C/D/E/F  | roadmap P4 | `build/28-p4b-xml-qr`       | `#35` | `fd6cef5786749aaa64bf8d23ab32e7fb2a2c002f`, `14abbffeaed67ab17f41ec400eed53dc0f0bc0b9`, SSH+DCO | `d7ccbff222f90b220545689568460165f8bc32b6` | pass   |
+| P4-C provider | roadmap P4 | `build/29-p4c-xsd-provider` | `#36` | `8a8c748976ba82689bf7742ab541a81522cf8777`, SSH+DCO                                             | `71dafd150175469c6b6f4d60a13ba55e2c405b31` | pass   |
+| P4-G          | roadmap P4 | `build/30-p4g-gate-attacks` | `#37` | `cc8ae46b1670418109bd93e6f5cc6c46ff231074`, SSH+DCO                                             | `b6ffbe95b4d33038fc19e2c77d493295dcc88ff2` | pass   |
+
+### Implemented state
+
+- Components and behavior: branded decimal/date/time/identifier values; fiscal context and mode tenure; alta/anulación/event records; immutable chain heads and fingerprints; effect-free plans with explicit head tokens/expiry; byte artifacts and monotonic states; deterministic XML projection/escaping; closed offline XSD provider; XAdES/PKI provider contracts with exact reference/algorithm/certificate checks; QR canonical content plus bounded SVG rendering/decode provider; distinct official/cryptographic/AEAT/Noeos claims; public Verification Engine `dev.noeos.jcs` adapter.
+- Paths/files: `packages/verifactu/src/domain/{artifact,claims,context,edition,integrity,lifecycle,offline-xsd,operations,pki,qr,records,result,scalars,verification-engine,xades,xml}.ts`, package allowlists/counts, P4 contract and fiscal attack tests, task graph and required workflow gates.
+- Public API/diagnostics: 149 admitted source bindings and 55 runtime bindings; all failure paths use versioned `DIAG-*` results; no internal/oracle exports.
+- Schemas/formats/editions: active edition fingerprint/XAdES/QR profiles are consumed immutably; UTF-8, uppercase SHA-256, canonical decimals/dates, XML control/entity rejection, QR duplicate/unknown/canonical checks and provider identities are enforced.
+- Persistence/migrations/compatibility: deliberately none; P5 owns durable state, UoW, outbox and migrations.
+- Toolchain/dependencies/Actions: exact existing Node/npm/TypeScript matrix; only admitted Verification Engine dependency; required quality/regulatory/release jobs now execute `gate:p4`.
+- GitHub effective state: protected squash-only `main`, zero approvals/CODEOWNERS, SSH signatures+DCO, auto-delete and all required checks green for every PR.
+
+### Verification and evidence
+
+| Claim/requirement                                  | test/oracle                                           | canonical task/job                                         | subject/environment                | result | evidence locator/digest                                     |
+| -------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------- | ------ | ----------------------------------------------------------- |
+| Domain/plan/artifact/XML/QR/claims/Engine contract | `tests/contract/p4-domain-core.mjs` (26 assertions)   | `contract:p4-domain` through `gate:p4`                     | Node 22/24 CI matrix               | pass   | PR #37 required contexts; head check closure `104944730320` |
+| Hostile XML/XSD/XAdES/PKI/QR/expiry/CAS cases      | `tests/security/p4-fiscal-attacks.mjs` (9 assertions) | `security:p4-fiscal` through `gate:p4`                     | network denied, explicit providers | pass   | PR #37 head `cc8ae46b...`; closure `104944730320`           |
+| Package/API and clean consumers                    | shell/build/pack/tarball consumer tasks               | `package:reproducibility`, `integration:tarball-consumers` | ESM/CJS/types, clean install       | pass   | PR #35/#37 checks; runtime 55 bindings                      |
+| Cross-platform deterministic gates                 | canonical task graph                                  | required Ubuntu/Windows/macOS contexts                     | Node 22.14.0, 22.23.2, 24.21.0     | pass   | PR #37 all required contexts and Performance/CodeQL         |
+
+- Coverage/mutation/fuzz: P4 critical branches are exercised by positive, boundary and seeded hostile tests; full mutation/fuzz campaigns remain a P7 assurance obligation and are not falsely claimed here.
+- Security/privacy/supply-chain: no ambient imports, raw keys, network/storage or taxpayer payloads in the core; parser/entity/wrapping/resource and export-drift negatives pass; CodeQL, OSV, dependency review, secret scan and npm admission pass.
+- Performance/reliability/recovery: bounded byte/depth/node limits and deterministic build smoke pass; durable crash/recovery and long-run performance belong to P5/P7.
+- Package/tarball/integration: allowlisted reproducible tarballs install in a clean consumer with exact public ESM/CJS/type identities and no CLI binary.
+- Legal/regulatory/external observations: official semantic and source claims are inherited from P3; P4 does not claim AEAT acceptance, legal opinion, certificate issuance or publication authorization.
+
+### Failures, corrections and review
+
+- First failures retained: initial PR #35 failed every format-gated job because local formatting used default Prettier options; QR attack test initially accepted noncanonical decimal input.
+- Root causes and affected variants: formatter configuration drift; parser validated percent encoding but not fiscal lexical canonicality.
+- Corrections/regressions: repository Prettier config was applied in signed follow-up commit `14abbff...`; QR parsing now re-parses and compares canonical NIF/series/date/amount; PR #35 was rerun green and PR #37 added the regression.
+- Invalidated evidence rerun: all PR #35 checks reran after formatting; PRs #36 and #37 passed required-check closure, platform matrix, conformance, Performance and CodeQL.
+- Review conversations: protected branch policy, zero-approval solo governance and no-CODEOWNERS decision remain unchanged and were re-read by the governance job.
+
+### Traceability and residual state
+
+- Requirements/ADRs/controls closed: P4-A through P4-G in the implementation roadmap; domain/operations/artifact/XML/XSD/XAdES/PKI/QR/claims/Engine documents and mapped historical findings REV-002–027, REV-045–046 are represented by code/tests or explicit downstream boundaries.
+- REV findings disposed: ambient authority, public-export drift, byte custody, canonical lexical drift, XML hostile constructs and signature wrapping are prevented or detected by executable controls.
+- Current findings: real host XSD/XAdES/PKI/QR backend capability admission, durable persistence, AEAT transport, legal review, full mutation/fuzz campaigns and publication remain open downstream.
+- Risks/exceptions/open questions: provider implementations are untrusted until their returned bytes/reports pass independent verification; no external certificate, AEAT credential or Facturacion system is assumed.
+- Explicit remaining committed scope: P5 durable stores/UoW/recovery and edition-bound AEAT wire orchestration; P6 adapter kit/CLI/public package cells; P7 whole-product assurance; P8 publication/support.
+- Deviations from roadmap and authority: none; provider boundaries are deliberately explicit to avoid ambient authority and do not waive the normative P4 contracts.
+
+### Recovery and next phase
+
+- Recovery/revert point: protected `main` `b6ffbe95b4d33038fc19e2c77d493295dcc88ff2`; revert/forward-recovery must use a new SSH-signed+DCO PR and rerun `gate:p4`.
+- Exit-criteria evaluation: P4 gate, contract, hostile security, package, platform, regulatory and required-check closure evidence all pass; public release/legal/AEAT claims remain forbidden.
+- Next phase and exact prerequisites: P5; re-read `08-persistence-consistency`, `09-aeat-integration`, `06-contracts/host-transaction-contract.md`, verify the active edition and Verification Engine tarball, then run `gate:p4` before adding ports.
+- Exact first commands/observations: `git fetch origin main --prune`; verify `git rev-parse origin/main` equals `b6ffbe95...`; inspect `git status --short`; run `node tooling/tasks/run-task.mjs --task gate:p4` under the admitted Node/Python profile; inspect GitHub effective protection.
+- Priority documents to reread: `implementation-roadmap.md`, `08-persistence-consistency/`, `09-aeat-integration/`, `06-contracts/host-transaction-contract.md`, `05-architecture/determinism-and-io.md`, `07-formats-cryptography/byte-artifact-lifecycle.md`.
+- Long-lead items: legal/RRSIF review, AEAT test credentials/certificates and endpoint observations, provider capability admission, independent cryptographic/XML/QR readers, crash/recovery harness and future-Facturacion synthetic host contract.
+
+### Amendment P4-001 — 2026-09-16 protected handoff identity
+
+- Statement corrected: the initial P4 closure record necessarily named the
+  implementation merge `b6ffbe95...` because a commit cannot contain its own
+  final SHA; the current-context capsule therefore did not yet identify the
+  handoff commit itself.
+- Correct value and reason: protected handoff PR `#38` had signed+DCO head
+  `a3caf98f0d2090fb2b359faee92cf3c9df5b6bc7` and native squash
+  `fd4b81640332a0d4f2169155d0f6f2d37ea0c1b6`, tree
+  `2fd9fc9f1fa44f554e0cc94d4963f27c0a9a4a45`, parent
+  `b6ffbe95b4d33038fc19e2c77d493295dcc88ff2`.
+- Discovered by / actor: Codex phase-closure read-back on `2026-09-16T19:35:01Z`.
+- Evidence locator and digest: GitHub PR `#38`; all required contexts,
+  `gate:p4`, Performance and CodeQL passed; required-check closure was
+  observed on the PR head before merge.
+- Affected requirements, phases, releases and claims: P4 handoff identity
+  only; no implementation, legal, AEAT, publication or Facturacion claim is
+  widened.
+- Evidence/exits invalidated: none; the implementation evidence remains bound
+  to `b6ffbe95...` and the current phase input is now bound to `fd4b816...`.
+- Remediation and protected PR: this append-only amendment is merged through a
+  new SSH-signed+DCO protected PR; its final SHA is derived by the next intake.
+
+## P5 implementation candidate — unprotected working record
+
+- Scope: roadmap P5-A through P5-G; this record is not a phase closure and has
+  no protected identity until the implementation and closure PRs pass all
+  required checks.
+- Re-read and binding: `docs/08-persistence-consistency/`,
+  `docs/09-aeat-integration/`, `docs/06-contracts/host-transaction-contract.md`,
+  the active edition `rrsif-2026-09-16-active.dc3f7e967b00`, and the P4 public
+  core were inspected before implementation.
+- Candidate implementation: the public core now exposes provider-facing
+  persistence ports, an atomic standalone test adapter with CAS, idempotency,
+  journal, outbox leases/fencing, indeterminate delivery, reconciliation,
+  checkpoints, rollback detection, schema migration, backup/restore and
+  retention dry-run; it also exposes exact edition-bound AEAT request/response
+  boundaries, certificate authorization, identity headers, one-observation
+  transport, retry decisions, correlation and a synthetic local peer.
+- Local evidence currently passes: P5 contract (29 assertions), boundary
+  security (8), and recovery performance (100 records). The peer is local and
+  synthetic; no AEAT acceptance, live certificate, private key, taxpayer
+  payload or external portal result is claimed.
+- Governance correction required before closure: the current protected `main`
+  handoff identity `23dda329...` has a signed commit but no canonical
+  `Signed-off-by` trailer, and its push CI reported the required commit-policy
+  failure (`35141730436`). P4 functional evidence remains intact, but the
+  append-only P5 delivery must correct this current governance state and
+  re-observe the full required-check closure before claiming P1-P5 closed.
+- Durable backend boundary: the package contains no ambient filesystem,
+  database, network or key access. `InMemoryAtomicStore` is explicitly
+  `standalone-test`; a production durable provider and authorized AEAT
+  observation remain separately qualified boundaries and are not silently
+  represented by the local adapter.
+
+## P5 closure — deterministic persistence and AEAT protocol boundaries
+
+### Identity and status
+
+- Status: `evidence-complete` for roadmap P5-A through P5-G's declared
+  deterministic model/adapter, recovery, security and local protocol scope.
+- Started/closed (UTC): `2026-09-16` intake /
+  `2026-09-16T21:30:41Z` protected implementation merge.
+- Input main: `fd4b81640332a0d4f2169155d0f6f2d37ea0c1b6`, the protected P4
+  handoff; implementation head `eed0a8ca2c004d5e9a957fe8ad055ae11249a514`
+  was SSH-signed and DCO-valid.
+- Protected implementation merge: PR `#40`, squash
+  `bd51d2823cfc325947702493415c96b2249761eb`, tree
+  `0cb1a848526b9772078a0b7f13057e6d7a0ff010`, sole parent
+  `23dda32978787825bf71a1695c0e12f2f62faa21`.
+- Closure record: this append-only handoff update is delivered by a dedicated
+  signed+DCO closure PR; its final protected identity is recorded in the
+  following amendment after merge.
+
+### Implemented state
+
+- Persistence ports cover records, exact byte artifacts, journal events,
+  evidence backup/restore and outbox intent. The standalone adapter executes
+  one atomic host publication boundary and rejects context/edition mixing,
+  stale heads, conflicting command identities, invalid predecessors and
+  outbox references outside the committed artifact set.
+- Outbox lifecycle covers pending, leases, attempt start, indeterminate and
+  possibly-observed delivery, reconciliation-required, retry-wait and
+  terminal classifications. Lease owners and fencing tokens prevent stale
+  workers from recording observations; unknown delivery requires
+  reconciliation before resend.
+- Recovery covers integrity re-verification, immutable checkpoint anchors,
+  rollback detection, sequential schema migration, digest-verified backup and
+  atomic restore-on-integrity-failure. Retention is dry-run and fail-closed;
+  no record or artifact is silently purged.
+- AEAT boundaries cover exact edition/environment HTTPS allowlists, system and
+  taxpayer identity binding, certificate-purpose authorization, deterministic
+  UTF-8 SOAP bytes, bounded batches/responses/wait values, strict XML active
+  construct rejection, identity correlation and retry decisions. Transport
+  observes once; retry and reconciliation remain durable orchestration
+  concerns.
+- `LocalProtocolHarness` is a strict synthetic peer with deterministic
+  drop/TLS/write/timeout/truncate/oversize/malformed fault scenarios and
+  redacted observations. It has no external AEAT authority and never emits
+  acceptance evidence for the real service.
+
+### Verification and evidence
+
+- Exact local gate: `gate:p5` passed 43 tasks with Node `24.21.0`, npm
+  `11.19.1`, TypeScript `5.9.3` and Python `3.13.15`. This included
+  `gate:foundation`, `gate:p2`, `gate:p3`, `gate:p3-contracts`, `gate:p4`,
+  all policy negatives, SBOM/SPDX SHACL, reproducible packages, clean
+  consumers and the three P5 tasks.
+- P5 contract: `tests/contract/p5-durable-aeat.mjs`, 29 assertions passed;
+  security: `tests/security/p5-boundary-attacks.mjs`, 8 assertions passed;
+  performance/recovery: `tests/performance/p5-recovery.mjs`, 100 chained
+  records, 274621-byte backup, 93.19 ms exploratory local run.
+- Package evidence from the same gate: public binding count 67; development
+  Verifactu tarball SHA-256
+  `da454dca6cbddf7c7527b4c02df817dd4854eda3d02198a1a138c833d048c460`;
+  component graph SHA-256
+  `f59ff2f98bc7ac31fd21c6e0086c654f947f2f5ad51a604cacc39a042d37e927`;
+  CycloneDX SHA-256
+  `eab0fbbe0d75374399140f9229cffca19224671501df07411783f24164b9f997`.
+- Protected PR `#40` passed all required contexts, Performance and CodeQL:
+  governance/DCO, documentation, quality, reproducibility, the five runtime
+  matrix contexts, regulatory/generated contracts, integration conformance,
+  CodeQL, OSV, dependency review, npm audit, secret scan and required-check
+  closure (`104984613658`).
+- P1-P4 revalidation: the local 43-task gate passed every inherited gate,
+  including P4's 26 domain and 9 fiscal-attack assertions. The observed
+  missing-DCO defect on the prior handoff identity `23dda329...` was corrected
+  by the DCO-bearing protected P5 squash `bd51d282...`; no functional P4
+  failure was inferred from that governance correction.
+
+### Failures, corrections and residual boundaries
+
+- Observed local failures and corrections: an initial Python venv resolved to
+  3.14.4 instead of the admitted 3.13.15 and was replaced by the exact locked
+  runtime; one gate run was invalidated after an edit during its snapshot and
+  was rerun from a stable tree; strict lease expiry and restore rollback were
+  hardened before the final passing run.
+- Production durable storage is intentionally not claimed by the package:
+  filesystem/database authority is a provider responsibility behind the
+  ports, and `InMemoryAtomicStore` reports `standalone-test`. Its atomic,
+  fencing, digest and recovery behavior is contract evidence, not a claim of
+  crash persistence in a selected production engine.
+- External AEAT endpoint/WSDL/certificate/mTLS observations, authorized
+  consultation/submission acceptance and legal/RRSIF review remain external
+  gates. No credential, private key, taxpayer payload or Facturacion system was
+  accessed or embedded. P6 owns adapter-kit/CLI integration; P7 owns whole
+  product mutation/fuzz and sustained performance assurance; P8 owns
+  publication/support.
+
+### Exit and next phase
+
+- P5 exit criteria are closed for the declared deterministic boundaries:
+  atomic publication, no split record/artifact/journal/outbox outcome,
+  idempotency/CAS/fencing, bounded recovery/migration/backup, exact wire
+  bytes, fail-closed identity/response parsing, ambiguity reconciliation and
+  redacted observability are executable and green.
+- Next phase: P6, starting from protected `main` at
+  `5207cd4db6291f8b31b2f9a23354ee9755ba8cdc` after this closure record is
+  protected. P6 must qualify real provider implementations without widening
+  the local-only or no-secret guarantees above.
+
+### Amendment P5-001 — 2026-09-16 protected closure identity
+
+- Protected closure PR `#41` carried signed+DCO head
+  `886cea82a53fd84dcb1d4a10d916a96abd11883c`; GitHub merged it with protected
+  squash `5207cd4db6291f8b31b2f9a23354ee9755ba8cdc`, tree
+  `23d005d39068d577231ebdd3896ad6a4466aaa5e`, sole parent
+  `bd51d2823cfc325947702493415c96b2249761eb`.
+- Read-back performed on `2026-09-16T21:35:06Z`: PR `#41` required contexts,
+  Performance and CodeQL were all successful; required-check closure was
+  `104986047111`. Both P5 implementation and closure branches were deleted
+  after protected merge.
+- Affected scope: P5 handoff identity, evidence locators and next-phase
+  pointer only. No implementation, legal, external AEAT, publication or
+  Facturacion claim is widened. The final protected `main` is now the exact
+  P5 recovery point.
+
+## P6 closure — public products and ecosystem conformance
+
+### Identity and status
+
+- Status: `evidence-complete` for the declared P6 candidate-product and
+  ecosystem scope; no publication or external acceptance is claimed.
+- Started/closed (UTC): `2026-09-17T11:59:00Z` / protected closure merge
+  `2026-09-17T12:28:34Z`.
+- Input main SHA / tree:
+  `742b5b609d055eb53c93dad92b40b79973f92678` /
+  `ba1cf2aad92c82aed1e770e7c204a7627daa4dd0`.
+- Closure main SHA / tree: `35cc132f20e9290b93dba4bee3d716c92745f57a` /
+  `569fbb61a136a8e6e6ed9f1b4abe0c8c7166f558`.
+- Closure PR: implementation `#43`; dedicated signed+DCO closure PR `#44`,
+  with protected identity recorded in amendment `P6-001` below.
+- Roadmap revision: `ROADMAP-DOC-0004`.
+- Documentation inventory digest: closure-tree current Markdown inventory,
+  413 files, SHA-256
+  `af5885af6df3e6274ee83ce4c0b2f1f64534a6d0bcc14f32c4e6f84d5046a1c7`;
+  historical archive remains 117 files, SHA-256
+  `99641c59c5e5bc32c08dfc337912301b8a7c1f91f08976673eb52396f41c93a1`.
+
+### Readiness and sources
+
+- Prerequisites and their evidence: protected P5 `main` at
+  `742b5b609d055eb53c93dad92b40b79973f92678`; current `06-contracts` and
+  `16-integrations-conformance`; package/build/compatibility policies; active
+  edition `rrsif-2026-09-16-active.dc3f7e967b00`; admitted public Verification
+  Engine tarball; clean worktree and signed+DCO branch history.
+- Re-observed mutable sources/dependencies: Node `22.14.0`, `22.23.2`,
+  `24.21.0`; npm `11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock;
+  `@noeos/verification-engine@1.0.1`; profile `dev.noeos.jcs@1.0.0`; all
+  package, Action, schema and external-input digests used by the inherited
+  supply-chain controls. The Engine tarball is SHA-256
+  `74e2449b5bab61ee62bdedc0355567461b33eadf15338f7d3265207bd28395f8`.
+- Assumptions resolved/falsified: package consumers cannot use workspace or
+  sibling source; ESM/CJS/type exports must refer to the same contract; the CLI
+  bin is a real installed executable; adapter reports cannot add fiscal
+  semantics; unavailable provider cells cannot become success; Facturacion is
+  absent and is represented only by a versioned contract and synthetic host.
+- Initial risks/blockers: incomplete public surface, deep-import leakage,
+  CJS/ESM identity drift, dependency/source shortcuts, empty adapter reports,
+  CLI nondeterminism, unbounded codecs and overclaiming provider/Facturacion
+  capability. Each received a boundary or negative fixture; no P6 blocker
+  remains inside the declared local scope.
+
+### Work packages and protected history
+
+| Work ID  | Issue                     | Branch                        | PR    | branch commits/signers/DCO                                                                                                                                                          | squash SHA                                 | result                                        |
+| -------- | ------------------------- | ----------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------- |
+| P6-W1–W8 | none; roadmap-bound phase | `feature/p6-public-ecosystem` | `#43` | `d6894b58611883ae1878ebbcec8122b37f27bb18`, `e76fcf8`, `e040fb3`, `515ed52`; admitted SSH signer `SHA256:65VbGskWghAQAXDbJ3/1hrWuYegZNLs/+S96BbNQCzI`, matching DCO on every commit | `54bdda1ef4fe34ff45d98a432347f4dbf28996ce` | pass; native protected squash, branch deleted |
+
+### Implemented state
+
+- Components and behavior: public `createVerifactu` client with configuration,
+  capabilities, records, verification, submissions, events, editions, schemas,
+  evidence and limits; strict JSON/NDJSON codecs; deterministic CLI; typed
+  adapter factory/instance/conformance reports, fault identities and cleanup;
+  individual provider capability status; Engine and synthetic future-host
+  integration contracts.
+- Paths/files created, changed or removed: `packages/verifactu/src/public-api.ts`,
+  public exports and persistence ports; `packages/cli/src/main.ts` and bin;
+  `packages/adapter-kit/src/index.ts`; two public JSON schemas; P6 contract,
+  integration and performance tests; clean-consumer child entrypoint; package
+  content/shell/build/typecheck/task-graph policy updates; approved P6 evidence.
+- Public API/CLI/events/diagnostics: library expected exports `227` and runtime
+  exports `80`; adapter kit `16`/`5`; CLI `5`/`4`; installed consumer public
+  binding count `89`. CLI commands are deterministic JSON/NDJSON with stable
+  diagnostics and exit codes; configured-missing capabilities fail closed.
+- Schemas/formats/editions/generated output: configuration/result schemas are
+  included under `schemas/`; schema descriptors are closed and versioned;
+  active edition is immutable and historical editions remain addressable;
+  package files, bin mode, licence/notice and exports are allowlisted.
+- Persistence/migrations/compatibility: P5 atomic UoW, fencing, outbox,
+  backup/restore, migration and historical verification were re-exercised as
+  inherited prerequisites; P6 synthetic Facturacion persists and reopens
+  history. No production durable backend or real Facturacion repository was
+  introduced.
+- Toolchain/dependencies/Actions: exact 248-entry npm lock; package dependency
+  lockstep is core Engine `1.0.1`, adapter/CLI core development version;
+  declaration builds resolve dependent package types from clean built outputs;
+  no lifecycle scripts or unadmitted network is added.
+- GitHub/npm/external effective state: PR `#43` was squash-merged under the
+  protected rules, all 17 required contexts plus Performance and CodeQL passed,
+  and the implementation branch was deleted. Packages remain private
+  `0.0.0-development` candidates; no npm publication occurred.
+
+### Verification and evidence
+
+| Claim/requirement                          | test/oracle                                                                                   | canonical task/job                                      | subject/environment                                                                         | result                                               | evidence locator/digest                                                                                                                                                                                                                                                   |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full inherited and P6 gate                 | task DAG, negative fixtures and gate closure                                                  | `gate:p6`                                               | protected `main` `54bdda1e`; Node 24.21.0/Python 3.13.15                                    | pass, 49 tasks                                       | `evidence/runs/p6-protected-final`; `gate:p6` report subject `54bdda1ef4fe34ff45d98a432347f4dbf28996ce`                                                                                                                                                                   |
+| Exact package artifacts                    | clean build, normalized tarball and reproducibility oracle                                    | `package:reproducibility`, `package:tarballs`           | two clean roots; npm 11.19.1                                                                | pass                                                 | library `301fdc7bdf93caae87bafc8885ba02edbb313f1cf76bb9a2446e9fffeec6ac5a`; adapter `3360453a2bc6365d8ccca66c37a2b5a94590d173bc4f2a459323beb6a1aa3c46`; CLI `b9f0ed33206b38626ddcdd4e5746a1e19e8c855f4c190a6aca4cdbe69287608f`                                            |
+| Installed ESM/CJS/types and closed imports | clean consumer with source/network denial and negative deep import                            | `integration:tarball-consumers`                         | one clean root, four digest-checked tarballs                                                | pass                                                 | `evidence/runs/p6-protected-final/integration-tarball-consumers.json`; 3 ESM, 2 CJS, 3 type packages, CLI bin present, 89 bindings                                                                                                                                        |
+| Public library, CLI and adapter contracts  | P6 contract plus boundary tests                                                               | `contract:p6-public-products`, `security:p6-boundaries` | built candidate distributions                                                               | pass; 29 contract assertions, 3 adapter scenarios    | `tests/contract/p6-public-products.mjs`; `tests/integration/p6-providers.mjs`; reports in the P6 evidence run                                                                                                                                                             |
+| Verification Engine and future Facturacion | Engine hash/evidence, atomic host UoW, claim fencing, backup/restore, historical verification | `integration:p6-engine-facturacion`                     | `@noeos/verification-engine@1.0.1`, `dev.noeos.jcs@1.0.0`, synthetic `facturacion-host-v1`  | pass, 18 assertions                                  | `tests/integration/p6-engine-facturacion.mjs`; package digest above; no real Facturacion implementation                                                                                                                                                                   |
+| Provider cells                             | offline XSD and certificate fixtures; explicit signer/storage/transport absence               | `integration:p6-providers`                              | bounded offline fixtures, no credentials                                                    | pass for 2 exercised cells; 3 explicitly unavailable | `tests/integration/p6-providers.mjs`; `claimedProviderCells:0`, `explicitUnavailableCells:3`                                                                                                                                                                              |
+| Clean build and consumer performance       | three clean builds and 1,000 codec/CLI iterations                                             | `performance:build-smoke`, `performance:p6-consumers`   | Node 24.21.0; isolated temp roots                                                           | pass; max build 3,420 ms; 1,000 iterations 46.33 ms  | reports in `evidence/runs/p6-protected-final`                                                                                                                                                                                                                             |
+| Protected CI portability/security          | required contexts and platform matrix                                                         | PR `#43` checks                                         | Ubuntu 24.04 Node 22.14.0/22.23.2/24.21.0, Windows 2025 Node 24.21.0, macOS 15 Node 24.21.0 | all pass                                             | run jobs `105198592969`, `105198593229`, `105198593499`, `105198593396`, `105198593245`, `105198593571`, `105198593459`, `105198593559`, `105198593623`, `105199033255` plus security jobs `105198594846`, `105198595458`, `105198595130`, `105198595174`, `105198595234` |
+
+- Coverage/mutation/fuzz results and justified scope: P6 exercised boundary,
+  negative, lifecycle and fault identities; sustained whole-product mutation,
+  fuzz, independent review and release rehearsal are intentionally P7.
+- Security/privacy/supply-chain results: BOM/UTF-8/duplicate/framing/size,
+  semantic-authority, deep-import, source-shortcut, package-content, lockstep,
+  DCO/signature and network-denial controls passed; no secrets or taxpayer data
+  were used.
+- Performance/reliability/recovery results: clean builds, codecs, CLI,
+  atomic synthetic host, fencing and backup/restore passed within exploratory
+  local bounds; production SLOs and crash/long-run baselines remain P7.
+- Package/tarball/integration matrix results: exact digests and installed
+  ESM/CJS/type/bin matrix above; no workspace/sibling source was available to
+  the consumer; unsupported cells remain visible and non-successful.
+- Legal/regulatory/external observations and independence class: regulatory
+  edition and generated contracts are inherited approved source-located
+  evidence; provider and Engine observations are local/fixture or public
+  tarball evidence. No live AEAT, legal acceptance, production certificate or
+  independent external review was observed.
+
+### Failures, corrections and review
+
+- First failures retained: source typecheck could not resolve the workspace
+  core package; clean declaration builds initially rejected the dependency
+  source outside package `rootDir`; earlier P6 runs also exposed a fixture bin
+  expectation, undeclared clean-child process, strict configuration-shape test,
+  CLI LF framing, duplicate assurance ID and lint diagnostics.
+- Root causes and affected variants: source-only type consumers had no admitted
+  path mapping; clean package builds had no sibling `node_modules`; policy and
+  negative fixtures still encoded P2 empty-shell assumptions; tests and docs
+  were temporarily inconsistent with strict schemas and uniqueness rules.
+- Corrections/regressions: source typecheck now maps the core package to its
+  source; package declarations resolve the already-built core declaration from
+  the clean build order; shell policy admits only the declared CLI bin; the
+  clean child is declared; strict fixtures, LF output, lint and assurance IDs
+  were corrected. No failed claimed provider cell was converted to success.
+- Invalidated evidence rerun: the failed local/CI P6 attempts were superseded
+  by the final protected `main` gate and the succeeding PR #43 required-check
+  closure; all affected package/build/regulatory/quality reports were rerun.
+- Review conversations and dispositions: PR #43 protected checks and
+  governance/DCO validation passed; no approval fiction or bypass was used.
+
+### Traceability and residual state
+
+- Requirements/ADRs/controls closed: P6-W1–P6-W8; `docs/06-contracts`,
+  `docs/16-integrations-conformance`; package/build/compatibility, public
+  security and historical-finding controls named by the roadmap; ADR-0035,
+  ADR-0038 and ADR-0039.
+- REV findings disposed: the P6 historical inputs in this document are
+  exercised or explicitly carried forward; no finding is closed by an absent
+  provider or by aggregate success masking an unavailable/failed cell.
+- Current findings: production durable storage, live AEAT, real Facturacion,
+  private production signer/certificate material, legal/CRA acceptance,
+  independent review and release/publication gates remain open downstream.
+- Risks/exceptions/open questions: candidate packages are private and
+  development-versioned; P6 performance is exploratory; provider capability
+  descriptors intentionally report unavailable where no authorized real
+  adapter exists.
+- Explicit remaining committed scope: P7 whole-product assurance, sustained
+  performance/recovery, migration campaign, release rehearsal and independent/
+  external evidence; P8 stable publication, verification and support.
+- Deviations from roadmap and authority: none. P6-W7 is satisfied by individual
+  exercised cells plus explicit unavailable cells; the roadmap prohibition on
+  inventing providers or requiring a real Facturacion implementation is
+  preserved.
+
+### Recovery and next phase
+
+- Recovery/revert point and verified procedure: protected implementation merge
+  `54bdda1ef4fe34ff45d98a432347f4dbf28996ce` is the P6 product recovery point;
+  rerun the exact admitted `gate:p6` command from a clean checkout, then use
+  the package digests above to compare artifacts. Revert only through a signed,
+  DCO-bearing protected PR.
+- Exit-criteria evaluation: complete; all P6 work packages, exact exports,
+  schemas, commands, events, errors, capability cells, clean package installs,
+  Engine profile, synthetic host, provider honesty, compatibility and CI
+  requirements passed in the declared scope.
+- Next phase and exact prerequisites: P7 after this closure record and its
+  identity amendment are protected; first schedule whole-product assurance,
+  sustained performance/recovery, mutation/fuzz, migration and release-
+  rehearsal evidence, then obtain the remaining external observations.
+- Exact first commands/observations: verify `git rev-parse origin/main`, its
+  tree and this handoff; verify PR/branch deletion and required-check read-back;
+  run `NODE_BIN=/tmp/verifactu-node.dmrkuL/node-v24.21.0-linux-x64/bin; PATH="$NODE_BIN:$PATH" TMPDIR=/tmp VERIFACTU_PYTHON=/tmp/verifactu-python-3.13.15-p3/bin/python "$NODE_BIN/node" tooling/tasks/run-task.mjs --task gate:p6 --evidence-dir evidence/runs/p7-intake`.
+- Priority documents to reread: `docs/17-roadmap-risk/implementation-roadmap.md`,
+  this handoff, `docs/06-contracts/`, `docs/16-integrations-conformance/`,
+  `docs/10-security-privacy/`, `docs/11-quality-testing/` and
+  `docs/18-assurance-audits/p6-public-ecosystem-evidence.md`.
+- Long-lead items carried forward: authorized AEAT endpoint/WSDL/certificate
+  access, production durable-store adapter, real Facturacion coordination,
+  signer/certificate provider, independent/legal/CRA review, npm ownership/
+  OIDC publication controls and stable performance/release baselines.
+
+### Amendment P6-001 — 2026-09-17 protected closure identity
+
+- Statement corrected: the P6 closure record initially named its implementation
+  merge while the dedicated handoff PR was still unmerged.
+- Correct value and reason: closure PR `#44` carried signed+DCO head
+  `1e5ecd9ecaeeef4a193dbcdb28d9c8a2682cc148`; GitHub merged it with protected
+  squash `35cc132f20e9290b93dba4bee3d716c92745f57a`, tree
+  `569fbb61a136a8e6e6ed9f1b4abe0c8c7166f558`, sole parent
+  `54bdda1ef4fe34ff45d98a432347f4dbf28996ce`.
+- Discovered by / actor: Codex protected-main handoff read-back after PR #44.
+- Evidence locator and digest: PR #44 required contexts, Performance and
+  CodeQL all passed; required-check closure job `105201699788`; protected main
+  read-back on `2026-09-17T12:28:34Z`. Package and Engine digests remain those
+  in the P6 evidence table and are unaffected by this documentation-only
+  amendment.
+- Affected requirements, phases, releases and claims: P6 handoff identity,
+  phase ledger, current-context capsule and P7 intake only. No implementation,
+  provider, Facturacion, legal, external AEAT or publication claim is widened.
+- Evidence/exits invalidated: the pre-merge closure identity placeholder only;
+  all P6 implementation, CI, package and local evidence remains valid.
+- Remediation and protected PR: PR #44 was merged squash-only with required
+  signatures/DCO and automatic branch deletion. P7 must derive the resulting
+  `main` SHA of this amendment, verify this record and rerun the declared intake
+  observations before starting new implementation.
+
+## P7 active record — whole-product assurance and release rehearsal
+
+### Identity and status
+
+- Status: `active`; not `evidence-complete` and not eligible for a closure PR.
+- Started: `2026-09-17T12:45:00Z` UTC; no closure time exists.
+- Input protected `main`: `4fb35c2f0a4394120af1de94ea8a207ed5447aa4`, tree
+  `651456ae2b4295bc38be858e2d69da5f012344f0`.
+- Implementation PR: `#46`, merged squash-only through the protected flow;
+  correction PRs `#49`, `#51`, `#53` and `#54` subsequently removed the false
+  real-Facturacion blocker, corrected exact-tree binding, expanded the installed
+  campaign and closed the claim/evidence graph; no P7 closure PR exists because
+  the authoritative gate is blocked.
+- Roadmap revision: `ROADMAP-DOC-0004`; campaign policy:
+  `config/assurance/p7-campaigns.json` (`P7-ASSURANCE-0001`).
+- P7 evidence schema: `evidence/schemas/p7-audit.schema.json`.
+
+### Work packages and evidence
+
+The canonical task graph now contains `assurance:p7-graph`,
+`assurance:p7-quality`, `security:p7-privacy`, `performance:p7-baselines`,
+`supply-chain:p7-audit`, `integration:p7-external-matrix`,
+`release:p7-legal-operations`, `assurance:p7-audits`,
+`release:p7-rehearsal`, `assurance:p7-dossier` and a fail-closed `gate:p7`.
+The authoritative exact-tree dossier run `evidence/runs/p7-dossier-main-6`
+executed 59 inherited/P7 tasks; the P7 task reports all bind subject
+`4fb35c2f0a4394120af1de94ea8a207ed5447aa4` and tree
+`651456ae2b4295bc38be858e2d69da5f012344f0`. The fail-closed gate run is
+`evidence/runs/p7-gate-blocked-main-5` and exited 42.
+The report files are ignored by Git by policy; raw artifact paths and SHA-256
+digests are retained in `docs/18-assurance-audits/p7-assurance-evidence.md`.
+
+Observed local evidence:
+
+- P7-A enumerated all 84 historical findings and all ten P7 waves.
+- P7-B ran 18 installed regression/consumer scripts, 1,000 deterministic fuzz
+  cases and 259 property cases without a throw/hang. Production
+  line/function/branch coverage and mutation thresholds remain unqualified
+  because no admitted production instrumenter/mutation engine is present.
+- P7-C ran XML, fiscal, boundary and admitted Gitleaks regressions; all 18
+  threat/control references remain represented. No independent penetration
+  review is claimed.
+- P7-D retained 20 raw latency/RSS samples, explicitly exploratory because no
+  stable qualified performance runner or adopted official baseline is available.
+- P7-E reconciled the exact 248-entry lock, 39 Action references, dual SBOM and
+  non-publishing provenance rehearsal. The mutable CycloneDX SPDX input was
+  refreshed to observed digest
+  `33863a360fc4d348e183d89c1ca7aa0877f481e7eb55be2d4102a30386188a10` through
+  protected PR `#54`; no stable attestation exists.
+- P7-F passed installed Engine `1.0.1`, offline providers and the synthetic
+  future-Facturacion host. Correction PR `#49` removed the incorrect blocker for
+  the absent real Facturacion repository; authorized AEAT, production
+  certificate/mTLS and external provider observations remain absent.
+- P7-G/H inventoried regulatory/CRA/declaration/operations evidence and all 84
+  findings, but no competent legal/CRA/privacy or technical independent review
+  has occurred. Internal evidence is labelled self-assessment.
+- P7-I passed a non-production three-package partial-publication and
+  forward-recovery simulation. No npm/GitHub channel or OIDC identity was
+  mutated. P7-J produced `p7-candidate-blocked-v1`, not authorization.
+
+### Current blockers and recovery
+
+`gate:p7` is deliberately fail-closed with exit 42 while any of these remain:
+
+1. Coverage/mutation denominators and the required 98/98/95, critical 100 and
+   other 95 thresholds have not been produced by admitted tools.
+2. Official performance/reliability baselines and a stable authorized runner
+   have not been observed.
+3. Authorized AEAT observation, production certificate/mTLS and external
+   provider conformance are unavailable.
+4. Competent external technical/security and legal/RRSIF/CRA/privacy reviews
+   are unavailable; no self-review is relabelled independent.
+5. Account/key/workstation/OIDC recovery custody and a real registry read-back
+   rehearsal are unavailable.
+
+The exact observations, first failures, corrections and unblock evidence are in
+`docs/18-assurance-audits/p7-assurance-evidence.md`. No blocker is an exception
+or legal waiver. The real Facturacion absence is a preserved ecosystem boundary.
+Any correction invalidates affected waves and requires a fresh exact-subject
+campaign through a signed/DCO protected PR. P8 cannot start until a later
+protected P7 closure record supplies all required external evidence and explicit
+release authorization. The exact post-merge raw-artifact digests and gate
+blocker keys are recorded in `docs/18-assurance-audits/p7-assurance-evidence.md`.
+
+### Final protected read-back
+
+The last protected `main` pointer before this documentation amendment is
+`8281ffa490ec856276dc91ffe90f2103f4834b97`, tree
+`fc9d5fb211dd1e4c6a8d3ed2db07b8ff8eb5ed75`; GitHub reports PRs `#53` through
+`#56` as merged/closed and their source branches as deleted. This amendment is
+documentation-only and does not change the authoritative P7 campaign subject
+`4fb35c2f0a4394120af1de94ea8a207ed5447aa4`, tree
+`651456ae2b4295bc38be858e2d69da5f012344f0`.
+
+### Amendment P7-003 — 2026-09-17 exact-tree campaign readback
+
+- Statement corrected: the prior P7 record described the authoritative task
+  reports with tree `not-derived-by-task-shell` and named the pre-`#51` campaign
+  subject and raw-artifact set.
+- Correct value and reason: protected PR `#51` merged as verified squash
+  `a47b18c814fbab3ad6ccb191d07ff2441ff40853`, exact tree
+  `162b1030824387de06e2354f22ef8b82f486510a`. Fresh A–J and gate runs were
+  executed from that subject under Node `24.21.0` and Python `3.13.15`.
+- Evidence locator and digest: dossier
+  `evidence/runs/p7-dossier-main-4`, task-report SHA-256
+  `5e6ea2e34af3db3b1295a22c46951d6cfa68f1afedb83ef43478975aee40211d`; gate
+  `evidence/runs/p7-gate-blocked-main-3`, task-report SHA-256
+  `c61df374047d909f9479d00246ddec7cc590539ce5022642a9579ce6430b24b2`, exit
+  42. The nine raw wave digests are in the P7 evidence document.
+- Findings and disposition: A passed with exact subject/tree. B, D, E, F, G,
+  H, I and J remain truthfully blocked by the previously recorded mandatory
+  quality, performance, supply-chain attestation, authorized external,
+  independent review, recovery-custody and hosted publication conditions. The
+  six normalized gate blocker keys are unchanged. The absence of a real
+  Facturacion implementation remains a documented boundary and is not a
+  blocker.
+- Affected requirements, phases, releases and claims: P7 campaign identity and
+  evidence locators only; P7 remains active and no stable, supported,
+  compliant, certified, AEAT-accepted, real-Facturacion or publication claim is
+  widened.
+- Evidence/exits invalidated: the pre-`#51` P7 campaign binding and its raw
+  artifact locators are superseded for current exact-tree readback; no prior
+  implementation or P6 evidence is invalidated.
+- Remediation and protected PR: this amendment is delivered through a new
+  SSH-signed+DCO protected documentation PR; its final protected SHA is derived
+  by the next handoff readback.
+
+### Amendment P7-004 — 2026-09-17 expanded quality campaign
+
+- Statement corrected: the P7 record previously stated 14 installed scripts;
+  the admitted campaign actually covers 18 installed quality, contract, policy
+  and performance entrypoints.
+- Evidence: protected PR `#53`, squash
+  `8717adbfc5050404730f6692485f7b1fdb328470`, tree
+  `d65eeec28458ff21842d975dc61a215973823ab8`; final B raw digest
+  `a569dd0cf463f33a70dedeab58ae4d83b03459233862a88835b0042c06985de9`.
+- Disposition: 18 executions, 1,000 fuzz cases and 259 property cases passed;
+  coverage and mutation blockers remain open because no admitted production
+  denominators exist.
+
+### Amendment P7-005 — 2026-09-17 typed graph and external-input readback
+
+- Statement corrected: P7-A/J lacked machine-validated graph closure, and the
+  mutable CycloneDX SPDX subschema had moved from v1.1-3.28.0 to v1.1-3.29.0.
+- Evidence: protected PR `#54`, squash
+  `4fb35c2f0a4394120af1de94ea8a207ed5447aa4`, exact tree
+  `651456ae2b4295bc38be858e2d69da5f012344f0`; graph closure 163 nodes/296
+  edges with no orphans, unknown references, stale evidence, missing artifacts
+  or unknown claims; refreshed input digest
+  `33863a360fc4d348e183d89c1ca7aa0877f481e7eb55be2d4102a30386188a10`.
+- Final locators: dossier `evidence/runs/p7-dossier-main-6`, task-report
+  digest `5b52f8a5e8cc241015b99f2089bd9483874f9c9b6b7ba646afb46c17333c2976`;
+  gate `evidence/runs/p7-gate-blocked-main-5`, task-report digest
+  `2c7f8f0c18013c4924c684a5113c4143c0f38d44d5b6a30cd53a93b56260991a`, exit
+  42 with the six normalized blocker keys.
+- Disposition: P7 remains active and blocked; no closure PR, P8 authorization,
+  stable/support/compliance/certification/AEAT acceptance, real-Facturacion or
+  publication claim is widened.

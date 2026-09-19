@@ -1,0 +1,33 @@
+name: Governed work item
+description: Propose a bounded repository change.
+title: "[work]: "
+labels: []
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective and scope
+      description: State the intended outcome and explicit omissions.
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Authority and traceability
+      description: List applicable requirements, ADRs, sources, risks, or findings.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and negative cases
+      description: Describe evidence, failure paths, and rollback.
+    validations:
+      required: true
+  - type: checkboxes
+    id: sensitive
+    attributes:
+      label: Sensitive-data check
+      options:
+        - label: I will not include secrets, private keys, certificates with private material, or real fiscal/personal data.
+          required: true

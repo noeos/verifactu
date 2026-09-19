@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "repository": "noeos/verifactu",
+  "observedAt": "2026-09-19T16:00:00Z",
+  "inputMainSha": "fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0",
+  "inputMainTree": "445827818107df80bc5ae845ca3c042da71a0715",
+  "currentDocumentFiles": 418,
+  "currentMarkdownFiles": 415,
+  "currentDocumentationAggregateSha256": "a99b0dfc29e9da0d2a22f75bebbe9e782e215e74b72ee28da2ed00320eb5b3f8",
+  "historicalFiles": 118,
+  "historicalAggregateSha256": "0bdda50cfbccca9fe17c65c5ba5dd0d532374292c21a8cb7471930c5418a231e",
+  "signerFingerprint": "SHA256:65VbGskWghAQAXDbJ3/1hrWuYegZNLs/+S96BbNQCzI",
+  "initialDiscrepancies": [
+    "main contained only LICENSE while the approved documentation was untracked",
+    "main had no branch or tag ruleset and no classic protection",
+    "merge commits and rebase merges were enabled and branch auto-delete was disabled",
+    "Actions full-SHA enforcement was disabled",
+    "secret scanning, push protection, Dependabot security updates, and private vulnerability reporting were disabled",
+    "organization administrative surfaces requiring admin:org were inaccessible and remain explicit unknowns",
+    "the retained execution record in handoff.md describes a prior repository incarnation and is non-authoritative"
+  ],
+  "bootstrapException": {
+    "authority": ["GOV-004", "GOV-010", "REPO-DOC-0022"],
+    "scope": "the first protected-flow seed and documentation admission only; no product source",
+    "expiresWhen": "strict main and release-tag rulesets are active and independently read back",
+    "routineReuse": false
+  }
+}

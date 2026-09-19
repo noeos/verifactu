@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.noeos.dev/verifactu/governance/document-metadata.schema.json",
+  "title": "VeriFactu documentation metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "status", "authority", "owner", "created", "last-reviewed"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 160},
+    "status": {
+      "enum": ["proposed", "researching", "draft", "under-review", "approved", "blocked", "superseded", "retired", "historical-input", "open", "closed", "accepted", "rejected"]
+    },
+    "authority": {"enum": ["normative", "decision", "evidence", "informative", "historical-input", "generated"]},
+    "owner": {"type": "string", "minLength": 1},
+    "created": {"type": "string", "format": "date"},
+    "last-reviewed": {"type": "string", "format": "date"},
+    "review-by": {"type": "string", "format": "date"},
+    "starts": {"type": "string", "format": "date-time"},
+    "expires": {"type": "string", "format": "date-time"},
+    "subject-sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "supersedes": {"$ref": "#/$defs/identifiers"},
+    "sources": {"$ref": "#/$defs/identifiers"},
+    "decisions": {"$ref": "#/$defs/identifiers"},
+    "requirements": {"$ref": "#/$defs/identifiers"},
+    "tests": {"$ref": "#/$defs/identifiers"},
+    "risks": {"$ref": "#/$defs/identifiers"},
+    "controls": {"$ref": "#/$defs/identifiers"},
+    "dependencies": {"$ref": "#/$defs/identifiers"},
+    "historical-inputs": {"$ref": "#/$defs/identifiers"}
+  },
+  "$defs": {
+    "identifiers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"}
+    }
+  }
+}

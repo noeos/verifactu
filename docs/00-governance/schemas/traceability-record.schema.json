@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.noeos.dev/verifactu/governance/traceability-record.schema.json",
+  "title": "VeriFactu traceability relationship",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["from", "relationship", "to", "disposition"],
+  "properties": {
+    "from": {"$ref": "#/$defs/id"},
+    "relationship": {
+      "enum": ["derives-from", "constrains", "decides", "implements", "verifies", "mitigates", "produces-evidence-for", "supersedes", "dispositions"]
+    },
+    "to": {"$ref": "#/$defs/id"},
+    "disposition": {
+      "enum": ["satisfied", "superseded", "not-applicable-demonstrated", "accepted-risk", "blocked"]
+    },
+    "rationale": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"}
+  }
+}
