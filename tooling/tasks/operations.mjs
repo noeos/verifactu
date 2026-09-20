@@ -182,6 +182,12 @@ function toolchainSummary(toolchain) {
 }
 
 async function runNpm(args, options = {}) {
+  if (process.env.VERIFACTU_NPM_ROOT)
+    return run(
+      process.execPath,
+      [resolve(process.env.VERIFACTU_NPM_ROOT, "npm/bin/npm-cli.js"), ...args],
+      options,
+    );
   if (process.platform === "win32")
     return run("cmd.exe", ["/d", "/s", "/c", "npm", ...args], options);
   return run("npm", args, options);
@@ -363,6 +369,18 @@ function validateDependencySpec(name, specifier) {
     exactVersion(specifier),
     "DEPENDENCY_MUTABLE",
     `${name}: ${specifier}`,
+  );
+}
+
+export function validateDependencyCooling(admission, reviewedAt, days) {
+  const published = Date.parse(admission.publishedAt);
+  const reviewed = Date.parse(`${reviewedAt}T00:00:00Z`);
+  assert(
+    Number.isFinite(published) &&
+      Number.isFinite(reviewed) &&
+      reviewed - published >= days * 86400000,
+    "DEPENDENCY_COOLING_PERIOD",
+    admission.name,
   );
 }
 
@@ -617,6 +635,13 @@ async function policyToolchain(context) {
   );
   assert(npmRecord, "TOOLCHAIN_NPM_ADMISSION", npmVersion);
   const npmCli = resolve(npmRootResult.stdout.trim(), "npm/bin/npm-cli.js");
+  if (process.env.VERIFACTU_NPM_ROOT)
+    assert(
+      resolve(process.env.VERIFACTU_NPM_ROOT) ===
+        resolve(npmRootResult.stdout.trim()),
+      "TOOLCHAIN_NPM_ROOT_MISMATCH",
+      npmRootResult.stdout.trim(),
+    );
   assert(
     (await sha256File(npmCli)) === npmRecord.cliSha256,
     "TOOLCHAIN_NPM_DIGEST",
@@ -883,6 +908,11 @@ async function policySupplyChain(context) {
     dependencyAdmission.dependencies.map((entry) => [entry.name, entry]),
   );
   assert(
+    dependencyAdmission.coolingPeriodDays === 7,
+    "DEPENDENCY_COOLING_POLICY",
+    String(dependencyAdmission.coolingPeriodDays),
+  );
+  assert(
     canonicalJson([...directDependencies.keys()].sort()) ===
       canonicalJson([...admittedDependencies.keys()].sort()),
     "DEPENDENCY_ADMISSION_SET",
@@ -891,6 +921,48 @@ async function policySupplyChain(context) {
   for (const [name, version] of directDependencies) {
     const admission = admittedDependencies.get(name);
     assert(admission.version === version, "DEPENDENCY_ADMISSION_VERSION", name);
+    const locked = lock.packages[`node_modules/${name}`];
+    assert(locked, "DEPENDENCY_LOCK_MISSING", name);
+    assert(
+      locked.integrity === admission.integrity &&
+        locked.resolved === admission.source &&
+        locked.license === admission.license,
+      "DEPENDENCY_ADMISSION_IDENTITY",
+      name,
+    );
+    validateDependencyCooling(
+      admission,
+      dependencyAdmission.reviewedAt,
+      dependencyAdmission.coolingPeriodDays,
+    );
+    assert(
+      admission.maintainers?.length > 0 &&
+        /^(?:git\+)?https:\/\//u.test(admission.repository) &&
+        admission.transitiveGraph === "package-lock.json",
+      "DEPENDENCY_ORIGIN",
+      name,
+    );
+    assert(
+      admission.installLifecycle === false &&
+        locked.hasInstallScript !== true &&
+        admission.optionalCode === false &&
+        Object.keys(locked.optionalDependencies ?? {}).length === 0,
+      "DEPENDENCY_EXECUTION_SURFACE",
+      name,
+    );
+    const installedFiles = await walk(
+      resolve(context.root, "node_modules", name),
+    );
+    const nativeFiles = installedFiles.filter(
+      (entry) =>
+        entry.type === "file" &&
+        /\.(?:node|dll|so|dylib|exe)$/iu.test(entry.relative),
+    );
+    assert(
+      admission.nativeCode === false && nativeFiles.length === 0,
+      "DEPENDENCY_NATIVE_CODE",
+      name,
+    );
     for (const field of [
       "purpose",
       "alternatives",
@@ -898,6 +970,8 @@ async function policySupplyChain(context) {
       "advisories",
       "license",
       "exit",
+      "permissions",
+      "network",
     ])
       assert(
         admission[field]?.length > 0,
@@ -1104,6 +1178,15 @@ async function testPolicy(context) {
       case "range-spec":
         fixtureError(fixture.expectedCode, () =>
           validateDependencySpec("fixture", "^1.0.0"),
+        );
+        break;
+      case "too-new-dependency":
+        fixtureError(fixture.expectedCode, () =>
+          validateDependencyCooling(
+            { name: "fixture", publishedAt: "2026-09-19T00:00:00Z" },
+            "2026-09-20",
+            7,
+          ),
         );
         break;
       case "extra-file":

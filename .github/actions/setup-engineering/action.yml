@@ -25,3 +25,4 @@ runs:
         test "$(npm --version)" = "$ADMITTED_NPM_VERSION"
         npm ci --ignore-scripts --omit=optional
         npm cache add @noeos/verification-engine@1.0.1 --ignore-scripts --no-audit --no-fund
+        echo "VERIFACTU_NPM_ROOT=$(npm root --global)" >> "$GITHUB_ENV"

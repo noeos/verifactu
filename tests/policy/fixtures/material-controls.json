@@ -99,6 +99,12 @@
       "expectedCode": "DEPENDENCY_MUTABLE"
     },
     {
+      "id": "NEG-DEPENDENCY-002",
+      "control": "dependency",
+      "mutation": "too-new-dependency",
+      "expectedCode": "DEPENDENCY_COOLING_PERIOD"
+    },
+    {
       "id": "NEG-PACKAGE-001",
       "control": "package",
       "mutation": "extra-file",
