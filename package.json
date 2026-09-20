@@ -22,7 +22,7 @@
     "build": "node tooling/tasks/run-task.mjs --task build:packages"
   },
   "devDependencies": {
-    "@types/node": "24.13.4",
+    "@types/node": "26.6.1",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "eslint": "10.10.0",
