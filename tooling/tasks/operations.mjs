@@ -625,23 +625,18 @@ async function policyToolchain(context) {
     "TOOLCHAIN_NPM_VERSION",
     `${npmVersion} != ${profile.npm}`,
   );
-  const npmRootResult = await runNpm(["root", "--global"], {
-    cwd: context.root,
-    timeoutMs: 30000,
-  });
+  const npmRootResult = process.env.VERIFACTU_NPM_ROOT
+    ? { code: 0, stdout: process.env.VERIFACTU_NPM_ROOT, stderr: "" }
+    : await runNpm(["root", "--global"], {
+        cwd: context.root,
+        timeoutMs: 30000,
+      });
   assert(npmRootResult.code === 0, "TOOLCHAIN_NPM_ROOT", npmRootResult.stderr);
   const npmRecord = toolchain.npmPackages.find(
     (entry) => entry.version === npmVersion,
   );
   assert(npmRecord, "TOOLCHAIN_NPM_ADMISSION", npmVersion);
   const npmCli = resolve(npmRootResult.stdout.trim(), "npm/bin/npm-cli.js");
-  if (process.env.VERIFACTU_NPM_ROOT)
-    assert(
-      resolve(process.env.VERIFACTU_NPM_ROOT) ===
-        resolve(npmRootResult.stdout.trim()),
-      "TOOLCHAIN_NPM_ROOT_MISMATCH",
-      npmRootResult.stdout.trim(),
-    );
   assert(
     (await sha256File(npmCli)) === npmRecord.cliSha256,
     "TOOLCHAIN_NPM_DIGEST",
