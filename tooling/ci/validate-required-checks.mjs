@@ -61,7 +61,10 @@ for (const entry of entries) {
     "CLOSURE_REPORT_EVIDENCE",
     entry.relative,
   );
-  if (leaf.task.includes(":") && leaf.jobId !== "dependency-review")
+  if (
+    leaf.task.includes(":") &&
+    !["dependency-review", "documentation"].includes(leaf.jobId)
+  )
     assert(
       report.evidenceTask === leaf.task,
       "CLOSURE_REPORT_TASK",

@@ -24,3 +24,4 @@ runs:
         test "$(node --version)" = "v${{ inputs.node-version }}"
         test "$(npm --version)" = "$ADMITTED_NPM_VERSION"
         npm ci --ignore-scripts --omit=optional
+        npm cache add @noeos/verification-engine@1.0.1 --ignore-scripts --no-audit --no-fund

@@ -1499,6 +1499,22 @@ async function integrationConsumers(context) {
     "CONSUMER_INSTALL",
     `${install.stdout}${install.stderr}`.trim(),
   );
+  const verificationPath = "node_modules/@noeos/verification-engine";
+  const verificationRoot = resolve(context.root, verificationPath);
+  const verificationConsumer = resolve(consumerRoot, verificationPath);
+  const rootFiles = (await walk(verificationRoot))
+    .filter((entry) => entry.type === "file")
+    .map((entry) => entry.relative);
+  const consumerFiles = (await walk(verificationConsumer))
+    .filter((entry) => entry.type === "file")
+    .map((entry) => entry.relative);
+  assert(
+    canonicalJson(rootFiles) === canonicalJson(consumerFiles) &&
+      (await digestFiles(verificationRoot, rootFiles)) ===
+        (await digestFiles(verificationConsumer, consumerFiles)),
+    "CONSUMER_DEPENDENCY_DRIFT",
+    verificationPath,
+  );
   let passed = 0;
   for (const name of PACKAGE_NAMES) {
     const expression = `import(${JSON.stringify(name)}).then(m=>{if(Object.keys(m).length!==0)process.exit(2)})`;

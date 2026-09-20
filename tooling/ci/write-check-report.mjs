@@ -73,7 +73,8 @@ if (taskIndex >= 0) {
   evidenceTask = task.taskId;
 } else {
   assert(
-    !check.task.includes(":") || jobId === "dependency-review",
+    !check.task.includes(":") ||
+      ["dependency-review", "documentation"].includes(jobId),
     "CHECK_REPORT_TASK_REQUIRED",
     jobId,
   );

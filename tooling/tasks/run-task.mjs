@@ -241,9 +241,15 @@ async function withDeclaredEnvironment(task, callback) {
     "WINDIR",
   ]);
   const allowed = new Set([...task.environment, ...platformRequired]);
+  const allowedFolded = new Set([...allowed].map((key) => key.toLowerCase()));
   try {
     for (const key of Object.keys(process.env)) {
-      if (!allowed.has(key)) delete process.env[key];
+      if (
+        process.platform === "win32"
+          ? !allowedFolded.has(key.toLowerCase())
+          : !allowed.has(key)
+      )
+        delete process.env[key];
     }
     process.env.LANG = "C.UTF-8";
     process.env.LC_ALL = "C.UTF-8";
