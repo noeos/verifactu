@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "TREE-0001",
+  "allowedRootFiles": [
+    ".editorconfig",
+    ".gitattributes",
+    ".gitignore",
+    ".node-version",
+    ".npmrc",
+    "eslint.config.mjs",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "SECURITY.md",
+    "package-lock.json",
+    "package.json",
+    "tsconfig.json"
+  ],
+  "allowedRootDirectories": [
+    ".github",
+    "benchmarks",
+    "config",
+    "docs",
+    "editions",
+    "evidence",
+    "fixtures",
+    "internal",
+    "packages",
+    "schemas",
+    "scripts",
+    "tests",
+    "tooling"
+  ],
+  "forbiddenDirectoryNames": [
+    "common",
+    "helper",
+    "helpers",
+    "misc",
+    "temp",
+    "utils"
+  ],
+  "ignoredOutputRoots": [
+    ".build-cache",
+    "coverage",
+    "dist",
+    "evidence/runs",
+    "node_modules"
+  ],
+  "packageRoots": [
+    "packages/verifactu",
+    "packages/adapter-kit",
+    "packages/cli"
+  ],
+  "lockfiles": ["package-lock.json"]
+}

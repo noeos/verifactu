@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "PACKAGES-0001",
+  "version": "0.0.0-development",
+  "packages": [
+    {
+      "name": "@noeos/verifactu",
+      "root": "packages/verifactu",
+      "publicExports": [],
+      "bin": null,
+      "allowlist": [
+        {
+          "path": "package/dist/index.d.ts",
+          "mode": 420,
+          "maximumBytes": 2048
+        },
+        { "path": "package/dist/index.js", "mode": 420, "maximumBytes": 2048 },
+        { "path": "package/LICENSE", "mode": 420, "maximumBytes": 512 },
+        { "path": "package/NOTICE", "mode": 420, "maximumBytes": 512 },
+        { "path": "package/README.md", "mode": 420, "maximumBytes": 4096 },
+        { "path": "package/package.json", "mode": 420, "maximumBytes": 4096 }
+      ]
+    },
+    {
+      "name": "@noeos/verifactu-adapter-kit",
+      "root": "packages/adapter-kit",
+      "publicExports": [],
+      "bin": null,
+      "allowlist": [
+        {
+          "path": "package/dist/index.d.ts",
+          "mode": 420,
+          "maximumBytes": 2048
+        },
+        { "path": "package/dist/index.js", "mode": 420, "maximumBytes": 2048 },
+        { "path": "package/LICENSE", "mode": 420, "maximumBytes": 512 },
+        { "path": "package/NOTICE", "mode": 420, "maximumBytes": 512 },
+        { "path": "package/README.md", "mode": 420, "maximumBytes": 4096 },
+        { "path": "package/package.json", "mode": 420, "maximumBytes": 4096 }
+      ]
+    },
+    {
+      "name": "@noeos/verifactu-cli",
+      "root": "packages/cli",
+      "publicExports": [],
+      "bin": null,
+      "allowlist": [
+        {
+          "path": "package/dist/index.d.ts",
+          "mode": 420,
+          "maximumBytes": 2048
+        },
+        { "path": "package/dist/index.js", "mode": 420, "maximumBytes": 2048 },
+        { "path": "package/LICENSE", "mode": 420, "maximumBytes": 512 },
+        { "path": "package/NOTICE", "mode": 420, "maximumBytes": 512 },
+        { "path": "package/README.md", "mode": 420, "maximumBytes": 4096 },
+        { "path": "package/package.json", "mode": 420, "maximumBytes": 4096 }
+      ]
+    }
+  ]
+}

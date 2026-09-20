@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "OWNERSHIP-0001",
+  "rules": [
+    {
+      "pattern": ".github/**",
+      "owner": "repository-owner",
+      "class": "policy",
+      "authority": "normative",
+      "generated": false,
+      "visibility": "public",
+      "layer": "governance",
+      "sensitivity": "public",
+      "checks": ["governance", "workflow-policy"]
+    },
+    {
+      "pattern": "docs/**",
+      "owner": "documentation-owner",
+      "class": "documentation",
+      "authority": "mixed",
+      "generated": false,
+      "visibility": "public",
+      "layer": "knowledge",
+      "sensitivity": "public",
+      "checks": ["documentation", "traceability"]
+    },
+    {
+      "pattern": "packages/verifactu/**",
+      "owner": "architecture-owner",
+      "class": "package-source",
+      "authority": "implementation",
+      "generated": false,
+      "visibility": "public-package",
+      "layer": "core",
+      "sensitivity": "public",
+      "checks": ["architecture", "types", "package"]
+    },
+    {
+      "pattern": "packages/adapter-kit/**",
+      "owner": "integration-owner",
+      "class": "package-source",
+      "authority": "implementation",
+      "generated": false,
+      "visibility": "public-package",
+      "layer": "adapter-kit",
+      "sensitivity": "public",
+      "checks": ["architecture", "types", "package"]
+    },
+    {
+      "pattern": "packages/cli/**",
+      "owner": "cli-owner",
+      "class": "package-source",
+      "authority": "implementation",
+      "generated": false,
+      "visibility": "public-package",
+      "layer": "cli",
+      "sensitivity": "public",
+      "checks": ["architecture", "types", "package"]
+    },
+    {
+      "pattern": "internal/**",
+      "owner": "architecture-owner",
+      "class": "private-source",
+      "authority": "implementation",
+      "generated": false,
+      "visibility": "private",
+      "layer": "provider",
+      "sensitivity": "public",
+      "checks": ["architecture", "security"]
+    },
+    {
+      "pattern": "{config,tooling,scripts,tests,fixtures,benchmarks,editions,schemas,evidence}/**",
+      "owner": "repository-owner",
+      "class": "engineering",
+      "authority": "normative",
+      "generated": false,
+      "visibility": "public",
+      "layer": "engineering",
+      "sensitivity": "public",
+      "checks": ["policy", "supply-chain"]
+    },
+    {
+      "pattern": "*",
+      "owner": "repository-owner",
+      "class": "root-control",
+      "authority": "normative",
+      "generated": false,
+      "visibility": "public",
+      "layer": "root",
+      "sensitivity": "public",
+      "checks": ["governance", "policy"]
+    }
+  ]
+}

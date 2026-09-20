@@ -1,0 +1,11 @@
+{
+  "_generated": {
+    "generator": "policy:generated",
+    "source": "config/toolchain/toolchain.json",
+    "sourceSha256": "d44d6035abea8c6451ee43d02ff16985b23cdfe2256047077b5f39329a6718a4"
+  },
+  "nodeProfiles": ["22.14.0", "22.23.2", "24.21.0", "26.8.2"],
+  "primaryNode": "24.21.0",
+  "primaryNpm": "11.19.1",
+  "typescript": "5.9.3"
+}

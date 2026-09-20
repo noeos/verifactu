@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "LICENSE-EVIDENCE-0001",
+  "overrides": [
+    {
+      "path": "node_modules/npm/node_modules/qrcode-terminal",
+      "name": "qrcode-terminal",
+      "version": "0.12.0",
+      "spdx": "Apache-2.0",
+      "evidencePath": "node_modules/npm/node_modules/qrcode-terminal/LICENSE",
+      "evidenceSha256": "b3c7a2fadb2515b8106eae58439a4b9c0581a4eaa88d6a265701f8d4dd7dadb8"
+    }
+  ]
+}

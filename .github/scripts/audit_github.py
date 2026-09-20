@@ -15,10 +15,12 @@ from typing import Any
 
 
 REPO = "noeos/verifactu"
+ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_CONTEXTS = {
-    "Required · governance signatures and DCO",
-    "Required · documentation and traceability",
-    "Required · required-check closure",
+    item["context"]
+    for item in json.loads(
+        (ROOT / "config/ci/required-checks.json").read_text(encoding="utf-8")
+    )["checks"]
 }
 
 
@@ -233,14 +235,14 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
 
     workflows = observed[f"repos/{REPO}/actions/workflows?per_page=100"]["body"] or {}
     workflow_rows = workflows.get("workflows", [])
-    check(rows, "workflows.exact", [("Governance", "active")], sorted((item.get("name"), item.get("state")) for item in workflow_rows))
+    check(rows, "workflows.exact", [("Required engineering foundation", "active")], sorted((item.get("name"), item.get("state")) for item in workflow_rows))
     checks = observed[f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100"]["body"] or {}
     producers = {(item.get("name"), (item.get("app") or {}).get("id"), item.get("conclusion")) for item in checks.get("check_runs", []) if item.get("name") in REQUIRED_CONTEXTS}
     check(rows, "checks.required_producers", {(name, 15368, "success") for name in REQUIRED_CONTEXTS}, producers)
     runs = observed[f"repos/{REPO}/actions/runs?head_sha={check_subject}&per_page=100"]["body"] or {}
     run_rows = runs.get("workflow_runs", [])
     run_identity = {(item.get("head_sha"), item.get("event"), item.get("path"), item.get("conclusion")) for item in run_rows}
-    check(rows, "checks.sole_workflow_run", {(check_subject, "pull_request", ".github/workflows/governance.yml", "success")}, run_identity)
+    check(rows, "checks.sole_workflow_run", {(check_subject, "pull_request", ".github/workflows/required.yml", "success")}, run_identity)
     combined = observed[f"repos/{REPO}/commits/{check_subject}/status"]["body"] or {}
     check(rows, "checks.legacy_status_producers", 0, combined.get("total_count"))
 

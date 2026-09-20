@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "id": "ARTIFACT-REGISTRY-0001",
+  "classes": [
+    {
+      "pattern": "config/generated/**",
+      "class": "generated",
+      "producer": "policy:generated",
+      "inputs": ["config/toolchain/toolchain.json"],
+      "toolProfile": "primary",
+      "cleanRegeneration": true,
+      "committed": true
+    },
+    {
+      "pattern": "package-lock.json",
+      "class": "generated",
+      "producer": "npm@11.19.1",
+      "inputs": ["package.json", "packages/*/package.json"],
+      "toolProfile": "primary",
+      "cleanRegeneration": true,
+      "committed": true
+    },
+    {
+      "pattern": "config/python/requirements.lock",
+      "class": "generated",
+      "producer": "uv pip compile",
+      "inputs": ["config/python/requirements.in"],
+      "toolProfile": "python-reference",
+      "cleanRegeneration": true,
+      "committed": true
+    },
+    {
+      "pattern": "evidence/runs/prepared/**",
+      "class": "vendored-immutable-input",
+      "producer": "prepare:external-inputs",
+      "inputs": ["config/admission/external-inputs.json"],
+      "toolProfile": "primary",
+      "cleanRegeneration": true,
+      "committed": false
+    },
+    {
+      "pattern": "evidence/runs/**",
+      "class": "temporary-output",
+      "producer": "canonical-task-graph",
+      "inputs": ["config/tasks/task-registry.json"],
+      "toolProfile": "task-specific",
+      "cleanRegeneration": false,
+      "committed": false
+    },
+    {
+      "pattern": "node_modules/**",
+      "class": "temporary-output",
+      "producer": "npm ci",
+      "inputs": ["package-lock.json"],
+      "toolProfile": "runtime-matrix",
+      "cleanRegeneration": true,
+      "committed": false
+    }
+  ]
+}

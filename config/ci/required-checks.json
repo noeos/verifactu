@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "id": "REQUIRED-CHECKS-0001",
+  "workflow": ".github/workflows/required.yml",
+  "events": ["pull_request", "push:main"],
+  "checks": [
+    {
+      "jobId": "signatures",
+      "context": "Required · governance signatures and DCO",
+      "report": "signatures.json",
+      "runner": "ubuntu-24.04",
+      "node": null,
+      "task": "governance-signatures",
+      "timeoutMinutes": 5
+    },
+    {
+      "jobId": "documentation",
+      "context": "Required · documentation and traceability",
+      "report": "documentation.json",
+      "runner": "ubuntu-24.04",
+      "node": null,
+      "task": "policy:docs",
+      "timeoutMinutes": 10
+    },
+    {
+      "jobId": "regulatory",
+      "context": "Required · regulatory sources and generated contracts",
+      "report": "regulatory.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "regulatory:absence",
+      "timeoutMinutes": 10
+    },
+    {
+      "jobId": "quality",
+      "context": "Required · quality and policy",
+      "report": "quality.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "gate:p2",
+      "timeoutMinutes": 15
+    },
+    {
+      "jobId": "node-22-14-ubuntu",
+      "context": "Required · ubuntu-24.04 · Node 22.14.0",
+      "report": "node-22-14-ubuntu.json",
+      "runner": "ubuntu-24.04",
+      "node": "22.14.0",
+      "task": "gate:platform",
+      "timeoutMinutes": 15
+    },
+    {
+      "jobId": "node-22-23-ubuntu",
+      "context": "Required · ubuntu-24.04 · Node 22.23.2",
+      "report": "node-22-23-ubuntu.json",
+      "runner": "ubuntu-24.04",
+      "node": "22.23.2",
+      "task": "gate:platform",
+      "timeoutMinutes": 15
+    },
+    {
+      "jobId": "node-24-ubuntu",
+      "context": "Required · ubuntu-24.04 · Node 24.21.0",
+      "report": "node-24-ubuntu.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "gate:platform",
+      "timeoutMinutes": 15
+    },
+    {
+      "jobId": "node-24-windows",
+      "context": "Required · windows-2025 · Node 24.21.0",
+      "report": "node-24-windows.json",
+      "runner": "windows-2025",
+      "node": "24.21.0",
+      "task": "gate:platform",
+      "timeoutMinutes": 20
+    },
+    {
+      "jobId": "node-24-macos",
+      "context": "Required · macos-15 · Node 24.21.0",
+      "report": "node-24-macos.json",
+      "runner": "macos-15",
+      "node": "24.21.0",
+      "task": "gate:platform",
+      "timeoutMinutes": 20
+    },
+    {
+      "jobId": "reproducibility",
+      "context": "Required · package reproducibility",
+      "report": "reproducibility.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "package:reproducibility",
+      "timeoutMinutes": 20
+    },
+    {
+      "jobId": "integration",
+      "context": "Required · integration conformance",
+      "report": "integration.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "integration:tarball-consumers",
+      "timeoutMinutes": 20
+    },
+    {
+      "jobId": "dependency-review",
+      "context": "Required · dependency review",
+      "report": "dependency-review.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "dependency-review",
+      "timeoutMinutes": 10
+    },
+    {
+      "jobId": "codeql",
+      "context": "Required · CodeQL",
+      "report": "codeql.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "codeql",
+      "timeoutMinutes": 15
+    },
+    {
+      "jobId": "secret-scan",
+      "context": "Required · secret scan",
+      "report": "secret-scan.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "gitleaks",
+      "timeoutMinutes": 10
+    },
+    {
+      "jobId": "osv",
+      "context": "Required · OSV",
+      "report": "osv.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "osv-scanner",
+      "timeoutMinutes": 10
+    },
+    {
+      "jobId": "npm-audit",
+      "context": "Required · npm audit signatures and licenses",
+      "report": "npm-audit.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "npm-audit-signatures-licenses",
+      "timeoutMinutes": 15
+    },
+    {
+      "jobId": "closure",
+      "context": "Required · required-check closure",
+      "report": "closure.json",
+      "runner": "ubuntu-24.04",
+      "node": "24.21.0",
+      "task": "required-check-closure",
+      "timeoutMinutes": 10
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@noeos/verifactu",
+  "version": "0.0.0-development",
+  "description": "Private pre-release shell for the future Noeos VeriFactu library",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.14.0 <27"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "dependencies": {
+    "@noeos/verification-engine": "1.0.1"
+  },
+  "license": "Apache-2.0"
+}

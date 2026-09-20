@@ -5,5 +5,10 @@ Thumbs.db
 *.log
 .tmp/
 tmp/
-dist/
+# P2 deterministic build and task output
+.build-cache/
 coverage/
+dist/
+evidence/runs/
+node_modules/
+*.tgz

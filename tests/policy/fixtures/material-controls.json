@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "id": "P2-NEGATIVE-FIXTURES-0001",
+  "fixtures": [
+    {
+      "id": "NEG-TREE-001",
+      "control": "tree",
+      "mutation": "unknown-root",
+      "expectedCode": "TREE_ROOT_UNKNOWN"
+    },
+    {
+      "id": "NEG-OWNERSHIP-001",
+      "control": "ownership",
+      "mutation": "ambiguous-ownership",
+      "expectedCode": "OWNERSHIP_AMBIGUOUS"
+    },
+    {
+      "id": "NEG-IMPORT-001",
+      "control": "architecture",
+      "mutation": "core-node-fs-import",
+      "expectedCode": "IMPORT_FORBIDDEN_BUILTIN"
+    },
+    {
+      "id": "NEG-GENERATED-001",
+      "control": "generated",
+      "mutation": "hand-edit",
+      "expectedCode": "GENERATED_STALE"
+    },
+    {
+      "id": "NEG-TASK-TOOL-001",
+      "control": "task",
+      "mutation": "unknown-operation",
+      "expectedCode": "TASK_OPERATION"
+    },
+    {
+      "id": "NEG-TASK-TOOL-002",
+      "control": "task",
+      "mutation": "undeclared-tool",
+      "expectedCode": "TASK_TOOL_DECLARATION"
+    },
+    {
+      "id": "NEG-TASK-NETWORK-001",
+      "control": "task",
+      "mutation": "undeclared-network",
+      "expectedCode": "TASK_NETWORK_DECLARATION"
+    },
+    {
+      "id": "NEG-TASK-WRITE-001",
+      "control": "task",
+      "mutation": "undeclared-write",
+      "expectedCode": "UNDECLARED_WRITE"
+    },
+    {
+      "id": "NEG-TASK-CYCLE-001",
+      "control": "task",
+      "mutation": "cycle",
+      "expectedCode": "TASK_CYCLE"
+    },
+    {
+      "id": "NEG-TASK-DUPLICATE-001",
+      "control": "task",
+      "mutation": "duplicate-id",
+      "expectedCode": "TASK_DUPLICATE"
+    },
+    {
+      "id": "NEG-TASK-STALE-001",
+      "control": "task",
+      "mutation": "stale-subject",
+      "expectedCode": "REPORT_SUBJECT"
+    },
+    {
+      "id": "NEG-TASK-EMPTY-001",
+      "control": "task",
+      "mutation": "zero-work",
+      "expectedCode": "ZERO_WORK"
+    },
+    {
+      "id": "NEG-CI-JOB-001",
+      "control": "workflow",
+      "mutation": "missing-context",
+      "expectedCode": "MISSING_REQUIRED_JOB"
+    },
+    {
+      "id": "NEG-CI-REPORT-001",
+      "control": "workflow",
+      "mutation": "missing-report",
+      "expectedCode": "MISSING_REQUIRED_REPORT"
+    },
+    {
+      "id": "NEG-ACTION-001",
+      "control": "action",
+      "mutation": "mutable-ref",
+      "expectedCode": "ACTION_MUTABLE"
+    },
+    {
+      "id": "NEG-DEPENDENCY-001",
+      "control": "dependency",
+      "mutation": "range-spec",
+      "expectedCode": "DEPENDENCY_MUTABLE"
+    },
+    {
+      "id": "NEG-DEPENDENCY-002",
+      "control": "dependency",
+      "mutation": "too-new-dependency",
+      "expectedCode": "DEPENDENCY_COOLING_PERIOD"
+    },
+    {
+      "id": "NEG-PACKAGE-001",
+      "control": "package",
+      "mutation": "extra-file",
+      "expectedCode": "PACKAGE_CONTENT_LEAK"
+    },
+    {
+      "id": "NEG-REPRO-001",
+      "control": "reproducibility",
+      "mutation": "different-output",
+      "expectedCode": "NONREPRODUCIBLE_OUTPUT"
+    },
+    {
+      "id": "NEG-DOWNLOAD-HTTP-001",
+      "control": "external-input",
+      "mutation": "download-404",
+      "expectedCode": "DOWNLOAD_HTTP"
+    },
+    {
+      "id": "NEG-DOWNLOAD-RETRY-001",
+      "control": "external-input",
+      "mutation": "download-retries",
+      "expectedCode": "DOWNLOAD_EXHAUSTED"
+    },
+    {
+      "id": "NEG-DOWNLOAD-DIGEST-001",
+      "control": "external-input",
+      "mutation": "download-digest",
+      "expectedCode": "DOWNLOAD_DIGEST"
+    }
+  ]
+}

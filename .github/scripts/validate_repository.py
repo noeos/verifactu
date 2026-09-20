@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dependency-free P1 repository and documentation validator."""
+"""Dependency-free governed repository and documentation validator."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ REQUIRED_ROOT = {
     ".github/ISSUE_TEMPLATE/work-item.yml",
     ".github/policy/allowed-signers",
     ".github/policy/github-desired-state.json",
-    ".github/workflows/governance.yml",
+    ".github/workflows/required.yml",
 }
 
 
@@ -96,11 +96,13 @@ def validate(root: Path) -> list[str]:
     for forbidden in ("CODEOWNERS", ".github/CODEOWNERS", "docs/CODEOWNERS"):
         if (root / forbidden).exists():
             fail(errors, "P1-CODEOWNERS", forbidden, "single-maintainer policy forbids CODEOWNERS")
-    for forbidden in ("packages", "internal", "editions", "schemas"):
-        if (root / forbidden).exists():
-            fail(errors, "P1-PRODUCT-SOURCE", forbidden, "product/source tree is forbidden before P1 exit")
-
-    all_files = [p for p in root.rglob("*") if p.is_file() and ".git" not in p.parts]
+    excluded_roots = {".git", ".build-cache", "node_modules"}
+    all_files = [
+        p for p in root.rglob("*")
+        if p.is_file()
+        and not any(part in excluded_roots for part in p.relative_to(root).parts)
+        and "evidence/runs" not in p.relative_to(root).as_posix()
+    ]
     for path in all_files:
         try:
             data = path.read_bytes()
@@ -190,15 +192,18 @@ def validate(root: Path) -> list[str]:
     if desired["mainRuleset"]["requiredApprovals"] != 0:
         fail(errors, "P1-REVIEWS", "github desired state", "required approvals must be zero")
 
-    workflow = (root / ".github/workflows/governance.yml").read_text(encoding="utf-8") if (root / ".github/workflows/governance.yml").exists() else ""
-    if "pull_request_target" in workflow or "workflow_dispatch" in workflow or re.search(r"(?m)^\s*push\s*:", workflow):
-        fail(errors, "P1-WORKFLOW-EVENT", "governance.yml", "only pull_request may produce required contexts")
+    workflow_path = root / ".github/workflows/required.yml"
+    workflow = workflow_path.read_text(encoding="utf-8") if workflow_path.exists() else ""
+    if "pull_request_target" in workflow or "workflow_dispatch" in workflow:
+        fail(errors, "P2-WORKFLOW-EVENT", "required.yml", "privileged/manual required-check events are forbidden")
+    if not re.search(r"(?m)^\s{2}pull_request:\s*$", workflow) or not re.search(r"(?m)^\s{2}push:\s*$", workflow):
+        fail(errors, "P2-WORKFLOW-EVENT", "required.yml", "pull_request and protected-main push are required")
     if not re.search(r"(?m)^permissions:\s*\{\}\s*$", workflow):
-        fail(errors, "P1-WORKFLOW-PERMISSIONS", "governance.yml", "top-level permissions must be empty")
+        fail(errors, "P2-WORKFLOW-PERMISSIONS", "required.yml", "top-level permissions must be empty")
     for match in SHA_ACTION_RE.finditer(workflow):
         ref = match.group(1)
-        if not re.search(r"@[0-9a-f]{40}$", ref):
-            fail(errors, "P1-ACTION-PIN", "governance.yml", f"non-full-SHA action {ref}")
+        if not ref.startswith("./") and not re.search(r"@[0-9a-f]{40}$", ref):
+            fail(errors, "P2-ACTION-PIN", "required.yml", f"non-full-SHA action {ref}")
 
     return errors
 
