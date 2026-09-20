@@ -1,0 +1,490 @@
+name: Required engineering foundation
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+concurrency:
+  group: required-${{ github.event.pull_request.number || github.ref }}-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  SOURCE_DATE_EPOCH: "0"
+  TZ: UTC
+  VERIFACTU_SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  signatures:
+    name: Required · governance signatures and DCO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact subject
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up report runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.21.0
+          check-latest: false
+      - name: Verify exact commit range
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          P1_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          P1_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: python3 .github/scripts/verify_commits.py --self-test
+      - name: Verify protected main squash attribution
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        run: |
+          test "$(git rev-list --count HEAD^..HEAD)" = 1
+          git log -1 --format=%B | grep -Eq '^Signed-off-by: .+ <.+>$'
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · governance signatures and DCO' --job-id signatures --output ci-reports/signatures.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-signatures
+          path: ci-reports/signatures.json
+
+  documentation:
+    name: Required · documentation and traceability
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.21.0
+          check-latest: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Validate documents, links, IDs and archive
+        shell: bash
+        run: python .github/scripts/validate_repository.py --self-test
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · documentation and traceability' --job-id documentation --output ci-reports/documentation.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-documentation
+          path: ci-reports/documentation.json
+
+  regulatory:
+    name: Required · regulatory sources and generated contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: &checkout
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: ./.github/actions/setup-engineering
+        with: &primary
+          node-version: 24.21.0
+          npm-version: 11.19.1
+      - name: Prove P2 regulatory absence
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task regulatory:absence
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-regulatory
+          path: ci-reports/regulatory.json
+
+  quality:
+    name: Required · quality and policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Install hash-locked SPDX validation runtime
+        shell: bash
+        run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
+      - name: Run complete P2 engineering gate
+        env:
+          VERIFACTU_PYTHON: python
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task gate:p2
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-quality
+          path: ci-reports/quality.json
+
+  node-22-14-ubuntu:
+    name: Required · ubuntu-24.04 · Node 22.14.0
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with:
+          node-version: 22.14.0
+          npm-version: 10.9.2
+      - name: Run portable platform gate
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task gate:platform
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.14.0' --job-id node-22-14-ubuntu --output ci-reports/node-22-14-ubuntu.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-node-22-14-ubuntu
+          path: ci-reports/node-22-14-ubuntu.json
+
+  node-22-23-ubuntu:
+    name: Required · ubuntu-24.04 · Node 22.23.2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with:
+          node-version: 22.23.2
+          npm-version: 11.19.1
+      - name: Run portable platform gate
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task gate:platform
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.23.2' --job-id node-22-23-ubuntu --output ci-reports/node-22-23-ubuntu.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-node-22-23-ubuntu
+          path: ci-reports/node-22-23-ubuntu.json
+
+  node-24-ubuntu:
+    name: Required · ubuntu-24.04 · Node 24.21.0
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Run portable platform gate
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task gate:platform
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 24.21.0' --job-id node-24-ubuntu --output ci-reports/node-24-ubuntu.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-node-24-ubuntu
+          path: ci-reports/node-24-ubuntu.json
+
+  node-24-windows:
+    name: Required · windows-2025 · Node 24.21.0
+    runs-on: windows-2025
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Run portable platform gate
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task gate:platform
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · windows-2025 · Node 24.21.0' --job-id node-24-windows --output ci-reports/node-24-windows.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-node-24-windows
+          path: ci-reports/node-24-windows.json
+
+  node-24-macos:
+    name: Required · macos-15 · Node 24.21.0
+    runs-on: macos-15
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Run portable platform gate
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task gate:platform
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · macos-15 · Node 24.21.0' --job-id node-24-macos --output ci-reports/node-24-macos.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-node-24-macos
+          path: ci-reports/node-24-macos.json
+
+  reproducibility:
+    name: Required · package reproducibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Build twice in isolated absolute roots
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task package:reproducibility
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · package reproducibility' --job-id reproducibility --output ci-reports/reproducibility.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-reproducibility
+          path: ci-reports/reproducibility.json
+
+  integration:
+    name: Required · integration conformance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Install and exercise only packed artifacts
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task integration:tarball-consumers
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · integration conformance' --job-id integration --output ci-reports/integration.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-integration
+          path: ci-reports/integration.json
+
+  dependency-review:
+    name: Required · dependency review
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Review pull-request dependency diff
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+        with:
+          fail-on-severity: moderate
+          deny-licenses: GPL-3.0-only, AGPL-3.0-only
+      - name: Reconcile protected-main dependency graph
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        run: node tooling/tasks/run-task.mjs --task policy:supply-chain
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · dependency review' --job-id dependency-review --output ci-reports/dependency-review.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-dependency-review
+          path: ci-reports/dependency-review.json
+
+  codeql:
+    name: Required · CodeQL
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - name: Initialize exact CodeQL
+        uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd
+        with:
+          languages: javascript-typescript
+          build-mode: none
+      - name: Analyze without privileged upload
+        uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd
+        with:
+          upload: false
+          output: codeql-results
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.21.0
+          check-latest: false
+      - name: Require non-empty SARIF and write leaf report
+        shell: bash
+        run: |
+          test -n "$(find codeql-results -name '*.sarif' -type f -size +0c -print -quit)"
+          node tooling/ci/write-check-report.mjs --context 'Required · CodeQL' --job-id codeql --output ci-reports/codeql.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-codeql
+          path: ci-reports/codeql.json
+
+  secret-scan:
+    name: Required · secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.21.0
+          check-latest: false
+      - name: Run admitted Gitleaks against complete history
+        shell: bash
+        run: node tooling/tools/run-admitted-tool.mjs --tool gitleaks -- git --no-banner --redact --exit-code 1 --log-opts='--all'
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · secret scan' --job-id secret-scan --output ci-reports/secret-scan.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-secret-scan
+          path: ci-reports/secret-scan.json
+
+  osv:
+    name: Required · OSV
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.21.0
+          check-latest: false
+      - name: Run admitted OSV scanner
+        shell: bash
+        run: node tooling/tools/run-admitted-tool.mjs --tool osv-scanner -- scan --lockfile package-lock.json --format table
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · OSV' --job-id osv --output ci-reports/osv.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-osv
+          path: ci-reports/osv.json
+
+  npm-audit:
+    name: Required · npm audit signatures and licenses
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: ./.github/actions/setup-engineering
+        with: *primary
+      - name: Verify registry signatures, advisories and licence graph
+        shell: bash
+        run: |
+          npm audit signatures
+          npm audit --audit-level=moderate
+          node tooling/tasks/run-task.mjs --task policy:supply-chain
+      - name: Write leaf report
+        shell: bash
+        run: node tooling/ci/write-check-report.mjs --context 'Required · npm audit signatures and licenses' --job-id npm-audit --output ci-reports/npm-audit.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: required-report-npm-audit
+          path: ci-reports/npm-audit.json
+
+  closure:
+    name: Required · required-check closure
+    if: ${{ always() }}
+    needs:
+      - signatures
+      - documentation
+      - regulatory
+      - quality
+      - node-22-14-ubuntu
+      - node-22-23-ubuntu
+      - node-24-ubuntu
+      - node-24-windows
+      - node-24-macos
+      - reproducibility
+      - integration
+      - dependency-review
+      - codeql
+      - secret-scan
+      - osv
+      - npm-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: *checkout
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.21.0
+          check-latest: false
+      - name: Download all leaf reports
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          pattern: required-report-*
+          path: required-reports
+          merge-multiple: true
+      - name: Validate exact complete report set and job results
+        env:
+          REQUIRED_NEEDS_JSON: ${{ toJSON(needs) }}
+        shell: bash
+        run: node tooling/ci/validate-required-checks.mjs --reports required-reports --output ci-reports/closure.json

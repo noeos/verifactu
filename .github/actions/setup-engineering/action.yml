@@ -1,0 +1,26 @@
+name: Set up admitted Node and locked dependencies
+description: Installs the exact admitted runtime, npm and lock without lifecycle or optional code.
+inputs:
+  node-version:
+    description: Exact admitted Node version
+    required: true
+  npm-version:
+    description: Exact admitted npm version
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Set up exact Node runtime
+      uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+      with:
+        node-version: ${{ inputs.node-version }}
+        check-latest: false
+    - name: Install exact npm and locked dependencies
+      shell: bash
+      env:
+        ADMITTED_NPM_VERSION: ${{ inputs.npm-version }}
+      run: |
+        npm install --global "npm@$ADMITTED_NPM_VERSION" --ignore-scripts --no-audit --no-fund
+        test "$(node --version)" = "v${{ inputs.node-version }}"
+        test "$(npm --version)" = "$ADMITTED_NPM_VERSION"
+        npm ci --ignore-scripts --omit=optional

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "DEPENDENCY-ADMISSION-0001",
+  "reviewedAt": "2026-09-20",
+  "dependencies": [
+    {
+      "name": "@noeos/verification-engine",
+      "version": "1.0.1",
+      "scope": "runtime",
+      "purpose": "Existing public cryptographic verification primitive; no fiscal policy capability",
+      "alternatives": "Reimplementing cryptographic verification would duplicate a separately maintained Noeos trust boundary",
+      "maintainerRisk": "same organization; registry integrity and exact version required",
+      "advisories": "npm audit and OSV required",
+      "license": "Apache-2.0",
+      "exit": "Replace behind the core package boundary and regenerate lock/SBOM evidence"
+    },
+    {
+      "name": "@types/node",
+      "version": "24.13.6",
+      "scope": "development",
+      "purpose": "Type declarations for admitted Node APIs",
+      "alternatives": "Handwritten declarations rejected as incomplete",
+      "maintainerRisk": "DefinitelyTyped community maintenance",
+      "advisories": "npm audit and OSV required",
+      "license": "MIT",
+      "exit": "Update or remove with TypeScript runtime declarations"
+    },
+    {
+      "name": "ajv",
+      "version": "8.20.0",
+      "scope": "development",
+      "purpose": "Offline JSON Schema validation",
+      "alternatives": "Custom schema validation rejected",
+      "maintainerRisk": "Single ecosystem implementation concentration",
+      "advisories": "npm audit and OSV required",
+      "license": "MIT",
+      "exit": "Replace through the schema-validation adapter"
+    },
+    {
+      "name": "ajv-formats",
+      "version": "3.0.1",
+      "scope": "development",
+      "purpose": "Standards format validation for admitted schemas",
+      "alternatives": "Incomplete handwritten format checks rejected",
+      "maintainerRisk": "Coupled to Ajv",
+      "advisories": "npm audit and OSV required",
+      "license": "MIT",
+      "exit": "Replace with Ajv when formats become native or change validator"
+    },
+    {
+      "name": "eslint",
+      "version": "10.11.0",
+      "scope": "development",
+      "purpose": "Static JavaScript policy checks",
+      "alternatives": "Node syntax checks alone do not enforce policy",
+      "maintainerRisk": "Broad plugin-free upstream dependency tree",
+      "advisories": "npm audit and OSV required",
+      "license": "MIT",
+      "exit": "Replace the policy:lint operation and preserve diagnostics"
+    },
+    {
+      "name": "npm",
+      "version": "11.19.1",
+      "scope": "development",
+      "purpose": "Pinned workspace installer and package producer",
+      "alternatives": "Changing package manager changes lock and archive semantics",
+      "maintainerRisk": "Bundled transitive dependency surface",
+      "advisories": "npm audit, signature verification and OSV required",
+      "license": "Artistic-2.0",
+      "exit": "Planned migration with regenerated lock, tarball and reproducibility evidence"
+    },
+    {
+      "name": "prettier",
+      "version": "3.6.2",
+      "scope": "development",
+      "purpose": "Deterministic formatting check",
+      "alternatives": "Manual formatting is non-reproducible",
+      "maintainerRisk": "Single formatter dependency",
+      "advisories": "npm audit and OSV required",
+      "license": "MIT",
+      "exit": "Replace policy:format and reformat in an isolated change"
+    },
+    {
+      "name": "typescript",
+      "version": "5.9.3",
+      "scope": "development",
+      "purpose": "Compiler, type checker and declaration emitter",
+      "alternatives": "Required by the selected TypeScript source format",
+      "maintainerRisk": "Compiler behavior is toolchain-sensitive",
+      "advisories": "npm audit and OSV required",
+      "license": "Apache-2.0",
+      "exit": "Toolchain migration with compatibility and reproducibility proof"
+    }
+  ]
+}

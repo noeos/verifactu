@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "source": "config/python/requirements.lock",
+  "dependencies": [
+    {
+      "name": "html5rdf",
+      "version": "1.2.1",
+      "license": "MIT",
+      "sha256": [
+        "1f519121bc366af3e485310dc8041d2e86e5173c1a320fac3dc9d2604069b83e",
+        "ace9b420ce52995bb4f05e7425eedf19e433c981dfe7a831ab391e2fa2e1a195"
+      ]
+    },
+    {
+      "name": "owlrl",
+      "version": "7.1.4",
+      "license": "W3C-20150513",
+      "sha256": [
+        "60bd4067e346b9111f0a2924565afe97ac6595b98b2bbe953928b5113971daf7",
+        "e78b46020169783345636da93a467d318f18700c483184dd15e885850cf64775"
+      ]
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "license": "Apache-2.0 OR BSD-2-Clause",
+      "sha256": [
+        "94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79",
+        "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+      ]
+    },
+    {
+      "name": "prettytable",
+      "version": "3.18.0",
+      "license": "BSD-3-Clause",
+      "sha256": [
+        "439217116152244369caf3d9f1caf2f9fe29b03bd79e88d2928c8e718c95d680",
+        "b3346e0e6f79180833aebaac088ae926340586cf6d7d991b9eb125b65f72313a"
+      ]
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.3.2",
+      "license": "MIT",
+      "sha256": [
+        "850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d",
+        "c777f4d763f140633dcb6d8a3eda953bf7a214dc4eff598413c070bcdc117cbc"
+      ]
+    },
+    {
+      "name": "pyshacl",
+      "version": "0.30.1",
+      "license": "Apache-2.0",
+      "sha256": [
+        "d7e0c21b25e948bb643dbc5db6258da64a90a8ac89055c1fe562b469031072aa",
+        "df712ac961b1ee7bcf0b27fa71ecab7785a135b2af69783ce30cb05fe41bcaf5"
+      ]
+    },
+    {
+      "name": "rdflib",
+      "version": "7.2.1",
+      "license": "BSD-3-Clause",
+      "sha256": [
+        "1a175bc1386a167a42fbfaba003bfa05c164a2a3ca3cb9c0c97f9c9638ca6ac2",
+        "cf9b7fa25234e8925da8b1fb09700f8349b5f0f100e785fb4260e737308292ac"
+      ]
+    },
+    {
+      "name": "wcwidth",
+      "version": "0.8.4",
+      "license": "MIT",
+      "sha256": [
+        "2097bb1d28a0ba8fe177c2eb607317f9b1627b03f33ebebfd3da670b337a65ba",
+        "2dae09efa25253ae2874188e86d6861af3b1652aef4118cdf3f0bda288a957fb"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "IMPORTS-0001",
+  "packages": {
+    "@noeos/verifactu": {
+      "root": "packages/verifactu/src",
+      "mayImportPackages": [],
+      "forbiddenBuiltins": [
+        "node:child_process",
+        "node:crypto",
+        "node:fs",
+        "node:http",
+        "node:https",
+        "node:net",
+        "node:os",
+        "node:process",
+        "node:tls"
+      ]
+    },
+    "@noeos/verifactu-adapter-kit": {
+      "root": "packages/adapter-kit/src",
+      "mayImportPackages": ["@noeos/verifactu"],
+      "forbiddenPrefixes": ["@noeos/verifactu/"]
+    },
+    "@noeos/verifactu-cli": {
+      "root": "packages/cli/src",
+      "mayImportPackages": ["@noeos/verifactu"],
+      "forbiddenPrefixes": ["@noeos/verifactu/"]
+    }
+  },
+  "productionForbiddenPrefixes": [
+    "internal/",
+    "tests/",
+    "../internal/",
+    "../tests/"
+  ],
+  "exceptions": []
+}

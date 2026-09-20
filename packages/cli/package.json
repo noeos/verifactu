@@ -1,0 +1,27 @@
+{
+  "name": "@noeos/verifactu-cli",
+  "version": "0.0.0-development",
+  "description": "Private pre-release shell for the future Noeos VeriFactu CLI",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.14.0 <27"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "dependencies": {
+    "@noeos/verifactu": "0.0.0-development"
+  },
+  "license": "Apache-2.0"
+}

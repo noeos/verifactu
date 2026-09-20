@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "PROVENANCE-REHEARSAL-0001",
+  "buildType": "https://noeos.dev/build-types/verifactu-p2/v1",
+  "builder": "local-or-github-actions-unattested-rehearsal",
+  "claimLevel": "none",
+  "publishable": false,
+  "signed": false
+}
