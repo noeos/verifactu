@@ -227,11 +227,17 @@ function reportPath(evidenceDir, taskId) {
 async function withDeclaredEnvironment(task, callback) {
   const original = { ...process.env };
   const platformRequired = new Set([
+    "APPDATA",
     "ComSpec",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "LOCALAPPDATA",
     "PATHEXT",
+    "ProgramData",
     "SystemRoot",
     "TEMP",
     "TMP",
+    "USERPROFILE",
     "WINDIR",
   ]);
   const allowed = new Set([...task.environment, ...platformRequired]);

@@ -181,6 +181,12 @@ function toolchainSummary(toolchain) {
   };
 }
 
+async function runNpm(args, options = {}) {
+  if (process.platform === "win32")
+    return run("cmd.exe", ["/d", "/s", "/c", "npm", ...args], options);
+  return run("npm", args, options);
+}
+
 export function validateGenerated(actual, expected) {
   assert(
     canonicalJson(actual) === canonicalJson(expected),
@@ -586,7 +592,7 @@ async function policyToolchain(context) {
     "TOOLCHAIN_NODE_DIGEST",
     process.execPath,
   );
-  const npmVersionResult = await run("npm", ["--version"], {
+  const npmVersionResult = await runNpm(["--version"], {
     cwd: context.root,
     timeoutMs: 30000,
   });
@@ -601,7 +607,7 @@ async function policyToolchain(context) {
     "TOOLCHAIN_NPM_VERSION",
     `${npmVersion} != ${profile.npm}`,
   );
-  const npmRootResult = await run("npm", ["root", "--global"], {
+  const npmRootResult = await runNpm(["root", "--global"], {
     cwd: context.root,
     timeoutMs: 30000,
   });
@@ -1457,6 +1463,13 @@ async function integrationConsumers(context) {
     type: "module",
   });
   const npmCli = resolve(context.root, "node_modules/npm/bin/npm-cli.js");
+  const cacheResult = await runNpm(["config", "get", "cache"], {
+    cwd: context.root,
+    timeoutMs: 30000,
+  });
+  assert(cacheResult.code === 0, "CONSUMER_CACHE", cacheResult.stderr);
+  const verifiedCache =
+    process.env.npm_config_cache ?? cacheResult.stdout.trim();
   const tarballs = manifest.subjects.map((subject) =>
     resolve(packageRoot, "tarballs", subject.file),
   );
@@ -1477,9 +1490,7 @@ async function integrationConsumers(context) {
       timeoutMs: 240000,
       env: {
         ...process.env,
-        npm_config_cache:
-          process.env.npm_config_cache ??
-          resolve(context.root, ".build-cache/npm"),
+        npm_config_cache: verifiedCache,
       },
     },
   );

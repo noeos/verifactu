@@ -31,7 +31,14 @@ const subject = process.env.VERIFACTU_SUBJECT_SHA;
 const observed = new Map();
 for (const entry of entries) {
   const report = await readJson(entry.path);
+  const leaf = leaves.find((candidate) => candidate.report === entry.relative);
+  assert(leaf, "CLOSURE_REPORT_NAME", entry.relative);
   assert(report.schemaVersion === 1, "CLOSURE_REPORT_SCHEMA", entry.relative);
+  assert(
+    report.producer === registry.workflow,
+    "CLOSURE_REPORT_PRODUCER",
+    entry.relative,
+  );
   assert(report.status === "passed", "CLOSURE_REPORT_STATUS", report.context);
   assert(
     report.subject === subject,
@@ -43,6 +50,29 @@ for (const entry of entries) {
     "CLOSURE_REPORT_EMPTY",
     report.context,
   );
+  assert(
+    report.jobId === leaf.jobId && report.context === leaf.context,
+    "CLOSURE_REPORT_REGISTRY",
+    entry.relative,
+  );
+  assert(
+    /^[a-f0-9]{64}$/u.test(report.evidenceSha256 ?? "") &&
+      report.resultDigest === report.evidenceSha256,
+    "CLOSURE_REPORT_EVIDENCE",
+    entry.relative,
+  );
+  if (leaf.task.includes(":") && leaf.jobId !== "dependency-review")
+    assert(
+      report.evidenceTask === leaf.task,
+      "CLOSURE_REPORT_TASK",
+      entry.relative,
+    );
+  if (leaf.jobId === "npm-audit")
+    assert(
+      report.evidenceTask === "policy:supply-chain",
+      "CLOSURE_REPORT_TASK",
+      entry.relative,
+    );
   assert(
     !observed.has(report.context),
     "CLOSURE_REPORT_DUPLICATE",

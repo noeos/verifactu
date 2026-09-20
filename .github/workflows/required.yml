@@ -45,16 +45,20 @@ jobs:
           P1_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           P1_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         shell: bash
-        run: python3 .github/scripts/verify_commits.py --self-test
+        run: |
+          mkdir -p ci-evidence
+          python3 .github/scripts/verify_commits.py --self-test | tee ci-evidence/signatures.json
       - name: Verify protected main squash attribution
         if: ${{ github.event_name == 'push' }}
         shell: bash
         run: |
           test "$(git rev-list --count HEAD^..HEAD)" = 1
           git log -1 --format=%B | grep -Eq '^Signed-off-by: .+ <.+>$'
+          mkdir -p ci-evidence
+          git log -1 --format='%H %G? %an <%ae>%n%B' > ci-evidence/signatures.json
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · governance signatures and DCO' --job-id signatures --output ci-reports/signatures.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · governance signatures and DCO' --job-id signatures --output ci-reports/signatures.json --evidence-file ci-evidence/signatures.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-signatures
@@ -82,10 +86,12 @@ jobs:
           check-latest: false
       - name: Validate documents, links, IDs and archive
         shell: bash
-        run: python .github/scripts/validate_repository.py --self-test
+        run: |
+          mkdir -p ci-evidence
+          python .github/scripts/validate_repository.py --self-test | tee ci-evidence/documentation.txt
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · documentation and traceability' --job-id documentation --output ci-reports/documentation.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · documentation and traceability' --job-id documentation --output ci-reports/documentation.json --evidence-file ci-evidence/documentation.txt
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-documentation
@@ -112,7 +118,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task regulatory:absence
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/regulatory--absence.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-regulatory
@@ -143,7 +149,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task gate:p2
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json --task-report evidence/runs/gate--p2.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-quality
@@ -167,7 +173,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.14.0' --job-id node-22-14-ubuntu --output ci-reports/node-22-14-ubuntu.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.14.0' --job-id node-22-14-ubuntu --output ci-reports/node-22-14-ubuntu.json --task-report evidence/runs/gate--platform.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-22-14-ubuntu
@@ -191,7 +197,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.23.2' --job-id node-22-23-ubuntu --output ci-reports/node-22-23-ubuntu.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.23.2' --job-id node-22-23-ubuntu --output ci-reports/node-22-23-ubuntu.json --task-report evidence/runs/gate--platform.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-22-23-ubuntu
@@ -213,7 +219,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 24.21.0' --job-id node-24-ubuntu --output ci-reports/node-24-ubuntu.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 24.21.0' --job-id node-24-ubuntu --output ci-reports/node-24-ubuntu.json --task-report evidence/runs/gate--platform.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-24-ubuntu
@@ -235,7 +241,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · windows-2025 · Node 24.21.0' --job-id node-24-windows --output ci-reports/node-24-windows.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · windows-2025 · Node 24.21.0' --job-id node-24-windows --output ci-reports/node-24-windows.json --task-report evidence/runs/gate--platform.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-24-windows
@@ -257,7 +263,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · macos-15 · Node 24.21.0' --job-id node-24-macos --output ci-reports/node-24-macos.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · macos-15 · Node 24.21.0' --job-id node-24-macos --output ci-reports/node-24-macos.json --task-report evidence/runs/gate--platform.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-24-macos
@@ -279,7 +285,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task package:reproducibility
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · package reproducibility' --job-id reproducibility --output ci-reports/reproducibility.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · package reproducibility' --job-id reproducibility --output ci-reports/reproducibility.json --task-report evidence/runs/package--reproducibility.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-reproducibility
@@ -301,7 +307,7 @@ jobs:
         run: node tooling/tasks/run-task.mjs --task integration:tarball-consumers
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · integration conformance' --job-id integration --output ci-reports/integration.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · integration conformance' --job-id integration --output ci-reports/integration.json --task-report evidence/runs/integration--tarball-consumers.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-integration
@@ -328,9 +334,20 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         shell: bash
         run: node tooling/tasks/run-task.mjs --task policy:supply-chain
+      - name: Capture dependency review evidence
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        run: |
+          mkdir -p ci-evidence
+          npm ls --all --json > ci-evidence/dependency-tree.json
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · dependency review' --job-id dependency-review --output ci-reports/dependency-review.json
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            node tooling/ci/write-check-report.mjs --context 'Required · dependency review' --job-id dependency-review --output ci-reports/dependency-review.json --evidence-file ci-evidence/dependency-tree.json
+          else
+            node tooling/ci/write-check-report.mjs --context 'Required · dependency review' --job-id dependency-review --output ci-reports/dependency-review.json --task-report evidence/runs/policy--supply-chain.json
+          fi
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-dependency-review
@@ -362,8 +379,9 @@ jobs:
       - name: Require non-empty SARIF and write leaf report
         shell: bash
         run: |
-          test -n "$(find codeql-results -name '*.sarif' -type f -size +0c -print -quit)"
-          node tooling/ci/write-check-report.mjs --context 'Required · CodeQL' --job-id codeql --output ci-reports/codeql.json
+          sarif=$(find codeql-results -name '*.sarif' -type f -size +0c -print -quit)
+          test -n "$sarif"
+          node tooling/ci/write-check-report.mjs --context 'Required · CodeQL' --job-id codeql --output ci-reports/codeql.json --evidence-file "$sarif"
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-codeql
@@ -387,10 +405,13 @@ jobs:
           check-latest: false
       - name: Run admitted Gitleaks against complete history
         shell: bash
-        run: node tooling/tools/run-admitted-tool.mjs --tool gitleaks -- git --no-banner --redact --exit-code 1 --log-opts='--all'
+        run: |
+          mkdir -p ci-evidence
+          node tooling/tools/run-admitted-tool.mjs --tool gitleaks -- git --no-banner --redact --exit-code 1 --log-opts='--all' > ci-evidence/gitleaks.txt 2>&1
+          cat ci-evidence/gitleaks.txt
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · secret scan' --job-id secret-scan --output ci-reports/secret-scan.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · secret scan' --job-id secret-scan --output ci-reports/secret-scan.json --evidence-file ci-evidence/gitleaks.txt
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-secret-scan
@@ -411,10 +432,13 @@ jobs:
           check-latest: false
       - name: Run admitted OSV scanner
         shell: bash
-        run: node tooling/tools/run-admitted-tool.mjs --tool osv-scanner -- scan --lockfile package-lock.json --format table
+        run: |
+          mkdir -p ci-evidence
+          node tooling/tools/run-admitted-tool.mjs --tool osv-scanner -- scan --lockfile package-lock.json --format table > ci-evidence/osv.txt 2>&1
+          cat ci-evidence/osv.txt
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · OSV' --job-id osv --output ci-reports/osv.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · OSV' --job-id osv --output ci-reports/osv.json --evidence-file ci-evidence/osv.txt
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-osv
@@ -439,7 +463,7 @@ jobs:
           node tooling/tasks/run-task.mjs --task policy:supply-chain
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · npm audit signatures and licenses' --job-id npm-audit --output ci-reports/npm-audit.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · npm audit signatures and licenses' --job-id npm-audit --output ci-reports/npm-audit.json --task-report evidence/runs/policy--supply-chain.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-npm-audit
