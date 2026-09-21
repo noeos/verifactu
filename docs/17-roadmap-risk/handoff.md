@@ -2514,3 +2514,188 @@ documentation-only and does not change the authoritative P7 campaign subject
   `creationAllowed=false`; P3-B and P4 are not authorized. Any successor
   observation must create a new snapshot/edition identity and rerun the full
   task graph and protected read-back.
+
+## P3-B closure — pre-P4 assurance (2026-09-21)
+
+### Identity and status
+
+- Status: `closure-candidate`; becomes `evidence-complete` only when this
+  dedicated signed+DCO handoff PR passes every required and auxiliary check,
+  merges through protected squash, and its resulting protected-main subject
+  passes final read-back.
+- Started/closed (UTC): started after protected P3 read-back on `2026-09-21`;
+  implementation protected at `2026-09-21T14:52:14Z`; closure time is derived
+  from the handoff squash.
+- Input main SHA / tree: `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` /
+  `a532ed80bc31a5f446eb8c019c466048b0b78911`.
+- Latest protected implementation main SHA / tree:
+  `ccc2b8decdbcdee58bdbfc5dd13209d47e1a9231` /
+  `6a3fdf4eb4192df2fddb5a37b0cffda912b318f8`, sole parent
+  `9e27bf377d07d93fe5faa448eb4ff907b7f21182`.
+- Closure PR: `#33` from dedicated branch `docs/33-p3b-handoff`; its final
+  head, squash and final-main run identities are appended by protected
+  read-back.
+- Roadmap revision: `ROADMAP-DOC-0020` plus universal matrix
+  `ROADMAP-DOC-0021`.
+- Documentation population: 539 files, 536 Markdown, aggregate SHA-256 derived
+  by the closure head; every byte is machine-indexed and every current Markdown
+  document passes ID/link/front-matter checks.
+
+### Readiness and sources
+
+- Protected P1–P3 handoffs, histories, task reports and effective GitHub state
+  were re-read. Active rulesets `23705155` and `23705170` have zero bypass
+  actors; protected main requires linear signed squash history and the exact 17
+  GitHub App `15368` contexts.
+- PR `#31` protected the bounded, no-bypass source observer across Ubuntu,
+  Windows and macOS. PR `#32` protected the admitted successor source graph and
+  assurance campaign.
+- Immutable `rrsif-2026-09-21-authoritative` contains 27 source objects with
+  exact URL, size, SHA-256/SHA-512, authority, licence and witness. All 14
+  developer payloads agree byte-for-byte on macOS and Windows; Linux retains
+  the ordinary-TLS weak-digest failure as a negative rather than weakening
+  verification. Entry pages and the W3C XMLDSig dependency were observed on
+  Linux with normal trust.
+- The transitive source graph has zero blocked edge. Candidate
+  `rrsif-2026-09-21-authoritative-candidate` stays immutable,
+  `creationAllowed=false`, `verificationAllowed=true`; P3-B does not implement
+  or activate P4 behavior.
+
+### Work packages and protected history
+
+| Work ID                          | Branch / PR                               | signed+DCO head                            | protected squash                           | Result                                                     |
+| -------------------------------- | ----------------------------------------- | ------------------------------------------ | ------------------------------------------ | ---------------------------------------------------------- |
+| P3-B source observation          | `build/31-p3b-source-observation` / `#31` | `a842d82a2debdd58656475ae4c265678f9b7a498` | `9e27bf377d07d93fe5faa448eb4ff907b7f21182` | 26/26 checks passed after retained ref-recovery correction |
+| P3-B implementation and campaign | `build/32-p3b-assurance` / `#32`          | `d607c5fc7908ead1c30b34c6acbd46776107e1f0` | `ccc2b8decdbcdee58bdbfc5dd13209d47e1a9231` | 26/26 PR checks and 25/25 protected-push checks passed     |
+| P3-B handoff                     | `docs/33-p3b-handoff` / `#33`             | SSH-signed+DCO required                    | derived by final read-back                 | must prove the exact closure-head matrix below             |
+
+GitHub verifies both protected squashes, each has one parent and a canonical DCO
+trailer, and both implementation source branches are deleted.
+
+### Implemented state
+
+- `P3B-BASELINE-0001` declares populations, denominators, 100% thresholds,
+  critical catalogue and fail-closed missing/partial/unknown semantics before
+  interpretation.
+- `P3B-CLAIM-EVIDENCE-GRAPH-0001` types the complete 15-row universal control
+  population and binds sources, decisions, implementation, oracle, fixtures,
+  tasks, CI producer, report, subject, package, edition, disposition and P4
+  consumer without orphan nodes.
+- Generator `RRSIF-CONTRACT-GENERATOR-0002` emits 562 structural declarations,
+  447 field constraints, 652 enumerations, 29 SOAP declarations and seven
+  source/page-located semantic rules from eight AEAT WSDL/XSD documents.
+- A separate Python ElementTree/hashlib/json oracle imports no generator code,
+  recounts every population and kills 6/6 seeded defects.
+- The task runner now propagates `blocked`, writes a schema-valid report and
+  exits non-zero. An unknown/partial status has a material negative fixture.
+- Canonical P4 first-commit policies cover all-production-module coverage,
+  critical/overall mutation, property, fuzz, fault/recovery, performance and
+  every supported compatibility cell. P4 code remains absent.
+
+### Verification and evidence
+
+| Population or control                              |              Denominator |    Passed | Result / evidence                                                |
+| -------------------------------------------------- | -----------------------: | --------: | ---------------------------------------------------------------- |
+| Documentation / Markdown                           |                539 / 536 | 539 / 536 | 100%; complete corpus and links/IDs                              |
+| Historical findings                                |                       84 |        84 | 100%; 18 P1–P3-scope prevented, 66 retained open for later scope |
+| Universal claim/evidence requirements              |                       15 |        15 | 100%; zero orphan/unknown graph endpoint                         |
+| Required CI contexts                               |                       17 |        17 | 100%; strict closure context included                            |
+| Source artifacts / AEAT XML documents              |                   27 / 8 |    27 / 8 | 100%; zero blocked source edge                                   |
+| Structural / field / enumeration / SOAP / semantic | 562 / 447 / 652 / 29 / 7 |      same | 100%; independent recount agrees                                 |
+| Parser negatives / oracle mutants                  |                    5 / 6 |     5 / 6 | 100%; exact expected rejection/detection                         |
+| Property / fuzz / fault / privacy                  |    1,024 / 512 / 12 / 12 |      same | 100%; zero skip or hidden retry                                  |
+| Compatibility cells                                |                        5 |         5 | Ubuntu Node 22.14/22.23/24.21, Windows 24.21, macOS 24.21        |
+| Generator performance/recovery                     |                        3 |         3 | maximum below 5,000 ms; one digest; two atomic writers           |
+| Critical catalogue                                 |                       14 |        14 | 100%; every named critical control passes                        |
+
+Exact implementation-subject local gate on `ccc2b8de…` passed with input digest
+`23dc55e13897cb519f221f7bdbada154afcb062d2828f50596c6fba22d4a5e6a`
+and output digest
+`fe5b5082fb0dc64ae27afc2dc53f10f63ccd70bb3ec4bf5cf26298fbe0a6df43`.
+Canonical configuration/evidence digests at that subject are baseline
+`88aa6bd6…f780`, REV disposition `fa253c36…cfcb`, source plan
+`8b824f3b…3c1f`, source manifest `0856118b…0c6` and generation report
+`514212d0…e06`.
+
+### Universal closure matrix
+
+| Control family              | P3-B result       | Proof / positive not-applicable boundary                                                                                                                                         |
+| --------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scope and requirements      | passed            | 15/15 graph requirements, 84/84 REV rows, 539-file corpus                                                                                                                        |
+| Identity and evidence       | passed            | exact commit/tree/parent, signed+DCO PRs, schema-valid same-subject reports                                                                                                      |
+| Toolchain                   | passed            | admitted Node/npm/Python/TypeScript plus hash/digest and validator checks                                                                                                        |
+| Task graph                  | passed            | acyclic declared graph, zero-work and blocked-result negatives, declared writes/network/secrets                                                                                  |
+| CI and GitHub               | passed            | active zero-bypass protection, 17/17 required contexts and closure                                                                                                               |
+| Platforms                   | passed            | 5/5 supported runtime cells; three source-observer trust stacks                                                                                                                  |
+| Functional quality          | passed            | complete P1–P3 tasks, tarball consumers and generated-contract/oracle scope; P4 fiscal behavior positively absent                                                                |
+| Quantitative quality        | passed            | all declared populations 100%; P4 coverage/mutation policies frozen before P4 code                                                                                               |
+| Security and privacy        | passed            | hostile XML/resource/network, secret/SAST/dependency and 12/12 redaction probes                                                                                                  |
+| Performance and reliability | passed            | three bounded deterministic runs, two clean rebuilds and atomic recovery writers; product workloads positively not applicable before P4                                          |
+| Compatibility               | passed            | toolchain/OS cells and package-shell consumers pass; fiscal public API/CLI/data migration positively absent                                                                      |
+| Supply chain                | passed            | exact lock, full-SHA Actions, tool/licence admission, reconciled CycloneDX/SPDX, provenance and reproducibility                                                                  |
+| Operations and law          | passed            | source/licence custody complete; product operations, external transport and release/legal claims positively not applicable because no P4 runtime exists and creation is disabled |
+| Negative assurance          | passed            | task/CI/supply/source/parser/report/dependency/artifact fixtures fail for exact reasons                                                                                          |
+| Closure                     | closure-candidate | no unowned P3-B blocker or exception; becomes passed only through this handoff PR's exact-head matrix and protected-main read-back                                               |
+
+### Failures, corrections and review
+
+- PR `#31` first attempted merge against a stale full SHA and its remote branch
+  was deleted before the API rejected the merge. The intact local signed commits
+  were pushed back to the exact ref, the PR was reopened, all checks reran and
+  only then was it protected-squashed. No evidence from the failed attempt was
+  reused as success.
+- Initial Linux observations retained six ordinary-TLS failures on the legacy
+  AEAT developer host. Official `prewww2.aeat.es` served WSDL/XSD through normal
+  trust; Windows and macOS independently captured the remaining legacy-host
+  payloads and agreed byte-for-byte. No TLS bypass, cached copy or source rewrite
+  was admitted.
+- The source graph exposed an XMLDSig schema dependency. Its exact W3C bytes and
+  licence were added; its DTD-bearing document is custody input but is never
+  expanded or parsed by the generator.
+- Clean local execution first selected ambient Node `24.19.0`, then intentionally
+  failed the admitted `24.21.0` check; the exact admitted runtime reran the whole
+  gate. A later local run correctly failed without locked `pyshacl`; the admitted
+  Python environment reran the complete gate.
+- PR `#32` had one auxiliary Conformance failure caused by a transient upstream
+  SPDX-model HTTP `504`. The failed attempt is retained; an exact-head retry
+  passed without code/evidence change. Required closure had already passed, but
+  the PR was not merged until all 26 checks were successful.
+- The dedicated handoff rerun reproduced that release-asset `504` twice. The
+  admitted input now uses GitHub's immutable release asset-ID API endpoint
+  `213001019` with an explicit octet-stream accept header; its 183,176 bytes and
+  SHA-256 `6b0b3b91…08c4` are unchanged and no authentication is required. This
+  availability correction invalidates and reruns supply-chain, SBOM,
+  provenance, reproducibility and complete P3-B evidence on the handoff head.
+- Reruns exposed that validation-only source import dropped witness arrays. The
+  importer was corrected to reconstruct exact witnesses deterministically and
+  all invalidated generation/oracle/assurance evidence reran.
+- No external, legal or organizationally independent review is invented. The
+  independent oracle is implementation-independent; GitHub checks provide
+  executable solo-governance review under the approved zero-approval ruleset.
+
+### Traceability and residual state
+
+- All universal rows and critical controls are machine mapped in
+  `config/quality/p3b-claim-evidence.json` and
+  `config/quality/p3b-baseline.json`; dashboard, open questions, concrete risk
+  rows, REV ledger and governed changelog are updated in this closure.
+- There is no open critical P1–P3 defect, missing denominator, partial metric,
+  hidden skip or accepted exception. Source/config/tool/task changes invalidate
+  their mapped reports and reopen P3-B.
+- Later legal declaration, AEAT credentials/transport, stable product workloads,
+  organizationally independent assurance, real Facturacion integration and
+  publication remain owned downstream prerequisites. They do not apply to
+  starting P4 code, and they remain explicit rather than being marked complete.
+
+### Recovery and next phase
+
+- Recovery point before P3-B implementation is protected
+  `9e27bf377d07d93fe5faa448eb4ff907b7f21182`; forward correction must use a new
+  signed+DCO protected PR. Immutable source/edition identities are never edited.
+- The handoff PR must pass every row above on its exact final head, squash with a
+  retained DCO trailer, delete its source branch and pass all protected-main
+  checks. A final append-only read-back records those non-self-referential IDs.
+- Only then is P3-B `evidence-complete` and P4 ready. The first P4 commit must
+  consume `P3B-BASELINE-0001` and all `p4FirstCommitPolicies`; it may not lower a
+  threshold or reuse a stale subject. P3-B grants no compliance, AEAT acceptance,
+  publication or release claim.

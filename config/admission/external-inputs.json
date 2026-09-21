@@ -52,7 +52,8 @@
     },
     {
       "id": "spdx-3.0.1-model",
-      "url": "https://github.com/spdx/spdx-3-model/releases/download/3.0.1/spdx-model.ttl",
+      "url": "https://api.github.com/repos/spdx/spdx-3-model/releases/assets/213001019",
+      "accept": "application/octet-stream",
       "sha256": "6b0b3b91d1f2d5011a89c7c7d9e752c61fa4e3e92887a723140f654df32508c4",
       "maximumBytes": 250000,
       "mediaType": "text/turtle",

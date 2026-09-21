@@ -45,6 +45,12 @@ const revDisposition = JSON.parse(
     "utf8",
   ),
 );
+const claimEvidence = JSON.parse(
+  await readFile(
+    resolve(root, "config/quality/p3b-claim-evidence.json"),
+    "utf8",
+  ),
+);
 const licenseEvidence = JSON.parse(
   await readFile(
     resolve(root, "config/admission/license-evidence.json"),
@@ -122,6 +128,24 @@ const expandRev = (member) => {
 };
 const disposedRevs = revDisposition.groups.flatMap((group) =>
   group.members.flatMap(expandRev),
+);
+const claimNodeIds = new Set(claimEvidence.nodes.map((node) => node.id));
+const graphReferencesValid = claimEvidence.edges.every(
+  (edge) => claimNodeIds.has(edge.from) && claimNodeIds.has(edge.to),
+);
+const graphDegrees = new Map(claimEvidence.nodes.map((node) => [node.id, 0]));
+for (const edge of claimEvidence.edges) {
+  graphDegrees.set(edge.from, (graphDegrees.get(edge.from) ?? 0) + 1);
+  graphDegrees.set(edge.to, (graphDegrees.get(edge.to) ?? 0) + 1);
+}
+const graphRequirements = claimEvidence.nodes.filter(
+  (node) => node.kind === "requirement",
+);
+const graphRequirementsVerified = graphRequirements.filter(
+  (node) =>
+    claimEvidence.edges.filter(
+      (edge) => edge.from === node.id && edge.type === "verified-by",
+    ).length >= claimEvidence.cardinality.requiredVerifiedByPerRequirement,
 );
 
 const runProperties = () => {
@@ -288,6 +312,11 @@ const metrics = {
   documentationFiles: docs.length,
   markdownDocuments: markdown.length,
   historicalFindings: [...expectedRevs].filter((id) => revs.has(id)).length,
+  claimEvidenceRequirements:
+    graphReferencesValid &&
+    [...graphDegrees.values()].every((degree) => degree > 0)
+      ? graphRequirementsVerified.length
+      : null,
   requiredCiContexts: required.checks.length,
   officialSourceArtifacts: manifest.sources.length,
   xmlContractDocuments: generation.populations.xmlDocuments,

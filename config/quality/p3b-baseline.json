@@ -6,17 +6,22 @@
   "populations": {
     "documentationFiles": {
       "selector": "docs/**/*",
-      "denominator": 538,
+      "denominator": 539,
       "requiredPercent": 100
     },
     "markdownDocuments": {
       "selector": "docs/**/*.md",
-      "denominator": 535,
+      "denominator": 536,
       "requiredPercent": 100
     },
     "historicalFindings": {
       "selector": "REV-001..REV-084",
       "denominator": 84,
+      "requiredPercent": 100
+    },
+    "claimEvidenceRequirements": {
+      "selector": "config/quality/p3b-claim-evidence.json requirement nodes",
+      "denominator": 15,
       "requiredPercent": 100
     },
     "requiredCiContexts": {
