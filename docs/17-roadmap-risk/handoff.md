@@ -2532,8 +2532,9 @@ documentation-only and does not change the authoritative P7 campaign subject
   `ccc2b8decdbcdee58bdbfc5dd13209d47e1a9231` /
   `6a3fdf4eb4192df2fddb5a37b0cffda912b318f8`, sole parent
   `9e27bf377d07d93fe5faa448eb4ff907b7f21182`.
-- Closure PR: dedicated branch `docs/33-p3b-handoff`; its PR, head, squash and
-  final-main run identities are appended by protected read-back.
+- Closure PR: `#33` from dedicated branch `docs/33-p3b-handoff`; its final
+  head, squash and final-main run identities are appended by protected
+  read-back.
 - Roadmap revision: `ROADMAP-DOC-0020` plus universal matrix
   `ROADMAP-DOC-0021`.
 - Documentation population: 539 files, 536 Markdown, aggregate SHA-256 derived
@@ -2562,11 +2563,11 @@ documentation-only and does not change the authoritative P7 campaign subject
 
 ### Work packages and protected history
 
-| Work ID                          | Branch / PR                                     | signed+DCO head                            | protected squash                           | Result                                                     |
-| -------------------------------- | ----------------------------------------------- | ------------------------------------------ | ------------------------------------------ | ---------------------------------------------------------- |
-| P3-B source observation          | `build/31-p3b-source-observation` / `#31`       | `a842d82a2debdd58656475ae4c265678f9b7a498` | `9e27bf377d07d93fe5faa448eb4ff907b7f21182` | 26/26 checks passed after retained ref-recovery correction |
-| P3-B implementation and campaign | `build/32-p3b-assurance` / `#32`                | `d607c5fc7908ead1c30b34c6acbd46776107e1f0` | `ccc2b8decdbcdee58bdbfc5dd13209d47e1a9231` | 26/26 PR checks and 25/25 protected-push checks passed     |
-| P3-B handoff                     | `docs/33-p3b-handoff` / derived by this closure | SSH-signed+DCO required                    | derived by final read-back                 | must prove the exact closure-head matrix below             |
+| Work ID                          | Branch / PR                               | signed+DCO head                            | protected squash                           | Result                                                     |
+| -------------------------------- | ----------------------------------------- | ------------------------------------------ | ------------------------------------------ | ---------------------------------------------------------- |
+| P3-B source observation          | `build/31-p3b-source-observation` / `#31` | `a842d82a2debdd58656475ae4c265678f9b7a498` | `9e27bf377d07d93fe5faa448eb4ff907b7f21182` | 26/26 checks passed after retained ref-recovery correction |
+| P3-B implementation and campaign | `build/32-p3b-assurance` / `#32`          | `d607c5fc7908ead1c30b34c6acbd46776107e1f0` | `ccc2b8decdbcdee58bdbfc5dd13209d47e1a9231` | 26/26 PR checks and 25/25 protected-push checks passed     |
+| P3-B handoff                     | `docs/33-p3b-handoff` / `#33`             | SSH-signed+DCO required                    | derived by final read-back                 | must prove the exact closure-head matrix below             |
 
 GitHub verifies both protected squashes, each has one parent and a canonical DCO
 trailer, and both implementation source branches are deleted.
