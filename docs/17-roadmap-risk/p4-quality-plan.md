@@ -93,6 +93,7 @@ contradict the performance authority.
 The canonical `p4:quality-plan` task validates identities, population
 cardinality, critical mappings, thresholds, campaigns, matrix and budgets, then
 runs seeded negative mutations of the declaration itself. `gate:p4-readiness`
-is produced by the required quality job before any implementation merge.
+remains the immutable prerequisite. As implementation slices land, the required
+quality job advances to the latest cumulative gate; P4-A uses `gate:p4a`.
 Thresholds cannot be lowered during P4. Any legitimate expansion lands first in
 a separate signed+DCO protected PR and invalidates all mapped evidence.

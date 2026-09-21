@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
+    "sourceMap": true,
     "tsBuildInfoFile": "../../.build-cache/verifactu.tsbuildinfo"
   },
   "include": ["src/**/*.ts"]
