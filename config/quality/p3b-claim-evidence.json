@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "id": "P3B-CLAIM-EVIDENCE-GRAPH-0001",
+  "subjectBinding": "runtime exact commit and tree from the task runner",
+  "nodes": [
+    { "id": "subject:runtime", "kind": "subject" },
+    { "id": "source:docs-corpus", "kind": "source" },
+    { "id": "source:authoritative-snapshot", "kind": "source" },
+    { "id": "decision:p3b-baseline", "kind": "decision" },
+    { "id": "implementation:p1-p3-task-graph", "kind": "implementation" },
+    { "id": "implementation:contract-generator", "kind": "implementation" },
+    { "id": "oracle:python-independent", "kind": "oracle" },
+    { "id": "fixture:material-negatives", "kind": "fixture" },
+    { "id": "task:gate-p3b", "kind": "task" },
+    { "id": "ci:required-regulatory", "kind": "ci-producer" },
+    { "id": "report:p3b-runtime", "kind": "report" },
+    { "id": "package:p1-p3-shells", "kind": "package" },
+    { "id": "edition:authoritative-candidate", "kind": "edition" },
+    { "id": "disposition:creation-disabled", "kind": "disposition" },
+    { "id": "consumer:p4-first-commit", "kind": "consumer" },
+    {
+      "id": "requirement:scope",
+      "kind": "requirement",
+      "controlFamily": "Scope and requirements"
+    },
+    {
+      "id": "requirement:identity",
+      "kind": "requirement",
+      "controlFamily": "Identity and evidence"
+    },
+    {
+      "id": "requirement:toolchain",
+      "kind": "requirement",
+      "controlFamily": "Toolchain"
+    },
+    {
+      "id": "requirement:task-graph",
+      "kind": "requirement",
+      "controlFamily": "Task graph"
+    },
+    {
+      "id": "requirement:ci-github",
+      "kind": "requirement",
+      "controlFamily": "CI and GitHub"
+    },
+    {
+      "id": "requirement:platforms",
+      "kind": "requirement",
+      "controlFamily": "Platforms"
+    },
+    {
+      "id": "requirement:functional-quality",
+      "kind": "requirement",
+      "controlFamily": "Functional quality"
+    },
+    {
+      "id": "requirement:quantitative-quality",
+      "kind": "requirement",
+      "controlFamily": "Quantitative quality"
+    },
+    {
+      "id": "requirement:security-privacy",
+      "kind": "requirement",
+      "controlFamily": "Security and privacy"
+    },
+    {
+      "id": "requirement:performance-reliability",
+      "kind": "requirement",
+      "controlFamily": "Performance and reliability"
+    },
+    {
+      "id": "requirement:compatibility",
+      "kind": "requirement",
+      "controlFamily": "Compatibility"
+    },
+    {
+      "id": "requirement:supply-chain",
+      "kind": "requirement",
+      "controlFamily": "Supply chain"
+    },
+    {
+      "id": "requirement:operations-law",
+      "kind": "requirement",
+      "controlFamily": "Operations and law"
+    },
+    {
+      "id": "requirement:negative-assurance",
+      "kind": "requirement",
+      "controlFamily": "Negative assurance"
+    },
+    {
+      "id": "requirement:closure",
+      "kind": "requirement",
+      "controlFamily": "Closure"
+    }
+  ],
+  "edges": [
+    {
+      "from": "source:docs-corpus",
+      "to": "requirement:scope",
+      "type": "authorizes"
+    },
+    {
+      "from": "source:authoritative-snapshot",
+      "to": "implementation:contract-generator",
+      "type": "input-to"
+    },
+    {
+      "from": "decision:p3b-baseline",
+      "to": "requirement:quantitative-quality",
+      "type": "governs"
+    },
+    {
+      "from": "implementation:p1-p3-task-graph",
+      "to": "task:gate-p3b",
+      "type": "executed-by"
+    },
+    {
+      "from": "implementation:contract-generator",
+      "to": "oracle:python-independent",
+      "type": "challenged-by"
+    },
+    {
+      "from": "fixture:material-negatives",
+      "to": "task:gate-p3b",
+      "type": "executed-by"
+    },
+    {
+      "from": "task:gate-p3b",
+      "to": "ci:required-regulatory",
+      "type": "produced-by"
+    },
+    {
+      "from": "ci:required-regulatory",
+      "to": "report:p3b-runtime",
+      "type": "produces"
+    },
+    {
+      "from": "report:p3b-runtime",
+      "to": "subject:runtime",
+      "type": "binds-to"
+    },
+    {
+      "from": "package:p1-p3-shells",
+      "to": "requirement:compatibility",
+      "type": "subject-of"
+    },
+    {
+      "from": "edition:authoritative-candidate",
+      "to": "disposition:creation-disabled",
+      "type": "has-disposition"
+    },
+    {
+      "from": "disposition:creation-disabled",
+      "to": "consumer:p4-first-commit",
+      "type": "guards"
+    },
+    {
+      "from": "requirement:scope",
+      "to": "task:gate-p3b",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:identity",
+      "to": "report:p3b-runtime",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:toolchain",
+      "to": "task:gate-p3b",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:task-graph",
+      "to": "task:gate-p3b",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:ci-github",
+      "to": "ci:required-regulatory",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:platforms",
+      "to": "ci:required-regulatory",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:functional-quality",
+      "to": "task:gate-p3b",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:quantitative-quality",
+      "to": "report:p3b-runtime",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:security-privacy",
+      "to": "fixture:material-negatives",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:performance-reliability",
+      "to": "report:p3b-runtime",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:compatibility",
+      "to": "ci:required-regulatory",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:supply-chain",
+      "to": "task:gate-p3b",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:operations-law",
+      "to": "disposition:creation-disabled",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:negative-assurance",
+      "to": "fixture:material-negatives",
+      "type": "verified-by"
+    },
+    {
+      "from": "requirement:closure",
+      "to": "report:p3b-runtime",
+      "type": "verified-by"
+    },
+    {
+      "from": "oracle:python-independent",
+      "to": "report:p3b-runtime",
+      "type": "contributes-to"
+    },
+    {
+      "from": "consumer:p4-first-commit",
+      "to": "decision:p3b-baseline",
+      "type": "must-consume"
+    }
+  ],
+  "cardinality": {
+    "requirementPopulation": 15,
+    "requiredVerifiedByPerRequirement": 1,
+    "allowedOrphans": 0,
+    "missingOrStaleStatus": "blocked"
+  }
+}

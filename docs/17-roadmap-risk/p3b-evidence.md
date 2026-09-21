@@ -21,9 +21,10 @@ all evidence to the exact protected subject.
 
 `config/quality/p3b-baseline.json` declares every population, denominator,
 percentage threshold, critical control and P4 first-commit policy. Missing,
-partial or unknown metrics produce `blocked`. The current exact populations are
-538 documentation files (535 Markdown), 84 historical findings, 17 required CI
-contexts, 27 official/standards source artifacts, eight AEAT XML contract
+partial or unknown metrics produce `blocked`. The closure exact populations are
+539 documentation files (536 Markdown), 84 historical findings, 15 universal
+claim/evidence requirements, 17 required CI contexts, 27 official/standards
+source artifacts, eight AEAT XML contract
 documents, 562 structural declarations, 447 field constraints, 652
 enumerations, 29 SOAP declarations and seven semantic rules.
 
@@ -44,7 +45,9 @@ performance repetitions; lock, licence and full-SHA Action admission; dual SBOM
 reconciliation; provenance, two-build reproducibility; and the five-cell
 Ubuntu/Windows/macOS Node compatibility declaration. Protected CI supplies the
 actual supported-cell execution and blocks closure if any required context is
-absent.
+absent. `config/quality/p3b-claim-evidence.json` is the canonical typed graph;
+the assurance task rejects unknown endpoints, orphan nodes or any requirement
+without its required verification edge.
 
 ## Scope boundary and residual state
 

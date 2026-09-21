@@ -2614,6 +2614,10 @@ async function downloadBounded(input, path, fetchImplementation = fetch) {
       const response = await fetchImplementation(input.url, {
         redirect: "follow",
         signal: AbortSignal.timeout(30000),
+        headers: {
+          "User-Agent": "noeos-verifactu-assurance/1",
+          ...(input.accept ? { Accept: input.accept } : {}),
+        },
       });
       if (!response.ok) {
         await response.body?.cancel();

@@ -42,3 +42,19 @@ release and external-acceptance questions remain prospective.
 Each item remains open until its authority, owner, deadline, conservative behavior
 and exact unblock evidence are recorded. No later execution observation may be
 treated as current without a fresh read-back against the implementation subject.
+
+## P3-B blocker disposition
+
+| Item                                                                  | Owner             | Due date/gate                                            | P3-B disposition                                                                                              |
+| --------------------------------------------------------------------- | ----------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Authoritative source custody and semantic contract                    | regulatory-owner  | 2026-09-21 P3-B closure                                  | Resolved by the immutable 27-artifact snapshot, generated candidate and independent oracle; drift reopens it. |
+| P4 quantitative instrumentation                                       | quality-owner     | First protected P4 commit                                | Policy is complete in `P3B-BASELINE-0001`; omission blocks that commit.                                       |
+| Legal/applicability/declaration review                                | legal-owner       | Before P7 external-assurance entry and before release    | Downstream prerequisite; no fiscal behavior or compliance claim exists in P3-B.                               |
+| AEAT credentials/test service and provider custody                    | security-owner    | Before the first phase that exercises external transport | Downstream prerequisite; P3-B generation and assurance are offline.                                           |
+| Organizationally independent assessment and stable performance runner | assurance-owner   | Before P7 closure                                        | Downstream prerequisite; the P3-B oracle is implementation-independent only.                                  |
+| Real Facturacion integration                                          | integration-owner | Separate Facturacion product schedule                    | Explicitly outside VeriFactu P3-B/P4-start authority; the synthetic boundary remains the only current claim.  |
+
+No unresolved row affects authorization to begin P4 under its first-commit
+policies. Any scope expansion that makes a downstream row applicable changes it
+to `blocked` immediately; absence of a calendar date for a future phase is not
+used as evidence that its prerequisite passed.
