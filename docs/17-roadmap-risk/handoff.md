@@ -84,40 +84,41 @@ Historical detail belongs in phase records below.
 | Field                        | Initial value                                                                                                                                                                                 |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                    |
-| Current phase                | P2 is active at closure candidate; P3 remains prohibited until protected closure mechanics and final read-back complete.                                                                      |
-| Phase status                 | P2-W1–P2-W8 are implemented through protected PRs `#12`, `#22` and `#24`; the dedicated closure PR is the only remaining self-referential step.                                               |
+| Current phase                | P2 is evidence-complete; P3 remains prohibited until a fresh intake derives and revalidates this exact closure point.                                                                         |
+| Phase status                 | P2-W1–P2-W8 and dedicated closure PR `#25` are complete; protected main and final authenticated read-back are recorded below.                                                                 |
 | Last evidence-complete phase | P1 at protected recovery point `93d92ca131be93f9430ae13ddc384e471c74cdaa`.                                                                                                                    |
 | Local repository             | Deterministic P2 engineering infrastructure and exactly three private empty package shells; no fiscal behavior, regulatory edition, publication workflow or release claim.                    |
-| Protected `main` SHA         | `d2fe740f9793f6c59e7ba80d4099c7d120bb1632`; tree `52c54a57e4a8e02ea881ef8de32fb8695e7adb1b`, one parent `d782ee8f46907f3eb8cc9e773cbcd3884ff4037b`.                                           |
+| Protected `main` SHA         | `5d71bec40a62fce3adbea13c79f23600fd1eca4a`; tree `9574ed07e45ec6b56aaee5d06b729fdcd27e3f5a`, one parent `d2fe740f9793f6c59e7ba80d4099c7d120bb1632`.                                           |
 | GitHub effective state       | Rulesets `23705155`/`23705170` remain active with no bypass; all 17 App `15368` contexts are required. The exact final authenticated read-back is recorded in the current P2 closure section. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                  |
 | Regulatory edition           | None active or approved; P2 proves regulatory-source absence. Acquisition and edition generation are P3 inputs.                                                                               |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                              |
 | Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                         |
 | External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                     |
-| Immediate instruction        | Complete and read back the dedicated P2 closure PR; P3 intake must derive that squash SHA/tree and revalidate this record before acquiring official sources.                                  |
+| Immediate instruction        | Start a fresh P3 intake only after deriving and revalidating this exact closure SHA/tree and its protected evidence.                                                                          |
 
 ## Phase ledger
 
-| Phase | Status            | Input `main`                               | Closure `main`                             | Closure PR           | Summary                                                                                                             |
-| ----- | ----------------- | ------------------------------------------ | ------------------------------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10`           | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved. |
-| P2    | active            | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | derived after protected closure            | dedicated closure PR | W1–W8 complete at `d2fe740f9793f6c59e7ba80d4099c7d120bb1632`; final closure checks/read-back pending.               |
-| P3    | planned           | P2 closure required                        | —                                          | —                    | Official sources, editions, generated contracts and independent oracles.                                            |
-| P3-B  | planned           | P1–P3 closure required                     | —                                          | —                    | Assurance gate before the first P4 implementation commit.                                                           |
-| P4    | planned           | P3-B closure required                      | —                                          | —                    | Deterministic fiscal core and verification boundaries.                                                              |
-| P5    | planned           | P4 closure required                        | —                                          | —                    | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                      |
-| P6    | planned           | P5 closure required                        | —                                          | —                    | Public products and ecosystem conformance.                                                                          |
-| P7    | planned           | P6 closure required                        | —                                          | —                    | Whole-product assurance, external validation and release rehearsal.                                                 |
-| P8    | planned           | P7 closure required                        | —                                          | —                    | Stable publication, verification and support.                                                                       |
+| Phase | Status            | Input `main`                               | Closure `main`                             | Closure PR | Summary                                                                                                             |
+| ----- | ----------------- | ------------------------------------------ | ------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10` | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved. |
+| P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`      | W1–W8, protected squash, branch deletion, 22/22 hosted checks and 86/86 final audit complete.                       |
+| P3    | planned           | P2 closure required                        | —                                          | —          | Official sources, editions, generated contracts and independent oracles.                                            |
+| P3-B  | planned           | P1–P3 closure required                     | —                                          | —          | Assurance gate before the first P4 implementation commit.                                                           |
+| P4    | planned           | P3-B closure required                      | —                                          | —          | Deterministic fiscal core and verification boundaries.                                                              |
+| P5    | planned           | P4 closure required                        | —                                          | —          | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                      |
+| P6    | planned           | P5 closure required                        | —                                          | —          | Public products and ecosystem conformance.                                                                          |
+| P7    | planned           | P6 closure required                        | —                                          | —          | Whole-product assurance, external validation and release rehearsal.                                                 |
+| P8    | planned           | P7 closure required                        | —                                          | —          | Stable publication, verification and support.                                                                       |
 
 ## Current working record
 
 P1 is evidence-complete at the exact protected recovery point recorded above.
 P2 implementation is complete at `d2fe740…`; no fiscal product implementation,
 generated regulatory edition, public package or release evidence is admitted.
-The next operational action is protected merge and read-back of the dedicated
-P2 closure record, followed by a fresh P3 intake from that resulting SHA.
+The next operational action is a fresh P3 intake from the protected closure
+SHA after independently revalidating its identity, tree, signature, DCO,
+checks and final audit.
 
 ## Required phase-record schema
 
@@ -782,24 +783,24 @@ future closures must create new exact-subject records under the approved roadmap
 
 ### Identity and status
 
-- Status: `active` at closure candidate. P2 becomes `evidence-complete` when this dedicated
-  documentation PR passes all 17 contexts, is native-squashed through protected
-  `main`, its branch is deleted, the resulting one-parent commit has valid
-  GitHub signature/DCO, its push run passes and the authenticated effective-state
-  read-back has no mismatch.
+- Status: `evidence-complete`. Dedicated closure PR `#25` passed its required
+  and auxiliary checks, was native-squashed through protected `main`, had its
+  branch deleted, and its one-parent result has valid GitHub signature/DCO. The
+  protected push and final authenticated effective-state read-back also pass.
 - Started/closed (UTC): issue `#11` opened at `2026-09-20T19:46:29Z`;
-  implementation completed at `2026-09-21T08:08:20Z`; closure time is the
-  protected merge time of this record.
+  implementation completed at `2026-09-21T08:08:20Z`; closure merged at
+  `2026-09-21T08:33:13Z`.
 - Input main SHA / tree: `93d92ca131be93f9430ae13ddc384e471c74cdaa` /
   `12a243f493f660e95ac9e97e4cf164c3ad3b625d`, the final P1 recovery point.
 - Implementation-complete main SHA / tree:
   `d2fe740f9793f6c59e7ba80d4099c7d120bb1632` /
   `52c54a57e4a8e02ea881ef8de32fb8695e7adb1b`.
-- Closure main SHA / tree: derived by P3 intake because a commit cannot embed its
-  own identity. This record binds the exact predecessor above and the closure
-  PR final head.
-- Closure PR: dedicated branch `docs/11-p2-closure`; PR number and squash are
-  derived by the protected merge/read-back.
+- Closure main SHA / tree: `5d71bec40a62fce3adbea13c79f23600fd1eca4a` /
+  `9574ed07e45ec6b56aaee5d06b729fdcd27e3f5a`; one parent is the implementation
+  point above.
+- Closure PR: `#25`, final signed+DCO head
+  `3a082dbc6c3b6e0d4282b42989406e89a36c488b`; protected squash `5d71bec…`;
+  source branch deleted and GitHub signature verified.
 - Roadmap revision: `ROADMAP-DOC-0004`; P2-W1–P2-W8 and every stated P2 exit
   condition were evaluated without adding fiscal behavior or reducing scope.
 - Documentation inventory: `533` tracked Markdown files before this closure;
@@ -833,12 +834,12 @@ future closures must create new exact-subject records under the approved roadmap
 
 ### Work packages and protected history
 
-| Work ID                                 | Issue | Branch / PR                                 | signed+DCO branch commits                                                   | protected squash / result                                                                                          |
-| --------------------------------------- | ----- | ------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| P2-W1–W8 foundation                     | `#11` | `build/11-p2-foundation` / `#12`            | `7e9c0f8`, `161822c`, `fecd580`, `d012289`, `55c02ca`; whole range verified | `bfdd9e80a34f3e8fb1be60bbd5b679173b3bc20c`; valid GitHub signature, DCO, one parent; pass                          |
-| P2 graph/SBOM/effective-state hardening | `#11` | `build/11-p2-hardening` / `#22`             | `fa0a060`, `ddc9aa6`; whole range verified                                  | `d782ee8f46907f3eb8cc9e773cbcd3884ff4037b`; valid GitHub signature, DCO, one parent; pass after Windows correction |
-| P2 Action-runtime correction            | `#11` | `build/11-p2-action-runtime` / `#24`        | `4445fc5914d59ff1f1685b24e5f8c9b973049273`; verified                        | `d2fe740f9793f6c59e7ba80d4099c7d120bb1632`; valid GitHub signature, DCO, one parent; pass                          |
-| P2 closure                              | `#11` | `docs/11-p2-closure` / dedicated closure PR | signed+DCO final head required                                              | derived after protected merge; closure mechanics pending                                                           |
+| Work ID                                 | Issue | Branch / PR                          | signed+DCO branch commits                                                   | protected squash / result                                                                                          |
+| --------------------------------------- | ----- | ------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| P2-W1–W8 foundation                     | `#11` | `build/11-p2-foundation` / `#12`     | `7e9c0f8`, `161822c`, `fecd580`, `d012289`, `55c02ca`; whole range verified | `bfdd9e80a34f3e8fb1be60bbd5b679173b3bc20c`; valid GitHub signature, DCO, one parent; pass                          |
+| P2 graph/SBOM/effective-state hardening | `#11` | `build/11-p2-hardening` / `#22`      | `fa0a060`, `ddc9aa6`; whole range verified                                  | `d782ee8f46907f3eb8cc9e773cbcd3884ff4037b`; valid GitHub signature, DCO, one parent; pass after Windows correction |
+| P2 Action-runtime correction            | `#11` | `build/11-p2-action-runtime` / `#24` | `4445fc5914d59ff1f1685b24e5f8c9b973049273`; verified                        | `d2fe740f9793f6c59e7ba80d4099c7d120bb1632`; valid GitHub signature, DCO, one parent; pass                          |
+| P2 closure                              | `#11` | `docs/11-p2-closure` / `#25`         | signed+DCO head `3a082db`; all required and auxiliary checks passed         | `5d71bec40a62fce3adbea13c79f23600fd1eca4a`; valid GitHub signature/DCO, one parent, branch deleted; pass           |
 
 All merged implementation branches were automatically deleted. There was no
 direct protected-branch push, force push, bypass, merge commit, rebase,
@@ -907,7 +908,8 @@ CODEOWNERS fiction or approval fiction.
 | Hardened cross-platform controls   | exact hosted OS/runtime matrix                                                       | all `Required ·` jobs                                      | PR `#22` head `ddc9aa6…`                                                                  | 17/17 pass                                                                            | run `35575365939`                                                                                                                                                                                                               |
 | Current Action runtime/admission   | exact pinned Node-24 Actions                                                         | all `Required ·` jobs                                      | PR `#24` head `4445fc5…`                                                                  | 17/17 pass; Node-20 warning eliminated                                                | run `35576097119`                                                                                                                                                                                                               |
 | Protected implementation main      | push path and squash attribution                                                     | all `Required ·` jobs                                      | `d2fe740f9793f6c59e7ba80d4099c7d120bb1632`                                                | 17/17 pass                                                                            | run `35576334044`                                                                                                                                                                                                               |
-| Effective GitHub state             | authenticated redacted comparison                                                    | `audit_github.py`                                          | subject `d2fe740…`, check subject `4445fc5…`, observed `2026-09-21T08:13:30Z`             | 85/85 pass                                                                            | transient report SHA-256 `3ebeaea57eb2c382668111e43d0ecc3d57a0c56f7b5a1d61c709362a47889fc4`; closure reruns after merge                                                                                                         |
+| Protected P2 closure               | protected squash, branch deletion and hosted producers                               | 17 required plus 5 auxiliary workflows                     | PR `#25` head `3a082dbc…`; main `5d71bec…`                                                | 22/22 pass on PR and protected push                                                   | PR runs `35578325566`, `35578325622`, `35578325605`, `35578325623`, `35578325631`; main runs `35578500946`, `35578500955`, `35578500970`, `35578501031`                                                                         |
+| Effective GitHub state             | authenticated redacted comparison                                                    | `audit_github.py`                                          | subject `5d71bec…`, check subject `3a082dbc…`, observed `2026-09-21T08:38:36Z`            | 86/86 pass                                                                            | `/tmp/p2-final-audit.json` SHA-256 `cab9b11e5dde0a92f361836b53dbc2a2fa6e836befc64d88c1eefb9f453c3789`                                                                                                                           |
 | Deliberate falsifiers              | expected stable failure code per mutation                                            | `test:policy`                                              | implementation tree                                                                       | 29/29 reject for intended reason                                                      | task report incorporated by `gate:p2`                                                                                                                                                                                           |
 | Reproducible closed packages       | two isolated builds, allowlists, packed-only consumer                                | `package:reproducibility`, `integration:tarball-consumers` | implementation tree, `SOURCE_DATE_EPOCH=0`                                                | 3/3 byte-identical; 18 allowlisted entries; clean imports/deep-import rejection pass  | core `694361716a4f66b37644ca07d58347924896f266e1cda0b5aafe1088290f1569`; adapter `0f59f26b4d88372a1e1067da984d90f9d26d5088ed7964d8c297869f5e51e1d6`; CLI `bbe6f1797b6f8f3ec66c76e784a4829596b8e4f968027f03647e05fd2170e9a4`     |
 | Reconciled supply-chain graph/SBOM | lock/install/package/Action/tool/runtime/data graph; official schemas and SPDX SHACL | `sbom:component-graph`, `sbom:documents`                   | 264 components / 500 relationships                                                        | counts reconcile; SHACL pass, 8,618 data triples                                      | graph `40c2cfa51f7f38abc7d1c0da9beefc4e997d3c1c77ea5b7021335209ac6c7c6d`; CycloneDX `6f46ada7be5f7a57ba7683054f356fae52e5415b3bcae961cf59375153907785`; SPDX `8fd912d2f1cc43f4b46d9dd8ad0a280bf5684ed2811046a974e5133a5a797fa0` |
@@ -934,23 +936,23 @@ CODEOWNERS fiction or approval fiction.
 
 ### Phase close control matrix
 
-| Control family              | status | P2 proof / positive not-applicable boundary                                                                                                    | owner               |
-| --------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| Scope and requirements      | passed | P2-W1–W8, issue `#11`, three implementation PRs and this exact closure mapping                                                                 | project-owner       |
-| Identity and evidence       | passed | exact subjects/trees/runs/digests; every human commit signed+DCO; protected squashes verified                                                  | repository-owner    |
-| Toolchain                   | passed | exact admitted runtimes, packages, Python, scanners and external inputs                                                                        | build-owner         |
-| Task graph                  | passed | 26-task acyclic/reachable/single-producer DAG; declared capability enforcement and zero-work failure                                           | quality-owner       |
-| CI and GitHub               | passed | exact 17 required contexts, auxiliary workflow architecture, closure, PR/main/bot events, least privilege and authenticated read-back          | repository-owner    |
-| Platforms                   | passed | Ubuntu 24.04 Node 22.14/22.23/24.21, Windows 2025 and macOS 15 Node 24.21                                                                      | quality-owner       |
-| Functional quality          | passed | complete declared P2 population: policy, package, consumer, SBOM and provenance tasks; no skipped cell                                         | quality-owner       |
-| Quantitative quality        | passed | no production/fiscal denominator exists; 29/29 material foundation falsifiers replace no percentage claim                                      | quality-owner       |
-| Security and privacy        | passed | SAST, secrets, OSV, npm/dependency/licence controls pass; no sensitive-data surface exists                                                     | security-owner      |
-| Performance and reliability | passed | applicable deterministic/retry controls pass; product workloads/SLOs are absent and explicitly downstream                                      | performance-owner   |
-| Compatibility               | passed | complete claimed P2 OS/runtime/package-consumer cells pass; no fiscal/provider compatibility claimed                                           | compatibility-owner |
-| Supply chain                | passed | exact lock/admissions, clean builds/consumers, 264-node graph, dual SBOM and honest provenance                                                 | supply-chain-owner  |
-| Operations and law          | passed | no product operation/publication/legal claim exists; licence controls pass and external gates remain mapped downstream                         | project-owner       |
-| Negative assurance          | passed | 29 safe maintained fixtures reject every material requested mutation for its intended code                                                     | quality-owner       |
-| Closure                     | passed | no material P2 blocker/exception/unknown; this PR's final checks, squash, deletion and read-back are conditions of the phase-status transition | project-owner       |
+| Control family              | status | P2 proof / positive not-applicable boundary                                                                                           | owner               |
+| --------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| Scope and requirements      | passed | P2-W1–W8, issue `#11`, three implementation PRs and this exact closure mapping                                                        | project-owner       |
+| Identity and evidence       | passed | exact subjects/trees/runs/digests; every human commit signed+DCO; protected squashes verified                                         | repository-owner    |
+| Toolchain                   | passed | exact admitted runtimes, packages, Python, scanners and external inputs                                                               | build-owner         |
+| Task graph                  | passed | 26-task acyclic/reachable/single-producer DAG; declared capability enforcement and zero-work failure                                  | quality-owner       |
+| CI and GitHub               | passed | exact 17 required contexts, auxiliary workflow architecture, closure, PR/main/bot events, least privilege and authenticated read-back | repository-owner    |
+| Platforms                   | passed | Ubuntu 24.04 Node 22.14/22.23/24.21, Windows 2025 and macOS 15 Node 24.21                                                             | quality-owner       |
+| Functional quality          | passed | complete declared P2 population: policy, package, consumer, SBOM and provenance tasks; no skipped cell                                | quality-owner       |
+| Quantitative quality        | passed | no production/fiscal denominator exists; 29/29 material foundation falsifiers replace no percentage claim                             | quality-owner       |
+| Security and privacy        | passed | SAST, secrets, OSV, npm/dependency/licence controls pass; no sensitive-data surface exists                                            | security-owner      |
+| Performance and reliability | passed | applicable deterministic/retry controls pass; product workloads/SLOs are absent and explicitly downstream                             | performance-owner   |
+| Compatibility               | passed | complete claimed P2 OS/runtime/package-consumer cells pass; no fiscal/provider compatibility claimed                                  | compatibility-owner |
+| Supply chain                | passed | exact lock/admissions, clean builds/consumers, 264-node graph, dual SBOM and honest provenance                                        | supply-chain-owner  |
+| Operations and law          | passed | no product operation/publication/legal claim exists; licence controls pass and external gates remain mapped downstream                | project-owner       |
+| Negative assurance          | passed | 29 safe maintained fixtures reject every material requested mutation for its intended code                                            | quality-owner       |
+| Closure                     | passed | no material P2 blocker/exception/unknown; PR `#25` checks, squash `5d71bec…`, deletion, protected push and 86/86 read-back complete   | project-owner       |
 
 ### Failures, corrections and review
 
@@ -1002,7 +1004,7 @@ CODEOWNERS fiction or approval fiction.
 
 ### Recovery and next phase
 
-- Recovery point/procedure: implementation point `d2fe740…`; recover only via a
+- Recovery point/procedure: closure point `5d71bec…` (tree `9574ed…`); recover only via a
   new bounded signed+DCO protected PR. Rebuild from exact lock/toolchain,
   regenerate/compare tarballs and SBOMs, run both closure roots, then repeat the
   authenticated GitHub read-back. Force/deletion/bypass remain unavailable.
@@ -1011,9 +1013,9 @@ CODEOWNERS fiction or approval fiction.
   generated edits, mutable Action/dependency, package leak and nonreproducible
   output fail; all 17 contexts are produced on human PR/main and live bot path
   classes; tarballs, consumers, graph, SBOMs and provenance reconcile.
-- P3 prerequisites: derive and verify this closure's squash SHA/tree/parent,
-  GitHub signature/DCO, all 17 final-head and push contexts, branch deletion and
-  fresh 85-control audit. Then re-observe official AEAT sources, applicability,
+- P3 prerequisites: derive and verify closure squash `5d71bec…`/tree `9574ed…`/parent,
+  GitHub signature/DCO, all 17 final-head and push contexts, auxiliary producers,
+  branch deletion and fresh 86-control audit. Then re-observe official AEAT sources, applicability,
   licences, immutable acquisition inputs and independent oracle availability.
 - Exact first commands: fetch/prune; switch to clean protected `main`; inspect
   SHA/tree/parent/signature/trailer; verify closure PR/deleted branch and push
