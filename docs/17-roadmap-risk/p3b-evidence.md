@@ -24,7 +24,7 @@ authorizes the first bounded P4 commit under the policies below.
 `config/quality/p3b-baseline.json` declares every population, denominator,
 percentage threshold, critical control and P4 first-commit policy. Missing,
 partial or unknown metrics produce `blocked`. The closure exact populations are
-539 documentation files (536 Markdown), 84 historical findings, 15 universal
+540 documentation files (537 Markdown), 84 historical findings, 15 universal
 claim/evidence requirements, 17 required CI contexts, 27 official/standards
 source artifacts, eight AEAT XML contract
 documents, 562 structural declarations, 447 field constraints, 652

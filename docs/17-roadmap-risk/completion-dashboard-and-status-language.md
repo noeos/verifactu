@@ -24,7 +24,8 @@ cannot edit underlying status or hide blocked work.
 ## Current scoped status
 
 P1, P2, P3 and the mandatory P3-B pre-P4 assurance gate are evidence-complete
-at their protected recovery points. P4 is ready to begin only under
-`P3B-BASELINE-0001` and its first-commit policies; P4–P8 remain unimplemented.
-`creationAllowed=false` and no fiscal-compliance, AEAT-acceptance, publication
-or release claim is made.
+at their protected recovery points. P4 pre-implementation quality populations,
+critical decisions/mutants, thresholds, toolchain/OS cells and resource budgets
+are declared by `P4-QUALITY-PLAN-0001`; P4 fiscal behavior and P5–P8 remain
+unimplemented. `creationAllowed=false` and no fiscal-compliance,
+AEAT-acceptance, publication or release claim is made.

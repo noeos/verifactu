@@ -37,7 +37,7 @@
       "report": "quality.json",
       "runner": "ubuntu-24.04",
       "node": "24.21.0",
-      "task": "gate:p2",
+      "task": "gate:p4-readiness",
       "timeoutMinutes": 15
     },
     {
