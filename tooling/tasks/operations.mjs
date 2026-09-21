@@ -1118,6 +1118,7 @@ async function testPolicy(context) {
     validateRegistry,
     validateReportSubject,
     validateZeroWork,
+    normalizeOutcomeStatus,
   } = await import("./run-task.mjs");
   const registry = await readJson(
     resolve(context.root, "config/tasks/task-registry.json"),
@@ -1277,6 +1278,11 @@ async function testPolicy(context) {
       case "zero-work":
         fixtureError(fixture.expectedCode, () =>
           validateZeroWork(registry.tasks[0], 0, 0),
+        );
+        break;
+      case "unknown-task-outcome":
+        fixtureError(fixture.expectedCode, () =>
+          normalizeOutcomeStatus({ status: "partial" }),
         );
         break;
       case "missing-context":
@@ -2719,6 +2725,7 @@ async function regulatoryAbsence(context) {
       path !== "schemas/README.md" &&
       !path.startsWith("editions/source-snapshots/") &&
       !path.startsWith("editions/rrsif-2026-09-21-observed-candidate/") &&
+      !path.startsWith("editions/rrsif-2026-09-21-authoritative-candidate/") &&
       path !== "schemas/regulatory-edition-envelope.schema.json",
   );
   assert(forbidden.length === 0, "P2_REGULATORY_SCOPE", forbidden.join(", "));
@@ -2744,24 +2751,24 @@ async function regulatoryImport(context) {
   const manifest = await readJson(
     resolve(
       context.root,
-      "editions/source-snapshots/rrsif-2026-09-21-observed/manifest.json",
+      "editions/source-snapshots/rrsif-2026-09-21-authoritative/manifest.json",
     ),
   );
   const captured = manifest.sources.filter(
-    (source) => source.status !== "blocked",
+    (source) => source.status === "captured",
   );
   const blocked = manifest.sources.filter(
     (source) => source.status === "blocked",
   );
   assert(
-    captured.length >= 10,
+    captured.length === 27,
     "REGULATORY_CAPTURE_INCOMPLETE",
     String(captured.length),
   );
   assert(
-    blocked.length >= 1,
-    "REGULATORY_BLOCKERS_ERASED",
-    "blocked authority edges must remain explicit",
+    blocked.length === 0 && manifest.closure.complete === true,
+    "REGULATORY_SOURCE_GRAPH_OPEN",
+    "authoritative source graph must be complete",
   );
   return {
     selected: manifest.sources.length,
@@ -2770,7 +2777,7 @@ async function regulatoryImport(context) {
     outputDigest: sha256(canonicalJson(manifest)),
     diagnostics: [
       `captured=${captured.length}`,
-      `blocked=${blocked.length}`,
+      "blocked=0",
       "runtime network denied",
     ],
   };
@@ -2790,7 +2797,7 @@ async function contractGeneration(context) {
   const generated = await readJson(
     resolve(
       context.root,
-      "editions/rrsif-2026-09-21-observed-candidate/generated/generation-report.json",
+      "editions/rrsif-2026-09-21-authoritative-candidate/generated/generation-report.json",
     ),
   );
   assert(
@@ -2804,9 +2811,9 @@ async function contractGeneration(context) {
     "activation is prohibited",
   );
   assert(
-    generated.blocked.length >= 1,
-    "GENERATION_HIDING_BLOCKERS",
-    "blocked source graph disappeared",
+    generated.blocked.length === 0,
+    "GENERATION_SOURCE_GRAPH_OPEN",
+    "source graph is not closed",
   );
   return {
     selected: generated.outputs.length + 1,
@@ -2814,9 +2821,9 @@ async function contractGeneration(context) {
     passed: generated.outputs.length + 1,
     outputDigest: generated.outputDigest,
     diagnostics: [
-      `blocked=${generated.blocked.length}`,
+      `structuralDeclarations=${generated.populations.structuralDeclarations}`,
       "network denied",
-      "metadata-only output; no fiscal semantics",
+      "structural contracts plus source-located semantic overlay; fiscal execution remains P4 scope",
     ],
   };
 }
@@ -2858,12 +2865,13 @@ async function independentOracle(context) {
 
 async function regulatoryDrift(context) {
   const generatedFiles = [
-    "editions/rrsif-2026-09-21-observed-candidate/generated/catalogues.json",
-    "editions/rrsif-2026-09-21-observed-candidate/generated/contract-manifest.json",
-    "editions/rrsif-2026-09-21-observed-candidate/generated/field-constraints.json",
-    "editions/rrsif-2026-09-21-observed-candidate/generated/public-schema.json",
-    "editions/rrsif-2026-09-21-observed-candidate/generated/soap-bindings.json",
-    "editions/rrsif-2026-09-21-observed-candidate/generated/semantic-overlay.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/catalogues.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/contract-manifest.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/field-constraints.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/public-schema.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/soap-bindings.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/semantic-overlay.json",
+    "editions/rrsif-2026-09-21-authoritative-candidate/generated/structural-contract.json",
   ];
   const before = await digestFiles(context.root, generatedFiles);
   const first = await run(
@@ -2877,7 +2885,7 @@ async function regulatoryDrift(context) {
   const manifest = await readJson(
     resolve(
       context.root,
-      "editions/source-snapshots/rrsif-2026-09-21-observed/manifest.json",
+      "editions/source-snapshots/rrsif-2026-09-21-authoritative/manifest.json",
     ),
   );
   const originalClosure = sha256(
@@ -2903,7 +2911,7 @@ async function regulatoryDrift(context) {
   const report = await readJson(
     resolve(
       context.root,
-      "editions/rrsif-2026-09-21-observed-candidate/generated/generation-report.json",
+      "editions/rrsif-2026-09-21-authoritative-candidate/generated/generation-report.json",
     ),
   );
   assert(
@@ -2934,7 +2942,7 @@ async function gateP3(context) {
     failures.map((report) => report.taskId).join(", "),
   );
   const source = await readJson(
-    resolve(context.root, "config/regulatory/source-plan.json"),
+    resolve(context.root, "config/regulatory/source-plan-p3b.json"),
   );
   const lifecycle = await readJson(
     resolve(context.root, "config/regulatory/edition-lifecycle.json"),
@@ -2963,9 +2971,28 @@ async function gateP3(context) {
       ),
     ),
     diagnostics: [
-      "P3 safe work passes; activation remains blocked by authoritative payload custody",
+      "P3 source custody and generated-contract closure pass; candidate activation remains prohibited until a later approved lifecycle transition",
     ],
   };
+}
+
+async function p3bAssurance(context) {
+  const result = await run("node", ["tooling/assurance/p3b-audit.mjs"], {
+    cwd: context.root,
+    timeoutMs: 300000,
+  });
+  assert(
+    result.code === 0,
+    "P3B_AUDIT_EXECUTION",
+    result.stderr || result.stdout,
+  );
+  const outcome = JSON.parse(result.stdout.trim().split(/\r?\n/u).at(-1));
+  assert(
+    ["passed", "blocked"].includes(outcome.status),
+    "P3B_AUDIT_STATUS",
+    outcome.status,
+  );
+  return outcome;
 }
 
 async function gate(context) {
@@ -3026,6 +3053,7 @@ export const operations = {
   independentOracle,
   regulatoryDrift,
   gateP3,
+  p3bAssurance,
   gate,
 };
 
@@ -3064,5 +3092,6 @@ export const operationCapabilities = Object.freeze({
   independentOracle: { tools: ["python"], network: "denied" },
   regulatoryDrift: { tools: ["node"], network: "denied" },
   gateP3: { tools: [], network: "denied" },
+  p3bAssurance: { tools: ["git", "node"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });

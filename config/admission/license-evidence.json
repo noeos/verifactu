@@ -10,5 +10,25 @@
       "evidencePath": "node_modules/npm/node_modules/qrcode-terminal/LICENSE",
       "evidenceSha256": "b3c7a2fadb2515b8106eae58439a4b9c0581a4eaa88d6a265701f8d4dd7dadb8"
     }
+  ],
+  "regulatorySources": [
+    {
+      "id": "BOE-REUSE-TERMS",
+      "authority": "Agencia Estatal Boletín Oficial del Estado",
+      "terms": "https://www.boe.es/datosabiertos/aviso_legal.php",
+      "disposition": "exact unmodified source bytes retained with origin and observation metadata"
+    },
+    {
+      "id": "AEAT-REUSE-TERMS",
+      "authority": "Agencia Estatal de Administración Tributaria",
+      "terms": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica.html",
+      "disposition": "exact unmodified technical-publication bytes retained with origin and observation metadata"
+    },
+    {
+      "id": "W3C-DOCUMENT-LICENSE",
+      "authority": "World Wide Web Consortium",
+      "terms": "https://www.w3.org/copyright/document-license-2023/",
+      "disposition": "exact unmodified XML Signature schema retained with origin and embedded copyright notice"
+    }
   ]
 }

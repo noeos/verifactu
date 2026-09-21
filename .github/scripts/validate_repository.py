@@ -95,10 +95,16 @@ def validate(root: Path) -> list[str]:
 
     for forbidden in ("CODEOWNERS", ".github/CODEOWNERS", "docs/CODEOWNERS"):
         if (root / forbidden).exists():
-            fail(errors, "P1-CODEOWNERS", forbidden, "single-maintainer policy forbids CODEOWNERS")
+            fail(
+                errors,
+                "P1-CODEOWNERS",
+                forbidden,
+                "single-maintainer policy forbids CODEOWNERS",
+            )
     excluded_roots = {".git", ".build-cache", "node_modules"}
     all_files = [
-        p for p in root.rglob("*")
+        p
+        for p in root.rglob("*")
         if p.is_file()
         and not any(part in excluded_roots for part in p.relative_to(root).parts)
         and "evidence/runs" not in p.relative_to(root).as_posix()
@@ -109,17 +115,41 @@ def validate(root: Path) -> list[str]:
             text = data.decode("utf-8")
         except UnicodeDecodeError:
             if path.suffix in {".md", ".json", ".yml", ".yaml", ".py"}:
-                fail(errors, "P1-UTF8", str(path.relative_to(root)), "governed text is not UTF-8")
+                fail(
+                    errors,
+                    "P1-UTF8",
+                    str(path.relative_to(root)),
+                    "governed text is not UTF-8",
+                )
             continue
-        if b"\r" in data:
+        immutable_source_blob = (
+            "editions/source-snapshots" in path.relative_to(root).as_posix()
+        )
+        if b"\r" in data and not immutable_source_blob:
             fail(errors, "P1-LF", str(path.relative_to(root)), "CR bytes are forbidden")
         if PRIVATE_RE.search(text):
-            fail(errors, "P1-PRIVATE-KEY", str(path.relative_to(root)), "private-key marker found")
-        if WORKSTATION_RE.search(text) and path != root / ".github/policy/p1-baseline.json" and "editions/source-snapshots" not in path.relative_to(root).as_posix():
-            fail(errors, "P1-WORKSTATION-PATH", str(path.relative_to(root)), "workstation-specific path found")
+            fail(
+                errors,
+                "P1-PRIVATE-KEY",
+                str(path.relative_to(root)),
+                "private-key marker found",
+            )
+        if (
+            WORKSTATION_RE.search(text)
+            and path != root / ".github/policy/p1-baseline.json"
+            and "editions/source-snapshots" not in path.relative_to(root).as_posix()
+        ):
+            fail(
+                errors,
+                "P1-WORKSTATION-PATH",
+                str(path.relative_to(root)),
+                "workstation-specific path found",
+            )
 
     docs = root / "docs"
-    current_files = [p for p in docs.rglob("*") if p.is_file() and "previous-docs" not in p.parts]
+    current_files = [
+        p for p in docs.rglob("*") if p.is_file() and "previous-docs" not in p.parts
+    ]
     historical_files = [p for p in (docs / "previous-docs").rglob("*") if p.is_file()]
     markdown = [p for p in current_files if p.suffix == ".md"]
     ids: dict[str, Path] = {}
@@ -134,7 +164,15 @@ def validate(root: Path) -> list[str]:
         if meta is None:
             fail(errors, "P1-METADATA", rel, "missing or malformed front matter")
             continue
-        for field in ("id", "title", "status", "authority", "owner", "created", "last-reviewed"):
+        for field in (
+            "id",
+            "title",
+            "status",
+            "authority",
+            "owner",
+            "created",
+            "last-reviewed",
+        ):
             if not meta.get(field):
                 fail(errors, "P1-METADATA", rel, f"missing {field}")
         doc_id = meta.get("id", "")
@@ -142,7 +180,12 @@ def validate(root: Path) -> list[str]:
         if doc_id and not placeholder_id and not ID_RE.match(doc_id):
             fail(errors, "P1-ID", rel, f"invalid identifier {doc_id!r}")
         if doc_id in ids:
-            fail(errors, "P1-ID-DUPLICATE", rel, f"duplicate {doc_id} also in {ids[doc_id].relative_to(root)}")
+            fail(
+                errors,
+                "P1-ID-DUPLICATE",
+                rel,
+                f"duplicate {doc_id} also in {ids[doc_id].relative_to(root)}",
+            )
         elif doc_id:
             ids[doc_id] = path
 
@@ -152,28 +195,48 @@ def validate(root: Path) -> list[str]:
             if not target or target.startswith(("http://", "https://", "mailto:")):
                 continue
             file_part, _, fragment = target.partition("#")
-            candidate = path if not file_part else (path.parent / unquote(file_part)).resolve()
+            candidate = (
+                path if not file_part else (path.parent / unquote(file_part)).resolve()
+            )
             try:
                 candidate.relative_to(root.resolve())
             except ValueError:
-                fail(errors, "P1-LINK-ESCAPE", path.relative_to(root).as_posix(), target)
+                fail(
+                    errors, "P1-LINK-ESCAPE", path.relative_to(root).as_posix(), target
+                )
                 continue
             if not candidate.exists():
                 fail(errors, "P1-LINK-DEAD", path.relative_to(root).as_posix(), target)
                 continue
             if fragment and candidate.suffix == ".md":
                 if candidate not in anchor_cache:
-                    anchor_cache[candidate] = anchors(candidate.read_text(encoding="utf-8"))
+                    anchor_cache[candidate] = anchors(
+                        candidate.read_text(encoding="utf-8")
+                    )
                 if unquote(fragment).lower() not in anchor_cache[candidate]:
-                    fail(errors, "P1-ANCHOR-DEAD", path.relative_to(root).as_posix(), target)
+                    fail(
+                        errors,
+                        "P1-ANCHOR-DEAD",
+                        path.relative_to(root).as_posix(),
+                        target,
+                    )
 
-    ledger = (docs / "18-assurance-audits/historical-findings-ledger.md").read_text(encoding="utf-8")
+    ledger = (docs / "18-assurance-audits/historical-findings-ledger.md").read_text(
+        encoding="utf-8"
+    )
     for number in range(1, 85):
         finding = f"REV-{number:03d}"
         if finding not in ledger:
-            fail(errors, "P1-HISTORICAL-DISPOSITION", finding, "missing from current ledger")
+            fail(
+                errors,
+                "P1-HISTORICAL-DISPOSITION",
+                finding,
+                "missing from current ledger",
+            )
 
-    baseline = json.loads((root / ".github/policy/p1-baseline.json").read_text(encoding="utf-8"))
+    baseline = json.loads(
+        (root / ".github/policy/p1-baseline.json").read_text(encoding="utf-8")
+    )
     expected = {
         "currentDocumentFiles": len(current_files),
         "currentMarkdownFiles": len(markdown),
@@ -184,22 +247,58 @@ def validate(root: Path) -> list[str]:
     # its exact value is retained, while live counts detect accidental omission.
     for key, actual in expected.items():
         if baseline.get(key) != actual:
-            fail(errors, "P1-INVENTORY", key, f"expected {baseline.get(key)!r}, observed {actual!r}")
+            fail(
+                errors,
+                "P1-INVENTORY",
+                key,
+                f"expected {baseline.get(key)!r}, observed {actual!r}",
+            )
 
-    desired = json.loads((root / ".github/policy/github-desired-state.json").read_text(encoding="utf-8"))
+    desired = json.loads(
+        (root / ".github/policy/github-desired-state.json").read_text(encoding="utf-8")
+    )
     if desired["mainRuleset"]["bypassActors"] or desired["tagRuleset"]["bypassActors"]:
-        fail(errors, "P1-BYPASS", "github desired state", "bypass actor list must be empty")
+        fail(
+            errors,
+            "P1-BYPASS",
+            "github desired state",
+            "bypass actor list must be empty",
+        )
     if desired["mainRuleset"]["requiredApprovals"] != 0:
-        fail(errors, "P1-REVIEWS", "github desired state", "required approvals must be zero")
+        fail(
+            errors,
+            "P1-REVIEWS",
+            "github desired state",
+            "required approvals must be zero",
+        )
 
     workflow_path = root / ".github/workflows/required.yml"
-    workflow = workflow_path.read_text(encoding="utf-8") if workflow_path.exists() else ""
+    workflow = (
+        workflow_path.read_text(encoding="utf-8") if workflow_path.exists() else ""
+    )
     if "pull_request_target" in workflow or "workflow_dispatch" in workflow:
-        fail(errors, "P2-WORKFLOW-EVENT", "required.yml", "privileged/manual required-check events are forbidden")
-    if not re.search(r"(?m)^\s{2}pull_request:\s*$", workflow) or not re.search(r"(?m)^\s{2}push:\s*$", workflow):
-        fail(errors, "P2-WORKFLOW-EVENT", "required.yml", "pull_request and protected-main push are required")
+        fail(
+            errors,
+            "P2-WORKFLOW-EVENT",
+            "required.yml",
+            "privileged/manual required-check events are forbidden",
+        )
+    if not re.search(r"(?m)^\s{2}pull_request:\s*$", workflow) or not re.search(
+        r"(?m)^\s{2}push:\s*$", workflow
+    ):
+        fail(
+            errors,
+            "P2-WORKFLOW-EVENT",
+            "required.yml",
+            "pull_request and protected-main push are required",
+        )
     if not re.search(r"(?m)^permissions:\s*\{\}\s*$", workflow):
-        fail(errors, "P2-WORKFLOW-PERMISSIONS", "required.yml", "top-level permissions must be empty")
+        fail(
+            errors,
+            "P2-WORKFLOW-PERMISSIONS",
+            "required.yml",
+            "top-level permissions must be empty",
+        )
     for match in SHA_ACTION_RE.finditer(workflow):
         ref = match.group(1)
         if not ref.startswith("./") and not re.search(r"@[0-9a-f]{40}$", ref):
@@ -209,7 +308,10 @@ def validate(root: Path) -> list[str]:
 
 
 def self_test() -> None:
-    assert front_matter("---\nid: GOV-001\ntitle: x\n---\n") == {"id": "GOV-001", "title": "x"}
+    assert front_matter("---\nid: GOV-001\ntitle: x\n---\n") == {
+        "id": "GOV-001",
+        "title": "x",
+    }
     assert front_matter("id: GOV-001") is None
     assert slug("Exact `SHA` / DCO") == "exact-sha-dco"
     assert "section" in anchors("# Title\n## Section\n")
@@ -225,7 +327,12 @@ def main() -> int:
     if args.self_test:
         self_test()
     errors = validate(args.root.resolve())
-    report = {"schemaVersion": 1, "subject": str(args.root.resolve()), "status": "passed" if not errors else "failed", "errors": errors}
+    report = {
+        "schemaVersion": 1,
+        "subject": str(args.root.resolve()),
+        "status": "passed" if not errors else "failed",
+        "errors": errors,
+    }
     print(json.dumps(report, indent=2, ensure_ascii=False))
     return 0 if not errors else 1
 

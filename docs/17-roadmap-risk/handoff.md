@@ -27,10 +27,10 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The current execution is the protected P3 sequence entered from the P2 closure
-`9571b69df4f5eec2b0efc548c30867fcadfd356b`. The current context capsule,
-phase ledger and the section titled **P3 closure — current protected execution
-(2026-09-21)** are authoritative for resumption. Later P3–P7 sections are
+The current execution is the mandatory P3-B sequence entered from protected P3
+read-back `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`. The current context capsule,
+phase ledger and [`p3b-evidence.md`](p3b-evidence.md) are authoritative for
+resumption. Later P4–P7 sections are
 preserved records from prior attempts and are explicitly superseded; they do
 not establish current implementation, evidence, phase status or permission to
 start P4.
@@ -84,40 +84,41 @@ Historical detail belongs in phase records below.
 | Field                        | Initial value                                                                                                                                                                                 |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                    |
-| Current phase                | P3 is blocked at the authoritative-payload boundary; P4 remains prohibited.                                                                                                                 |
-| Phase status                 | P3-W1–P3-W6 and protected closure/read-back are complete; six payload blockers prevent `evidence-complete` and P4 readiness.                                                               |
+| Current phase                | P3-B assurance is active; P4 remains prohibited.                                                                                                                                              |
+| Phase status                 | Authoritative payload custody is resolved; source/contract/oracle corrections are local closure-candidate work pending protected PR and exact-subject read-back.                              |
 | Last evidence-complete phase | P1 at protected recovery point `93d92ca131be93f9430ae13ddc384e471c74cdaa`.                                                                                                                    |
-| Local repository             | Deterministic P2 foundation plus P3 source custody, blocked candidate contracts and independent oracle; no fiscal behavior or release claim.                                                |
-| Protected `main` SHA         | `c8b2603453e7a4c364e7a8730a8ab6d5bc5702ca`; tree `01ca9709e43990b2bf61cc0bb09ab41356e399f5`, one parent `a87044d312f4fbb03b6a02490d758f2e739dd254`.                             |
+| Local repository             | Deterministic P2 foundation plus corrected authoritative P3 source custody, structural candidate contracts, independent oracle and P3-B assurance; no fiscal behavior or release claim.       |
+| Protected `main` SHA         | `9e27bf377d07d93fe5faa448eb4ff907b7f21182`; P3-B source-observation prerequisite merged by protected PR `#31`; later local work is not yet protected evidence.                                |
 | GitHub effective state       | Rulesets `23705155`/`23705170` remain active with no bypass; all 17 App `15368` contexts are required. The exact final authenticated read-back is recorded in the current P2 closure section. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                  |
-| Regulatory edition           | Immutable observed snapshot `rrsif-2026-09-21-observed` and blocked candidate `rrsif-2026-09-21-observed-candidate`; verification-only, `creationAllowed=false`.                            |
+| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                              |
 | Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                         |
 | External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                     |
-| Immediate instruction        | Re-observe and resolve the six blocked AEAT payload edges in a successor snapshot; do not start P4 or enable fiscal creation.                                                              |
+| Immediate instruction        | Complete P3-B locally, merge through signed+DCO protected PR, rerun all 17 contexts and perform exact final-main read-back; do not start P4 or enable fiscal creation.                        |
 
 ## Phase ledger
 
-| Phase | Status            | Input `main`                               | Closure `main`                             | Closure PR | Summary                                                                                                                  |
-| ----- | ----------------- | ------------------------------------------ | ------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10` | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved.      |
-| P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`      | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
-| P3    | blocked           | `9571b69df4f5eec2b0efc548c30867fcadfd356b` | `c8b2603453e7a4c364e7a8730a8ab6d5bc5702ca` | `#28`/`#29` | Safe source custody, blocked candidate contracts and independent oracles; six AEAT payload authorities unavailable.       |
-| P3-B  | planned           | P1–P3 closure required                     | —                                          | —          | Assurance gate before the first P4 implementation commit.                                                                |
-| P4    | planned           | P3-B closure required                      | —                                          | —          | Deterministic fiscal core and verification boundaries.                                                                   |
-| P5    | planned           | P4 closure required                        | —                                          | —          | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
-| P6    | planned           | P5 closure required                        | —                                          | —          | Public products and ecosystem conformance.                                                                               |
-| P7    | planned           | P6 closure required                        | —                                          | —          | Whole-product assurance, external validation and release rehearsal.                                                      |
-| P8    | planned           | P7 closure required                        | —                                          | —          | Stable publication, verification and support.                                                                            |
+| Phase | Status            | Input `main`                               | Closure `main`                             | Closure PR  | Summary                                                                                                                  |
+| ----- | ----------------- | ------------------------------------------ | ------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------ |
+| P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10`  | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved.      |
+| P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`       | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
+| P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b` | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30` | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
+| P3-B  | active            | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | —                                          | `#31`+TBD   | Payload observation prerequisite merged; full assurance correction and exact-subject closure are in progress.            |
+| P4    | planned           | P3-B closure required                      | —                                          | —           | Deterministic fiscal core and verification boundaries.                                                                   |
+| P5    | planned           | P4 closure required                        | —                                          | —           | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
+| P6    | planned           | P5 closure required                        | —                                          | —           | Public products and ecosystem conformance.                                                                               |
+| P7    | planned           | P6 closure required                        | —                                          | —           | Whole-product assurance, external validation and release rehearsal.                                                      |
+| P8    | planned           | P7 closure required                        | —                                          | —           | Stable publication, verification and support.                                                                            |
 
 ## Current working record
 
-P1 and P2 are evidence-complete at their recorded protected points. P3 safe
-implementation is complete on the current branch; the candidate remains
-blocked and no P4 source or fiscal behavior is admitted. The next operational
-action is a protected implementation merge followed by a dedicated P3 closure
-handoff with exact final-main identity and check read-back.
+P1–P3 are evidence-complete at their recorded protected points. P3-B corrects
+the formerly blocked source graph and executes the pre-P4 assurance campaign;
+its local result is not protected closure evidence. No P4 source or fiscal
+behavior is admitted. The next operational action is protected implementation
+merge followed by dedicated P3-B handoff/read-back with exact final-main
+identity and all required contexts.
 
 ## Required phase-record schema
 
@@ -2401,10 +2402,10 @@ documentation-only and does not change the authoritative P7 campaign subject
 
 ### Work packages and protected history
 
-| Work ID | Issue | Branch | PR | branch commits/signers/DCO | squash SHA | result |
-| --- | --- | --- | --- | --- | --- | --- |
-| P3-W1–W6 | derived from P3 intake | `build/28-p3-source-contracts` | pending | SSH-signed+DCO required | derived | safe implementation; blocked activation |
-| P3 closure | same | dedicated handoff branch | pending | SSH-signed+DCO required | derived | exact final-main read-back required |
+| Work ID    | Issue                  | Branch                         | PR      | branch commits/signers/DCO | squash SHA | result                                  |
+| ---------- | ---------------------- | ------------------------------ | ------- | -------------------------- | ---------- | --------------------------------------- |
+| P3-W1–W6   | derived from P3 intake | `build/28-p3-source-contracts` | pending | SSH-signed+DCO required    | derived    | safe implementation; blocked activation |
+| P3 closure | same                   | dedicated handoff branch       | pending | SSH-signed+DCO required    | derived    | exact final-main read-back required     |
 
 ### Implemented state
 
@@ -2421,13 +2422,13 @@ documentation-only and does not change the authoritative P7 campaign subject
 
 ### Verification and evidence
 
-| Claim/requirement | Test/oracle | Canonical task/job | Result | Evidence |
-| --- | --- | --- | --- | --- |
-| bounded custody and blocked closure | source manifest/importer | `regulatory:import` | pass, 12 captured/6 blocked | subject-bound task report |
-| deterministic staged output | generator and repeat run | `contract:generation`, `regulatory:drift` | pass, no-diff | generated report/output digest |
-| hostile input rejection | Python Expat parser and five fixtures | `oracle:independent` | pass | independent oracle report |
-| source/output provenance | Python hashlib/json checker | `oracle:independent` | pass, seeded defects detected | independent oracle report |
-| complete P3 safe graph | inherited P2 plus P3 dependencies | `gate:p3` | pass; activation blocked truthfully | gate report |
+| Claim/requirement                   | Test/oracle                           | Canonical task/job                        | Result                              | Evidence                       |
+| ----------------------------------- | ------------------------------------- | ----------------------------------------- | ----------------------------------- | ------------------------------ |
+| bounded custody and blocked closure | source manifest/importer              | `regulatory:import`                       | pass, 12 captured/6 blocked         | subject-bound task report      |
+| deterministic staged output         | generator and repeat run              | `contract:generation`, `regulatory:drift` | pass, no-diff                       | generated report/output digest |
+| hostile input rejection             | Python Expat parser and five fixtures | `oracle:independent`                      | pass                                | independent oracle report      |
+| source/output provenance            | Python hashlib/json checker           | `oracle:independent`                      | pass, seeded defects detected       | independent oracle report      |
+| complete P3 safe graph              | inherited P2 plus P3 dependencies     | `gate:p3`                                 | pass; activation blocked truthfully | gate report                    |
 
 - Independence class: implementation-independent tool/runtime, not external,
   organizational or legal independence. No AEAT acceptance or compliance
@@ -2483,7 +2484,7 @@ documentation-only and does not change the authoritative P7 campaign subject
   relabel the first result.
 - The dedicated closure PR carrying this amendment is the corrective path. Its
   protected squash message MUST include `Signed-off-by: Daniel David
-  <ddcandales@gmail.com>`, and its post-merge main push MUST pass the complete
+<ddcandales@gmail.com>`, and its post-merge main push MUST pass the complete
   required set before this phase record is evidence-complete.
 - P3 status remains `blocked`: the immutable candidate is verification-only,
   `creationAllowed=false`, and six AEAT payload IDs remain unresolved. P4 and

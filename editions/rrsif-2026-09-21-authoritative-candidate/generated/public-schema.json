@@ -1,0 +1,27 @@
+{
+  "$id": "urn:noeos:verifactu:regulatory-edition:authoritative-candidate:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "editionId": {
+      "const": "rrsif-2026-09-21-authoritative-candidate"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "recordKind": {
+      "enum": [
+        "invoice-registration",
+        "invoice-cancellation",
+        "event"
+      ]
+    }
+  },
+  "required": [
+    "editionId",
+    "recordKind",
+    "payload"
+  ],
+  "title": "RRSIF authoritative candidate contract envelope",
+  "type": "object"
+}

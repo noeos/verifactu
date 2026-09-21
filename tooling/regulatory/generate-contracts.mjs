@@ -1,176 +1,305 @@
 #!/usr/bin/env node
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../..");
-const snapshot = "editions/source-snapshots/rrsif-2026-09-21-observed";
-const snapshotRoot = resolve(root, snapshot);
-const manifest = JSON.parse(
-  await readFile(resolve(snapshotRoot, "manifest.json"), "utf8"),
+const snapshotRelative =
+  "editions/source-snapshots/rrsif-2026-09-21-authoritative";
+const snapshotRoot = resolve(root, snapshotRelative);
+const outputRelative =
+  "editions/rrsif-2026-09-21-authoritative-candidate/generated";
+const outputRoot = resolve(root, outputRelative);
+const manifestBytes = await readFile(resolve(snapshotRoot, "manifest.json"));
+const manifest = JSON.parse(manifestBytes);
+const semanticRules = JSON.parse(
+  await readFile(
+    resolve(root, "config/regulatory/semantic-rules-p3b.json"),
+    "utf8",
+  ),
 );
-const outputRoot = resolve(
-  root,
-  "editions/rrsif-2026-09-21-observed-candidate/generated",
-);
-await mkdir(outputRoot, { recursive: true });
 
+function fail(code, detail) {
+  throw Object.assign(new Error(`${code}: ${detail}`), { code });
+}
 function sha(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 function canonical(value) {
-  const normalize = (v) =>
-    Array.isArray(v)
-      ? v.map(normalize)
-      : v && typeof v === "object"
+  const normalize = (item) =>
+    Array.isArray(item)
+      ? item.map(normalize)
+      : item && typeof item === "object"
         ? Object.fromEntries(
-            Object.keys(v)
+            Object.keys(item)
               .sort()
-              .map((k) => [k, normalize(v[k])]),
+              .map((key) => [key, normalize(item[key])]),
           )
-        : v;
+        : item;
   return `${JSON.stringify(normalize(value), null, 2)}\n`;
 }
-const sourceRecords = manifest.sources.filter(
-  (source) => source.status !== "blocked",
-);
-const links = [];
-for (const source of sourceRecords) {
-  const bytes = await readFile(resolve(snapshotRoot, source.path));
+async function writeAtomic(path, bytes) {
+  const temporary = `${path}.tmp-${process.pid}`;
+  await writeFile(temporary, bytes, { mode: 0o644 });
+  await rename(temporary, path);
+}
+function attributes(tag) {
+  const result = {};
+  for (const match of tag.matchAll(
+    /(?:^|\s)([A-Za-z_][\w:.-]*)\s*=\s*(["'])(.*?)\2/gsu,
+  ))
+    result[match[1]] = match[3];
+  return result;
+}
+function xmlContract(source, bytes) {
+  if (bytes.length > 2 * 1024 * 1024) fail("XML_INPUT_TOO_LARGE", source.id);
   const text = bytes.toString("utf8");
-  for (const match of text.matchAll(/href=["']([^"']+)["']/giu)) {
-    const href = match[1];
+  if (/<!\s*(?:DOCTYPE|ENTITY)/iu.test(text))
+    fail("XML_EXTERNAL_DECLARATION", source.id);
+  for (const remote of text.matchAll(
+    /schemaLocation\s*=\s*["']((?:https?:|file:|\/\/)[^"']+)["']/giu,
+  )) {
+    const allowed =
+      remote[1] ===
+        "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" &&
+      manifest.sources.some(
+        (entry) =>
+          entry.id === "SRC-STD-XMLDSIG" && entry.status === "captured",
+      );
+    if (!allowed) fail("XML_EXTERNAL_REFERENCE", `${source.id}:${remote[1]}`);
+  }
+  const declarations = [];
+  const dependencies = [];
+  let depth = 0;
+  let maximumDepth = 0;
+  for (const match of text.matchAll(/<([^!?][^>]*?)>/gsu)) {
+    const body = match[1].trim();
+    if (body.startsWith("/")) {
+      depth -= 1;
+      if (depth < 0) fail("XML_STRUCTURE", source.id);
+      continue;
+    }
+    const selfClosing = body.endsWith("/");
+    const [qualified = ""] = body.split(/\s/u, 1);
+    const local = qualified.replace(/\/$/u, "").split(":").at(-1);
+    const attrs = attributes(body);
+    if (["include", "import"].includes(local) && attrs.schemaLocation) {
+      if (
+        attrs.schemaLocation.includes("\\") ||
+        attrs.schemaLocation.split("/").includes("..")
+      )
+        fail("XML_PATH_ESCAPE", source.id);
+      dependencies.push(attrs.schemaLocation);
+    }
     if (
-      href.startsWith("http") ||
-      href.includes("static_files") ||
-      href.endsWith(".xsd") ||
-      href.endsWith(".wsdl")
-    )
-      links.push({ sourceId: source.id, href });
+      [
+        "schema",
+        "element",
+        "attribute",
+        "complexType",
+        "simpleType",
+        "group",
+        "message",
+        "part",
+        "portType",
+        "operation",
+        "binding",
+        "service",
+        "port",
+      ].includes(local)
+    ) {
+      declarations.push({
+        kind: local,
+        ...(attrs.name ? { name: attrs.name } : {}),
+        ...(attrs.type ? { type: attrs.type } : {}),
+        ...(attrs.ref ? { ref: attrs.ref } : {}),
+        ...(attrs.element ? { element: attrs.element } : {}),
+        ...(attrs.minOccurs ? { minOccurs: attrs.minOccurs } : {}),
+        ...(attrs.maxOccurs ? { maxOccurs: attrs.maxOccurs } : {}),
+        ...(attrs.targetNamespace
+          ? { targetNamespace: attrs.targetNamespace }
+          : {}),
+        ...(attrs.location ? { location: attrs.location } : {}),
+      });
+    }
+    if (!selfClosing) {
+      depth += 1;
+      maximumDepth = Math.max(maximumDepth, depth);
+      if (depth > 64) fail("XML_NESTING_LIMIT", source.id);
+    }
+  }
+  if (depth !== 0) fail("XML_STRUCTURE", source.id);
+  return {
+    sourceId: source.id,
+    file: basename(source.path),
+    sha256: source.sha256,
+    declarations,
+    dependencies: [...new Set(dependencies)].sort(),
+    maximumDepth,
+  };
+}
+
+const xmlSources = manifest.sources.filter(
+  (source) =>
+    source.authority !== "W3C" &&
+    (source.path.endsWith(".xsd") || source.path.endsWith(".wsdl")),
+);
+const parsed = [];
+for (const source of xmlSources)
+  parsed.push(
+    xmlContract(source, await readFile(resolve(snapshotRoot, source.path))),
+  );
+const declarationKey = (entry) =>
+  `${entry.sourceId}\0${entry.kind}\0${entry.name ?? ""}\0${entry.ref ?? ""}`;
+const structuralDeclarations = parsed
+  .flatMap((document) =>
+    document.declarations.map((declaration) => ({
+      sourceId: document.sourceId,
+      ...declaration,
+    })),
+  )
+  .sort((a, b) => declarationKey(a).localeCompare(declarationKey(b)));
+const fieldConstraints = structuralDeclarations.filter((entry) =>
+  ["element", "attribute", "simpleType"].includes(entry.kind),
+);
+const enumerationEntries = [];
+for (const source of xmlSources.filter((entry) =>
+  entry.path.endsWith(".xsd"),
+)) {
+  const text = (await readFile(resolve(snapshotRoot, source.path))).toString(
+    "utf8",
+  );
+  for (const match of text.matchAll(
+    /<(?:\w+:)?enumeration\b([^>]*)\/?\s*>/gsu,
+  )) {
+    const value = attributes(match[1]).value;
+    if (value !== undefined)
+      enumerationEntries.push({ sourceId: source.id, value });
   }
 }
-const uniqueLinks = [
-  ...new Map(
-    links.map((link) => [`${link.sourceId}\0${link.href}`, link]),
-  ).values(),
-].sort((a, b) =>
-  `${a.sourceId}${a.href}`.localeCompare(`${b.sourceId}${b.href}`),
+enumerationEntries.sort((a, b) =>
+  `${a.sourceId}\0${a.value}`.localeCompare(`${b.sourceId}\0${b.value}`),
 );
-const blocked = manifest.blockedSources.map(({ id, blocker, url }) => ({
-  id,
-  blocker,
-  url,
-}));
-const structural = {
-  schemaVersion: 1,
-  editionId: "rrsif-2026-09-21-observed-candidate",
-  status: "blocked",
-  sourceSnapshot: manifest.id,
-  sourceManifestSha256: sha(
-    await readFile(resolve(snapshotRoot, "manifest.json")),
+const wsdl = structuralDeclarations.filter((entry) =>
+  ["service", "port", "binding", "portType", "operation", "message"].includes(
+    entry.kind,
   ),
-  sourceClosure: sha(
-    sourceRecords.map((source) => `${source.id}\0${source.sha256}`).join("\n"),
-  ),
-  generatedBy: {
-    id: "RRSIF-CONTRACT-GENERATOR-0001",
-    version: "1.0.0",
-    configuration: "config/regulatory/source-plan.json",
-  },
-  mode: "metadata-only; no fiscal semantics are invented",
-  discoveredOfficialLinks: uniqueLinks,
-  structuralDeclarations: [],
-  unresolvedOfficialArtifacts: blocked,
-  creationAllowed: false,
-  verificationAllowed: true,
-};
-const schema = {
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "urn:noeos:verifactu:regulatory-edition:observed-candidate:v1",
-  title: "Blocked regulatory edition envelope",
-  type: "object",
-  additionalProperties: false,
-  required: ["editionId", "recordKind", "sourceSnapshot", "creationAllowed"],
-  properties: {
-    editionId: { type: "string", minLength: 1 },
-    recordKind: { enum: ["blocked-envelope"] },
-    sourceSnapshot: { type: "string", minLength: 1 },
-    creationAllowed: { const: false },
-    verificationAllowed: { const: true },
-  },
-};
-const bindings = {
-  schemaVersion: 1,
-  editionId: structural.editionId,
-  services: [],
-  unresolved: blocked.filter(
-    (entry) => entry.id.includes("0019") || entry.id.includes("0020"),
-  ),
-  networkAtRuntime: "denied",
-};
-const catalogues = {
-  schemaVersion: 1,
-  editionId: structural.editionId,
-  entries: [],
-  sourceEntryPoints: sourceRecords
-    .filter((source) => /0021|0023|0024|0025/u.test(source.id))
-    .map((source) => ({ id: source.id, role: source.role })),
-  unresolved: blocked.filter((entry) => /0021|0023|0024|0025/u.test(entry.id)),
-};
-const constraints = {
-  schemaVersion: 1,
-  editionId: structural.editionId,
-  fields: [],
-  note: "No field constraint is asserted until authoritative AEAT payload bytes are admitted.",
-};
-const semanticOverlay = {
-  schemaVersion: 1,
-  editionId: structural.editionId,
-  rules: sourceRecords
-    .filter((source) => source.authority === "AEAT")
-    .map((source) => ({
-      id: `ENTRY-POINT-${source.id}`,
-      sourceId: source.id,
-      statement: `The ${source.role} is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated.`,
-      kind: "source-graph-observation",
-      creationImpact: "none",
-    })),
-  unresolved: blocked.map((entry) => entry.id),
-  note: "This overlay records source custody facts only; it is not a fiscal rule implementation.",
-};
+);
+const sourceManifestSha256 = sha(manifestBytes);
+const sourceClosure = sha(
+  manifest.sources.map((source) => `${source.id}\0${source.sha256}`).join("\n"),
+);
+for (const rule of semanticRules.rules) {
+  const source = manifest.sources.find((entry) => entry.id === rule.sourceId);
+  if (
+    !source ||
+    !Array.isArray(rule.pages) ||
+    rule.pages.length !== 2 ||
+    rule.pages.some((page) => !Number.isInteger(page) || page < 1)
+  )
+    fail("SEMANTIC_RULE_SOURCE", rule.id);
+}
 const files = {
-  "contract-manifest.json": structural,
-  "public-schema.json": schema,
-  "soap-bindings.json": bindings,
-  "catalogues.json": catalogues,
-  "field-constraints.json": constraints,
-  "semantic-overlay.json": semanticOverlay,
+  "contract-manifest.json": {
+    schemaVersion: 1,
+    editionId: manifest.editionId,
+    status: "candidate",
+    sourceSnapshot: manifest.id,
+    sourceManifestSha256,
+    sourceClosure,
+    generatedBy: { id: "RRSIF-CONTRACT-GENERATOR-0002", version: "2.0.0" },
+    structuralDeclarationCount: structuralDeclarations.length,
+    fieldConstraintCount: fieldConstraints.length,
+    enumerationCount: enumerationEntries.length,
+    semanticRuleCount: semanticRules.rules.length,
+    networkAtGeneration: "denied",
+    networkAtRuntime: "denied",
+    creationAllowed: false,
+    verificationAllowed: true,
+  },
+  "structural-contract.json": {
+    schemaVersion: 1,
+    editionId: manifest.editionId,
+    documents: parsed,
+    declarations: structuralDeclarations,
+  },
+  "field-constraints.json": {
+    schemaVersion: 1,
+    editionId: manifest.editionId,
+    fields: fieldConstraints,
+  },
+  "catalogues.json": {
+    schemaVersion: 1,
+    editionId: manifest.editionId,
+    entries: enumerationEntries,
+    validationCatalogue: {
+      sourceId: "SRC-0021-PDF",
+      version: "1.2.2",
+      executionImplemented: false,
+    },
+  },
+  "soap-bindings.json": {
+    schemaVersion: 1,
+    editionId: manifest.editionId,
+    declarations: wsdl,
+    networkAtRuntime: "denied",
+  },
+  "semantic-overlay.json": {
+    ...semanticRules,
+    sourceManifestSha256,
+    executionImplemented: false,
+  },
+  "public-schema.json": {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "urn:noeos:verifactu:regulatory-edition:authoritative-candidate:v1",
+    title: "RRSIF authoritative candidate contract envelope",
+    type: "object",
+    additionalProperties: false,
+    required: ["editionId", "recordKind", "payload"],
+    properties: {
+      editionId: { const: manifest.editionId },
+      recordKind: {
+        enum: ["invoice-registration", "invoice-cancellation", "event"],
+      },
+      payload: { type: "object" },
+    },
+  },
 };
+await mkdir(outputRoot, { recursive: true });
 for (const [name, value] of Object.entries(files))
-  await writeFile(resolve(outputRoot, name), canonical(value), { mode: 0o644 });
+  await writeAtomic(resolve(outputRoot, name), canonical(value));
 const outputDigest = sha(
   Object.entries(files)
-    .sort()
+    .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, value]) => `${name}\0${canonical(value)}`)
     .join("\n"),
 );
 const report = {
   schemaVersion: 1,
-  generator: structural.generatedBy,
-  editionId: structural.editionId,
-  sourceManifestSha256: structural.sourceManifestSha256,
+  generator: files["contract-manifest.json"].generatedBy,
+  editionId: manifest.editionId,
+  sourceManifestSha256,
+  inputs: xmlSources.length,
   outputs: Object.keys(files).sort(),
+  populations: {
+    sourceArtifacts: manifest.sources.length,
+    xmlDocuments: xmlSources.length,
+    structuralDeclarations: structuralDeclarations.length,
+    fieldConstraints: fieldConstraints.length,
+    enumerations: enumerationEntries.length,
+    soapDeclarations: wsdl.length,
+    semanticRules: semanticRules.rules.length,
+  },
   outputDigest,
   deterministic: true,
   network: "denied",
   creationAllowed: false,
-  blocked: blocked.map((entry) => entry.id),
+  blocked: [],
 };
-await writeFile(
+await writeAtomic(
   resolve(outputRoot, "generation-report.json"),
   canonical(report),
-  { mode: 0o644 },
 );
 process.stdout.write(
-  `${JSON.stringify({ status: "passed", outputDigest, outputs: Object.keys(files).length, blocked: blocked.length })}\n`,
+  `${JSON.stringify({ status: "passed", outputDigest, ...report.populations })}\n`,
 );

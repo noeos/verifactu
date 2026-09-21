@@ -1,0 +1,20 @@
+{
+  "creationAllowed": false,
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "enumerationCount": 652,
+  "fieldConstraintCount": 447,
+  "generatedBy": {
+    "id": "RRSIF-CONTRACT-GENERATOR-0002",
+    "version": "2.0.0"
+  },
+  "networkAtGeneration": "denied",
+  "networkAtRuntime": "denied",
+  "schemaVersion": 1,
+  "semanticRuleCount": 7,
+  "sourceClosure": "03ef8aecd997b3430fb35ff6b491368d324374db09ce98c6846ff47eeb6104d6",
+  "sourceManifestSha256": "0856118bfb3d528ffa2acc6322c3484616ba6aff978f620db5e7aab916ba60c6",
+  "sourceSnapshot": "rrsif-2026-09-21-authoritative",
+  "status": "candidate",
+  "structuralDeclarationCount": 562,
+  "verificationAllowed": true
+}

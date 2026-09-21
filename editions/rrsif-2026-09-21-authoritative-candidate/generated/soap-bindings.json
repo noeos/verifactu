@@ -1,0 +1,149 @@
+{
+  "declarations": [
+    {
+      "kind": "binding",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "binding",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "binding",
+      "name": "sfRequerimiento",
+      "sourceId": "SRC-0019-WSDL",
+      "type": "sfWdsl:sfPortTypePorRequerimiento"
+    },
+    {
+      "kind": "binding",
+      "name": "sfVerifactu",
+      "sourceId": "SRC-0019-WSDL",
+      "type": "sfWdsl:sfPortTypeVerifactu"
+    },
+    {
+      "kind": "message",
+      "name": "EntradaConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "message",
+      "name": "EntradaRegFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "message",
+      "name": "RespuestaConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "message",
+      "name": "RespuestaRegFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "name": "ConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "name": "ConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "name": "RegFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "name": "RegFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "name": "RegFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "operation",
+      "name": "RegFactuSistemaFacturacion",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaRequerimiento",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaRequerimientoPruebas",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaRequerimientoSello",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaRequerimientoSelloPruebas",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaVerifactu",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaVerifactuPruebas",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaVerifactuSello",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "port",
+      "name": "SistemaVerifactuSelloPruebas",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "portType",
+      "name": "sfPortTypePorRequerimiento",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "portType",
+      "name": "sfPortTypeVerifactu",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "service",
+      "name": "sfRequerimiento",
+      "sourceId": "SRC-0019-WSDL"
+    },
+    {
+      "kind": "service",
+      "name": "sfVerifactu",
+      "sourceId": "SRC-0019-WSDL"
+    }
+  ],
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "networkAtRuntime": "denied",
+  "schemaVersion": 1
+}

@@ -1,0 +1,33 @@
+{
+  "blocked": [],
+  "creationAllowed": false,
+  "deterministic": true,
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "generator": {
+    "id": "RRSIF-CONTRACT-GENERATOR-0002",
+    "version": "2.0.0"
+  },
+  "inputs": 8,
+  "network": "denied",
+  "outputDigest": "561005c36d5c3ae0b00a98215f59e24769b7b4dec9b1a6cba878f00eacb90482",
+  "outputs": [
+    "catalogues.json",
+    "contract-manifest.json",
+    "field-constraints.json",
+    "public-schema.json",
+    "semantic-overlay.json",
+    "soap-bindings.json",
+    "structural-contract.json"
+  ],
+  "populations": {
+    "enumerations": 652,
+    "fieldConstraints": 447,
+    "semanticRules": 7,
+    "soapDeclarations": 29,
+    "sourceArtifacts": 27,
+    "structuralDeclarations": 562,
+    "xmlDocuments": 8
+  },
+  "schemaVersion": 1,
+  "sourceManifestSha256": "0856118bfb3d528ffa2acc6322c3484616ba6aff978f620db5e7aab916ba60c6"
+}

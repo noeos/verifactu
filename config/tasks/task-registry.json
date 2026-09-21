@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "TASK-GRAPH-0001",
-  "closureRoots": ["gate:p2", "gate:platform", "gate:p3"],
+  "closureRoots": ["gate:p2", "gate:platform", "gate:p3b"],
   "tasks": [
     {
       "id": "policy:tree",
@@ -571,7 +571,7 @@
         "tooling/regulatory/import-snapshot.mjs"
       ],
       "outputs": [
-        "editions/source-snapshots/rrsif-2026-09-21-observed/manifest.json"
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/manifest.json"
       ],
       "workingDirectory": ".",
       "toolProfile": "primary",
@@ -596,7 +596,9 @@
         "config/regulatory/**",
         "tooling/regulatory/generate-contracts.mjs"
       ],
-      "outputs": ["editions/rrsif-2026-09-21-observed-candidate/generated/**"],
+      "outputs": [
+        "editions/rrsif-2026-09-21-authoritative-candidate/generated/**"
+      ],
       "workingDirectory": ".",
       "toolProfile": "primary",
       "environment": ["CI", "PATH", "SOURCE_DATE_EPOCH"],
@@ -617,7 +619,7 @@
       "dependencies": ["contract:generation"],
       "inputs": [
         "editions/source-snapshots/**",
-        "editions/rrsif-2026-09-21-observed-candidate/generated/**",
+        "editions/rrsif-2026-09-21-authoritative-candidate/generated/**",
         "internal/contract-generation/offline_parser.py",
         "internal/independent-oracles/oracle.py",
         "fixtures/adversarial/regulatory/**",
@@ -644,7 +646,7 @@
       "dependencies": ["contract:generation"],
       "inputs": [
         "editions/source-snapshots/**",
-        "editions/rrsif-2026-09-21-observed-candidate/generated/**",
+        "editions/rrsif-2026-09-21-authoritative-candidate/generated/**",
         "config/regulatory/**",
         "tooling/regulatory/generate-contracts.mjs"
       ],
@@ -779,6 +781,52 @@
       "reportSchema": "evidence/schemas/task-report.schema.json",
       "zeroWork": "fail",
       "operation": "gateP3",
+      "tools": []
+    },
+    {
+      "id": "p3b:assurance",
+      "version": 1,
+      "owner": "assurance-owner",
+      "dependencies": ["gate:p3"],
+      "inputs": ["**"],
+      "outputs": ["evidence/runs/artifacts/p3b/assurance.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "VERIFACTU_PYTHON",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 600,
+      "concurrencyLock": "assurance",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "p3bAssurance",
+      "tools": ["git", "node"]
+    },
+    {
+      "id": "gate:p3b",
+      "version": 1,
+      "owner": "assurance-owner",
+      "dependencies": ["p3b:assurance"],
+      "inputs": ["**"],
+      "outputs": ["evidence/runs/gate--p3b.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": ["CI", "VERIFACTU_SUBJECT_SHA", "VERIFACTU_SUBJECT_TREE"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 900,
+      "concurrencyLock": "closure",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "gate",
       "tools": []
     }
   ]

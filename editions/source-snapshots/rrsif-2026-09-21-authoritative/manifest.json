@@ -1,0 +1,574 @@
+{
+  "acquisition": {
+    "licence": "AEAT and BOE reuse notices retained; redistribution is source-attributed and unmodified",
+    "maxBytes": 10485760,
+    "maxFiles": 128,
+    "observer": "REGULATORY-SOURCE-OBSERVER-0001",
+    "promotionRule": "entry pages require one successful authenticated observation; developer payloads require byte-identical successful observations on macOS and Windows",
+    "redirects": 0,
+    "runtimeNetwork": "denied",
+    "timeoutSeconds": 30,
+    "tls": "platform-default verification; no bypass or weakened policy"
+  },
+  "authorityHierarchy": [
+    "BOE enacted text",
+    "AEAT technical publication",
+    "AEAT developer artifact linked by the technical publication"
+  ],
+  "blockedSources": [],
+  "closure": {
+    "complete": true,
+    "creationAllowed": false,
+    "requiredBeforeActivation": [],
+    "verificationAllowed": true
+  },
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "id": "rrsif-2026-09-21-authoritative",
+  "immutable": true,
+  "observations": [
+    {
+      "manifestSha256": "9a097e417b42e2ce97ed5c28320d81b739f90ba06917989f1b95dacd9ad04b30",
+      "observedAt": "2026-09-21T14:28:11Z",
+      "platform": "Linux-x86_64",
+      "role": "entry-page and standards custody plus retained AEAT developer-host TLS negative"
+    },
+    {
+      "manifestSha256": "080721256fdd737bd96ebaff3826104b80ffcee93682810dceadd1d24b99cd36",
+      "observedAt": "2026-09-21T14:15:46Z",
+      "platform": "Darwin-arm64",
+      "role": "payload custody witness A"
+    },
+    {
+      "manifestSha256": "a0d9d5c3159a498f1dc3e5fbd5eea637b7be460ba225102584facf3aefa0bc86",
+      "observedAt": "2026-09-21T14:16:23Z",
+      "platform": "Windows-X64",
+      "role": "payload custody witness B"
+    }
+  ],
+  "observedAt": "2026-09-21T14:28:11Z",
+  "schemaVersion": 1,
+  "sourcePlan": "config/regulatory/source-plan-p3b.json",
+  "sourcePlanSha256": "8b824f3b36edb67296cd6f91d7ce16856409abcfaba2e00c791e413357233c1f",
+  "sources": [
+    {
+      "authority": "BOE",
+      "bytes": 145349,
+      "dependsOn": [],
+      "id": "SRC-0011",
+      "licence": "BOE-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/boe/SRC-0011.html",
+      "sha256": "20ebefa07aad823150b4eeca63486dba07885bf6bddbc6ce9347b0b08b6015cf",
+      "sha512": "e427ba6dac4d8688a9c1f8da3da2db2efa57bd279b6d7ae5f6ffc3ef85a898547dbf1322786835be6f547907c23952bf6219695a764f569aca8d76fece4c76a4",
+      "status": "captured",
+      "targetId": "entry-boe-rd-1007-2023",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "BOE",
+      "bytes": 150804,
+      "dependsOn": [
+        "SRC-0011"
+      ],
+      "id": "SRC-0014",
+      "licence": "BOE-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/boe/SRC-0014.html",
+      "sha256": "65186f2f861571d12b42031589a23e886e3a0e6a44a74c18919130b36c3b66dd",
+      "sha512": "591a523e743caf3e715e9aaab8d4edfc45166acfc8c4aa580db2bc825daed5e8365110483bbf39241037816f75015e638fd4cc1856e539dba0c37a1b4ad2dc66",
+      "status": "captured",
+      "targetId": "entry-boe-hac-1177-2024",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-22138",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 27386,
+      "dependsOn": [
+        "SRC-0011"
+      ],
+      "id": "SRC-0016",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0016.html",
+      "sha256": "c4b621b1af643888b2c5196699b72d4db0f97b41580e6ecbc3db1f38d01d6844",
+      "sha512": "44d23e41d9b6a6c035aa9ec5caf4066852b87ef02dcd46037ce413e9f123547729d33b14109d4489705ad7aff1c520920dbbf066c07835d3d40456415a605fac",
+      "status": "captured",
+      "targetId": "entry-aeat-applicability",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 13445,
+      "dependsOn": [
+        "SRC-0016"
+      ],
+      "id": "SRC-0017",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0017.html",
+      "sha256": "6b4a5cf333196747fb0029de3ceac2dcf9601dcff230d2cbe6e705e38c6217a9",
+      "sha512": "4d5a0084a9ac7ce6d41c239a9913d4ba26dee55070963de39dd4171c03fe0653f23a4516fb6a6532998f1581cf1cd62e5d66bc2f2d9214fc8d5253742bb35f66",
+      "status": "captured",
+      "targetId": "entry-aeat-technical-index",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 13969,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0018",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0018.html",
+      "sha256": "584f9920d8bc57ad26382a6c45d60aff392b4660348aa05837b8cb2c29b2d960",
+      "sha512": "53f49b8e8f0f0b9a070ed094f5761a34a876a7b419265ee82a032905512071b968590df90577cee37000b6fcaf7ea0cdd3f868e037a0c1f25e4144e2a18c968a",
+      "status": "captured",
+      "targetId": "entry-aeat-record-design",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/disenos-registro.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 13925,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0019",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0019.html",
+      "sha256": "ea5b23eaf18185c881425f4cf155453a03662451cf8e5c9d209652bf4812251f",
+      "sha512": "5400c9d822490421098e3a5e2d346761bd175e2679bcdc90cf4211ea6522a3a5e42512afd8ec36a7eb61b9f42967e9b63439a1ef06b497aeeffa175fae716d00",
+      "status": "captured",
+      "targetId": "entry-aeat-wsdl",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/wsdl-servicios-web.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 8780,
+      "dependsOn": [
+        "SRC-0019"
+      ],
+      "id": "SRC-0019-WSDL",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/wsdl+xml",
+      "path": "sources/aeat/SistemaFacturacion.wsdl",
+      "sha256": "05919120708ff7650612fa6683c9336eaf919335d9a4db10e86759190af48602",
+      "sha512": "0a3cb514ebdbeb104e7832fa72fe0c80b7f3a78f980246312b1d154b826ceac9a9fd979b1ebff9f0278ae6784eafab62d2548cda682b6db0e5ea67768e4aab1d",
+      "status": "captured",
+      "targetId": "wsdl",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SistemaFacturacion.wsdl",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 13965,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0020",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0020.html",
+      "sha256": "2a4dbd787374ac649b87c823c85a503bbbdd6e70a44f0508ef45197e2ac168f5",
+      "sha512": "9ff245f6552ada76acc2dc48f1fc33e5f1f7ac4f130b157ce2e342bad381b1128da97ecfa9a2e3c00923b4923ee3b21e8d3488676ce6acb66690a664d72a1269",
+      "status": "captured",
+      "targetId": "entry-aeat-xsd",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/esquemas.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 1573,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-01",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/SuministroLR.xsd",
+      "sha256": "cbdac8d427cc5ab5d77ca48974cab0f35d6bb819c4c66db361681e3710aeba36",
+      "sha512": "8999802b6ac10e977ae6e61ff3cf68d130f22732ae730b762de6960faf68b004e24ebfc52db10dd9c7aefb692340423f641aa5f590fa940a4bb9555ce3ac8a10",
+      "status": "captured",
+      "targetId": "xsd-suministro-lr",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SuministroLR.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 6259,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-02",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/RespuestaSuministro.xsd",
+      "sha256": "82acf80f785643caac13087aae66808ed721a13f08ca5218cf8ae81b695549ef",
+      "sha512": "19ec606ac53f8d60e9c50739cc5a698d9045854c49c4d47bc8e5e711159801e83144f7bf44d6851dda1db804f4149a617e2024ef35fc455d0c762bf75a1c00d4",
+      "status": "captured",
+      "targetId": "xsd-respuesta-suministro",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/RespuestaSuministro.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 3886,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-03",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/ConsultaLR.xsd",
+      "sha256": "bf2cdb8fc4b95b291757a72b76d8fffca06a6d30d9329122ca2fd6b2d5f8f1b1",
+      "sha512": "6daf0535b29924b6313c58f0976db518e52161b677587a56a550d4d77c7344d867278c01be2f682517ff649a298add80b1a84b40e5106318d018104e3f0a167d",
+      "status": "captured",
+      "targetId": "xsd-consulta-lr",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/ConsultaLR.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 10058,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-04",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/RespuestaConsultaLR.xsd",
+      "sha256": "de35063acb8d9ba0d6ae51acc6b595de9c2b12333250e95e13108ef5f2670d45",
+      "sha512": "40414f94493e829adca6eaba9129fd783dcd7451585f217143b7c9698d1c91c3f4b8bb24904b2dc316c1ee4bad2f277c1321d81ecbbaf1a91b066cb8620464d9",
+      "status": "captured",
+      "targetId": "xsd-respuesta-consulta-lr",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/RespuestaConsultaLR.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 49540,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-05",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/SuministroInformacion.xsd",
+      "sha256": "ee4c1655175644de44c4c25055ffeb8e5f4bb4bc3834ce8254d4222ef18c8aa1",
+      "sha512": "f5036b1c1aabd77a7b3a20c9a4d3de0a3e26235d0ce0bbe0d912df197e61ef6fcdb510129b21e2f039280e0c7e4a57da306f92139e6569d84f9f8215c7fe180f",
+      "status": "captured",
+      "targetId": "xsd-suministro-informacion",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SuministroInformacion.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 30873,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-06",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/EventosSIF.xsd",
+      "sha256": "cc7347c6a9a57a0c8edbc6b9ddcce55176452d0db0e68369477e207e9fbdd7e7",
+      "sha512": "9f36d38ff69b2e26c110431156a0a10501e38915effb7ad97801c278a7bad375e8c292df7664a3cecfb44a2acf4cda972bea6f8cfc7f7a82a8306b95e9b96a55",
+      "status": "captured",
+      "targetId": "xsd-eventos-sif",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/EventosSIF.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 4228,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "id": "SRC-0020-XSD-07",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/xml",
+      "path": "sources/aeat/RespuestaValRegistNoVeriFactu.xsd",
+      "sha256": "8f47af4f3c49d29b6a62aed261c09f171e855ad6d6bb72ef3fc0b147dc9572f0",
+      "sha512": "6c378b46bbf0034045204da73f3144ba26cdc7821bb5a37bb21aec7d0e7c1ba91dc5f0f78ee3e697a9a2e83d0c614af1ac8fbfb962d017ac1bbdabc097ad9a87",
+      "status": "captured",
+      "targetId": "xsd-respuesta-validacion-no-verifactu",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/RespuestaValRegistNoVeriFactu.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 14065,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0021",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0021.html",
+      "sha256": "5d288fe831f3c825852803e6f3a2181b73d998435b78c12af5cea56b08578246",
+      "sha512": "c6d119dfdd61e0f728795a0d799d29ef50f175c6b0365e417cd34cf7525bc519d9bd9405c657491fe6d74bdcd30feb35494c535afb1e8664b1e0a40c2266c7cb",
+      "status": "captured",
+      "targetId": "entry-aeat-validation",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/documento-validaciones-errores.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 658946,
+      "dependsOn": [
+        "SRC-0021"
+      ],
+      "id": "SRC-0021-PDF",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/pdf",
+      "path": "sources/aeat/Validaciones_Errores_Veri-Factu.pdf",
+      "sha256": "426eb926fc098a36a163f66ca5f40d9e0847ca23300bbe5008979832d3513440",
+      "sha512": "fc4a2a17e19ad1bc747d1b9bd42a550e2612aaf244d1351e9d538a6ee213eaf4bd9764335fd6ea332c1dcf56b05eefeac274c108f57473fb4ce9f446406b53a5",
+      "status": "captured",
+      "targetId": "validation-errors",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Validaciones_Errores_Veri-Factu.pdf",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 14231,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0022",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0022.html",
+      "sha256": "2609973a919fbbc3e830b95fd75a0a896176c708a0d543498c310836a222c26e",
+      "sha512": "5929372620156e62c94edcfe6ad6f1d973da1a06ea883a6c07a4c1ce9ca35fc9eafabffa52c7924573ea5e09c8edade841a855a19f4a8bf6a7806468168ac1f8",
+      "status": "captured",
+      "targetId": "entry-aeat-remission",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-servicios-remision-voluntaria-registros-validaciones.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 14165,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0023",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0023.html",
+      "sha256": "bcb8d0056b7db10290d5807537d01fdac6d6c02312cf7948c370a53f052dd189",
+      "sha512": "57b9eb155860d37b844944b01c9a25154c42ac2c3106e0959a7c6f712820cd2486b0b906d8357e054219a6ad2e5c08aafe688b03e24b7a24bd4eacd853bfb2ef",
+      "status": "captured",
+      "targetId": "entry-aeat-hash",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/algoritmo-calculo-codificacion-huella-hash.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 1174110,
+      "dependsOn": [
+        "SRC-0023"
+      ],
+      "id": "SRC-0023-PDF",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/pdf",
+      "path": "sources/aeat/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "sha256": "f4334c254bb875b417247b54315199f89d75a8c4814dfd1e86efec562653d7de",
+      "sha512": "ac907d8246baf017987ad8e3fdddfc05d4e82baa169340fa8977d14bde5c7244465547271a1c983dd1a0c40e91369a9bc1d392eb947f768e1ee45188594fe16c",
+      "status": "captured",
+      "targetId": "hash-specification",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 14392,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0024",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0024.html",
+      "sha256": "e8867be23298e7585f33f7dda4196459937d4439d3894c02500d64bb5685fdb4",
+      "sha512": "71d2b21f5c5f0c34a08d737aeeb45c0547dc31a361bec6e18b96e61b50c670d97fa333e3fc33be75b972cc471fbcc74d75b188a4fe5cffd6d565cb1432b68c9b",
+      "status": "captured",
+      "targetId": "entry-aeat-signature",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-tecnicas-firma-electronica-registros-evento.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "archiveEntries": [
+        "ejemploRegistro-firmado-epes-xades4j.xml",
+        "ejemploRegistro.xml"
+      ],
+      "authority": "AEAT developer host",
+      "bytes": 5881,
+      "dependsOn": [
+        "SRC-0024-INDEX"
+      ],
+      "id": "SRC-0024-EXAMPLES",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/zip",
+      "path": "sources/aeat/AnexosEjemplosFirmaRegFact.zip",
+      "sha256": "66fac533bef6c93c041b08704bf538843fe552052a2994899aba0875c2c4b24e",
+      "sha512": "70595555dd04b8ec6fdbc02b2fa61f07044b7361c5738d549398e4ca8d2b3a6be45656f557e43a38093069114f78b0d0c7f70f5d97e5855accc4a8203985ffef",
+      "status": "captured",
+      "targetId": "signature-examples",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Espec-Tecnicas/AnexosEjemplosFirmaRegFact.zip",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 5329,
+      "dependsOn": [
+        "SRC-0024"
+      ],
+      "id": "SRC-0024-INDEX",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/signature-index.html",
+      "sha256": "9538db90c67d6b4bba125df728ec0b519bf56cc1120b15016fcdcbccf6d07592",
+      "sha512": "4de31a8e73ef7e1e7a233f0fd43884b2326b05a33a961c7cb1efcad79c553304362ff67b090e481d71605388dcb8b1256551f8226039fae005df63908ab34e10",
+      "status": "captured",
+      "targetId": "signature-index",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion.html",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 1497921,
+      "dependsOn": [
+        "SRC-0024"
+      ],
+      "id": "SRC-0024-PDF",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/pdf",
+      "path": "sources/aeat/EspecTecGenerFirmaElectRfact.pdf",
+      "sha256": "60953acd5d437a745db9076377739d8ef3f05c31967c1424cd4f6a8ac04af481",
+      "sha512": "c241a68be07e477fb3b629f2f1c97272a160345617cbea7c95dca928c4e5de63430ed646af1565c5610ecceb6eb55cd9d56ce28abd1a61f940f10bfe834de55f",
+      "status": "captured",
+      "targetId": "signature-specification",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Espec-Tecnicas/EspecTecGenerFirmaElectRfact.pdf",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "AEAT",
+      "bytes": 14139,
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "id": "SRC-0025",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "text/html",
+      "path": "sources/aeat/SRC-0025.html",
+      "sha256": "a7dfe4c954b45e18585cafc5b3e3dc15ea41b074d8f1e3968244db555f44d085",
+      "sha512": "2b31d4661b18168ba2278615f8efbb2b1106db699d47ffc26fd81ed0f0b444db1f1a34f5a2e1472998b2862e738538011df8567fed1feb0addfb165f4fd7e63a",
+      "status": "captured",
+      "targetId": "entry-aeat-qr",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/caracteristicas-qr-especificaciones-servicio-cotejo-factura.html",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    },
+    {
+      "authority": "AEAT developer host",
+      "bytes": 786534,
+      "dependsOn": [
+        "SRC-0025"
+      ],
+      "id": "SRC-0025-PDF",
+      "licence": "AEAT-REUSE-TERMS",
+      "mediaType": "application/pdf",
+      "path": "sources/aeat/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "sha256": "f86b3c260d8a4963dbc18c5007732b53199156c5d1db63242e68db71501b49eb",
+      "sha512": "f5ca36b31f21c9accfd4eb11f926b4ff32cc55c1ac59d3e092428e143ccc5fe2449dc5c8ad467ec8871e02a5f86c0876636dba64e98b0bc25340bae38840abab",
+      "status": "captured",
+      "targetId": "qr-specification",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "witnessedBy": [
+        "Darwin-arm64",
+        "Windows-X64"
+      ]
+    },
+    {
+      "authority": "W3C",
+      "bytes": 10292,
+      "dependsOn": [],
+      "id": "SRC-STD-XMLDSIG",
+      "licence": "W3C-DOCUMENT-LICENSE",
+      "mediaType": "application/xml+dtd",
+      "path": "sources/standards/xmldsig-core-schema.xsd",
+      "sha256": "d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d",
+      "sha512": "8375f1eba227632a368031ce37936960f553db8a836e189156c43147192f7b44af54f49a9bd05a73940ed0c63ca1dff42420c4afa3307008bdc2e13c326e8685",
+      "status": "captured",
+      "targetId": "xmldsig-schema",
+      "url": "https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd",
+      "witnessedBy": [
+        "Linux-x86_64"
+      ]
+    }
+  ]
+}

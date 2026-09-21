@@ -175,6 +175,12 @@
       "control": "external-input",
       "mutation": "download-digest",
       "expectedCode": "DOWNLOAD_DIGEST"
+    },
+    {
+      "id": "NEG-TASK-STATUS-001",
+      "control": "task-runner",
+      "mutation": "unknown-task-outcome",
+      "expectedCode": "TASK_OUTCOME_STATUS"
     }
   ]
 }

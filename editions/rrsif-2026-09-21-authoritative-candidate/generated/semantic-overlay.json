@@ -1,0 +1,85 @@
+{
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "executionImplemented": false,
+  "rules": [
+    {
+      "id": "HASH-ALGORITHM-001",
+      "kind": "hash-contract",
+      "pages": [
+        1,
+        4
+      ],
+      "sourceId": "SRC-0023-PDF",
+      "sourceVersion": "0.1.2",
+      "statement": "The admitted hash algorithm is SHA-256."
+    },
+    {
+      "id": "HASH-INPUT-ENCODING-001",
+      "kind": "hash-contract",
+      "pages": [
+        5,
+        7
+      ],
+      "sourceId": "SRC-0023-PDF",
+      "sourceVersion": "0.1.2",
+      "statement": "The ordered name=value input string is encoded as UTF-8 before hashing."
+    },
+    {
+      "id": "SIGNATURE-FORMAT-001",
+      "kind": "signature-contract",
+      "pages": [
+        6,
+        7
+      ],
+      "sourceId": "SRC-0024-PDF",
+      "sourceVersion": "0.1.5",
+      "statement": "Electronic signatures use XAdES Enveloped, class EPES."
+    },
+    {
+      "id": "SIGNATURE-DIGEST-001",
+      "kind": "signature-contract",
+      "pages": [
+        7,
+        8
+      ],
+      "sourceId": "SRC-0024-PDF",
+      "sourceVersion": "0.1.5",
+      "statement": "The record-signing digest algorithm is SHA-256."
+    },
+    {
+      "id": "QR-ENCODING-001",
+      "kind": "qr-contract",
+      "pages": [
+        8,
+        10
+      ],
+      "sourceId": "SRC-0025-PDF",
+      "sourceVersion": "0.5.0",
+      "statement": "QR URLs use application/x-www-form-urlencoded mechanics with UTF-8."
+    },
+    {
+      "id": "QR-PARAMETERS-001",
+      "kind": "qr-contract",
+      "pages": [
+        10,
+        12
+      ],
+      "sourceId": "SRC-0025-PDF",
+      "sourceVersion": "0.5.0",
+      "statement": "Required QR parameters are nif, numserie, fecha and importe."
+    },
+    {
+      "id": "VALIDATION-CATALOGUE-001",
+      "kind": "validation-contract",
+      "pages": [
+        1,
+        35
+      ],
+      "sourceId": "SRC-0021-PDF",
+      "sourceVersion": "1.2.2",
+      "statement": "Validation and error semantics are governed by the admitted AEAT catalogue version 1.2.2; this P3 contract does not execute those fiscal validations."
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceManifestSha256": "0856118bfb3d528ffa2acc6322c3484616ba6aff978f620db5e7aab916ba60c6"
+}
