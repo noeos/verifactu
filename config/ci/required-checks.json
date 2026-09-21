@@ -28,7 +28,7 @@
       "report": "regulatory.json",
       "runner": "ubuntu-24.04",
       "node": "24.21.0",
-      "task": "regulatory:absence",
+      "task": "gate:p3",
       "timeoutMinutes": 10
     },
     {

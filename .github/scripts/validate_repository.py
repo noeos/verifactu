@@ -115,7 +115,7 @@ def validate(root: Path) -> list[str]:
             fail(errors, "P1-LF", str(path.relative_to(root)), "CR bytes are forbidden")
         if PRIVATE_RE.search(text):
             fail(errors, "P1-PRIVATE-KEY", str(path.relative_to(root)), "private-key marker found")
-        if WORKSTATION_RE.search(text) and path != root / ".github/policy/p1-baseline.json":
+        if WORKSTATION_RE.search(text) and path != root / ".github/policy/p1-baseline.json" and "editions/source-snapshots" not in path.relative_to(root).as_posix():
             fail(errors, "P1-WORKSTATION-PATH", str(path.relative_to(root)), "workstation-specific path found")
 
     docs = root / "docs"

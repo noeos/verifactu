@@ -1,0 +1,527 @@
+{
+  "creationAllowed": false,
+  "discoveredOfficialLinks": [
+    {
+      "href": "https://dpej.rae.es/",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://subastas.boe.es",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229#a149",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229#a97",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740#a78",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740#a84",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1992-28925",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1992-28925#a62",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1997-25336#a22",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1999-16831",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186#a2-2",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186#a29",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186#a93",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2007-15984",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820#a68",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2012-14696",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2012-14696#a5",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2014-12328#a9",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-10565#a129",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2019-10487",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2021-11473",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-1995-81678",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-2015-81840",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-2016-80807",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-2016-81287",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.boe.es/eli/es/rd/2023/12/05/1007/con",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://www.mpr.gob.es/",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://youtu.be/7W_GfHGjVrw",
+      "sourceId": "SRC-0011"
+    },
+    {
+      "href": "https://dpej.rae.es/",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://subastas.boe.es",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-1999-16831",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-11044",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186#a29",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2007-15984",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2012-14696",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2012-14696#a19",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2012-14696#a6",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-10565",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-23537#df-2",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840#da",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840#df-3",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840#df-4",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-22138",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=BOE-A-2023-26727",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-2014-81822",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-2015-81840",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/buscar/doc.php?id=DOUE-L-2016-80807",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.boe.es/eli/es/o/2024/10/17/hac1177/con",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://www.mpr.gob.es/",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "https://youtu.be/7W_GfHGjVrw",
+      "sourceId": "SRC-0014"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "/static_files/Sede/Biblioteca/Folleto/VERIFACTU/Folleto_VERIFACTU_es_es.pdf",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "http://www.boe.es/buscar/act.php?id=BOE-A-2012-14696",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "http://www.boe.es/buscar/act.php?id=BOE-A-2021-11473",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "http://www.boe.es/buscar/act.php?id=BOE-A-2024-27600",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://eur-lex.europa.eu/eli/dir/2016/1164/oj",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-22138",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www.boe.es/buscar/act.php?id=BOE-A-2025-6600",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www.boe.es/eli/es/l/2003/12/17/58/con#a2-2",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www.boe.es/eli/es/l/2003/12/17/58/con#a29",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www1.agenciatributaria.gob.es/wlpl/TIKE-CONT/MenuAplicacionFacturacion",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www1.agenciatributaria.gob.es/wlpl/TIKE-CONT/SvTikeEmitidasQuery",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "https://www2.agenciatributaria.gob.es/wlpl/TOCP-ADMI/Asistente?tipoEntrada=Z&servicio=114",
+      "sourceId": "SRC-0016"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0017"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0017"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0017"
+    },
+    {
+      "href": "https://preportal.aeat.es",
+      "sourceId": "SRC-0017"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0017"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0018"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0018"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0018"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0018"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Documento_Diseno_de_registro_de_facturacion/Documento_Diseno_de_registro_de_facturacion.html",
+      "sourceId": "SRC-0018"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0019"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0019"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0019"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0019"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/WSDL_de_los_servicios_web/WSDL_de_los_servicios_web.html",
+      "sourceId": "SRC-0019"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0020"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0020"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0020"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0020"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Esquemas_de_los_servicios_web/Esquemas_de_los_servicios_web.html",
+      "sourceId": "SRC-0020"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0021"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0021"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0021"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0021"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Validaciones_y_errores/Validaciones_y_errores.html",
+      "sourceId": "SRC-0021"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0022"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_Descripcion_SWeb.pdf",
+      "sourceId": "SRC-0022"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0022"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0022"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0022"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0023"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0023"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0023"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0023"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "sourceId": "SRC-0023"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0024"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0024"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0024"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0024"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion.html",
+      "sourceId": "SRC-0024"
+    },
+    {
+      "href": "/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/FAQs-Desarrolladores.pdf",
+      "sourceId": "SRC-0025"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.css",
+      "sourceId": "SRC-0025"
+    },
+    {
+      "href": "/static_files/common/css/aeat.07.print.css",
+      "sourceId": "SRC-0025"
+    },
+    {
+      "href": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/accesibilidad/declaracion-accesibilidad.html",
+      "sourceId": "SRC-0025"
+    },
+    {
+      "href": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "sourceId": "SRC-0025"
+    }
+  ],
+  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "generatedBy": {
+    "configuration": "config/regulatory/source-plan.json",
+    "id": "RRSIF-CONTRACT-GENERATOR-0001",
+    "version": "1.0.0"
+  },
+  "mode": "metadata-only; no fiscal semantics are invented",
+  "schemaVersion": 1,
+  "sourceClosure": "8e642e64383a02ea2cefb7cc67c978baf910e83c4b5bbd34a06315ab81a9ff55",
+  "sourceManifestSha256": "8b01ec2433a8f162ce63cca85577b29d306140caf19dc277a4a5142af3b89d6e",
+  "sourceSnapshot": "rrsif-2026-09-21-observed",
+  "status": "blocked",
+  "structuralDeclarations": [],
+  "unresolvedOfficialArtifacts": [
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0019-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/WSDL_de_los_servicios_web/WSDL_de_los_servicios_web.html"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0020-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Esquemas_de_los_servicios_web/Esquemas_de_los_servicios_web.html"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0021-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Validaciones_y_errores/Validaciones_y_errores.html"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0023-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf"
+    },
+    {
+      "blocker": "PAYLOAD_NOT_EXPOSED_BY_CURRENT_INDEX",
+      "id": "SRC-0024-PAYLOAD",
+      "url": "https://sede.agenciatributaria.gob.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0025-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf"
+    }
+  ],
+  "verificationAllowed": true
+}

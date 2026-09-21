@@ -35,14 +35,12 @@ rule changes, then maps impact to domain, contracts, migrations and vectors.
 
 ## Implementation status
 
-The contract-generation pipeline described above is specified but not
-implemented.
-
-The current repository contains no source importer, contract generator,
-generated edition package, semantic overlay, structural graph, independent
-oracle or checked-in generated contract output. No regulatory edition is
-available for runtime selection.
-
-Implementation must first provide authenticated offline inputs, deterministic
-generation, dependency-closure checks, hostile-input fixtures,
-reproducibility checks and independent review evidence.
+P3 implements the deterministic generator at
+`tooling/regulatory/generate-contracts.mjs` and the independent Python
+challenge path at `internal/independent-oracles/oracle.py`. It emits a staged
+public envelope, field-constraint and catalogue files, SOAP-binding discovery,
+source/generator digests and a blocked-candidate report from the immutable
+snapshot. Generation is network-denied and repeatable; missing linked payloads
+are retained as unresolved rather than silently converted into fiscal fields.
+The generated output therefore proves custody and drift controls, not fiscal
+semantics or AEAT acceptance.

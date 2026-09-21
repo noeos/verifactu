@@ -1,0 +1,45 @@
+{
+  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "entries": [],
+  "schemaVersion": 1,
+  "sourceEntryPoints": [
+    {
+      "id": "SRC-0021",
+      "role": "validation/error entry point"
+    },
+    {
+      "id": "SRC-0023",
+      "role": "hash specification entry point"
+    },
+    {
+      "id": "SRC-0024",
+      "role": "signature specification entry point"
+    },
+    {
+      "id": "SRC-0025",
+      "role": "QR and verification-service entry point"
+    }
+  ],
+  "unresolved": [
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0021-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Validaciones_y_errores/Validaciones_y_errores.html"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0023-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf"
+    },
+    {
+      "blocker": "PAYLOAD_NOT_EXPOSED_BY_CURRENT_INDEX",
+      "id": "SRC-0024-PAYLOAD",
+      "url": "https://sede.agenciatributaria.gob.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0025-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf"
+    }
+  ]
+}

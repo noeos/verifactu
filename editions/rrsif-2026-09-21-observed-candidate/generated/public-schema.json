@@ -1,0 +1,34 @@
+{
+  "$id": "urn:noeos:verifactu:regulatory-edition:observed-candidate:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "creationAllowed": {
+      "const": false
+    },
+    "editionId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "recordKind": {
+      "enum": [
+        "blocked-envelope"
+      ]
+    },
+    "sourceSnapshot": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "verificationAllowed": {
+      "const": true
+    }
+  },
+  "required": [
+    "editionId",
+    "recordKind",
+    "sourceSnapshot",
+    "creationAllowed"
+  ],
+  "title": "Blocked regulatory edition envelope",
+  "type": "object"
+}

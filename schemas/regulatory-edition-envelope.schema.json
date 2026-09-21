@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:noeos:verifactu:regulatory-edition-envelope:v1",
+  "title": "Regulatory edition envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["editionId", "recordKind", "sourceSnapshot", "creationAllowed"],
+  "properties": {
+    "editionId": {"type":"string","minLength":1},
+    "recordKind": {"const":"blocked-envelope"},
+    "sourceSnapshot": {"type":"string","minLength":1},
+    "creationAllowed": {"const":false},
+    "verificationAllowed": {"const":true}
+  }
+}

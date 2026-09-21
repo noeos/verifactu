@@ -30,6 +30,27 @@
       "committed": true
     },
     {
+      "pattern": "editions/source-snapshots/**",
+      "class": "vendored-immutable-input",
+      "producer": "regulatory:import",
+      "inputs": ["config/regulatory/source-plan.json"],
+      "toolProfile": "primary",
+      "cleanRegeneration": true,
+      "committed": true
+    },
+    {
+      "pattern": "editions/rrsif-2026-09-21-observed-candidate/generated/**",
+      "class": "generated",
+      "producer": "contract:generation",
+      "inputs": [
+        "editions/source-snapshots/**",
+        "config/regulatory/source-plan.json"
+      ],
+      "toolProfile": "primary",
+      "cleanRegeneration": true,
+      "committed": true
+    },
+    {
       "pattern": "evidence/runs/prepared/**",
       "class": "vendored-immutable-input",
       "producer": "prepare:external-inputs",

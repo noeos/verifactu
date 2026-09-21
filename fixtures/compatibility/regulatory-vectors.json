@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {"id":"node-22","runtime":"node","version":"22.14.0","expected":"same canonical output"},
+    {"id":"node-24","runtime":"node","version":"24.21.0","expected":"same canonical output"},
+    {"id":"python-313","runtime":"python","version":"3.13.15","expected":"independent oracle passes"}
+  ],
+  "network": "denied",
+  "sourceDateEpoch": 0
+}

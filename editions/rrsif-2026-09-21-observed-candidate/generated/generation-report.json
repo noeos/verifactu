@@ -1,0 +1,30 @@
+{
+  "blocked": [
+    "SRC-0019-PAYLOAD",
+    "SRC-0020-PAYLOAD",
+    "SRC-0021-PAYLOAD",
+    "SRC-0023-PAYLOAD",
+    "SRC-0024-PAYLOAD",
+    "SRC-0025-PAYLOAD"
+  ],
+  "creationAllowed": false,
+  "deterministic": true,
+  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "generator": {
+    "configuration": "config/regulatory/source-plan.json",
+    "id": "RRSIF-CONTRACT-GENERATOR-0001",
+    "version": "1.0.0"
+  },
+  "network": "denied",
+  "outputDigest": "af8ffc67256ae0a005565856fca2d1e160d57f12d7d13c6cd0bcf79641a6e3d6",
+  "outputs": [
+    "catalogues.json",
+    "contract-manifest.json",
+    "field-constraints.json",
+    "public-schema.json",
+    "semantic-overlay.json",
+    "soap-bindings.json"
+  ],
+  "schemaVersion": 1,
+  "sourceManifestSha256": "8b01ec2433a8f162ce63cca85577b29d306140caf19dc277a4a5142af3b89d6e"
+}
