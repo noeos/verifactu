@@ -457,6 +457,7 @@ export function validateWorkflowText(
   workflowText,
   admissions,
   contexts = requiredContextRegistry(),
+  requireClosure = true,
 ) {
   for (const admission of admissions) {
     for (const field of [
@@ -478,7 +479,7 @@ export function validateWorkflowText(
         `${admission.name}.${field}`,
       );
     assert(
-      ["node24", "composite"].includes(admission.runtime),
+      ["node24", "composite", "docker"].includes(admission.runtime),
       "ACTION_RUNTIME",
       `${admission.name}.${admission.runtime}`,
     );
@@ -507,16 +508,18 @@ export function validateWorkflowText(
       context,
     );
   }
-  assert(
-    /if:\s*\$\{\{\s*always\(\)\s*\}\}/u.test(workflowText),
-    "WORKFLOW_CLOSURE_ALWAYS",
-    "closure is not always-run",
-  );
-  assert(
-    workflowText.includes("validate-required-checks.mjs"),
-    "MISSING_REQUIRED_REPORT",
-    "closure report validator absent",
-  );
+  if (requireClosure) {
+    assert(
+      /if:\s*\$\{\{\s*always\(\)\s*\}\}/u.test(workflowText),
+      "WORKFLOW_CLOSURE_ALWAYS",
+      "closure is not always-run",
+    );
+    assert(
+      workflowText.includes("validate-required-checks.mjs"),
+      "MISSING_REQUIRED_REPORT",
+      "closure report validator absent",
+    );
+  }
   return contexts.length;
 }
 
@@ -858,6 +861,21 @@ async function policyWorkflow(context) {
   const workflowPath = resolve(context.root, ".github/workflows/required.yml");
   const text = await readFile(workflowPath, "utf8");
   const count = validateWorkflowText(text, admissions);
+  const workflowFiles = (
+    await walk(context.root, {
+      exclude: [".git", "node_modules", "evidence/runs"],
+    })
+  )
+    .filter((entry) => entry.type === "file")
+    .map((entry) => entry.relative)
+    .filter(
+      (path) => path.startsWith(".github/workflows/") && path.endsWith(".yml"),
+    );
+  for (const path of workflowFiles) {
+    if (path === ".github/workflows/required.yml") continue;
+    const auxiliary = await readFile(resolve(context.root, path), "utf8");
+    validateWorkflowText(auxiliary, admissions, [], false);
+  }
   const registry = await readJson(
     resolve(context.root, "config/ci/required-checks.json"),
   );

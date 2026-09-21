@@ -1,0 +1,35 @@
+name: GitHub authority boundary
+
+on:
+  schedule:
+    - cron: "0 3 * * 4"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: github-audit
+  cancel-in-progress: true
+
+jobs:
+  authority:
+    name: GitHub audit · token authority boundary
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Collect bounded authority evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/audit_github.py --authority-boundary --output ci-reports/github-authority.json
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: auxiliary-github-authority
+          path: ci-reports/github-authority.json

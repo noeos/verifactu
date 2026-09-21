@@ -127,6 +127,25 @@
       "reviewedAncestry": "v4 release commit is GitHub-verified and every workflow reference uses the exact commit",
       "knownAdvisories": "none identified in admission review; CI vulnerability gates remain authoritative",
       "replacement": "Re-admit an exact commit with reviewed tree, runtime, permissions and generated code"
+    },
+    {
+      "name": "ossf/scorecard-action",
+      "tag": "v2.4.4",
+      "sha": "2d1146689b8cda280b9bc96326124645441f03bc",
+      "license": "Apache-2.0",
+      "permissions": ["contents:read"],
+      "treeSha": "a4487cd15a8122a8c0184945e5ad4149323d108d",
+      "commitSignature": "valid",
+      "runtime": "docker",
+      "reviewedAt": "2026-09-21",
+      "network": "GitHub API and the pinned Scorecard container only",
+      "credentialHandling": "read-only repository token; result publication disabled",
+      "bundledCodeReview": "action.yaml and pinned ghcr.io image reference reviewed at exact commit",
+      "contractReview": "results_file, results_format, repo_token and publish_results are explicit; SARIF output is required non-empty",
+      "reviewedAncestry": "tag v2.4.4 resolves to this exact GitHub-verified commit",
+      "knownAdvisories": "none identified in admission review; CI vulnerability gates remain authoritative",
+      "manifestSha256": "9d2952edbb13c6d1f8f07f51e0be211000c9d5acf6c32ded76e9f9fb8d907eab",
+      "replacement": "Re-admit an exact commit with reviewed tree, runtime, permissions and generated code"
     }
   ]
 }

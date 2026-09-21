@@ -1,0 +1,71 @@
+name: Security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 2 * * 2"
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  SOURCE_DATE_EPOCH: "0"
+  TZ: UTC
+  VERIFACTU_SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  supply-chain:
+    name: Security · supply chain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: ./.github/actions/setup-engineering
+        with:
+          node-version: 24.21.0
+          npm-version: 11.19.1
+      - run: node tooling/tasks/run-task.mjs --task policy:supply-chain
+        shell: bash
+      - run: node tooling/ci/write-auxiliary-report.mjs --context 'Security · supply chain' --job-id supply-chain --output ci-reports/supply-chain.json --task-report evidence/runs/policy--supply-chain.json
+        shell: bash
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: auxiliary-security-supply-chain
+          path: ci-reports/supply-chain.json
+  secrets:
+    name: Security · secret regressions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-engineering
+        with:
+          node-version: 24.21.0
+          npm-version: 11.19.1
+      - run: node tooling/tasks/run-task.mjs --task security:secrets
+        shell: bash
+      - run: node tooling/ci/write-auxiliary-report.mjs --context 'Security · secret regressions' --job-id secrets --output ci-reports/secrets.json --task-report evidence/runs/security--secrets.json
+        shell: bash
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: auxiliary-security-secrets
+          path: ci-reports/secrets.json
