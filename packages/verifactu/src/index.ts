@@ -1,2 +1,17 @@
-/** P2 package shell. Fiscal capabilities are introduced only by later phases. */
-export {};
+export * from "./contracts/configuration.js";
+export * from "./contracts/limits.js";
+export * from "./contracts/results.js";
+export * from "./contracts/staged-codec.js";
+export * from "./domain/chains.js";
+export * from "./domain/context.js";
+export * from "./domain/corrections.js";
+export * from "./domain/date-time.js";
+export * from "./domain/decimal.js";
+export * from "./domain/diagnostics.js";
+export * from "./domain/events.js";
+export * from "./domain/identities.js";
+export * from "./domain/invariants.js";
+export * from "./domain/mode-tenure.js";
+export * from "./domain/records.js";
+export * from "./domain/sequences.js";
+export * from "./domain/states.js";

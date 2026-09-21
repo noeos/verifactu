@@ -6,15 +6,57 @@
     {
       "name": "@noeos/verifactu",
       "root": "packages/verifactu",
-      "publicExports": [],
+      "publicExports": [
+        "./contracts/configuration.js",
+        "./contracts/limits.js",
+        "./contracts/results.js",
+        "./contracts/staged-codec.js",
+        "./domain/chains.js",
+        "./domain/context.js",
+        "./domain/corrections.js",
+        "./domain/date-time.js",
+        "./domain/decimal.js",
+        "./domain/diagnostics.js",
+        "./domain/events.js",
+        "./domain/identities.js",
+        "./domain/invariants.js",
+        "./domain/mode-tenure.js",
+        "./domain/records.js",
+        "./domain/sequences.js",
+        "./domain/states.js"
+      ],
       "bin": null,
       "allowlist": [
         {
-          "path": "package/dist/index.d.ts",
+          "path": "package/dist/*.d.ts",
           "mode": 420,
-          "maximumBytes": 2048
+          "maximumBytes": 16384
         },
-        { "path": "package/dist/index.js", "mode": 420, "maximumBytes": 2048 },
+        {
+          "path": "package/dist/*.js",
+          "mode": 420,
+          "maximumBytes": 16384
+        },
+        {
+          "path": "package/dist/*.js.map",
+          "mode": 420,
+          "maximumBytes": 16384
+        },
+        {
+          "path": "package/dist/**/*.d.ts",
+          "mode": 420,
+          "maximumBytes": 16384
+        },
+        {
+          "path": "package/dist/**/*.js",
+          "mode": 420,
+          "maximumBytes": 16384
+        },
+        {
+          "path": "package/dist/**/*.js.map",
+          "mode": 420,
+          "maximumBytes": 16384
+        },
         { "path": "package/LICENSE", "mode": 420, "maximumBytes": 512 },
         { "path": "package/NOTICE", "mode": 420, "maximumBytes": 512 },
         { "path": "package/README.md", "mode": 420, "maximumBytes": 4096 },

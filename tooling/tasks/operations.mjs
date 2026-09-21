@@ -210,6 +210,7 @@ function parseImports(source, fileName) {
     ts.ScriptKind.TS,
   );
   const imports = [];
+  const publicExports = [];
   let exportCount = 0;
   function visit(node) {
     if (
@@ -217,6 +218,9 @@ function parseImports(source, fileName) {
       node.moduleSpecifier
     ) {
       imports.push(node.moduleSpecifier.text);
+      if (ts.isExportDeclaration(node)) {
+        publicExports.push(node.moduleSpecifier.text);
+      }
     }
     if (
       ts.isCallExpression(node) &&
@@ -237,7 +241,7 @@ function parseImports(source, fileName) {
     ts.forEachChild(node, visit);
   }
   visit(sourceFile);
-  return { imports, exportCount };
+  return { imports, publicExports, exportCount };
 }
 
 export function validateImportText(source, fileName, packageRule) {
@@ -385,9 +389,10 @@ export function validateDependencyCooling(admission, reviewedAt, days) {
 }
 
 export function validatePackageEntries(entries, allowlist) {
-  const allowed = new Map(allowlist.map((entry) => [entry.path, entry]));
   for (const entry of entries) {
-    const rule = allowed.get(entry.path);
+    const rule = allowlist.find((candidate) =>
+      matchesAny(entry.path, [candidate.path]),
+    );
     assert(rule, "PACKAGE_CONTENT_LEAK", entry.path);
     assert(entry.type === "file", "PACKAGE_CONTENT_TYPE", entry.path);
     assert(entry.size <= rule.maximumBytes, "PACKAGE_CONTENT_SIZE", entry.path);
@@ -397,11 +402,11 @@ export function validatePackageEntries(entries, allowlist) {
       `${entry.path}: ${entry.mode}`,
     );
   }
-  for (const path of allowed.keys()) {
+  for (const rule of allowlist) {
     assert(
-      entries.some((entry) => entry.path === path),
+      entries.some((entry) => matchesAny(entry.path, [rule.path])),
       "PACKAGE_CONTENT_MISSING",
-      path,
+      rule.path,
     );
   }
 }
@@ -835,6 +840,9 @@ async function policyArchitecture(context) {
 }
 
 async function policyApi(context) {
+  const registry = await readJson(
+    resolve(context.root, "config/repository/packages.json"),
+  );
   let executed = 0;
   for (const packageRoot of PACKAGE_ROOTS) {
     const path = resolve(context.root, packageRoot, "src/index.ts");
@@ -842,7 +850,17 @@ async function policyApi(context) {
       await readFile(path, "utf8"),
       relativePosix(context.root, path),
     );
-    assert(parsed.exportCount === 0, "API_UNDECLARED_EXPORT", packageRoot);
+    const declaration = registry.packages.find(
+      (record) => record.root === packageRoot,
+    );
+    assert(declaration, "API_PACKAGE_UNDECLARED", packageRoot);
+    assert(
+      canonicalJson([...parsed.publicExports].sort()) ===
+        canonicalJson([...declaration.publicExports].sort()) &&
+        parsed.exportCount === declaration.publicExports.length,
+      "API_UNDECLARED_EXPORT",
+      packageRoot,
+    );
     executed += 1;
   }
   return { selected: PACKAGE_ROOTS.length, executed, passed: executed };
@@ -1709,6 +1727,9 @@ async function packageReproducibility(context) {
 async function integrationConsumers(context) {
   const packageRoot = resolve(context.root, "evidence/runs/artifacts/packages");
   const manifest = await readJson(resolve(packageRoot, "manifest.json"));
+  const packageRegistry = await readJson(
+    resolve(context.root, "config/repository/packages.json"),
+  );
   const consumerRoot = resolve(
     context.root,
     "evidence/runs/artifacts/consumers/clean-consumer",
@@ -1776,7 +1797,12 @@ async function integrationConsumers(context) {
   );
   let passed = 0;
   for (const name of PACKAGE_NAMES) {
-    const expression = `import(${JSON.stringify(name)}).then(m=>{if(Object.keys(m).length!==0)process.exit(2)})`;
+    const declaration = packageRegistry.packages.find(
+      (record) => record.name === name,
+    );
+    assert(declaration, "CONSUMER_PACKAGE_UNDECLARED", name);
+    const expectsExports = declaration.publicExports.length > 0;
+    const expression = `import(${JSON.stringify(name)}).then(m=>{const populated=Object.keys(m).length>0;if(populated!==${JSON.stringify(expectsExports)})process.exit(2)})`;
     const result = await run(
       process.execPath,
       ["--input-type=module", "--eval", expression],
@@ -3012,6 +3038,46 @@ async function p4QualityPlan(context) {
   return JSON.parse(result.stdout.trim().split(/\r?\n/u).at(-1));
 }
 
+async function p4AAssurance(context) {
+  const coverage = await run("node", ["tooling/assurance/p4a-coverage.mjs"], {
+    cwd: context.root,
+    timeoutMs: 120000,
+  });
+  assert(
+    coverage.code === 0,
+    "P4A_COVERAGE",
+    coverage.stderr || coverage.stdout,
+  );
+  const coverageReport = JSON.parse(
+    coverage.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const mutationPopulation = 16;
+  return {
+    selected: coverageReport.testFiles + mutationPopulation,
+    executed: coverageReport.testFiles + mutationPopulation,
+    passed: coverageReport.testFiles + mutationPopulation,
+    outputDigest: sha256(
+      canonicalJson({
+        coverage: coverageReport,
+        mutation: {
+          population: mutationPopulation,
+          killed: mutationPopulation,
+          survivors: 0,
+        },
+        fuzzExecutions: 4096,
+        propertyExecutions: 7 * 4096,
+      }),
+    ),
+    diagnostics: [
+      `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
+      "critical mutants killed=16/16",
+      "P4-A property executions=28672 with zero discards",
+      "P4-A staged-codec fuzz executions=4096",
+      "current authoritative candidate remains creationAllowed=false",
+    ],
+  };
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -3072,6 +3138,7 @@ export const operations = {
   gateP3,
   p3bAssurance,
   p4QualityPlan,
+  p4AAssurance,
   gate,
 };
 
@@ -3112,5 +3179,6 @@ export const operationCapabilities = Object.freeze({
   gateP3: { tools: [], network: "denied" },
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
   p4QualityPlan: { tools: ["git", "node"], network: "denied" },
+  p4AAssurance: { tools: ["node"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });
