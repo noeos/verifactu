@@ -72,3 +72,45 @@ export function compareDecimal(
   const rightValue = right.coefficient * 10n ** BigInt(scale - right.scale);
   return leftValue < rightValue ? -1 : leftValue > rightValue ? 1 : 0;
 }
+
+export function addDecimals(values: readonly ExactDecimal[]): ExactDecimal {
+  const scale = values.reduce(
+    (maximum, value) => Math.max(maximum, value.scale),
+    0,
+  );
+  const coefficient = values.reduce(
+    (sum, value) =>
+      sum + value.coefficient * 10n ** BigInt(scale - value.scale),
+    0n,
+  );
+  return decimalFromParts(coefficient, scale);
+}
+
+export function subtractDecimals(
+  left: ExactDecimal,
+  right: ExactDecimal,
+): ExactDecimal {
+  const scale = Math.max(left.scale, right.scale);
+  const coefficient =
+    left.coefficient * 10n ** BigInt(scale - left.scale) -
+    right.coefficient * 10n ** BigInt(scale - right.scale);
+  return decimalFromParts(coefficient, scale);
+}
+
+export function decimalFromParts(
+  coefficient: bigint,
+  scale: number,
+): ExactDecimal {
+  if (!Number.isSafeInteger(scale) || scale < 0) {
+    throw new RangeError("decimal scale must be a non-negative safe integer");
+  }
+  const negative = coefficient < 0n;
+  const digits = (negative ? -coefficient : coefficient)
+    .toString()
+    .padStart(scale + 1, "0");
+  const lexical =
+    scale === 0
+      ? `${negative ? "-" : ""}${digits}`
+      : `${negative ? "-" : ""}${digits.slice(0, -scale)}.${digits.slice(-scale)}`;
+  return Object.freeze({ lexical, coefficient, scale });
+}

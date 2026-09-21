@@ -94,9 +94,8 @@ export function verifyChain(
       (index === 0 && entry.predecessor.kind !== "genesis") ||
       (index > 0 &&
         (entry.predecessor.kind !== "link" ||
-          previous === undefined ||
-          entry.predecessor.recordId !== previous.record.id ||
-          entry.predecessor.digest !== previous.currentDigest))
+          entry.predecessor.recordId !== previous!.record.id ||
+          entry.predecessor.digest !== previous!.currentDigest))
     ) {
       return chainFailure("DIAG-CHAIN-PREDECESSOR", index);
     }

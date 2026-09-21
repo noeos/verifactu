@@ -11,12 +11,15 @@ test("P4-CB-003 identities accept only canonical non-empty values", () => {
   for (const value of ["", " leading", "trailing ", "a/b", "x".repeat(129)]) {
     assert.equal(api.identity("tenant", value).status, "invalid");
   }
+  assert.equal(api.editionId("edition-2026").value, "edition-2026");
 });
 
 test("P4-CB-005 decimals are exact and never accept binary numbers", () => {
   const parsed = api.parseDecimal("123.450", 3, 6);
   assert.equal(parsed.status, "succeeded");
   assert.equal(api.formatDecimal(parsed.value), "123.450");
+  assert.equal(parsed.value.coefficient, 123450n);
+  assert.equal(parsed.value.scale, 3);
   assert.equal(api.decimalFromUnknown(0.1).status, "invalid");
   assert.equal(api.parseDecimal("01").status, "invalid");
   assert.equal(api.parseDecimal("-0.0").status, "invalid");
@@ -45,9 +48,65 @@ test("P4-CB-005 decimals are exact and never accept binary numbers", () => {
     ),
     1,
   );
+  assert.equal(
+    api.compareDecimal(
+      api.parseDecimal("1.2").value,
+      api.parseDecimal("1.11").value,
+    ),
+    1,
+  );
+  assert.equal(
+    api.compareDecimal(
+      api.parseDecimal("1.11").value,
+      api.parseDecimal("1.2").value,
+    ),
+    -1,
+  );
+  assert.equal(
+    api.addDecimals([
+      api.parseDecimal("1.20").value,
+      api.parseDecimal("2.3").value,
+    ]).lexical,
+    "3.50",
+  );
+  assert.equal(
+    api.addDecimals([
+      api.parseDecimal("1.2").value,
+      api.parseDecimal("2.34").value,
+    ]).lexical,
+    "3.54",
+  );
+  assert.equal(
+    api.subtractDecimals(
+      api.parseDecimal("1.20").value,
+      api.parseDecimal("2.30").value,
+    ).lexical,
+    "-1.10",
+  );
+  assert.equal(
+    api.subtractDecimals(
+      api.parseDecimal("5.6").value,
+      api.parseDecimal("2.34").value,
+    ).lexical,
+    "3.26",
+  );
+  assert.equal(
+    api.subtractDecimals(
+      api.parseDecimal("5.67").value,
+      api.parseDecimal("2.3").value,
+    ).lexical,
+    "3.37",
+  );
+  assert.equal(api.decimalFromParts(12n, 0).lexical, "12");
+  assert.equal(api.decimalFromParts(-123n, 2).lexical, "-1.23");
+  assert.equal(api.decimalFromParts(0n, 2).lexical, "0.00");
+  assert.equal(api.decimalFromParts(1n, 3).lexical, "0.001");
+  assert.throws(() => api.decimalFromParts(1n, -1), RangeError);
 });
 
 test("P4-CB-006 date and instant parsing rejects impossible or implicit values", () => {
+  assert.equal(api.parseFiscalDate("2026-01-01").status, "succeeded");
+  assert.equal(api.parseFiscalDate("2026-12-31").status, "succeeded");
   assert.equal(api.parseFiscalDate("2024-02-29").status, "succeeded");
   assert.equal(api.parseFiscalDate("2023-02-29").status, "invalid");
   assert.equal(api.parseFiscalDate("2026-13-01").status, "invalid");
@@ -56,8 +115,17 @@ test("P4-CB-006 date and instant parsing rejects impossible or implicit values",
   assert.equal(api.parseFiscalDate("2026-01-00").status, "invalid");
   assert.equal(api.parseFiscalDate("1900-02-29").status, "invalid");
   assert.equal(api.parseFiscalDate("2000-02-29").status, "succeeded");
+  assert.equal(api.parseFiscalDate("not-a-date").status, "invalid");
   assert.equal(
     api.parseFiscalInstant("2026-09-21T10:00:00+02:00").status,
+    "succeeded",
+  );
+  assert.equal(
+    api.parseFiscalInstant("2026-09-21T23:59:59+14:00").status,
+    "succeeded",
+  );
+  assert.equal(
+    api.parseFiscalInstant("2026-09-21T23:59:59+12:59").status,
     "succeeded",
   );
   assert.equal(api.parseFiscalInstant("2026-09-21T10:00:00").status, "invalid");

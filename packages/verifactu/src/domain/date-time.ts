@@ -20,9 +20,10 @@ function leap(year: number): boolean {
 
 export function parseFiscalDate(value: string): OperationResult<FiscalDate> {
   const match = DATE.exec(value);
-  const year = Number(match?.[1]);
-  const month = Number(match?.[2]);
-  const day = Number(match?.[3]);
+  if (match === null) return invalidDate();
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
   const days = [
     31,
     leap(year) ? 29 : 28,
@@ -37,17 +38,9 @@ export function parseFiscalDate(value: string): OperationResult<FiscalDate> {
     30,
     31,
   ];
-  if (
-    match === null ||
-    month < 1 ||
-    month > 12 ||
-    day < 1 ||
-    day > (days[month - 1] ?? 0)
-  ) {
-    return failed("invalid", [
-      diagnostic("DIAG-DATE-INVALID", "input", "domain", "/date"),
-    ]);
-  }
+  if (month < 1 || month > 12) return invalidDate();
+  const maximumDay = days[month - 1]!;
+  if (day < 1 || day > maximumDay) return invalidDate();
   return succeeded(value as FiscalDate);
 }
 
@@ -55,10 +48,7 @@ export function parseFiscalInstant(
   value: string,
 ): OperationResult<FiscalInstant> {
   const match = INSTANT.exec(value);
-  if (
-    match === null ||
-    parseFiscalDate(match[1] ?? "").status !== "succeeded"
-  ) {
+  if (match === null || parseFiscalDate(match[1]!).status !== "succeeded") {
     return failed("invalid", [
       diagnostic("DIAG-INSTANT-INVALID", "input", "domain", "/instant"),
     ]);
@@ -66,7 +56,7 @@ export function parseFiscalInstant(
   const hour = Number(match[2]);
   const minute = Number(match[3]);
   const second = Number(match[4]);
-  const offset = match[5] ?? "";
+  const offset = match[5]!;
   const offsetHour = offset === "Z" ? 0 : Number(offset.slice(1, 3));
   const offsetMinute = offset === "Z" ? 0 : Number(offset.slice(4, 6));
   if (
@@ -100,8 +90,8 @@ function daysFromCivil(year: number, month: number, day: number): bigint {
 
 function instantSeconds(value: FiscalInstant): bigint {
   const match = INSTANT.exec(value)!;
-  const date = DATE.exec(match[1] ?? "")!;
-  const offset = match[5] ?? "Z";
+  const date = DATE.exec(match[1]!)!;
+  const offset = match[5]!;
   const direction = offset.startsWith("-") ? -1 : 1;
   const offsetSeconds =
     offset === "Z"
@@ -117,6 +107,12 @@ function instantSeconds(value: FiscalInstant): bigint {
         offsetSeconds,
     )
   );
+}
+
+function invalidDate(): OperationResult<FiscalDate> {
+  return failed("invalid", [
+    diagnostic("DIAG-DATE-INVALID", "input", "domain", "/date"),
+  ]);
 }
 
 export function compareFiscalInstants(
