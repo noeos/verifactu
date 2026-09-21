@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "authority": "AEAT/BOE captured entry-point bytes",
+  "vectors": [
+    {"id":"OFF-INDEX-001","sourceId":"SRC-0017","sourceSha256":"41d50e31dd1afe09e17ef6a6b150a88bc9c05b36526c2e4b29320efd4c7ae534","claim":"technical index enumerates WSDL, schemas, validations, hash, signature and QR sections","expected":"entry-point-links-retained"},
+    {"id":"OFF-HASH-001","sourceId":"SRC-0023","sourceSha256":"c15cc1a0d09fda347329cbb8f305b3965390f729ebf468b588146160b99cf5c7","claim":"hash specification has an authoritative AEAT entry point","expected":"entry-point-retained"},
+    {"id":"OFF-QR-001","sourceId":"SRC-0025","sourceSha256":"c8438d176fbd5b6f6bc44b5d3f44e211543210a1f182c37b948b3f0e1b4ac7ab","claim":"QR specification has an authoritative AEAT entry point","expected":"entry-point-retained"}
+  ],
+  "note": "Official entry pages are not substitutes for the linked technical payloads; blocked payload edges remain explicit."
+}

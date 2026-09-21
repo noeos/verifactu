@@ -34,11 +34,10 @@ or state. The expected diagnostic and rejection layer are explicit.
 
 ## Initial oracle state
 
-The oracle and vector model above is approved as a design requirement only. No
-executable independent oracle, source snapshot, generated contract closure or
-phase trace matrix is currently available in the repository.
-
-The implementation must first admit immutable official inputs, generate the
-required vectors and fixtures, provide independent challenge paths and bind
-every result to exact source, toolchain, configuration and artifact identities.
-Until then, no source, contract or regulatory claim is evidence-complete.
+P3 now provides an offline Python oracle and hostile XML parser, official
+entry-point vectors, synthetic boundary/compatibility vectors and five seeded
+adversarial fixtures. The oracle recomputes source SHA-256/SHA-512 identities,
+checks generated output provenance and detects deliberate baseline corruption;
+it does not import the Node generator or claim legal/organizational
+independence. The six missing AEAT payloads remain a mapped blocker, so no
+fiscal or protocol claim is evidence-complete.

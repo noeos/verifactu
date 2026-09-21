@@ -1,0 +1,85 @@
+{
+  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "note": "This overlay records source custody facts only; it is not a fiscal rule implementation.",
+  "rules": [
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0016",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0016",
+      "statement": "The applicability and portal entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0017",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0017",
+      "statement": "The technical-artifact index and authority graph is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0018",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0018",
+      "statement": "The record-design entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0019",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0019",
+      "statement": "The WSDL entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0020",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0020",
+      "statement": "The XSD/schema entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0021",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0021",
+      "statement": "The validation/error entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0022",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0022",
+      "statement": "The voluntary-remission service specification is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0023",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0023",
+      "statement": "The hash specification entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0024",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0024",
+      "statement": "The signature specification entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    },
+    {
+      "creationImpact": "none",
+      "id": "ENTRY-POINT-SRC-0025",
+      "kind": "source-graph-observation",
+      "sourceId": "SRC-0025",
+      "statement": "The QR and verification-service entry point is discovered from the authenticated AEAT entry-point page; linked payload bytes remain independently gated."
+    }
+  ],
+  "schemaVersion": 1,
+  "unresolved": [
+    "SRC-0019-PAYLOAD",
+    "SRC-0020-PAYLOAD",
+    "SRC-0021-PAYLOAD",
+    "SRC-0023-PAYLOAD",
+    "SRC-0024-PAYLOAD",
+    "SRC-0025-PAYLOAD"
+  ]
+}

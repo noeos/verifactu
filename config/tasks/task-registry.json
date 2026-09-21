@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "TASK-GRAPH-0001",
-  "closureRoots": ["gate:p2", "gate:platform"],
+  "closureRoots": ["gate:p2", "gate:platform", "gate:p3"],
   "tasks": [
     {
       "id": "policy:tree",
@@ -561,6 +561,108 @@
       "tools": ["git"]
     },
     {
+      "id": "regulatory:import",
+      "version": 1,
+      "owner": "regulatory-owner",
+      "dependencies": ["policy:tree"],
+      "inputs": [
+        "config/regulatory/**",
+        "editions/source-snapshots/**",
+        "tooling/regulatory/import-snapshot.mjs"
+      ],
+      "outputs": [
+        "editions/source-snapshots/rrsif-2026-09-21-observed/manifest.json"
+      ],
+      "workingDirectory": ".",
+      "toolProfile": "primary",
+      "environment": ["CI", "PATH"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 120,
+      "concurrencyLock": "regulatory-source",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "regulatoryImport",
+      "tools": ["node"]
+    },
+    {
+      "id": "contract:generation",
+      "version": 1,
+      "owner": "regulatory-owner",
+      "dependencies": ["regulatory:import"],
+      "inputs": [
+        "editions/source-snapshots/**",
+        "config/regulatory/**",
+        "tooling/regulatory/generate-contracts.mjs"
+      ],
+      "outputs": ["editions/rrsif-2026-09-21-observed-candidate/generated/**"],
+      "workingDirectory": ".",
+      "toolProfile": "primary",
+      "environment": ["CI", "PATH", "SOURCE_DATE_EPOCH"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 120,
+      "concurrencyLock": "contract-generation",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "contractGeneration",
+      "tools": ["node"]
+    },
+    {
+      "id": "oracle:independent",
+      "version": 1,
+      "owner": "quality-owner",
+      "dependencies": ["contract:generation"],
+      "inputs": [
+        "editions/source-snapshots/**",
+        "editions/rrsif-2026-09-21-observed-candidate/generated/**",
+        "internal/contract-generation/offline_parser.py",
+        "internal/independent-oracles/oracle.py",
+        "fixtures/adversarial/regulatory/**",
+        "fixtures/synthetic/regulatory-vectors.json"
+      ],
+      "outputs": ["evidence/runs/oracle--independent.json"],
+      "workingDirectory": ".",
+      "toolProfile": "python-reference",
+      "environment": ["CI", "PATH", "VERIFACTU_PYTHON"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 120,
+      "concurrencyLock": "oracle",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "independentOracle",
+      "tools": ["python"]
+    },
+    {
+      "id": "regulatory:drift",
+      "version": 1,
+      "owner": "regulatory-owner",
+      "dependencies": ["contract:generation"],
+      "inputs": [
+        "editions/source-snapshots/**",
+        "editions/rrsif-2026-09-21-observed-candidate/generated/**",
+        "config/regulatory/**",
+        "tooling/regulatory/generate-contracts.mjs"
+      ],
+      "outputs": ["evidence/runs/regulatory--drift.json"],
+      "workingDirectory": ".",
+      "toolProfile": "primary",
+      "environment": ["CI", "PATH", "SOURCE_DATE_EPOCH"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 120,
+      "concurrencyLock": "contract-generation",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "regulatoryDrift",
+      "tools": ["node"]
+    },
+    {
       "id": "gate:foundation",
       "version": 1,
       "owner": "quality-owner",
@@ -651,6 +753,32 @@
       "reportSchema": "evidence/schemas/task-report.schema.json",
       "zeroWork": "fail",
       "operation": "gate",
+      "tools": []
+    },
+    {
+      "id": "gate:p3",
+      "version": 1,
+      "owner": "quality-owner",
+      "dependencies": [
+        "gate:p2",
+        "regulatory:import",
+        "contract:generation",
+        "oracle:independent",
+        "regulatory:drift"
+      ],
+      "inputs": ["**"],
+      "outputs": ["evidence/runs/gate--p3.json"],
+      "workingDirectory": ".",
+      "toolProfile": "primary",
+      "environment": ["CI", "VERIFACTU_SUBJECT_SHA", "VERIFACTU_SUBJECT_TREE"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 1800,
+      "concurrencyLock": "closure",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "gateP3",
       "tools": []
     }
   ]

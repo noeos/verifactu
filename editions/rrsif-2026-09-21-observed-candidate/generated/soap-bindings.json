@@ -1,0 +1,18 @@
+{
+  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "networkAtRuntime": "denied",
+  "schemaVersion": 1,
+  "services": [],
+  "unresolved": [
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0019-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/WSDL_de_los_servicios_web/WSDL_de_los_servicios_web.html"
+    },
+    {
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "id": "SRC-0020-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Esquemas_de_los_servicios_web/Esquemas_de_los_servicios_web.html"
+    }
+  ]
+}

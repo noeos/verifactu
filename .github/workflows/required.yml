@@ -113,12 +113,12 @@ jobs:
         with: &primary
           node-version: 24.21.0
           npm-version: 11.19.1
-      - name: Prove P2 regulatory absence
+      - name: Run P3 source, contract and oracle gate
         shell: bash
-        run: node tooling/tasks/run-task.mjs --task regulatory:absence
+        run: node tooling/tasks/run-task.mjs --task gate:p3
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/regulatory--absence.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p3.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-regulatory

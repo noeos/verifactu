@@ -22,7 +22,7 @@ env:
 
 jobs:
   regulatory:
-    name: Conformance · regulatory absence
+    name: Conformance · regulatory sources and generated contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -37,9 +37,9 @@ jobs:
         with:
           node-version: 24.21.0
           npm-version: 11.19.1
-      - run: node tooling/tasks/run-task.mjs --task regulatory:absence
+      - run: node tooling/tasks/run-task.mjs --task gate:p3
         shell: bash
-      - run: node tooling/ci/write-auxiliary-report.mjs --context 'Conformance · regulatory absence' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/regulatory--absence.json
+      - run: node tooling/ci/write-auxiliary-report.mjs --context 'Conformance · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p3.json
         shell: bash
       - uses: ./.github/actions/upload-check-report
         with:

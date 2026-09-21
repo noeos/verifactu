@@ -74,15 +74,15 @@ silently skips a source. Each must fail with a specific diagnostic.
 
 ## Implementation status
 
-The acquisition, quarantine, promotion and generation processes described above
-are design requirements only.
+P3 implements the bounded offline promotion path in
+`tooling/regulatory/import-snapshot.mjs`. The immutable
+`rrsif-2026-09-21-observed` snapshot contains twelve captured BOE/AEAT entry
+point bytes, dual digests, source dependencies and licence identities. Six
+linked AEAT developer payload edges remain `blocked` after ordinary TLS
+validation failed; no cached, stale or TLS-bypassed bytes are admitted.
 
-The current repository contains no implemented source importer, promoter,
-regulatory snapshot, generated contract package, negative policy runner or active
-regulatory edition. No source bytes have been admitted as a reproducible runtime
-input and no edition is approved for generation.
-
-Implementation must first provide the bounded acquisition and offline promotion
-pipeline, its manifests, dependency closure, negative fixtures, reproducibility
-checks and review evidence. Until those outputs exist and are approved,
-regulatory source import remains specified but unavailable.
+The candidate manifest and independent negative campaign are executable and
+network-denied. Because the authoritative WSDL/XSD/catalogue/hash/signature/QR
+payload closure is incomplete, the candidate is verification-only and
+`creationAllowed=false`; it is not an approved regulatory edition. A future
+observation creates a successor snapshot and never mutates this one.

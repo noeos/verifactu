@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "id": "REGULATORY-SOURCE-PLAN-0001",
+  "snapshotId": "rrsif-2026-09-21-observed",
+  "observedAt": "2026-09-21T13:12:37Z",
+  "observation": {
+    "transportRepresentation": "HTTP bytes normalized from CRLF to LF only for text snapshot storage; transport digest retained separately",
+    "transportSha256": {
+      "SRC-0011": "51d04b5b5bc88d4aea6922359ac8f4165f7344b51ae82dcad80f5e69555c5b90",
+      "SRC-0014": "672db81017075582e640cdd07962efbcda28415e3d1f6084aca2453124a5deb9",
+      "SRC-0016": "c4b621b1af643888b2c5196699b72d4db0f97b41580e6ecbc3db1f38d01d6844",
+      "SRC-0017": "6b4a5cf333196747fb0029de3ceac2dcf9601dcff230d2cbe6e705e38c6217a9",
+      "SRC-0018": "584f9920d8bc57ad26382a6c45d60aff392b4660348aa05837b8cb2c29b2d960",
+      "SRC-0019": "ea5b23eaf18185c881425f4cf155453a03662451cf8e5c9d209652bf4812251f",
+      "SRC-0020": "2a4dbd787374ac649b87c823c85a503bbbdd6e70a44f0508ef45197e2ac168f5",
+      "SRC-0021": "5d288fe831f3c825852803e6f3a2181b73d998435b78c12af5cea56b08578246",
+      "SRC-0022": "2609973a919fbbc3e830b95fd75a0a896176c708a0d543498c310836a222c26e",
+      "SRC-0023": "bcb8d0056b7db10290d5807537d01fdac6d6c02312cf7948c370a53f052dd189",
+      "SRC-0024": "e8867be23298e7585f33f7dda4196459937d4439d3894c02500d64bb5685fdb4",
+      "SRC-0025": "a7dfe4c954b45e18585cafc5b3e3dc15ea41b074d8f1e3968244db555f44d085"
+    }
+  },
+  "authorityHierarchy": [
+    "BOE enacted text",
+    "AEAT technical publication",
+    "AEAT developer artifact linked by the technical publication",
+    "W3C/standards material only for format mechanics"
+  ],
+  "acquisition": {
+    "tool": "urllib3-independent-observer-v1",
+    "tls": "normal platform verification; no bypass",
+    "redirects": "same-host only",
+    "maxBytes": 10485760,
+    "maxFiles": 128,
+    "timeoutSeconds": 30,
+    "runtimeNetwork": "denied",
+    "licenceReview": "required before redistribution"
+  },
+  "sources": [
+    {
+      "id": "SRC-0011",
+      "authority": "BOE",
+      "role": "RRSIF enacted/consolidated text",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "path": "sources/boe/SRC-0011.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "BOE-REUSE-TERMS",
+      "dependsOn": []
+    },
+    {
+      "id": "SRC-0014",
+      "authority": "BOE",
+      "role": "HAC/1177/2024 technical order",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-22138",
+      "path": "sources/boe/SRC-0014.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "BOE-REUSE-TERMS",
+      "dependsOn": ["SRC-0011"]
+    },
+    {
+      "id": "SRC-0016",
+      "authority": "AEAT",
+      "role": "applicability and portal entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu.html",
+      "path": "sources/aeat/SRC-0016.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0011"]
+    },
+    {
+      "id": "SRC-0017",
+      "authority": "AEAT",
+      "role": "technical-artifact index and authority graph",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica.html",
+      "path": "sources/aeat/SRC-0017.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0016"]
+    },
+    {
+      "id": "SRC-0018",
+      "authority": "AEAT",
+      "role": "record-design entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/disenos-registro.html",
+      "path": "sources/aeat/SRC-0018.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0019",
+      "authority": "AEAT",
+      "role": "WSDL entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/wsdl-servicios-web.html",
+      "path": "sources/aeat/SRC-0019.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0020",
+      "authority": "AEAT",
+      "role": "XSD/schema entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/esquemas.html",
+      "path": "sources/aeat/SRC-0020.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0021",
+      "authority": "AEAT",
+      "role": "validation/error entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/documento-validaciones-errores.html",
+      "path": "sources/aeat/SRC-0021.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0022",
+      "authority": "AEAT",
+      "role": "voluntary-remission service specification",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-servicios-remision-voluntaria-registros-validaciones.html",
+      "path": "sources/aeat/SRC-0022.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0023",
+      "authority": "AEAT",
+      "role": "hash specification entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/algoritmo-calculo-codificacion-huella-hash.html",
+      "path": "sources/aeat/SRC-0023.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0024",
+      "authority": "AEAT",
+      "role": "signature specification entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-tecnicas-firma-electronica-registros-evento.html",
+      "path": "sources/aeat/SRC-0024.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0025",
+      "authority": "AEAT",
+      "role": "QR and verification-service entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/caracteristicas-qr-especificaciones-servicio-cotejo-factura.html",
+      "path": "sources/aeat/SRC-0025.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"]
+    },
+    {
+      "id": "SRC-0019-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "linked WSDL bytes",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/WSDL_de_los_servicios_web/WSDL_de_los_servicios_web.html",
+      "path": null,
+      "mediaType": "text/html",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": ["SRC-0019"]
+    },
+    {
+      "id": "SRC-0020-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "linked XSD graph bytes",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Esquemas_de_los_servicios_web/Esquemas_de_los_servicios_web.html",
+      "path": null,
+      "mediaType": "application/xml",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": ["SRC-0020"]
+    },
+    {
+      "id": "SRC-0021-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "validation/error catalogue bytes",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Validaciones_y_errores/Validaciones_y_errores.html",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": ["SRC-0021"]
+    },
+    {
+      "id": "SRC-0023-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "hash specification bytes",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": ["SRC-0023"]
+    },
+    {
+      "id": "SRC-0024-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "signature specification and examples",
+      "url": "https://sede.agenciatributaria.gob.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "PAYLOAD_NOT_EXPOSED_BY_CURRENT_INDEX",
+      "licence": null,
+      "dependsOn": ["SRC-0024"]
+    },
+    {
+      "id": "SRC-0025-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "QR specification bytes",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": ["SRC-0025"]
+    }
+  ],
+  "licences": [
+    {
+      "id": "AEAT-REUSE-TERMS",
+      "authority": "AEAT",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/aviso-legal/utilizacion-informacion-contenida-web-aeat.html",
+      "disposition": "attribution-and-no-distortion-required"
+    },
+    {
+      "id": "BOE-REUSE-TERMS",
+      "authority": "BOE",
+      "url": "https://www.boe.es/informacion/aviso_legal/index.php",
+      "disposition": "official-text-reuse-conditions"
+    }
+  ],
+  "requiredBeforeActivation": [
+    "SRC-0019-PAYLOAD",
+    "SRC-0020-PAYLOAD",
+    "SRC-0021-PAYLOAD",
+    "SRC-0023-PAYLOAD",
+    "SRC-0024-PAYLOAD",
+    "SRC-0025-PAYLOAD"
+  ]
+}

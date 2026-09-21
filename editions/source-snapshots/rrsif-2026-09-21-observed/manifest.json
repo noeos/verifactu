@@ -1,0 +1,403 @@
+{
+  "schemaVersion": 1,
+  "id": "rrsif-2026-09-21-observed",
+  "observedAt": "2026-09-21T13:12:37Z",
+  "observation": {
+    "transportRepresentation": "HTTP bytes normalized from CRLF to LF only for text snapshot storage; transport digest retained separately",
+    "transportSha256": {
+      "SRC-0011": "51d04b5b5bc88d4aea6922359ac8f4165f7344b51ae82dcad80f5e69555c5b90",
+      "SRC-0014": "672db81017075582e640cdd07962efbcda28415e3d1f6084aca2453124a5deb9",
+      "SRC-0016": "c4b621b1af643888b2c5196699b72d4db0f97b41580e6ecbc3db1f38d01d6844",
+      "SRC-0017": "6b4a5cf333196747fb0029de3ceac2dcf9601dcff230d2cbe6e705e38c6217a9",
+      "SRC-0018": "584f9920d8bc57ad26382a6c45d60aff392b4660348aa05837b8cb2c29b2d960",
+      "SRC-0019": "ea5b23eaf18185c881425f4cf155453a03662451cf8e5c9d209652bf4812251f",
+      "SRC-0020": "2a4dbd787374ac649b87c823c85a503bbbdd6e70a44f0508ef45197e2ac168f5",
+      "SRC-0021": "5d288fe831f3c825852803e6f3a2181b73d998435b78c12af5cea56b08578246",
+      "SRC-0022": "2609973a919fbbc3e830b95fd75a0a896176c708a0d543498c310836a222c26e",
+      "SRC-0023": "bcb8d0056b7db10290d5807537d01fdac6d6c02312cf7948c370a53f052dd189",
+      "SRC-0024": "e8867be23298e7585f33f7dda4196459937d4439d3894c02500d64bb5685fdb4",
+      "SRC-0025": "a7dfe4c954b45e18585cafc5b3e3dc15ea41b074d8f1e3968244db555f44d085"
+    }
+  },
+  "authorityHierarchy": [
+    "BOE enacted text",
+    "AEAT technical publication",
+    "AEAT developer artifact linked by the technical publication",
+    "W3C/standards material only for format mechanics"
+  ],
+  "acquisition": {
+    "tool": "urllib3-independent-observer-v1",
+    "tls": "normal platform verification; no bypass",
+    "redirects": "same-host only",
+    "maxBytes": 10485760,
+    "maxFiles": 128,
+    "timeoutSeconds": 30,
+    "runtimeNetwork": "denied",
+    "licenceReview": "required before redistribution"
+  },
+  "sourcePlan": "config/regulatory/source-plan.json",
+  "sourcePlanSha256": "b62370eb708e023c4ab8f2e2ab85d08f300605ae444f63f41420e0ba4756d295",
+  "sources": [
+    {
+      "id": "SRC-0011",
+      "authority": "BOE",
+      "role": "RRSIF enacted/consolidated text",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "path": "sources/boe/SRC-0011.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "BOE-REUSE-TERMS",
+      "dependsOn": [],
+      "bytes": 145168,
+      "sha256": "6a426d143d3fc2e2ce2abb98990cc927612dc4f9e80a33cb8d81cc9415eb510a",
+      "sha512": "19716d95b4e4b4403a2d33017bb13329413b81527910d705630bc67163ee4eedc04fbabf8ebc9a6d9fc0b12d95afab627d804a710d2911258105c7bfbc3ce504",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0014",
+      "authority": "BOE",
+      "role": "HAC/1177/2024 technical order",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-22138",
+      "path": "sources/boe/SRC-0014.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "BOE-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0011"
+      ],
+      "bytes": 150623,
+      "sha256": "26fdc755bff8f6c0f36c9fd83b2e21bd07fb75d0f1551d0ca9a66e2ffaeb6f6e",
+      "sha512": "287ef547813f90c1750433f85be448b199624e278bf313c4137af2759528b93c67f7f5f2554702878192423a4e8ee1886e2d3df7174a0c114eca4f4fbd2e34cd",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0016",
+      "authority": "AEAT",
+      "role": "applicability and portal entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu.html",
+      "path": "sources/aeat/SRC-0016.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0011"
+      ],
+      "bytes": 27329,
+      "sha256": "53b6ed8e06270cfceb6cdf19db6d7509b3978fa4d5ce0c30d8e663e79c90adc7",
+      "sha512": "5177388920e41a1ba762f4bdb058781c193813220472adb257f561de59222f3b46dfaa0abc1d7e3244406c9fa5450c12fba9c5dacf2ce382c6d9d9b297511601",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0017",
+      "authority": "AEAT",
+      "role": "technical-artifact index and authority graph",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica.html",
+      "path": "sources/aeat/SRC-0017.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0016"
+      ],
+      "bytes": 13391,
+      "sha256": "41d50e31dd1afe09e17ef6a6b150a88bc9c05b36526c2e4b29320efd4c7ae534",
+      "sha512": "60058d891dd4855055c2489627c5276e9c1ee1659c3b72a4e784f636ecffe996163151adec5baf47a5a63d7343e59611df9f7034fa973c052b0d9e3e0d916354",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0018",
+      "authority": "AEAT",
+      "role": "record-design entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/disenos-registro.html",
+      "path": "sources/aeat/SRC-0018.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 13915,
+      "sha256": "64a66cb86bddbc27e06cb9dbcfce5a4005a10156589681000507760e815888da",
+      "sha512": "f846f2178c58aa8830c5f78934d371f4854ad0ca4672ac6204e25476dfb14674fda6027560234631cab50a7ad16c467d4b5e04f14aa12281d17d62cdc8182054",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0019",
+      "authority": "AEAT",
+      "role": "WSDL entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/wsdl-servicios-web.html",
+      "path": "sources/aeat/SRC-0019.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 13871,
+      "sha256": "572984faea6123d189c1dfa52b6a1f76bc40756be57dc4226893be47bae46d19",
+      "sha512": "886f4c0c945ce34994bda805e4fccd2efba8da9dcfd5b48aac2ed36c040e5840e8781669b89acf40cb5aac98a95c4b39ffb4b512e83d795921c7b3f8edf81baf",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0019-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "linked WSDL bytes",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/WSDL_de_los_servicios_web/WSDL_de_los_servicios_web.html",
+      "path": null,
+      "mediaType": "text/html",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": [
+        "SRC-0019"
+      ],
+      "sha256": null,
+      "sha512": null,
+      "bytes": null
+    },
+    {
+      "id": "SRC-0020",
+      "authority": "AEAT",
+      "role": "XSD/schema entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/esquemas.html",
+      "path": "sources/aeat/SRC-0020.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 13911,
+      "sha256": "d0672f843ab0416704c6f43b11e9c79b7be91f1cb47a20d6f5155c91d998ccf8",
+      "sha512": "0735d2b1cc84e2d58fd6f9057ebf4c93eedf64d741f843df0bd9e1155047b960aa993bb95aa7d239ad674f5dd98aba64e4f0854e8a525f3a40d01fff23ebda4e",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0020-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "linked XSD graph bytes",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Esquemas_de_los_servicios_web/Esquemas_de_los_servicios_web.html",
+      "path": null,
+      "mediaType": "application/xml",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": [
+        "SRC-0020"
+      ],
+      "sha256": null,
+      "sha512": null,
+      "bytes": null
+    },
+    {
+      "id": "SRC-0021",
+      "authority": "AEAT",
+      "role": "validation/error entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/documento-validaciones-errores.html",
+      "path": "sources/aeat/SRC-0021.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 14011,
+      "sha256": "363ad63fb9df537e0191e293c2d97e123a4ff2d0d8b49d8f951a45f0eeed33da",
+      "sha512": "000fb66587e056b7e171aca5aca70d63c7bc02a07d24f7b99f1596f1561790b9d71ebb1cc2b35cad55bd56d4015894d30e49ac7458637e527011c61e66d07ad3",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0021-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "validation/error catalogue bytes",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Validaciones_y_errores/Validaciones_y_errores.html",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": [
+        "SRC-0021"
+      ],
+      "sha256": null,
+      "sha512": null,
+      "bytes": null
+    },
+    {
+      "id": "SRC-0022",
+      "authority": "AEAT",
+      "role": "voluntary-remission service specification",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-servicios-remision-voluntaria-registros-validaciones.html",
+      "path": "sources/aeat/SRC-0022.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 14177,
+      "sha256": "0617e486b1b59f5b53b55a75b2b410b0cc78a527ede1add95f7eada82030f06a",
+      "sha512": "7fbd8acf012ab9fee31bfb10b509e1eda3f6cf341d1e49dc02f0874a3d8241f75052bea414512e28f276d983c38e8f0f75fd0cc449cdd6a94b7cdd1addf01a21",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0023",
+      "authority": "AEAT",
+      "role": "hash specification entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/algoritmo-calculo-codificacion-huella-hash.html",
+      "path": "sources/aeat/SRC-0023.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 14111,
+      "sha256": "c15cc1a0d09fda347329cbb8f305b3965390f729ebf468b588146160b99cf5c7",
+      "sha512": "a8efb83ae68e49e27532eef9fb885a4d784a99bc793f6425f0e1d66376de7853bf9c00016670f9c9ad79cbcbe3673275100ad8428791336f176e0224fef1a681",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0023-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "hash specification bytes",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": [
+        "SRC-0023"
+      ],
+      "sha256": null,
+      "sha512": null,
+      "bytes": null
+    },
+    {
+      "id": "SRC-0024",
+      "authority": "AEAT",
+      "role": "signature specification entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-tecnicas-firma-electronica-registros-evento.html",
+      "path": "sources/aeat/SRC-0024.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 14338,
+      "sha256": "46a4aedb85558b7225991af20d42c46bc4286b634a2fd917136a46d0977836fd",
+      "sha512": "fbd16de1e21c769c012c66286dd4b3faaa1edd2a8fab5fa9cbd8df29a8c898b725f165bd08f007aafb1974cfc37be24fc43ff1753b1ba7498fed8201adc90901",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0024-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "signature specification and examples",
+      "url": "https://sede.agenciatributaria.gob.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "PAYLOAD_NOT_EXPOSED_BY_CURRENT_INDEX",
+      "licence": null,
+      "dependsOn": [
+        "SRC-0024"
+      ],
+      "sha256": null,
+      "sha512": null,
+      "bytes": null
+    },
+    {
+      "id": "SRC-0025",
+      "authority": "AEAT",
+      "role": "QR and verification-service entry point",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/caracteristicas-qr-especificaciones-servicio-cotejo-factura.html",
+      "path": "sources/aeat/SRC-0025.html",
+      "mediaType": "text/html",
+      "status": "captured",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": [
+        "SRC-0017"
+      ],
+      "bytes": 14085,
+      "sha256": "c8438d176fbd5b6f6bc44b5d3f44e211543210a1f182c37b948b3f0e1b4ac7ab",
+      "sha512": "8bf31c39844f6c0dde9995a0a34dde41d00fb900c7b49ff0227fcbe5ed1ce8eef9bda0101737dd2e2b49eaf444c38d65ca246bca7477f23750d2e7093d254c5a",
+      "mode": 420,
+      "capturedRepresentation": "UTF-8 text committed as an immutable snapshot blob"
+    },
+    {
+      "id": "SRC-0025-PAYLOAD",
+      "authority": "AEAT developer host",
+      "role": "QR specification bytes",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "path": null,
+      "mediaType": "application/pdf",
+      "status": "blocked",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "licence": null,
+      "dependsOn": [
+        "SRC-0025"
+      ],
+      "sha256": null,
+      "sha512": null,
+      "bytes": null
+    }
+  ],
+  "blockedSources": [
+    {
+      "id": "SRC-0019-PAYLOAD",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/WSDL_de_los_servicios_web/WSDL_de_los_servicios_web.html"
+    },
+    {
+      "id": "SRC-0020-PAYLOAD",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Esquemas_de_los_servicios_web/Esquemas_de_los_servicios_web.html"
+    },
+    {
+      "id": "SRC-0021-PAYLOAD",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Validaciones_y_errores/Validaciones_y_errores.html"
+    },
+    {
+      "id": "SRC-0023-PAYLOAD",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf"
+    },
+    {
+      "id": "SRC-0024-PAYLOAD",
+      "blocker": "PAYLOAD_NOT_EXPOSED_BY_CURRENT_INDEX",
+      "url": "https://sede.agenciatributaria.gob.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/"
+    },
+    {
+      "id": "SRC-0025-PAYLOAD",
+      "blocker": "TLS_CERTIFICATE_CHAIN_UNAVAILABLE",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf"
+    }
+  ],
+  "closure": {
+    "complete": false,
+    "requiredBeforeActivation": [
+      "SRC-0019-PAYLOAD",
+      "SRC-0020-PAYLOAD",
+      "SRC-0021-PAYLOAD",
+      "SRC-0023-PAYLOAD",
+      "SRC-0024-PAYLOAD",
+      "SRC-0025-PAYLOAD"
+    ],
+    "creationAllowed": false,
+    "verificationAllowed": true
+  }
+}

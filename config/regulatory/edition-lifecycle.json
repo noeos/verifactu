@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "states": [
+    "discovered",
+    "imported",
+    "generated-unverified",
+    "candidate",
+    "approved",
+    "active",
+    "sunset",
+    "historical",
+    "blocked",
+    "revoked-for-generation"
+  ],
+  "creationRule": "only active with non-null approval and zero blockers",
+  "verificationRule": "historical, sunset and revoked editions may verify; no non-active edition may create",
+  "current": {
+    "editionId": "rrsif-2026-09-21-observed-candidate",
+    "state": "blocked",
+    "immutable": true,
+    "creationAllowed": false,
+    "verificationAllowed": true,
+    "blockers": [
+      "SRC-0019-PAYLOAD",
+      "SRC-0020-PAYLOAD",
+      "SRC-0021-PAYLOAD",
+      "SRC-0023-PAYLOAD",
+      "SRC-0024-PAYLOAD",
+      "SRC-0025-PAYLOAD"
+    ],
+    "approval": null
+  },
+  "transitions": {
+    "discovered": ["imported", "blocked"],
+    "imported": ["generated-unverified", "blocked"],
+    "generated-unverified": ["candidate", "blocked"],
+    "candidate": ["approved", "blocked", "revoked-for-generation"],
+    "approved": ["active", "sunset", "revoked-for-generation"],
+    "active": ["sunset", "historical", "revoked-for-generation"],
+    "sunset": ["historical", "revoked-for-generation"],
+    "blocked": ["imported", "revoked-for-generation"],
+    "historical": [],
+    "revoked-for-generation": ["historical"]
+  }
+}
