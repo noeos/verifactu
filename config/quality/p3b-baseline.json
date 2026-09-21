@@ -89,6 +89,11 @@
       "denominator": 12,
       "requiredPercent": 100
     },
+    "editionPointerFaultCases": {
+      "selector": "current edition/lifecycle/vector/artifact-registry pointer faults",
+      "denominator": 5,
+      "requiredPercent": 100
+    },
     "privacyCases": {
       "selector": "diagnostic redaction probes",
       "denominator": 12,

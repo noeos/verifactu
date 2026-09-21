@@ -77,11 +77,10 @@ generation is forbidden.
 
 ## Baseline edition state
 
-P3 has created immutable snapshot
-`rrsif-2026-09-21-observed` and candidate
-`rrsif-2026-09-21-observed-candidate`. The candidate is blocked and
-verification-only: its approval is `null`, its `creationAllowed` flag is
-`false`, and six required AEAT payload authorities remain explicitly mapped in
-the lifecycle manifest. No active edition exists and no fiscal artifact
-creation is available. The generated envelope is metadata-only until the
-authoritative dependency graph is complete.
+P3 created the retained immutable snapshot `rrsif-2026-09-21-observed` and its
+blocked candidate. P3-B subsequently admitted the complete immutable snapshot
+`rrsif-2026-09-21-authoritative` and generated the current
+`rrsif-2026-09-21-authoritative-candidate`. Its source graph is complete, but it
+remains verification-only: approval is `null`, `creationAllowed` is `false` and
+no active edition exists. Fiscal creation remains unavailable until an explicit
+authorized lifecycle transition; source completeness alone is not activation.

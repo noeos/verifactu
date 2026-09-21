@@ -34,10 +34,12 @@ or state. The expected diagnostic and rejection layer are explicit.
 
 ## Initial oracle state
 
-P3 now provides an offline Python oracle and hostile XML parser, official
+P3-B provides an offline Python oracle and hostile XML parser, official
 entry-point vectors, synthetic boundary/compatibility vectors and five seeded
 adversarial fixtures. The oracle recomputes source SHA-256/SHA-512 identities,
 checks generated output provenance and detects deliberate baseline corruption;
 it does not import the Node generator or claim legal/organizational
-independence. The six missing AEAT payloads remain a mapped blocker, so no
-fiscal or protocol claim is evidence-complete.
+independence. The authoritative snapshot closes all 27 source-custody edges.
+Its generated candidate remains `creationAllowed=false`; P4 must add the
+independent fiscal, format and cryptographic vectors before those claims can be
+evidence-complete.
