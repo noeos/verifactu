@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "REGULATORY-SOURCE-OBSERVATION-0001",
+  "policy": {
+    "tls": "platform-default verification; no bypass or weakened policy",
+    "redirects": 0,
+    "timeoutSeconds": 30,
+    "maximumBytes": 10485760,
+    "retention": "private CI artifact pending licence and authority admission"
+  },
+  "targets": [
+    {
+      "id": "wsdl",
+      "source": "SRC-0019-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SistemaFacturacion.wsdl",
+      "file": "SistemaFacturacion.wsdl"
+    },
+    {
+      "id": "xsd-suministro-lr",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SuministroLR.xsd",
+      "file": "SuministroLR.xsd"
+    },
+    {
+      "id": "xsd-respuesta-suministro",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/RespuestaSuministro.xsd",
+      "file": "RespuestaSuministro.xsd"
+    },
+    {
+      "id": "xsd-consulta-lr",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/ConsultaLR.xsd",
+      "file": "ConsultaLR.xsd"
+    },
+    {
+      "id": "xsd-respuesta-consulta-lr",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/RespuestaConsultaLR.xsd",
+      "file": "RespuestaConsultaLR.xsd"
+    },
+    {
+      "id": "xsd-suministro-informacion",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SuministroInformacion.xsd",
+      "file": "SuministroInformacion.xsd"
+    },
+    {
+      "id": "xsd-eventos-sif",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/EventosSIF.xsd",
+      "file": "EventosSIF.xsd"
+    },
+    {
+      "id": "xsd-respuesta-validacion-no-verifactu",
+      "source": "SRC-0020-PAYLOAD",
+      "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/RespuestaValRegistNoVeriFactu.xsd",
+      "file": "RespuestaValRegistNoVeriFactu.xsd"
+    },
+    {
+      "id": "validation-errors",
+      "source": "SRC-0021-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Validaciones_Errores_Veri-Factu.pdf",
+      "file": "Validaciones_Errores_Veri-Factu.pdf"
+    },
+    {
+      "id": "hash-specification",
+      "source": "SRC-0023-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "file": "Veri-Factu_especificaciones_huella_hash_registros.pdf"
+    },
+    {
+      "id": "signature-specification",
+      "source": "SRC-0024-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Espec-Tecnicas/EspecTecGenerFirmaElectRfact.pdf",
+      "file": "EspecTecGenerFirmaElectRfact.pdf"
+    },
+    {
+      "id": "signature-index",
+      "source": "SRC-0024-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion.html",
+      "file": "signature-index.html"
+    },
+    {
+      "id": "qr-specification",
+      "source": "SRC-0025-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "file": "DetalleEspecificacTecnCodigoQRfactura.pdf"
+    }
+  ]
+}
