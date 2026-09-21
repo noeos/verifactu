@@ -82,6 +82,12 @@
       "file": "signature-index.html"
     },
     {
+      "id": "signature-examples",
+      "source": "SRC-0024-PAYLOAD",
+      "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/Espec-Tecnicas/AnexosEjemplosFirmaRegFact.zip",
+      "file": "AnexosEjemplosFirmaRegFact.zip"
+    },
+    {
       "id": "qr-specification",
       "source": "SRC-0025-PAYLOAD",
       "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
