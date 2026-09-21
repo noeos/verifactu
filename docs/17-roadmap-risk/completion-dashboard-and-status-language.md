@@ -23,8 +23,8 @@ cannot edit underlying status or hide blocked work.
 
 ## Current scoped status
 
-P1 and P2 are evidence-complete at their protected recovery points. P3 source
-custody has a successor authoritative snapshot and candidate contract, and P3-B
-is active pending its protected exact-subject closure/read-back. P4–P8 remain
-planned. `creationAllowed=false` and no fiscal-compliance, AEAT-acceptance,
-publication or release claim is made.
+P1, P2, P3 and the mandatory P3-B pre-P4 assurance gate are evidence-complete
+at their protected recovery points. P4 is ready to begin only under
+`P3B-BASELINE-0001` and its first-commit policies; P4–P8 remain unimplemented.
+`creationAllowed=false` and no fiscal-compliance, AEAT-acceptance, publication
+or release claim is made.

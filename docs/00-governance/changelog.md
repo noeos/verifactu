@@ -26,5 +26,11 @@ changelog and makes no compliance, publication or support claim.
   dispositions and P4 first-commit quality policies are canonical and
   fail-closed.
 - Fiscal runtime implementation remains absent. The candidate remains
-  `creationAllowed=false`; P4 is authorized only after the dedicated P3-B
-  handoff/read-back PR is protected and green.
+  `creationAllowed=false`; P4 is authorized only under the frozen first-commit
+  controls after protected handoff PR `#33` and forward-correction/read-back PR
+  `#34` are green on their exact required subjects.
+- PR `#33`'s protected squash retained a literal escaped newline instead of a
+  canonical DCO trailer, and its protected-push governance check failed. The
+  required closure check consequently failed. Both failed results are retained;
+  PR `#34` forward-corrects the latest protected subject with a canonical
+  signed-off trailer and reruns the complete matrix.

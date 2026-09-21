@@ -27,13 +27,13 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The current execution is the mandatory P3-B sequence entered from protected P3
-read-back `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`. The current context capsule,
-phase ledger and [`p3b-evidence.md`](p3b-evidence.md) are authoritative for
-resumption. Later P4–P7 sections are
-preserved records from prior attempts and are explicitly superseded; they do
-not establish current implementation, evidence, phase status or permission to
-start P4.
+The current execution has completed the mandatory P3-B sequence entered from
+protected P3 read-back `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`.
+The current context capsule, phase ledger and
+[`p3b-evidence.md`](p3b-evidence.md) are authoritative for resumption. Later
+P4–P7 sections are preserved records from prior attempts and are explicitly
+superseded; they do not establish current implementation or evidence. P4 may
+begin only under the frozen first-commit controls recorded by this closure.
 
 ## Historical initial baseline control — retained
 
@@ -81,21 +81,21 @@ unknown evidence is `blocked`, never `passed`.
 This capsule is intentionally short and MUST be refreshed by the active phase.
 Historical detail belongs in phase records below.
 
-| Field                        | Initial value                                                                                                                                                                                 |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                    |
-| Current phase                | P3-B assurance is active; P4 remains prohibited.                                                                                                                                              |
-| Phase status                 | Authoritative payload custody is resolved; source/contract/oracle corrections are local closure-candidate work pending protected PR and exact-subject read-back.                              |
-| Last evidence-complete phase | P1 at protected recovery point `93d92ca131be93f9430ae13ddc384e471c74cdaa`.                                                                                                                    |
-| Local repository             | Deterministic P2 foundation plus corrected authoritative P3 source custody, structural candidate contracts, independent oracle and P3-B assurance; no fiscal behavior or release claim.       |
-| Protected `main` SHA         | `9e27bf377d07d93fe5faa448eb4ff907b7f21182`; P3-B source-observation prerequisite merged by protected PR `#31`; later local work is not yet protected evidence.                                |
-| GitHub effective state       | Rulesets `23705155`/`23705170` remain active with no bypass; all 17 App `15368` contexts are required. The exact final authenticated read-back is recorded in the current P2 closure section. |
-| Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                  |
-| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                |
-| Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                              |
-| Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                         |
-| External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                     |
-| Immediate instruction        | Complete P3-B locally, merge through signed+DCO protected PR, rerun all 17 contexts and perform exact final-main read-back; do not start P4 or enable fiscal creation.                        |
+| Field                        | Initial value                                                                                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                       |
+| Current phase                | P3-B assurance is evidence-complete; P4 is ready under the frozen first-commit policies and remains unimplemented.                                                                               |
+| Phase status                 | Protected source/contract/oracle assurance and exact-subject handoff/read-back are complete; no P4 fiscal runtime exists.                                                                        |
+| Last evidence-complete phase | P3-B, through protected handoff PR `#33`, retained failed push evidence and forward-correction/read-back PR `#34`.                                                                               |
+| Local repository             | Deterministic P2 foundation plus corrected authoritative P3 source custody, structural candidate contracts, independent oracle and P3-B assurance; no fiscal behavior or release claim.          |
+| Protected `main` SHA         | P3-B handoff squash `f6614f8d1ebd17c12e11d0149803d002e201c13e`; final forward-correction/read-back subject is the protected result of PR `#34` and its authenticated API audit.                  |
+| GitHub effective state       | Rulesets `23705155`/`23705170` are active with zero bypass; all 17 strict contexts are bound to App `15368`. PR `#34` restores canonical DCO and must pass its exact-head and final-main matrix. |
+| Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                     |
+| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                   |
+| Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                                 |
+| Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                            |
+| External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                        |
+| Immediate instruction        | Begin P4 only by consuming `P3B-BASELINE-0001` and every `p4FirstCommitPolicies` threshold in its first commit; keep fiscal creation disabled until later gates authorize it.                    |
 
 ## Phase ledger
 
@@ -104,7 +104,7 @@ Historical detail belongs in phase records below.
 | P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10`  | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved.      |
 | P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`       | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b` | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30` | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
-| P3-B  | active            | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | —                                          | `#31`+TBD   | Payload observation prerequisite merged; full assurance correction and exact-subject closure are in progress.            |
+| P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | protected PR `#34` result                  | `#31`–`#34` | Source observation, implementation, handoff, retained DCO failure and protected forward-correction/read-back complete.   |
 | P4    | planned           | P3-B closure required                      | —                                          | —           | Deterministic fiscal core and verification boundaries.                                                                   |
 | P5    | planned           | P4 closure required                        | —                                          | —           | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
 | P6    | planned           | P5 closure required                        | —                                          | —           | Public products and ecosystem conformance.                                                                               |
@@ -113,12 +113,11 @@ Historical detail belongs in phase records below.
 
 ## Current working record
 
-P1–P3 are evidence-complete at their recorded protected points. P3-B corrects
-the formerly blocked source graph and executes the pre-P4 assurance campaign;
-its local result is not protected closure evidence. No P4 source or fiscal
-behavior is admitted. The next operational action is protected implementation
-merge followed by dedicated P3-B handoff/read-back with exact final-main
-identity and all required contexts.
+P1–P3 and P3-B are evidence-complete at their recorded protected points. P3-B
+corrected the formerly blocked source graph and executed the pre-P4 assurance
+campaign. No P4 source or fiscal behavior is admitted. The next operational
+action is the first bounded P4 commit under the canonical P3-B policies; any
+missing denominator, skipped cell, lowered threshold or stale subject blocks it.
 
 ## Required phase-record schema
 
@@ -2699,3 +2698,39 @@ Canonical configuration/evidence digests at that subject are baseline
   consume `P3B-BASELINE-0001` and all `p4FirstCommitPolicies`; it may not lower a
   threshold or reuse a stale subject. P3-B grants no compliance, AEAT acceptance,
   publication or release claim.
+
+### Protected handoff and forward-correction read-back
+
+The preceding closure-candidate did not become evidence-complete at PR `#33`'s
+first protected squash. This append-only amendment is authoritative where the
+candidate language above conflicts with the observed protected result.
+
+- PR `#33` final head `e82225b8a332d27ce934609b43e6f1ba0249f115`, tree
+  `dbb8d4f7bb8bfee8ec9a0698815688ee947700e4`, had two commits. GitHub verified
+  both SSH signatures and both canonical DCO trailers. Its exact-head matrix
+  passed 26/26 check-runs from App `15368`, including closure job
+  `106399989088` in run `35619629851`.
+- Protected squash `f6614f8d1ebd17c12e11d0149803d002e201c13e` has exact
+  tree `dbb8d4f7bb8bfee8ec9a0698815688ee947700e4`, sole parent
+  `ccc2b8decdbcdee58bdbfc5dd13209d47e1a9231` and a valid GitHub signature.
+  GitHub auto-deleted the source branch.
+- The merge API request escaped its intended line breaks. The squash message
+  therefore contains literal `\\n` bytes before `Signed-off-by:` rather than a
+  canonical trailer. Required protected-push job `106400357801` in run
+  `35619996738` failed for that exact subject, and closure job `106401978019`
+  consequently failed. The final protected-push matrix was 23/25 successful and
+  2/25 failed. Both failed results are retained and neither is counted as
+  closure success.
+- PR `#34` is the forward correction and final read-back. Its own commits must
+  be SSH-signed with canonical DCO, all 17 exact App `15368` contexts plus every
+  auxiliary check must pass on its final head, and its protected squash request
+  must encode real line breaks and retain a canonical DCO trailer.
+- P3-B becomes evidence-complete only if PR `#34` merges through the active
+  zero-bypass ruleset and every final protected-main check, including governance
+  and required-check closure, passes. The authenticated post-merge API read-back
+  supplies the non-self-referential final squash, tree, parent and run IDs.
+
+This correction changes no source snapshot, generated contract, denominator,
+threshold or P4 policy and implements no P4 runtime. It restores governance of
+the newest protected subject and reruns all evidence invalidated by the new
+documentation subject.

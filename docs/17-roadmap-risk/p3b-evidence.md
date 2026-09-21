@@ -1,7 +1,7 @@
 ---
 id: ROADMAP-DOC-0023
 title: P3-B pre-P4 assurance evidence
-status: active
+status: approved
 authority: normative
 owner: assurance-owner
 created: 2026-09-21
@@ -13,9 +13,11 @@ historical-inputs: [REV-001, REV-084]
 
 # P3-B pre-P4 assurance evidence
 
-This is the human read-back of the machine baseline and campaign. It does not
-authorize P4 until a signed+DCO protected closure PR and final-main audit bind
-all evidence to the exact protected subject.
+This is the human read-back of the machine baseline and campaign. Protected
+handoff PR `#33` supplied the exact-head matrix; forward-correction/read-back PR
+`#34` restores canonical DCO on the newest protected subject and binds final
+evidence through its authenticated post-merge audit. Only that completed chain
+authorizes the first bounded P4 commit under the policies below.
 
 ## Declared baseline before interpretation
 
@@ -59,3 +61,15 @@ remain open rather than being converted into false passes. Coverage, mutation,
 property, fuzz, fault/recovery, performance and compatibility denominators for
 the first P4 commit are canonical in the baseline and become mandatory as soon
 as P4 production code exists.
+
+## Protected read-back disposition
+
+PR `#33` passed 26/26 exact-head checks, but its protected squash encoded the
+requested DCO line with literal escaped newlines. The protected-push governance
+job failed and required-check closure consequently failed; the exact 23/25
+successful, 2/25 failed matrix is retained as failed evidence. PR `#34` is the
+append-only forward correction: its commits and squash require canonical DCO,
+its exact PR head must pass all required and auxiliary jobs, and its
+protected-main subject must pass governance, closure and the complete post-push
+matrix. The final API read-back records that non-self-referential subject; no
+#33 push evidence is relabelled as success.
