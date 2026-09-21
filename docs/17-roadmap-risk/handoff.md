@@ -81,43 +81,44 @@ unknown evidence is `blocked`, never `passed`.
 This capsule is intentionally short and MUST be refreshed by the active phase.
 Historical detail belongs in phase records below.
 
-| Field                        | Initial value                                                                                                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                       |
-| Current phase                | P3-B assurance is evidence-complete; P4 is ready under the frozen first-commit policies and remains unimplemented.                                                                               |
-| Phase status                 | Protected source/contract/oracle assurance and exact-subject handoff/read-back are complete; no P4 fiscal runtime exists.                                                                        |
-| Last evidence-complete phase | P3-B, through protected handoff PR `#33`, retained failed push evidence and forward-correction/read-back PR `#34`.                                                                               |
-| Local repository             | Deterministic P2 foundation plus corrected authoritative P3 source custody, structural candidate contracts, independent oracle and P3-B assurance; no fiscal behavior or release claim.          |
-| Protected `main` SHA         | P3-B handoff squash `f6614f8d1ebd17c12e11d0149803d002e201c13e`; final forward-correction/read-back subject is the protected result of PR `#34` and its authenticated API audit.                  |
-| GitHub effective state       | Rulesets `23705155`/`23705170` are active with zero bypass; all 17 strict contexts are bound to App `15368`. PR `#34` restores canonical DCO and must pass its exact-head and final-main matrix. |
-| Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                     |
-| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                   |
-| Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                                 |
-| Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                            |
-| External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                        |
-| Immediate instruction        | Begin P4 only by consuming `P3B-BASELINE-0001` and every `p4FirstCommitPolicies` threshold in its first commit; keep fiscal creation disabled until later gates authorize it.                    |
+| Field                        | Initial value                                                                                                                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                               |
+| Current phase                | P4 pre-implementation quality readiness is active; fiscal implementation has not started.                                                                                                |
+| Phase status                 | P3-B is evidence-complete; exact P4 populations, critical decisions/mutants, campaigns, compatibility cells and budgets are declared and await protected publication before wave P4-A.   |
+| Last evidence-complete phase | P3-B, including authoritative-edition pointer correction and five seeded recurrence faults through protected PR `#38`.                                                                   |
+| Local repository             | Deterministic P2 foundation, authoritative P3 source custody/contracts/oracle, P3-B assurance and P4 quality-plan candidate; no fiscal behavior or release claim.                        |
+| Protected `main` SHA         | `999d78c19b0e1be3097201a0cc61947a10760bbe`, protected squash of PR `#38`, with 17/17 protected-push required checks successful.                                                          |
+| GitHub effective state       | Rulesets `23705155`/`23705170` are active with zero bypass; all 17 strict contexts are bound to App `15368`; PR `#38` and its protected-main subject passed complete closure.            |
+| Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                             |
+| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                           |
+| Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                         |
+| Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                    |
+| External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                |
+| Immediate instruction        | Publish `P4-QUALITY-PLAN-0001` through protected issue `#36`; only then begin P4-A with its implementation, tests and evidence together. Keep fiscal creation disabled until authorized. |
 
 ## Phase ledger
 
-| Phase | Status            | Input `main`                               | Closure `main`                             | Closure PR  | Summary                                                                                                                  |
-| ----- | ----------------- | ------------------------------------------ | ------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------ |
-| P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10`  | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved.      |
-| P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`       | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
-| P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b` | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30` | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
-| P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | protected PR `#34` result                  | `#31`–`#34` | Source observation, implementation, handoff, retained DCO failure and protected forward-correction/read-back complete.   |
-| P4    | planned           | P3-B closure required                      | —                                          | —           | Deterministic fiscal core and verification boundaries.                                                                   |
-| P5    | planned           | P4 closure required                        | —                                          | —           | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
-| P6    | planned           | P5 closure required                        | —                                          | —           | Public products and ecosystem conformance.                                                                               |
-| P7    | planned           | P6 closure required                        | —                                          | —           | Whole-product assurance, external validation and release rehearsal.                                                      |
-| P8    | planned           | P7 closure required                        | —                                          | —           | Stable publication, verification and support.                                                                            |
+| Phase | Status            | Input `main`                               | Closure `main`                             | Closure PR  | Summary                                                                                                                   |
+| ----- | ----------------- | ------------------------------------------ | ------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10`  | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved.       |
+| P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`       | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete.  |
+| P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b` | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30` | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.         |
+| P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#38` | Source observation, assurance, handoff/read-back and authoritative-edition pointer correction complete.                   |
+| P4    | active            | `999d78c19b0e1be3097201a0cc61947a10760bbe` | —                                          | —           | Pre-implementation quality population is declared; deterministic fiscal core and verification boundaries remain to build. |
+| P5    | planned           | P4 closure required                        | —                                          | —           | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                            |
+| P6    | planned           | P5 closure required                        | —                                          | —           | Public products and ecosystem conformance.                                                                                |
+| P7    | planned           | P6 closure required                        | —                                          | —           | Whole-product assurance, external validation and release rehearsal.                                                       |
+| P8    | planned           | P7 closure required                        | —                                          | —           | Stable publication, verification and support.                                                                             |
 
 ## Current working record
 
 P1–P3 and P3-B are evidence-complete at their recorded protected points. P3-B
-corrected the formerly blocked source graph and executed the pre-P4 assurance
-campaign. No P4 source or fiscal behavior is admitted. The next operational
-action is the first bounded P4 commit under the canonical P3-B policies; any
-missing denominator, skipped cell, lowered threshold or stale subject blocks it.
+corrected the formerly blocked source graph, executed the pre-P4 assurance
+campaign and closed stale edition pointers. P4 now has a pre-implementation
+quality-plan candidate but no fiscal behavior. Its protected publication must
+precede wave P4-A; every work package then supplies its mapped tests and evidence
+without a missing denominator, skipped cell, lowered threshold or stale subject.
 
 ## Required phase-record schema
 

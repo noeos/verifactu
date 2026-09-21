@@ -6,12 +6,12 @@
   "populations": {
     "documentationFiles": {
       "selector": "docs/**/*",
-      "denominator": 539,
+      "denominator": 540,
       "requiredPercent": 100
     },
     "markdownDocuments": {
       "selector": "docs/**/*.md",
-      "denominator": 536,
+      "denominator": 537,
       "requiredPercent": 100
     },
     "historicalFindings": {
