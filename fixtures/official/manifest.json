@@ -1,11 +1,29 @@
 {
   "schemaVersion": 1,
-  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
   "authority": "AEAT/BOE captured entry-point bytes",
   "vectors": [
-    {"id":"OFF-INDEX-001","sourceId":"SRC-0017","sourceSha256":"41d50e31dd1afe09e17ef6a6b150a88bc9c05b36526c2e4b29320efd4c7ae534","claim":"technical index enumerates WSDL, schemas, validations, hash, signature and QR sections","expected":"entry-point-links-retained"},
-    {"id":"OFF-HASH-001","sourceId":"SRC-0023","sourceSha256":"c15cc1a0d09fda347329cbb8f305b3965390f729ebf468b588146160b99cf5c7","claim":"hash specification has an authoritative AEAT entry point","expected":"entry-point-retained"},
-    {"id":"OFF-QR-001","sourceId":"SRC-0025","sourceSha256":"c8438d176fbd5b6f6bc44b5d3f44e211543210a1f182c37b948b3f0e1b4ac7ab","claim":"QR specification has an authoritative AEAT entry point","expected":"entry-point-retained"}
+    {
+      "id": "OFF-INDEX-001",
+      "sourceId": "SRC-0017",
+      "sourceSha256": "6b4a5cf333196747fb0029de3ceac2dcf9601dcff230d2cbe6e705e38c6217a9",
+      "claim": "technical index enumerates WSDL, schemas, validations, hash, signature and QR sections",
+      "expected": "entry-point-links-retained"
+    },
+    {
+      "id": "OFF-HASH-001",
+      "sourceId": "SRC-0023",
+      "sourceSha256": "bcb8d0056b7db10290d5807537d01fdac6d6c02312cf7948c370a53f052dd189",
+      "claim": "hash specification has an authoritative AEAT entry point",
+      "expected": "entry-point-retained"
+    },
+    {
+      "id": "OFF-QR-001",
+      "sourceId": "SRC-0025",
+      "sourceSha256": "a7dfe4c954b45e18585cafc5b3e3dc15ea41b074d8f1e3968244db555f44d085",
+      "claim": "QR specification has an authoritative AEAT entry point",
+      "expected": "entry-point-retained"
+    }
   ],
-  "note": "Official entry pages are not substitutes for the linked technical payloads; blocked payload edges remain explicit."
+  "note": "Official entry pages are not substitutes for the separately retained linked technical payloads; every behavioral claim must identify the exact source artifact it uses."
 }

@@ -57,6 +57,24 @@ const licenseEvidence = JSON.parse(
     "utf8",
   ),
 );
+const editionLifecycle = JSON.parse(
+  await readFile(
+    resolve(root, "config/regulatory/edition-lifecycle.json"),
+    "utf8",
+  ),
+);
+const artifactRegistry = JSON.parse(
+  await readFile(resolve(root, "config/repository/artifacts.json"), "utf8"),
+);
+const officialFixtures = JSON.parse(
+  await readFile(resolve(root, "fixtures/official/manifest.json"), "utf8"),
+);
+const syntheticFixtures = JSON.parse(
+  await readFile(
+    resolve(root, "fixtures/synthetic/regulatory-vectors.json"),
+    "utf8",
+  ),
+);
 
 const sha = (value) => createHash("sha256").update(value).digest("hex");
 const canonical = (value) => {
@@ -199,6 +217,102 @@ const custodyPredicate = (candidate) =>
   candidate.sources.every(
     (source) => /^[a-f0-9]{64}$/u.test(source.sha256) && source.bytes > 0,
   );
+const currentEditionPointersValid = (
+  lifecycle,
+  generated,
+  official,
+  synthetic,
+  artifacts,
+) => {
+  const editionId = lifecycle.current.editionId;
+  const sources = new Map(
+    manifest.sources.map((source) => [source.id, source.sha256]),
+  );
+  return (
+    editionId === manifest.editionId &&
+    editionId === generated.editionId &&
+    editionId === official.editionId &&
+    editionId === synthetic.editionId &&
+    lifecycle.current.creationAllowed === false &&
+    official.vectors.every(
+      (vector) => sources.get(vector.sourceId) === vector.sourceSha256,
+    ) &&
+    artifacts.classes.some(
+      (entry) =>
+        entry.pattern === `editions/${editionId}/generated/**` &&
+        entry.class === "generated" &&
+        entry.producer === "contract:generation",
+    )
+  );
+};
+const validCurrentEditionPointers = () =>
+  currentEditionPointersValid(
+    editionLifecycle,
+    generation,
+    officialFixtures,
+    syntheticFixtures,
+    artifactRegistry,
+  );
+const runEditionPointerFaults = () => {
+  const mutations = [
+    [
+      {
+        ...editionLifecycle,
+        current: { ...editionLifecycle.current, editionId: "stale" },
+      },
+      generation,
+      officialFixtures,
+      syntheticFixtures,
+      artifactRegistry,
+    ],
+    [
+      editionLifecycle,
+      { ...generation, editionId: "stale" },
+      officialFixtures,
+      syntheticFixtures,
+      artifactRegistry,
+    ],
+    [
+      editionLifecycle,
+      generation,
+      { ...officialFixtures, editionId: "stale" },
+      syntheticFixtures,
+      artifactRegistry,
+    ],
+    [
+      editionLifecycle,
+      generation,
+      {
+        ...officialFixtures,
+        vectors: officialFixtures.vectors.map((vector, index) =>
+          index === 0 ? { ...vector, sourceSha256: "0".repeat(64) } : vector,
+        ),
+      },
+      syntheticFixtures,
+      artifactRegistry,
+    ],
+    [
+      editionLifecycle,
+      generation,
+      officialFixtures,
+      syntheticFixtures,
+      {
+        ...artifactRegistry,
+        classes: artifactRegistry.classes.filter(
+          (entry) => !entry.pattern.includes("authoritative-candidate"),
+        ),
+      },
+    ],
+  ];
+  const passed = mutations.filter(
+    (values) => !currentEditionPointersValid(...values),
+  ).length;
+  return {
+    denominator: mutations.length,
+    passed,
+    percent: (passed / mutations.length) * 100,
+  };
+};
 const runFaults = () => {
   const mutations = Array.from({ length: 12 }, () => structuredClone(manifest));
   mutations[0].closure.complete = false;
@@ -332,6 +446,7 @@ const metrics = {
   propertyCases: runProperties().passed,
   fuzzCases: runFuzz().passed,
   faultCases: runFaults().passed,
+  editionPointerFaultCases: runEditionPointerFaults().passed,
   privacyCases: privacyPassed,
   compatibilityCells: compatibility.length,
 };
@@ -363,7 +478,10 @@ const critical = {
     new Set(disposedRevs).size === 84 &&
     [...expectedRevs].every((id) => disposedRevs.includes(id)) &&
     !corpus.includes("No implementation phase has started"),
-  "official-source-custody": custodyPredicate(manifest),
+  "official-source-custody":
+    custodyPredicate(manifest) &&
+    validCurrentEditionPointers() &&
+    metrics.editionPointerFaultCases === 5,
   "deterministic-contract-generation": new Set(outputDigests).size === 1,
   "independent-oracle":
     oracle.status === "passed" && oracleCampaign.status === "passed",
@@ -439,6 +557,7 @@ const result = {
     property: runProperties(),
     fuzz: runFuzz(),
     fault: runFaults(),
+    editionPointers: runEditionPointerFaults(),
     privacy: {
       denominator: 12,
       passed: privacyPassed,

@@ -51,6 +51,19 @@
       "committed": true
     },
     {
+      "pattern": "editions/rrsif-2026-09-21-authoritative-candidate/generated/**",
+      "class": "generated",
+      "producer": "contract:generation",
+      "inputs": [
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/**",
+        "config/regulatory/source-plan-p3b.json",
+        "config/regulatory/semantic-rules-p3b.json"
+      ],
+      "toolProfile": "primary",
+      "cleanRegeneration": true,
+      "committed": true
+    },
+    {
       "pattern": "evidence/runs/prepared/**",
       "class": "vendored-immutable-input",
       "producer": "prepare:external-inputs",

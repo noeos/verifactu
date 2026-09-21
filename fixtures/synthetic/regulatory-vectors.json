@@ -1,11 +1,31 @@
 {
   "schemaVersion": 1,
-  "editionId": "rrsif-2026-09-21-observed-candidate",
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
   "independence": "literal expected metadata and boundary diagnostics; not legal evidence",
   "vectors": [
-    {"id":"SYN-REG-001","class":"boundary","input":{"creationAllowed":false},"expected":{"accepted":true,"diagnostic":"EDITION_NOT_ACTIVE"}},
-    {"id":"SYN-REG-002","class":"adversarial","input":{"source":"../../outside"},"expected":{"accepted":false,"diagnostic":"PATH_TRAVERSAL"}},
-    {"id":"SYN-REG-003","class":"compatibility","input":{"runtimeNetwork":"denied"},"expected":{"accepted":true,"diagnostic":null}},
-    {"id":"SYN-REG-004","class":"negative","input":{"blockedSource":"SRC-0020-PAYLOAD"},"expected":{"accepted":false,"diagnostic":"SOURCE_GRAPH_INCOMPLETE"}}
+    {
+      "id": "SYN-REG-001",
+      "class": "boundary",
+      "input": { "creationAllowed": false },
+      "expected": { "accepted": true, "diagnostic": "EDITION_NOT_ACTIVE" }
+    },
+    {
+      "id": "SYN-REG-002",
+      "class": "adversarial",
+      "input": { "source": "../../outside" },
+      "expected": { "accepted": false, "diagnostic": "PATH_TRAVERSAL" }
+    },
+    {
+      "id": "SYN-REG-003",
+      "class": "compatibility",
+      "input": { "runtimeNetwork": "denied" },
+      "expected": { "accepted": true, "diagnostic": null }
+    },
+    {
+      "id": "SYN-REG-004",
+      "class": "negative",
+      "input": { "blockedSource": "SRC-0020-PAYLOAD" },
+      "expected": { "accepted": false, "diagnostic": "SOURCE_GRAPH_INCOMPLETE" }
+    }
   ]
 }

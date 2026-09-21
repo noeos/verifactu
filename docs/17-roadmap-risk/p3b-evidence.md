@@ -42,7 +42,8 @@ It traverses P1–P3 task closure and additionally proves: complete-corpus and
 REV disposition; source dual digests and transitive custody; deterministic
 offline generation; independent Python recount and six seeded mutants; five
 material parser negatives; 1,024 canonicalization properties; 512 hostile XML
-mutations; 12 custody faults; 12 privacy probes; three deterministic recovery/
+mutations; 12 custody faults; five current-edition pointer faults; 12 privacy
+probes; three deterministic recovery/
 performance repetitions; lock, licence and full-SHA Action admission; dual SBOM
 reconciliation; provenance, two-build reproducibility; and the five-cell
 Ubuntu/Windows/macOS Node compatibility declaration. Protected CI supplies the
