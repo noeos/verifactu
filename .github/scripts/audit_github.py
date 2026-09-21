@@ -22,6 +22,13 @@ REQUIRED_CONTEXTS = {
         (ROOT / "config/ci/required-checks.json").read_text(encoding="utf-8")
     )["checks"]
 }
+DESIRED_STATE = json.loads(
+    (ROOT / ".github/policy/github-desired-state.json").read_text(encoding="utf-8")
+)
+EXPECTED_WORKFLOWS = {
+    (item["name"], item["path"], item["state"])
+    for item in DESIRED_STATE["workflows"]
+}
 
 
 def api(endpoint: str) -> dict[str, Any]:
@@ -166,7 +173,11 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
     for key, expected in {"enabled": True, "allowed_actions": "selected", "sha_pinning_required": True}.items():
         check(rows, f"actions.{key}", expected, actions.get(key))
     selected = observed[f"repos/{REPO}/actions/permissions/selected-actions"]["body"] or {}
-    for key, expected in {"github_owned_allowed": True, "verified_allowed": False, "patterns_allowed": []}.items():
+    for key, expected in {
+        "github_owned_allowed": True,
+        "verified_allowed": False,
+        "patterns_allowed": DESIRED_STATE["actions"]["patternsAllowed"],
+    }.items():
         check(rows, f"actions.selected.{key}", expected, selected.get(key))
     workflow = observed[f"repos/{REPO}/actions/permissions/workflow"]["body"] or {}
     check(rows, "actions.default_workflow_permissions", "read", workflow.get("default_workflow_permissions"))
@@ -244,22 +255,27 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
 
     workflows = observed[f"repos/{REPO}/actions/workflows?per_page=100"]["body"] or {}
     workflow_rows = workflows.get("workflows", [])
-    check(
-        rows,
-        "workflows.exact",
-        sorted([
-            ("Required engineering foundation", ".github/workflows/required.yml", "active"),
-            ("Dependabot Updates", "dynamic/dependabot/dependabot-updates", "active"),
-        ]),
-        sorted((item.get("name"), item.get("path"), item.get("state")) for item in workflow_rows),
-    )
+    check(rows, "workflows.exact", EXPECTED_WORKFLOWS, {
+        (item.get("name"), item.get("path"), item.get("state")) for item in workflow_rows
+    })
     checks = observed[f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100"]["body"] or {}
     producers = {(item.get("name"), (item.get("app") or {}).get("id"), item.get("conclusion")) for item in checks.get("check_runs", []) if item.get("name") in REQUIRED_CONTEXTS}
     check(rows, "checks.required_producers", {(name, 15368, "success") for name in REQUIRED_CONTEXTS}, producers)
     runs = observed[f"repos/{REPO}/actions/runs?head_sha={check_subject}&per_page=100"]["body"] or {}
     run_rows = runs.get("workflow_runs", [])
     run_identity = {(item.get("head_sha"), item.get("event"), item.get("path"), item.get("conclusion")) for item in run_rows}
-    check(rows, "checks.sole_workflow_run", {(check_subject, "pull_request", ".github/workflows/required.yml", "success")}, run_identity)
+    check(
+        rows,
+        "checks.required_workflow_run",
+        True,
+        (check_subject, "pull_request", ".github/workflows/required.yml", "success") in run_identity,
+    )
+    check(
+        rows,
+        "checks.workflow_run_paths_admitted",
+        True,
+        all(identity[2] in {path for _, path, _ in EXPECTED_WORKFLOWS} for identity in run_identity),
+    )
     combined = observed[f"repos/{REPO}/commits/{check_subject}/status"]["body"] or {}
     check(rows, "checks.legacy_status_producers", 0, combined.get("total_count"))
 
@@ -315,12 +331,40 @@ def json_safe(value: Any) -> Any:
     return value
 
 
+def authority_boundary(output: Path | None) -> dict[str, Any]:
+    repository = api(f"repos/{REPO}")
+    administration = api(f"repos/{REPO}/rulesets")
+    report = {
+        "schemaVersion": 1,
+        "status": "passed"
+        if repository["status"] == 200
+        and administration["state"] in {"inaccessible", "not-found"}
+        else "failed",
+        "claim": "ephemeral workflow token authority boundary",
+        "repositoryRead": {key: repository[key] for key in ("status", "state", "responseSha256")},
+        "administrationRead": {key: administration[key] for key in ("status", "state", "responseSha256")},
+        "limitation": "This is not a maintainer-authenticated effective-state audit.",
+    }
+    encoded = json_safe(report)
+    if output:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(encoded, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return encoded
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--subject", required=True)
+    parser.add_argument("--subject")
     parser.add_argument("--check-subject", help="PR head whose required producers are observed; defaults to subject")
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--authority-boundary", action="store_true")
     args = parser.parse_args()
+    if args.authority_boundary:
+        report = authority_boundary(args.output)
+        print(json.dumps(report, indent=2, sort_keys=True) + "\n", end="")
+        return 0 if report["status"] == "passed" else 1
+    if not args.subject:
+        parser.error("--subject is required unless --authority-boundary is used")
     report = json_safe(audit(args.subject, args.check_subject or args.subject))
     encoded = json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
     if args.output:

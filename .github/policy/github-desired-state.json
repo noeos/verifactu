@@ -21,7 +21,7 @@
     "allowedActions": "selected",
     "githubOwnedAllowed": true,
     "verifiedCreatorAllowed": false,
-    "patternsAllowed": [],
+    "patternsAllowed": ["ossf/scorecard-action"],
     "shaPinningRequired": true,
     "defaultWorkflowPermissions": "read",
     "canApprovePullRequestReviews": false,
@@ -46,6 +46,53 @@
     "Required · OSV",
     "Required · npm audit signatures and licenses",
     "Required · required-check closure"
+  ],
+  "workflows": [
+    {
+      "name": "Required engineering foundation",
+      "path": ".github/workflows/required.yml",
+      "state": "active"
+    },
+    {
+      "name": "Engineering CI",
+      "path": ".github/workflows/ci.yml",
+      "state": "active"
+    },
+    {
+      "name": "Conformance",
+      "path": ".github/workflows/conformance.yml",
+      "state": "active"
+    },
+    {
+      "name": "Security",
+      "path": ".github/workflows/security.yml",
+      "state": "active"
+    },
+    {
+      "name": "Performance",
+      "path": ".github/workflows/performance.yml",
+      "state": "active"
+    },
+    {
+      "name": "GitHub authority boundary",
+      "path": ".github/workflows/github-audit.yml",
+      "state": "active"
+    },
+    {
+      "name": "Scorecard",
+      "path": ".github/workflows/scorecard.yml",
+      "state": "active"
+    },
+    {
+      "name": "Release candidate rehearsal",
+      "path": ".github/workflows/release-candidate.yml",
+      "state": "active"
+    },
+    {
+      "name": "Dependabot Updates",
+      "path": "dynamic/dependabot/dependabot-updates",
+      "state": "active"
+    }
   ],
   "mainRuleset": {
     "name": "protected-main",

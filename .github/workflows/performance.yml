@@ -1,0 +1,46 @@
+name: Performance
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "45 2 * * 3"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: performance-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  SOURCE_DATE_EPOCH: "0"
+  TZ: UTC
+  VERIFACTU_SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  reproducibility-smoke:
+    name: Performance · reproducibility smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: ./.github/actions/setup-engineering
+        with:
+          node-version: 24.21.0
+          npm-version: 11.19.1
+      - run: node tooling/tasks/run-task.mjs --task package:reproducibility
+        shell: bash
+      - run: node tooling/ci/write-auxiliary-report.mjs --context 'Performance · reproducibility smoke' --job-id reproducibility-smoke --output ci-reports/reproducibility-smoke.json --task-report evidence/runs/package--reproducibility.json
+        shell: bash
+      - uses: ./.github/actions/upload-check-report
+        with:
+          artifact-name: auxiliary-performance-reproducibility
+          path: ci-reports/reproducibility-smoke.json

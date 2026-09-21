@@ -1,0 +1,43 @@
+name: Scorecard
+
+on:
+  schedule:
+    - cron: "15 3 * * 5"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: scorecard
+  cancel-in-progress: true
+
+jobs:
+  scorecard:
+    name: Scorecard · scoped SARIF signal
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Run pinned Scorecard
+        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc
+        with:
+          results_file: scorecard-results.sarif
+          results_format: sarif
+          publish_results: false
+          repo_token: ${{ github.token }}
+      - name: Require non-empty SARIF
+        shell: bash
+        run: test -s scorecard-results.sarif
+      - name: Retain scoped signal
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: scorecard-sarif
+          path: scorecard-results.sarif
+          if-no-files-found: error
+          retention-days: 14
