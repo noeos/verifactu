@@ -114,6 +114,7 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
         f"repos/{REPO}/rulesets",
         f"repos/{REPO}/branches/main/protection",
         f"repos/{REPO}/branches?per_page=100",
+        f"repos/{REPO}/pulls?state=open&per_page=100",
         f"repos/{REPO}/environments?per_page=100",
         f"repos/{REPO}/actions/secrets?per_page=100",
         f"repos/{REPO}/actions/variables?per_page=100",
@@ -219,7 +220,15 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
     check(rows, "rulesets.main.status.contexts", {(name, 15368) for name in REQUIRED_CONTEXTS}, contexts)
     check(rows, "rulesets.classic_protection_absent", 404, observed[f"repos/{REPO}/branches/main/protection"]["status"])
     branches = observed[f"repos/{REPO}/branches?per_page=100"]["body"] or []
-    check(rows, "branches.exact", ["main"], sorted(item.get("name") for item in branches))
+    open_pulls = observed[f"repos/{REPO}/pulls?state=open&per_page=100"]["body"] or []
+    bot_refs = sorted(
+        item["head"]["ref"]
+        for item in open_pulls
+        if (item.get("user") or {}).get("login") == "dependabot[bot]"
+        and (item.get("base") or {}).get("ref") == "main"
+        and (item.get("head") or {}).get("ref", "").startswith("dependabot/")
+    )
+    check(rows, "branches.admitted", sorted(["main", *bot_refs]), sorted(item.get("name") for item in branches))
     check(rows, "branches.main.ruleset_protected", True, next((item.get("protected") for item in branches if item.get("name") == "main"), None))
 
     for endpoint in (
@@ -235,7 +244,15 @@ def audit(subject: str, check_subject: str) -> dict[str, Any]:
 
     workflows = observed[f"repos/{REPO}/actions/workflows?per_page=100"]["body"] or {}
     workflow_rows = workflows.get("workflows", [])
-    check(rows, "workflows.exact", [("Required engineering foundation", "active")], sorted((item.get("name"), item.get("state")) for item in workflow_rows))
+    check(
+        rows,
+        "workflows.exact",
+        sorted([
+            ("Required engineering foundation", ".github/workflows/required.yml", "active"),
+            ("Dependabot Updates", "dynamic/dependabot/dependabot-updates", "active"),
+        ]),
+        sorted((item.get("name"), item.get("path"), item.get("state")) for item in workflow_rows),
+    )
     checks = observed[f"repos/{REPO}/commits/{check_subject}/check-runs?per_page=100"]["body"] or {}
     producers = {(item.get("name"), (item.get("app") or {}).get("id"), item.get("conclusion")) for item in checks.get("check_runs", []) if item.get("name") in REQUIRED_CONTEXTS}
     check(rows, "checks.required_producers", {(name, 15368, "success") for name in REQUIRED_CONTEXTS}, producers)

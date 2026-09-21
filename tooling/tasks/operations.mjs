@@ -525,16 +525,7 @@ async function policyTree(context) {
   const artifacts = await readJson(
     resolve(context.root, "config/repository/artifacts.json"),
   );
-  assert(artifacts.schemaVersion === 1, "ARTIFACT_REGISTRY", "schemaVersion");
-  for (const entry of artifacts.classes) {
-    for (const field of ["pattern", "class", "producer", "toolProfile"])
-      assert(entry[field]?.length > 0, "ARTIFACT_REGISTRY_FIELD", field);
-    assert(
-      Array.isArray(entry.inputs) && entry.inputs.length > 0,
-      "ARTIFACT_REGISTRY_INPUTS",
-      entry.pattern,
-    );
-  }
+  validateArtifactRegistry(artifacts, files);
   const ignoredSources = await run(
     "git",
     ["check-ignore", "--no-index", ...files],
@@ -558,6 +549,60 @@ async function policyTree(context) {
     assert(ignored.code === 0, "OUTPUT_NOT_IGNORED", output);
   }
   return { selected: count, executed: count, passed: count };
+}
+
+function validateArtifactRegistry(artifacts, files) {
+  assert(artifacts.schemaVersion === 1, "ARTIFACT_REGISTRY", "schemaVersion");
+  const patterns = new Set();
+  for (const entry of artifacts.classes) {
+    for (const field of ["pattern", "class", "producer", "toolProfile"])
+      assert(entry[field]?.length > 0, "ARTIFACT_REGISTRY_FIELD", field);
+    assert(!patterns.has(entry.pattern), "ARTIFACT_DUPLICATE", entry.pattern);
+    patterns.add(entry.pattern);
+    assert(
+      ["generated", "vendored-immutable-input", "temporary-output"].includes(
+        entry.class,
+      ),
+      "ARTIFACT_CLASS",
+      entry.pattern,
+    );
+    assert(
+      Array.isArray(entry.inputs) && entry.inputs.length > 0,
+      "ARTIFACT_REGISTRY_INPUTS",
+      entry.pattern,
+    );
+    for (const input of entry.inputs)
+      assert(
+        files.some((file) => matchesAny(file, [input])),
+        "ARTIFACT_INPUT_MISSING",
+        `${entry.pattern}: ${input}`,
+      );
+    assert(
+      typeof entry.cleanRegeneration === "boolean" &&
+        typeof entry.committed === "boolean",
+      "ARTIFACT_REGISTRY_FIELD",
+      entry.pattern,
+    );
+    if (entry.committed) {
+      assert(
+        entry.class === "generated" && entry.cleanRegeneration,
+        "ARTIFACT_COMMITTED_POLICY",
+        entry.pattern,
+      );
+      assert(
+        files.some((file) => matchesAny(file, [entry.pattern])),
+        "ARTIFACT_OUTPUT_MISSING",
+        entry.pattern,
+      );
+    }
+  }
+  for (const file of files) {
+    const committed = artifacts.classes.filter(
+      (entry) => entry.committed && matchesAny(file, [entry.pattern]),
+    );
+    assert(committed.length <= 1, "ARTIFACT_AMBIGUOUS", file);
+  }
+  return artifacts.classes.length;
 }
 
 async function policyGenerated(context) {
@@ -805,6 +850,25 @@ async function policyWorkflow(context) {
   const workflowPath = resolve(context.root, ".github/workflows/required.yml");
   const text = await readFile(workflowPath, "utf8");
   const count = validateWorkflowText(text, admissions);
+  const registry = await readJson(
+    resolve(context.root, "config/ci/required-checks.json"),
+  );
+  const desired = await readJson(
+    resolve(context.root, ".github/policy/github-desired-state.json"),
+  );
+  assert(
+    registry.workflow === ".github/workflows/required.yml",
+    "WORKFLOW_REGISTRY_PATH",
+    registry.workflow,
+  );
+  assert(
+    canonicalJson(registry.checks.map((check) => check.context)) ===
+      canonicalJson(requiredContextRegistry()) &&
+      canonicalJson(desired.requiredContexts) ===
+        canonicalJson(requiredContextRegistry()),
+    "WORKFLOW_CONTEXT_DRIFT",
+    "required contexts differ between workflow, registry and GitHub desired state",
+  );
   return { selected: count, executed: count, passed: count };
 }
 
@@ -1042,6 +1106,16 @@ async function testPolicy(context) {
   const imports = await readJson(
     resolve(context.root, "config/repository/import-rules.json"),
   );
+  const artifacts = await readJson(
+    resolve(context.root, "config/repository/artifacts.json"),
+  );
+  const files = (
+    await walk(context.root, {
+      exclude: [".git", "node_modules", "evidence/runs"],
+    })
+  )
+    .filter((entry) => entry.type === "file")
+    .map((entry) => entry.relative);
   const generated = await readJson(
     resolve(context.root, "config/generated/toolchain.generated.json"),
   );
@@ -1052,6 +1126,20 @@ async function testPolicy(context) {
     resolve(context.root, ".github/workflows/required.yml"),
     "utf8",
   );
+  const spdxFixtureGraph = {
+    components: [
+      {
+        id: "package:fixture",
+        name: "fixture",
+        version: "1.0.0",
+        digest: "a".repeat(64),
+        license: "MIT",
+        type: "package",
+        scope: "subject",
+      },
+    ],
+    relationships: [],
+  };
   for (const fixture of fixtureManifest.fixtures) {
     switch (fixture.mutation) {
       case "unknown-root":
@@ -1086,6 +1174,13 @@ async function testPolicy(context) {
         fixtureError(fixture.expectedCode, () =>
           validateGenerated({ ...generated, primaryNode: "0.0.0" }, generated),
         );
+        break;
+      case "missing-artifact-input":
+        fixtureError(fixture.expectedCode, () => {
+          const mutated = structuredClone(artifacts);
+          mutated.classes[0].inputs = ["config/nonexistent-source.json"];
+          validateArtifactRegistry(mutated, files);
+        });
         break;
       case "unknown-operation":
         fixtureError(fixture.expectedCode, () => {
@@ -1130,6 +1225,16 @@ async function testPolicy(context) {
         fixtureError(fixture.expectedCode, () => {
           const mutated = structuredClone(registry);
           mutated.tasks.push(structuredClone(mutated.tasks[0]));
+          validateRegistry(mutated);
+        });
+        break;
+      case "unreachable-task":
+        fixtureError(fixture.expectedCode, () => {
+          const mutated = structuredClone(registry);
+          const orphan = structuredClone(mutated.tasks[0]);
+          orphan.id = "fixture:unreachable";
+          orphan.outputs = ["evidence/runs/fixture--unreachable.json"];
+          mutated.tasks.push(orphan);
           validateRegistry(mutated);
         });
         break;
@@ -1203,6 +1308,41 @@ async function testPolicy(context) {
         fixtureError(fixture.expectedCode, () =>
           validateReproducible("a", "b"),
         );
+        break;
+      case "spdx-invalid-vocabulary":
+        fixtureError(fixture.expectedCode, () => {
+          const document = spdxFromGraph(spdxFixtureGraph);
+          document["@graph"].find(
+            (entry) => entry.type === "software_Package",
+          ).type = "NotAnSpdxType";
+          validateSpdxDocument(document, spdxFixtureGraph);
+        });
+        break;
+      case "spdx-dangling-relationship":
+        fixtureError(fixture.expectedCode, () => {
+          const document = spdxFromGraph(spdxFixtureGraph);
+          document["@graph"].find((entry) => entry.type === "Relationship").to =
+            ["https://noeos.dev/spdx/p2/missing"];
+          validateSpdxDocument(document, spdxFixtureGraph);
+        });
+        break;
+      case "spdx-missing-subject-hash":
+        fixtureError(fixture.expectedCode, () => {
+          const document = spdxFromGraph(spdxFixtureGraph);
+          delete document["@graph"].find(
+            (entry) => entry.type === "software_Package",
+          ).verifiedUsing;
+          validateSpdxDocument(document, spdxFixtureGraph);
+        });
+        break;
+      case "spdx-license-contradiction":
+        fixtureError(fixture.expectedCode, () => {
+          const document = spdxFromGraph(spdxFixtureGraph);
+          document["@graph"].find(
+            (entry) => entry.type === "simplelicensing_LicenseExpression",
+          ).simplelicensing_licenseExpression = "Apache-2.0";
+          validateSpdxDocument(document, spdxFixtureGraph);
+        });
         break;
       case "download-404":
         await fixtureErrorAsync(
@@ -1659,6 +1799,13 @@ async function componentGraph(context) {
       )
     ).overrides.map((entry) => [entry.path, entry.spdx]),
   );
+  const dependencyAdmissions = new Map(
+    (
+      await readJson(
+        resolve(context.root, "config/admission/dependencies.json"),
+      )
+    ).dependencies.map((entry) => [entry.name, entry]),
+  );
   const components = [
     {
       id: "workspace:@noeos/verifactu-workspace@0.0.0-development",
@@ -1674,6 +1821,10 @@ async function componentGraph(context) {
   for (const [path, entry] of Object.entries(lock.packages)) {
     if (!path.startsWith("node_modules/")) continue;
     if (entry.link === true) continue;
+    const name = path
+      .split("/node_modules/")
+      .at(-1)
+      .replace(/^node_modules\//u, "");
     let digest = entry.integrity;
     if (!digest) {
       const installedRoot = resolve(context.root, path);
@@ -1687,11 +1838,28 @@ async function componentGraph(context) {
     components.push({
       id,
       type: "npm",
-      name: path.slice(13),
+      name,
       version: entry.version,
+      purl: `pkg:npm/${name.startsWith("@") ? `%40${name.slice(1)}` : name}@${entry.version}`,
+      source: entry.resolved ?? (entry.inBundle ? "bundled-in:npm" : null),
       digest,
       license: entry.license ?? licenseOverrides.get(path),
+      licenseEvidence: entry.license
+        ? "package-lock.json"
+        : "config/admission/license-evidence.json",
       scope: entry.dev ? "development" : "runtime",
+      optional: entry.optional === true,
+      peer: entry.peer === true,
+      platform: {
+        os: entry.os ?? [],
+        cpu: entry.cpu ?? [],
+        libc: entry.libc ?? [],
+      },
+      lifecycleScript: entry.hasInstallScript === true,
+      bundled: entry.inBundle === true,
+      admissionId: dependencyAdmissions.has(name)
+        ? `npm:${name}@${entry.version}`
+        : null,
     });
   }
   for (const item of actions)
@@ -1918,6 +2086,7 @@ function cyclonedxFromGraph(graph) {
     "bom-ref": component.id,
     name: component.name,
     version: component.version,
+    purl: component.purl,
     hashes: digestRecords(component.digest),
     licenses: [
       /\s(?:AND|OR|WITH)\s/u.test(component.license)
@@ -1927,6 +2096,18 @@ function cyclonedxFromGraph(graph) {
     properties: [
       { name: "noeos:scope", value: component.scope },
       { name: "noeos:type", value: component.type },
+      ...(component.source
+        ? [{ name: "noeos:source", value: component.source }]
+        : []),
+      ...(component.admissionId
+        ? [{ name: "noeos:admission", value: component.admissionId }]
+        : []),
+      ...(component.optional === undefined
+        ? []
+        : [{ name: "noeos:optional", value: String(component.optional) }]),
+      ...(component.peer === undefined
+        ? []
+        : [{ name: "noeos:peer", value: String(component.peer) }]),
     ],
   }));
   return {
@@ -1956,6 +2137,22 @@ function cyclonedxFromGraph(graph) {
 function spdxFromGraph(graph) {
   const creation = "_:creationinfo";
   const documentId = "https://noeos.dev/spdx/p2/document";
+  const licenseExpressions = [
+    ...new Set(graph.components.map((component) => component.license)),
+  ]
+    .sort()
+    .map((expression) => ({
+      type: "simplelicensing_LicenseExpression",
+      spdxId: `https://noeos.dev/spdx/p2/license/${sha256(expression)}`,
+      creationInfo: creation,
+      simplelicensing_licenseExpression: expression,
+    }));
+  const licenseIdByExpression = new Map(
+    licenseExpressions.map((entry) => [
+      entry.simplelicensing_licenseExpression,
+      entry.spdxId,
+    ]),
+  );
   const packageElements = graph.components.map((component, index) => ({
     type: "software_Package",
     spdxId: `https://noeos.dev/spdx/p2/package/${index}`,
@@ -1963,8 +2160,10 @@ function spdxFromGraph(graph) {
     name: component.name,
     software_packageVersion: component.version,
     software_downloadLocation: "https://noeos.dev/not-published",
+    software_packageUrl: component.purl,
+    software_sourceInfo: component.source,
     software_copyrightText: "Copyright 2026 Noeos contributors",
-    comment: `SPDX-License-Identifier: ${component.license}; noeos type=${component.type}; scope=${component.scope}`,
+    comment: `noeos type=${component.type}; scope=${component.scope}`,
     verifiedUsing: /^[a-f0-9]{64}$/u.test(component.digest ?? "")
       ? [{ type: "Hash", algorithm: "sha256", hashValue: component.digest }]
       : /^[a-f0-9]{40}$/u.test(component.digest ?? "")
@@ -1990,6 +2189,16 @@ function spdxFromGraph(graph) {
       comment: `noeos relationship type=${relationship.type}`,
     }),
   );
+  for (const [index, component] of graph.components.entries())
+    relationshipElements.push({
+      type: "Relationship",
+      spdxId: `https://noeos.dev/spdx/p2/license-relationship/${index}`,
+      creationInfo: creation,
+      from: packageElements[index].spdxId,
+      relationshipType: "hasDeclaredLicense",
+      to: [licenseIdByExpression.get(component.license)],
+      completeness: "complete",
+    });
   return {
     "@context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
     "@graph": [
@@ -2016,14 +2225,93 @@ function spdxFromGraph(graph) {
         element: [
           "https://github.com/noeos",
           ...packageElements.map((entry) => entry.spdxId),
+          ...licenseExpressions.map((entry) => entry.spdxId),
           ...relationshipElements.map((entry) => entry.spdxId),
         ],
         profileConformance: ["core", "software"],
       },
       ...packageElements,
+      ...licenseExpressions,
       ...relationshipElements,
     ],
   };
+}
+
+function validateSpdxDocument(document, graph) {
+  const elements = document["@graph"];
+  const identified = elements.filter((entry) => entry.spdxId);
+  const byId = new Map(identified.map((entry) => [entry.spdxId, entry]));
+  assert(byId.size === identified.length, "SPDX_ELEMENT_DUPLICATE", "spdxId");
+  const allowedTypes = new Set([
+    "CreationInfo",
+    "Organization",
+    "SpdxDocument",
+    "software_Package",
+    "simplelicensing_LicenseExpression",
+    "Relationship",
+  ]);
+  for (const entry of elements)
+    assert(allowedTypes.has(entry.type), "SPDX_VOCABULARY", entry.type);
+  const spdxDocument = elements.find((entry) => entry.type === "SpdxDocument");
+  assert(spdxDocument, "SPDX_SUBJECT_MISSING", "document");
+  const packages = elements.filter(
+    (entry) => entry.type === "software_Package",
+  );
+  assert(
+    packages.length === graph.components.length,
+    "SPDX_SUBJECT_MISSING",
+    "package count",
+  );
+  const relationships = elements.filter(
+    (entry) => entry.type === "Relationship",
+  );
+  for (const relationship of relationships) {
+    assert(
+      byId.has(relationship.from) &&
+        Array.isArray(relationship.to) &&
+        relationship.to.length > 0 &&
+        relationship.to.every((id) => byId.has(id)),
+      "SPDX_RELATIONSHIP_DANGLING",
+      relationship.spdxId,
+    );
+  }
+  for (const [index, component] of graph.components.entries()) {
+    const entry = packages[index];
+    if (component.scope === "subject") {
+      assert(
+        spdxDocument.rootElement?.includes(entry.spdxId),
+        "SPDX_SUBJECT_MISSING",
+        entry.spdxId,
+      );
+      assert(
+        entry.verifiedUsing?.some(
+          (hash) =>
+            hash.algorithm ===
+              (/^[a-f0-9]{40}$/u.test(component.digest) ? "sha1" : "sha256") &&
+            hash.hashValue === component.digest,
+        ),
+        "SPDX_SUBJECT_HASH",
+        entry.spdxId,
+      );
+    }
+    const licenses = relationships.filter(
+      (relationship) =>
+        relationship.from === entry.spdxId &&
+        relationship.relationshipType === "hasDeclaredLicense",
+    );
+    assert(
+      licenses.length === 1 && licenses[0].to.length === 1,
+      "SPDX_LICENSE_MISSING",
+      entry.spdxId,
+    );
+    assert(
+      byId.get(licenses[0].to[0])?.simplelicensing_licenseExpression ===
+        component.license,
+      "SPDX_LICENSE_CONTRADICTION",
+      entry.spdxId,
+    );
+  }
+  return graph.components.length;
 }
 
 function addSchemaFormats(instance) {
@@ -2060,6 +2348,7 @@ async function sbomDocuments(context) {
   const graph = await readJson(resolve(outputRoot, "component-graph.json"));
   const cyclonedx = cyclonedxFromGraph(graph);
   const spdx = spdxFromGraph(graph);
+  validateSpdxDocument(spdx, graph);
   const prepared = resolve(context.root, "evidence/runs/prepared");
   const cdxSchema = await readJson(resolve(prepared, "cyclonedx-1.7-schema"));
   const cdxSpdxSchema = await readJson(
@@ -2174,6 +2463,31 @@ async function provenanceRehearsal(context) {
   const reconciliation = await readJson(
     resolve(context.root, "evidence/runs/artifacts/sbom/reconciliation.json"),
   );
+  const materials = [
+    ["package-lock.json", "package-lock.json"],
+    ["toolchain", "config/toolchain/toolchain.json"],
+    ["dependency-admissions", "config/admission/dependencies.json"],
+    ["action-admissions", "config/admission/actions.json"],
+    ["external-input-admissions", "config/admission/external-inputs.json"],
+    ["package-manifest", "evidence/runs/artifacts/packages/manifest.json"],
+  ];
+  const resolvedMaterials = [];
+  for (const [uri, path] of materials)
+    resolvedMaterials.push({
+      uri,
+      digest: { sha256: await sha256File(resolve(context.root, path)) },
+    });
+  resolvedMaterials.push(
+    {
+      uri: "component-graph",
+      digest: { sha256: reconciliation.componentGraphSha256 },
+    },
+    {
+      uri: "cyclonedx-1.7",
+      digest: { sha256: reconciliation.cyclonedxSha256 },
+    },
+    { uri: "spdx-3.0.1", digest: { sha256: reconciliation.spdxSha256 } },
+  );
   const statement = {
     _type: "https://in-toto.io/Statement/v1",
     subject: packageManifest.subjects.map((entry) => ({
@@ -2184,22 +2498,25 @@ async function provenanceRehearsal(context) {
     predicate: {
       buildDefinition: {
         buildType: policy.buildType,
-        externalParameters: {},
-        internalParameters: { publish: false },
+        externalParameters: {
+          sourceCommit: context.identity.subject,
+          sourceTree: context.identity.tree,
+          packageNames: packageManifest.subjects.map((entry) => entry.name),
+        },
+        internalParameters: { publish: false, sourceDateEpoch: 0 },
         resolvedDependencies: [
           {
             uri: `git+https://github.com/noeos/verifactu@${context.identity.subject}`,
             digest: { gitTree: context.identity.tree },
           },
-          {
-            uri: "component-graph",
-            digest: { sha256: reconciliation.componentGraphSha256 },
-          },
+          ...resolvedMaterials,
         ],
       },
       runDetails: {
         builder: { id: policy.builder },
-        metadata: { invocationId: "non-publishing-p2-rehearsal" },
+        metadata: {
+          invocationId: `non-publishing-p2-rehearsal-${context.identity.subject}`,
+        },
       },
     },
     claims: {

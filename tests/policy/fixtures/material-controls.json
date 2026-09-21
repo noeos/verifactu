@@ -27,6 +27,12 @@
       "expectedCode": "GENERATED_STALE"
     },
     {
+      "id": "NEG-ARTIFACT-INPUT-001",
+      "control": "artifact-registry",
+      "mutation": "missing-artifact-input",
+      "expectedCode": "ARTIFACT_INPUT_MISSING"
+    },
+    {
       "id": "NEG-TASK-TOOL-001",
       "control": "task",
       "mutation": "unknown-operation",
@@ -61,6 +67,12 @@
       "control": "task",
       "mutation": "duplicate-id",
       "expectedCode": "TASK_DUPLICATE"
+    },
+    {
+      "id": "NEG-TASK-REACHABILITY-001",
+      "control": "task",
+      "mutation": "unreachable-task",
+      "expectedCode": "TASK_UNREACHABLE"
     },
     {
       "id": "NEG-TASK-STALE-001",
@@ -115,6 +127,30 @@
       "control": "reproducibility",
       "mutation": "different-output",
       "expectedCode": "NONREPRODUCIBLE_OUTPUT"
+    },
+    {
+      "id": "NEG-SPDX-VOCAB-001",
+      "control": "spdx",
+      "mutation": "spdx-invalid-vocabulary",
+      "expectedCode": "SPDX_VOCABULARY"
+    },
+    {
+      "id": "NEG-SPDX-REL-001",
+      "control": "spdx",
+      "mutation": "spdx-dangling-relationship",
+      "expectedCode": "SPDX_RELATIONSHIP_DANGLING"
+    },
+    {
+      "id": "NEG-SPDX-SUBJECT-001",
+      "control": "spdx",
+      "mutation": "spdx-missing-subject-hash",
+      "expectedCode": "SPDX_SUBJECT_HASH"
+    },
+    {
+      "id": "NEG-SPDX-LICENSE-001",
+      "control": "spdx",
+      "mutation": "spdx-license-contradiction",
+      "expectedCode": "SPDX_LICENSE_CONTRADICTION"
     },
     {
       "id": "NEG-DOWNLOAD-HTTP-001",

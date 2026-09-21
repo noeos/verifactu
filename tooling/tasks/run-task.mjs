@@ -146,6 +146,24 @@ export function validateRegistry(registry) {
     state.set(id, "done");
   };
   for (const id of ids) visit(id);
+  assert(
+    Array.isArray(registry.closureRoots) && registry.closureRoots.length > 0,
+    "TASK_CLOSURE_ROOTS",
+    "no closure roots declared",
+  );
+  const reachable = new Set();
+  const traverse = (id) => {
+    assert(ids.has(id), "TASK_CLOSURE_ROOT_UNKNOWN", id);
+    if (reachable.has(id)) return;
+    reachable.add(id);
+    for (const dependency of byId.get(id).dependencies) traverse(dependency);
+  };
+  for (const id of registry.closureRoots) traverse(id);
+  assert(
+    reachable.size === ids.size,
+    "TASK_UNREACHABLE",
+    [...ids].filter((id) => !reachable.has(id)).join(", "),
+  );
   return byId;
 }
 

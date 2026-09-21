@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "TASK-GRAPH-0001",
+  "closureRoots": ["gate:p2", "gate:platform"],
   "tasks": [
     {
       "id": "policy:tree",
@@ -242,6 +243,7 @@
       "dependencies": [],
       "inputs": [
         ".github/workflows/**",
+        ".github/policy/github-desired-state.json",
         "config/ci/**",
         "config/admission/actions.json"
       ],
