@@ -53,8 +53,8 @@ const mutations = [
   [
     "P4-MUT-007",
     "domain/records.js",
-    "record.invoiceNumber.length === 0",
-    "record.invoiceNumber.length < 0",
+    "invoice.identity.series.length === 0",
+    "invoice.identity.series.length < 0",
     "tests/unit/p4-records-corrections.test.mjs",
   ],
   [

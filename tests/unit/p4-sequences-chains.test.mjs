@@ -38,11 +38,12 @@ test("P4-CB-014 sequence rejects gaps, duplicates, chronology and scope changes"
     occurredAt: at(`2026-09-21T12:00:0${value}Z`),
   }));
   assert.equal(api.validateScopedSequence(entries).status, "succeeded");
-  assert.equal(
-    api.validateScopedSequence([{ ...entries[0], position: { value: 2 } }])
-      .status,
-    "conflict",
-  );
+  const gap = api.validateScopedSequence([
+    { ...entries[0], position: { value: 2 } },
+  ]);
+  assert.equal(gap.status, "conflict");
+  assert.equal(gap.diagnostics[0].parameters.expected, 1);
+  assert.equal(gap.diagnostics[0].parameters.actual, 2);
   assert.equal(
     api.validateScopedSequence([
       entries[0],
@@ -52,6 +53,13 @@ test("P4-CB-014 sequence rejects gaps, duplicates, chronology and scope changes"
   );
   assert.equal(
     api.validateScopedSequence([entries[1], entries[0]]).status,
+    "conflict",
+  );
+  assert.equal(
+    api.validateScopedSequence([
+      entries[0],
+      { ...entries[1], occurredAt: entries[0].occurredAt },
+    ]).status,
     "conflict",
   );
   assert.equal(
@@ -77,6 +85,36 @@ test("P4-CB-016 complete verification rejects gaps, forks, mutation and wrong he
   assert.equal(
     api.verifyChain([{ ...chain[0], position: 2 }], digest).status,
     "conflict",
+  );
+  assert.equal(
+    api.verifyChain(
+      [{ ...chain[0], predecessor: chain[1].predecessor }],
+      digest,
+    ).diagnostics[0].code,
+    "DIAG-CHAIN-PREDECESSOR",
+  );
+  assert.equal(
+    api.verifyChain(
+      [
+        chain[0],
+        {
+          ...chain[1],
+          predecessor: {
+            ...chain[1].predecessor,
+            recordId: id("record", "wrong-record"),
+          },
+        },
+      ],
+      digest,
+    ).diagnostics[0].code,
+    "DIAG-CHAIN-PREDECESSOR",
+  );
+  assert.equal(
+    api.verifyChain(
+      [chain[0], { ...chain[1], predecessor: { kind: "genesis" } }],
+      digest,
+    ).diagnostics[0].code,
+    "DIAG-CHAIN-PREDECESSOR",
   );
   assert.equal(
     api.verifyChain(
@@ -119,4 +157,7 @@ test("digest and position constructors reject malformed values", () => {
   assert.equal(api.nextSequencePosition({ value: 1 }).value, 2);
   assert.equal(api.validateSequence([]).status, "succeeded");
   assert.equal(api.verifyChain([], digest).value.head, null);
+  const emptyHead = api.verifyChain([], digest, "a".repeat(64));
+  assert.equal(emptyHead.diagnostics[0].code, "DIAG-CHAIN-HEAD");
+  assert.equal(emptyHead.diagnostics[0].parameters.index, -1);
 });

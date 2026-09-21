@@ -901,6 +901,7 @@
         "tests/security/p4-isolation-redaction.test.mjs",
         "tooling/assurance/p4a-coverage.mjs",
         "tooling/assurance/p4a-mutation.mjs",
+        "tooling/assurance/p4a-overall-mutation.mjs",
         "config/quality/p4-quality-plan.json"
       ],
       "outputs": ["evidence/runs/p4a--assurance.json"],
@@ -914,7 +915,7 @@
       ],
       "network": "denied",
       "secrets": "denied",
-      "timeoutSeconds": 300,
+      "timeoutSeconds": 420,
       "concurrencyLock": "assurance",
       "selectionClass": "always",
       "reportSchema": "evidence/schemas/task-report.schema.json",

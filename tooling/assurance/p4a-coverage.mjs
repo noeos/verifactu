@@ -65,7 +65,7 @@ try {
   const report = {
     schemaVersion: 1,
     testFiles: tests.length,
-    tests: 31,
+    tests: 37,
     statements: metric("Statements"),
     branches: metric("Branches"),
     functions: metric("Functions"),

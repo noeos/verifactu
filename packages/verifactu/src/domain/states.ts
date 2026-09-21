@@ -5,7 +5,13 @@ import {
 } from "../contracts/results.js";
 import { diagnostic } from "./diagnostics.js";
 import type { FiscalEvent } from "./events.js";
-import type { InstallationId, TaxpayerId } from "./identities.js";
+import type {
+  ArtifactId,
+  AttemptId,
+  EvidenceId,
+  InstallationId,
+  TaxpayerId,
+} from "./identities.js";
 import type { OperatingMode } from "./mode-tenure.js";
 
 export type InstallationState =
@@ -110,4 +116,123 @@ export function transitionInstallation(
       event: event.kind,
     }),
   ]);
+}
+
+export type ConstructionState = "accepted" | "rejected" | "indeterminate";
+export type DurabilityState = "not-committed" | "committed";
+export type ChainVerificationState =
+  | "not-verified"
+  | "verified"
+  | "broken"
+  | "indeterminate";
+export type SubmissionState =
+  | "not-eligible"
+  | "queued"
+  | "attempting"
+  | "accepted"
+  | "accepted-with-qualification"
+  | "rejected"
+  | "retryable-failure"
+  | "indeterminate-outcome";
+export type AuthorityResponseState =
+  | "not-observed"
+  | "accepted"
+  | "accepted-with-qualification"
+  | "rejected"
+  | "indeterminate";
+export type CorrectionState =
+  | "original"
+  | "corrected"
+  | "substituted"
+  | "cancelled";
+export type ConservationState = "not-retained" | "retained" | "exported";
+
+export interface RecordLifecycleState {
+  readonly construction: ConstructionState;
+  readonly durability: DurabilityState;
+  readonly chainVerification: ChainVerificationState;
+  readonly submission: SubmissionState;
+  readonly authorityResponse: AuthorityResponseState;
+  readonly correction: CorrectionState;
+  readonly conservation: ConservationState;
+  readonly quarantine: "clear" | "quarantined";
+  readonly artifactId?: ArtifactId;
+  readonly attemptId?: AttemptId;
+  readonly evidenceIds: readonly EvidenceId[];
+}
+
+export function defineRecordLifecycle(
+  state: RecordLifecycleState,
+): OperationResult<RecordLifecycleState> {
+  const hasAttempt = state.attemptId !== undefined;
+  const hasResponse = state.authorityResponse !== "not-observed";
+  const eligibleSubmission = state.submission !== "not-eligible";
+  if (
+    (eligibleSubmission &&
+      (state.construction !== "accepted" ||
+        state.durability !== "committed" ||
+        state.artifactId === undefined)) ||
+    (state.chainVerification === "verified" &&
+      state.artifactId === undefined) ||
+    (hasResponse && !hasAttempt) ||
+    (state.submission === "attempting" && !hasAttempt) ||
+    (["accepted", "accepted-with-qualification", "rejected"].includes(
+      state.submission,
+    ) &&
+      state.authorityResponse === "not-observed") ||
+    (state.quarantine === "quarantined" && eligibleSubmission)
+  ) {
+    return failed("conflict", [
+      diagnostic(
+        "DIAG-RECORD-STATE-IMPOSSIBLE",
+        "integrity",
+        "state",
+        "/recordState",
+      ),
+    ]);
+  }
+  return succeeded(
+    Object.freeze({
+      ...state,
+      evidenceIds: Object.freeze([...state.evidenceIds]),
+    }),
+  );
+}
+
+const SUBMISSION_EDGES = Object.freeze({
+  "not-eligible": Object.freeze(["queued"] as const),
+  queued: Object.freeze(["attempting"] as const),
+  attempting: Object.freeze([
+    "accepted",
+    "accepted-with-qualification",
+    "rejected",
+    "retryable-failure",
+    "indeterminate-outcome",
+  ] as const),
+  accepted: Object.freeze([] as const),
+  "accepted-with-qualification": Object.freeze([] as const),
+  rejected: Object.freeze([] as const),
+  "retryable-failure": Object.freeze(["attempting"] as const),
+  "indeterminate-outcome": Object.freeze(["attempting"] as const),
+}) satisfies Readonly<Record<SubmissionState, readonly SubmissionState[]>>;
+
+export function transitionSubmissionState(
+  current: SubmissionState,
+  next: SubmissionState,
+): OperationResult<SubmissionState> {
+  const allowed: readonly SubmissionState[] = SUBMISSION_EDGES[current];
+  return allowed.includes(next)
+    ? succeeded(next)
+    : failed("conflict", [
+        diagnostic(
+          "DIAG-SUBMISSION-TRANSITION",
+          "conflict",
+          "state",
+          "/submission",
+          {
+            current,
+            next,
+          },
+        ),
+      ]);
 }

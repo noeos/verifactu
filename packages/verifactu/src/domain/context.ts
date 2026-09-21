@@ -1,4 +1,6 @@
 import type {
+  ClockId,
+  ConfigurationId,
   CorrelationId,
   EditionId,
   InstallationId,
@@ -22,7 +24,13 @@ export interface OperationContext {
   readonly editionId: EditionId;
   readonly operatingMode: OperatingMode;
   readonly tenureId: TenureId;
-  readonly clock: Readonly<{ instant: FiscalInstant }>;
+  readonly clock: Readonly<{
+    id: ClockId;
+    instant: FiscalInstant;
+    quality: "authoritative" | "synchronized" | "degraded";
+  }>;
+  readonly configurationId: ConfigurationId;
+  readonly locale?: string;
   readonly correlationId: CorrelationId;
   readonly principalId: PrincipalId;
 }

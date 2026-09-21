@@ -17,5 +17,6 @@ test("current candidate configuration remains creation-disabled", () => {
     strictDecoding: true,
   });
   assert.equal(configuration.editionPolicy.creationAllowed, false);
+  assert.equal(configuration.strictDecoding, true);
   assert.equal(Object.isFrozen(configuration.editionPolicy.allowedModes), true);
 });

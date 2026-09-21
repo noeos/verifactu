@@ -14,10 +14,19 @@ export type TenantId = Identity<"tenant">;
 export type TaxpayerId = Identity<"taxpayer">;
 export type InstallationId = Identity<"installation">;
 export type RecordId = Identity<"record">;
+export type InvoiceId = Identity<"invoice">;
 export type EventId = Identity<"event">;
+export type ChainId = Identity<"chain">;
+export type SubmissionId = Identity<"submission">;
+export type AttemptId = Identity<"attempt">;
+export type ArtifactId = Identity<"artifact">;
+export type EvidenceId = Identity<"evidence">;
 export type CorrelationId = Identity<"correlation">;
 export type PrincipalId = Identity<"principal">;
 export type EditionId = Identity<"edition">;
+export type ClockId = Identity<"clock">;
+export type ConfigurationId = Identity<"configuration">;
+export type IdempotencyKey = Identity<"idempotency">;
 
 const IDENTITY_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9._:-]{0,126}[A-Za-z0-9])?$/u;
 

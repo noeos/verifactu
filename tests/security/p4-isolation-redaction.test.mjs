@@ -15,7 +15,12 @@ test("P4-CB-004 context scope rejects cross-tenant and cross-taxpayer substituti
     editionId: id("edition", "rrsif-2026-09-21"),
     operatingMode: "non-verifactu",
     tenureId: "tenure-1",
-    clock: { instant: "2026-09-21T12:00:00Z" },
+    clock: {
+      id: id("clock", "clock-1"),
+      instant: api.parseFiscalInstant("2026-09-21T12:00:00Z").value,
+      quality: "authoritative",
+    },
+    configurationId: id("configuration", "configuration-1"),
     correlationId: id("correlation", "correlation-1"),
     principalId: id("principal", "principal-1"),
   });

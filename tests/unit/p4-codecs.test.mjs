@@ -15,10 +15,9 @@ const decoder = api.objectShape(["name"], (value) =>
 );
 
 test("P4-CB-001 staged decoding stops at the first failed stage", () => {
-  assert.equal(
-    api.decodeJson(new Uint8Array([0xff]), decoder).status,
-    "invalid",
-  );
+  const malformedUtf8 = api.decodeJson(new Uint8Array([0xff]), decoder);
+  assert.equal(malformedUtf8.status, "invalid");
+  assert.equal(malformedUtf8.diagnostics[0].code, "DIAG-UTF8-INVALID");
   assert.equal(
     api.decodeJson(bytes("{"), decoder).diagnostics[0].stage,
     "syntax",
@@ -35,6 +34,33 @@ test("P4-CB-001 staged decoding stops at the first failed stage", () => {
     api.decodeJson(bytes('{"name":"ok"}'), decoder).status,
     "succeeded",
   );
+  assert.equal(
+    api.decodeJson(
+      bytes('{"outer":{"name":"ok"}}'),
+      { decode: api.succeeded },
+      {
+        ...api.DEFAULT_DECODE_LIMITS,
+        maximumDepth: 1,
+      },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    api.decodeJson(
+      bytes("1"),
+      { decode: api.succeeded },
+      {
+        ...api.DEFAULT_DECODE_LIMITS,
+        maximumBytes: 1,
+      },
+    ).status,
+    "succeeded",
+  );
+  const bom = api.decodeJson(new Uint8Array([0xef, 0xbb, 0xbf, 0x7b, 0x7d]), {
+    decode: api.succeeded,
+  });
+  assert.equal(bom.status, "succeeded");
+  assert.equal(JSON.stringify(bom.value), "{}");
 });
 
 test("P4-CB-002 duplicate and unknown members fail closed", () => {
@@ -48,9 +74,36 @@ test("P4-CB-002 duplicate and unknown members fail closed", () => {
       .code,
     "DIAG-STRUCTURE-MEMBER",
   );
+  assert.equal(
+    api.decodeJson(bytes('{"extra":true}'), decoder).diagnostics[0].parameters
+      .member,
+    "extra",
+  );
 });
 
 test("resource limits are validated before syntax", () => {
+  assert.equal(api.validDecodeLimits(api.DEFAULT_DECODE_LIMITS), true);
+  for (const name of [
+    "maximumBytes",
+    "maximumDepth",
+    "maximumMembers",
+    "maximumStringCodePoints",
+  ]) {
+    assert.equal(
+      api.validDecodeLimits({ ...api.DEFAULT_DECODE_LIMITS, [name]: 0 }),
+      false,
+      name,
+    );
+    assert.equal(
+      api.validDecodeLimits({ ...api.DEFAULT_DECODE_LIMITS, [name]: 1 }),
+      true,
+      name,
+    );
+  }
+  assert.equal(
+    api.validDecodeLimits({ ...api.DEFAULT_DECODE_LIMITS, maximumBytes: 1.5 }),
+    false,
+  );
   const limits = {
     maximumBytes: 1,
     maximumDepth: 1,
@@ -76,9 +129,11 @@ test("JSON reader covers every supported value and bounded container", () => {
     "{}",
     '{"nested":{"value":"escaped\\ntext"}}',
   ]) {
+    const result = api.decodeJson(bytes(source), any);
+    assert.equal(result.status, "succeeded", source);
     assert.equal(
-      api.decodeJson(bytes(source), any).status,
-      "succeeded",
+      JSON.stringify(result.value),
+      JSON.stringify(JSON.parse(source)),
       source,
     );
   }
@@ -100,6 +155,27 @@ test("JSON reader covers every supported value and bounded container", () => {
       maximumMembers: 1,
     }).status,
     "invalid",
+  );
+  assert.equal(
+    api.decodeJson(bytes("[1]"), any, {
+      ...api.DEFAULT_DECODE_LIMITS,
+      maximumDepth: 1,
+    }).status,
+    "succeeded",
+  );
+  assert.equal(
+    api.decodeJson(bytes('{"a":1}'), any, {
+      ...api.DEFAULT_DECODE_LIMITS,
+      maximumMembers: 1,
+    }).status,
+    "succeeded",
+  );
+  assert.equal(
+    api.decodeJson(bytes('"a"'), any, {
+      ...api.DEFAULT_DECODE_LIMITS,
+      maximumStringCodePoints: 1,
+    }).status,
+    "succeeded",
   );
   assert.equal(
     api.decodeJson(bytes('"ab"'), any, {

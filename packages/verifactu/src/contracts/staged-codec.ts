@@ -27,7 +27,11 @@ class JsonReader {
   }
 
   #space(): void {
-    while (/\s/u.test(this.source[this.#position] ?? "")) this.#position += 1;
+    for (;;) {
+      const token = this.source[this.#position];
+      if (token === undefined || !/\s/u.test(token)) return;
+      this.#position += 1;
+    }
   }
 
   #value(depth: number): unknown {
@@ -60,8 +64,9 @@ class JsonReader {
   #string(): string {
     const start = this.#position;
     this.#position += 1;
-    while (this.#position < this.source.length) {
+    for (;;) {
       const token = this.source[this.#position];
+      if (token === undefined) break;
       if (token === '"') {
         this.#position += 1;
         const value = JSON.parse(
@@ -143,9 +148,7 @@ export function decodeJson<T>(
   }
   let text: string;
   try {
-    text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(
-      bytes,
-    );
+    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } catch {
     return failed("invalid", [
       diagnostic("DIAG-UTF8-INVALID", "input", "utf8", ""),
@@ -189,7 +192,7 @@ export function objectShape<T>(
       if (unexpected.length > 0) {
         return failed("invalid", [
           diagnostic("DIAG-STRUCTURE-MEMBER", "input", "structure", "", {
-            member: unexpected[0] ?? "",
+            member: unexpected[0]!,
           }),
         ]);
       }

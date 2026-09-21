@@ -58,7 +58,12 @@ test("P4-PROP-002 context identity scopes never substitute", () => {
       editionId: id("edition", "rrsif-2026-09-21"),
       operatingMode: "non-verifactu",
       tenureId: "tenure-1",
-      clock: { instant: "2026-09-21T00:00:00Z" },
+      clock: {
+        id: id("clock", "clock-1"),
+        instant: at("2026-09-21T00:00:00Z"),
+        quality: "authoritative",
+      },
+      configurationId: id("configuration", "configuration-1"),
       correlationId: id("correlation", `c-${suffix}`),
       principalId: id("principal", `u-${suffix}`),
     };
@@ -86,13 +91,27 @@ test("P4-PROP-003 decimal parse-format-parse is exact", () => {
 });
 
 test("P4-PROP-004 date/time parse-format-parse is exact", () => {
+  const two = (value) => String(value).padStart(2, "0");
   for (let index = 0; index < RUNS; index += 1) {
-    const day = String((next() % 28) + 1).padStart(2, "0");
-    const hour = String(next() % 24).padStart(2, "0");
-    const lexical = `2026-09-${day}T${hour}:00:00Z`;
+    const lexical = `${1800 + (next() % 401)}-${two((next() % 12) + 1)}-${two(
+      (next() % 28) + 1,
+    )}T${two(next() % 24)}:${two(next() % 60)}:${two(next() % 60)}Z`;
     assert.equal(
       api.parseFiscalInstant(api.parseFiscalInstant(lexical).value).value,
       lexical,
+    );
+    const otherLexical = `${1800 + (next() % 401)}-${two(
+      (next() % 12) + 1,
+    )}-${two((next() % 28) + 1)}T${two(next() % 24)}:${two(
+      next() % 60,
+    )}:${two(next() % 60)}Z`;
+    const expected = Math.sign(Date.parse(lexical) - Date.parse(otherLexical));
+    assert.equal(
+      api.compareFiscalInstants(
+        api.parseFiscalInstant(lexical).value,
+        api.parseFiscalInstant(otherLexical).value,
+      ),
+      expected,
     );
   }
 });
@@ -117,6 +136,11 @@ test("P4-PROP-006 mode tenure intervals remain contiguous", () => {
   const common = {
     taxpayerId: id("taxpayer", "taxpayer-1"),
     installationId: id("installation", "installation-1"),
+    decisionSource: "initial-configuration",
+    authorizedBy: id("principal", "principal-1"),
+    configurationId: id("configuration", "configuration-1"),
+    transitionEvidenceIds: [id("evidence", "tenure-proof-1")],
+    relatedEventIds: [id("event", "tenure-event-1")],
   };
   for (let index = 0; index < RUNS; index += 1) {
     const boundary = String((next() % 27) + 2).padStart(2, "0");

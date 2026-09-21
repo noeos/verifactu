@@ -3051,19 +3051,40 @@ async function p4AAssurance(context) {
   const coverageReport = JSON.parse(
     coverage.stdout.trim().split(/\r?\n/u).at(-1),
   );
-  const mutationPopulation = 16;
+  const overallMutation = await run(
+    "node",
+    ["tooling/assurance/p4a-overall-mutation.mjs"],
+    {
+      cwd: context.root,
+      timeoutMs: 240000,
+    },
+  );
+  assert(
+    overallMutation.code === 0,
+    "P4A_OVERALL_MUTATION",
+    overallMutation.stderr || overallMutation.stdout,
+  );
+  const overallMutationReport = JSON.parse(
+    overallMutation.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const criticalMutationPopulation = 16;
+  const selected =
+    coverageReport.testFiles +
+    criticalMutationPopulation +
+    overallMutationReport.population;
   return {
-    selected: coverageReport.testFiles + mutationPopulation,
-    executed: coverageReport.testFiles + mutationPopulation,
-    passed: coverageReport.testFiles + mutationPopulation,
+    selected,
+    executed: selected,
+    passed: selected,
     outputDigest: sha256(
       canonicalJson({
         coverage: coverageReport,
-        mutation: {
-          population: mutationPopulation,
-          killed: mutationPopulation,
+        criticalMutation: {
+          population: criticalMutationPopulation,
+          killed: criticalMutationPopulation,
           survivors: 0,
         },
+        overallMutation: overallMutationReport,
         fuzzExecutions: 4096,
         propertyExecutions: 7 * 4096,
       }),
@@ -3071,6 +3092,7 @@ async function p4AAssurance(context) {
     diagnostics: [
       `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
       "critical mutants killed=16/16",
+      `overall mutants killed=${overallMutationReport.killed}/${overallMutationReport.population} (${overallMutationReport.killedPercent}%) across ${overallMutationReport.productionFiles} production files; survivors=${overallMutationReport.survivors.length} timeouts=${overallMutationReport.timeouts}`,
       "P4-A property executions=28672 with zero discards",
       "P4-A staged-codec fuzz executions=4096",
       "current authoritative candidate remains creationAllowed=false",
