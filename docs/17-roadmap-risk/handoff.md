@@ -2468,3 +2468,23 @@ documentation-only and does not change the authoritative P7 campaign subject
 - P4 and P3-B remain prohibited until all mapped blockers are resolved, an
   approved/active edition has a non-null approval record and the final protected
   main read-back binds every report to its exact subject/tree.
+
+### Amendment P3-006 — 2026-09-21 protected implementation read-back
+
+- Implementation PR `#28` was merged through the protected squash path as
+  `a87044d312f4fbb03b6a02490d758f2e739dd254` at
+  `2026-09-21T13:26:53Z`; GitHub reports the source branch deleted. The squash
+  is GitHub-verified, but its merge message omitted a DCO trailer, so the
+  protected main-push governance leaf failed. This is a retained first failure,
+  not a reason to bypass protection.
+- PR #28 had 23/23 check-runs successful, including required regulatory
+  `gate:p3` and the auxiliary conformance gate. The failed first run and the
+  corrected rerun remain in GitHub Actions history; the correction does not
+  relabel the first result.
+- The dedicated closure PR carrying this amendment is the corrective path. Its
+  protected squash message MUST include `Signed-off-by: Daniel David
+  <ddcandales@gmail.com>`, and its post-merge main push MUST pass the complete
+  required set before this phase record is evidence-complete.
+- P3 status remains `blocked`: the immutable candidate is verification-only,
+  `creationAllowed=false`, and six AEAT payload IDs remain unresolved. P4 and
+  P3-B are prohibited regardless of protected CI success.
