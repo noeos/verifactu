@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "id": "P3B-BASELINE-0001",
+  "declaredBeforeInterpretation": true,
+  "scope": "P1-P3 repository, source-custody, generated-contract and assurance infrastructure; no P4 fiscal runtime",
+  "populations": {
+    "documentationFiles": {
+      "selector": "docs/**/*",
+      "denominator": 538,
+      "requiredPercent": 100
+    },
+    "markdownDocuments": {
+      "selector": "docs/**/*.md",
+      "denominator": 535,
+      "requiredPercent": 100
+    },
+    "historicalFindings": {
+      "selector": "REV-001..REV-084",
+      "denominator": 84,
+      "requiredPercent": 100
+    },
+    "requiredCiContexts": {
+      "selector": "config/ci/required-checks.json",
+      "denominator": 17,
+      "requiredPercent": 100
+    },
+    "officialSourceArtifacts": {
+      "selector": "authoritative snapshot manifest",
+      "denominator": 27,
+      "requiredPercent": 100
+    },
+    "xmlContractDocuments": {
+      "selector": "admitted AEAT WSDL/XSD",
+      "denominator": 8,
+      "requiredPercent": 100
+    },
+    "structuralDeclarations": {
+      "selector": "generator declarations",
+      "denominator": 562,
+      "requiredPercent": 100
+    },
+    "fieldConstraints": {
+      "selector": "generator field constraints",
+      "denominator": 447,
+      "requiredPercent": 100
+    },
+    "enumerations": {
+      "selector": "generator enumeration catalogue",
+      "denominator": 652,
+      "requiredPercent": 100
+    },
+    "soapDeclarations": {
+      "selector": "generator WSDL declarations",
+      "denominator": 29,
+      "requiredPercent": 100
+    },
+    "semanticRules": {
+      "selector": "source-located semantic overlay",
+      "denominator": 7,
+      "requiredPercent": 100
+    },
+    "parserNegativeFixtures": {
+      "selector": "fixtures/adversarial/regulatory/*.xml",
+      "denominator": 5,
+      "requiredPercent": 100
+    },
+    "oracleSeededMutants": {
+      "selector": "independent oracle seeded mutants",
+      "denominator": 6,
+      "requiredPercent": 100
+    },
+    "propertyCases": {
+      "selector": "deterministic canonicalization properties",
+      "denominator": 1024,
+      "requiredPercent": 100
+    },
+    "fuzzCases": {
+      "selector": "deterministic hostile XML byte mutations",
+      "denominator": 512,
+      "requiredPercent": 100
+    },
+    "faultCases": {
+      "selector": "source/generator custody fault injections",
+      "denominator": 12,
+      "requiredPercent": 100
+    },
+    "privacyCases": {
+      "selector": "diagnostic redaction probes",
+      "denominator": 12,
+      "requiredPercent": 100
+    },
+    "compatibilityCells": {
+      "selector": "supported OS/runtime matrix",
+      "denominator": 5,
+      "requiredPercent": 100
+    }
+  },
+  "criticalCatalogue": [
+    "protected-history-and-exact-subject",
+    "documentation-and-rev-graph",
+    "official-source-custody",
+    "deterministic-contract-generation",
+    "independent-oracle",
+    "hostile-parser-and-resource-bounds",
+    "security-and-privacy",
+    "required-ci-context-closure",
+    "lock-license-and-action-admission",
+    "cyclonedx-and-spdx-reconciliation",
+    "provenance-and-reproducibility",
+    "os-runtime-compatibility",
+    "negative-property-fuzz-fault-recovery",
+    "audit-readback"
+  ],
+  "thresholds": {
+    "criticalCataloguePercent": 100,
+    "allDeclaredPopulationsPercent": 100,
+    "oracleMutationScorePercent": 100,
+    "missingMetricStatus": "blocked",
+    "partialMetricStatus": "blocked",
+    "unknownStatus": "blocked",
+    "generatorMaximumMillisecondsPerRun": 5000,
+    "generatorRepetitions": 3
+  },
+  "p4FirstCommitPolicies": {
+    "coverage": {
+      "denominator": "all production modules and branches introduced by P4",
+      "threshold": "100% statements and 100% branches for critical fiscal paths; no exclusions without approved risk"
+    },
+    "mutation": {
+      "denominator": "all generated mutants in P4 production modules",
+      "threshold": "100% critical mutants and >=95% overall; equivalent/surviving mutants require per-mutant disposition"
+    },
+    "property": {
+      "denominator": "declared generators × seeds × properties",
+      "threshold": "100% executed; zero-work blocks"
+    },
+    "fuzz": {
+      "denominator": "declared parsers × corpora × seeds",
+      "threshold": "zero crash, hang, OOM, network or unbounded growth; zero-work blocks"
+    },
+    "faultRecovery": {
+      "denominator": "declared durable boundaries × fault points × recovery outcomes",
+      "threshold": "100% invariant preservation and idempotent recovery"
+    },
+    "performance": {
+      "denominator": "declared workloads × supported profiles",
+      "threshold": "all approved latency, throughput, memory and artifact-size budgets"
+    },
+    "compatibility": {
+      "denominator": "public operations × supported OS/runtime/toolchain cells",
+      "threshold": "100% supported cells; unavailable cells block rather than skip"
+    }
+  }
+}

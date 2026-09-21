@@ -10,6 +10,78 @@
   },
   "targets": [
     {
+      "id": "entry-boe-rd-1007-2023",
+      "source": "SRC-0011",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2023-24840",
+      "file": "SRC-0011.html"
+    },
+    {
+      "id": "entry-boe-hac-1177-2024",
+      "source": "SRC-0014",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-22138",
+      "file": "SRC-0014.html"
+    },
+    {
+      "id": "entry-aeat-applicability",
+      "source": "SRC-0016",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu.html",
+      "file": "SRC-0016.html"
+    },
+    {
+      "id": "entry-aeat-technical-index",
+      "source": "SRC-0017",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica.html",
+      "file": "SRC-0017.html"
+    },
+    {
+      "id": "entry-aeat-record-design",
+      "source": "SRC-0018",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/disenos-registro.html",
+      "file": "SRC-0018.html"
+    },
+    {
+      "id": "entry-aeat-wsdl",
+      "source": "SRC-0019",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/wsdl-servicios-web.html",
+      "file": "SRC-0019.html"
+    },
+    {
+      "id": "entry-aeat-xsd",
+      "source": "SRC-0020",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/esquemas.html",
+      "file": "SRC-0020.html"
+    },
+    {
+      "id": "entry-aeat-validation",
+      "source": "SRC-0021",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/documento-validaciones-errores.html",
+      "file": "SRC-0021.html"
+    },
+    {
+      "id": "entry-aeat-remission",
+      "source": "SRC-0022",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-servicios-remision-voluntaria-registros-validaciones.html",
+      "file": "SRC-0022.html"
+    },
+    {
+      "id": "entry-aeat-hash",
+      "source": "SRC-0023",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/algoritmo-calculo-codificacion-huella-hash.html",
+      "file": "SRC-0023.html"
+    },
+    {
+      "id": "entry-aeat-signature",
+      "source": "SRC-0024",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/especificaciones-tecnicas-firma-electronica-registros-evento.html",
+      "file": "SRC-0024.html"
+    },
+    {
+      "id": "entry-aeat-qr",
+      "source": "SRC-0025",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/informacion-tecnica/caracteristicas-qr-especificaciones-servicio-cotejo-factura.html",
+      "file": "SRC-0025.html"
+    },
+    {
       "id": "wsdl",
       "source": "SRC-0019-PAYLOAD",
       "url": "https://prewww2.aeat.es/static_files/common/internet/dep/aplicaciones/es/aeat/tikeV1.0/cont/ws/SistemaFacturacion.wsdl",
@@ -92,6 +164,12 @@
       "source": "SRC-0025-PAYLOAD",
       "url": "https://www.agenciatributaria.es/static_files/AEAT_Desarrolladores/EEDD/IVA/VERI-FACTU/DetalleEspecificacTecnCodigoQRfactura.pdf",
       "file": "DetalleEspecificacTecnCodigoQRfactura.pdf"
+    },
+    {
+      "id": "xmldsig-schema",
+      "source": "SRC-STD-XMLDSIG",
+      "url": "https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd",
+      "file": "xmldsig-core-schema.xsd"
     }
   ]
 }

@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 1,
+  "id": "REGULATORY-SOURCE-PLAN-0002",
+  "snapshotId": "rrsif-2026-09-21-authoritative",
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "observedAt": "2026-09-21T14:28:11Z",
+  "authorityHierarchy": [
+    "BOE enacted text",
+    "AEAT technical publication",
+    "AEAT developer artifact linked by the technical publication"
+  ],
+  "acquisition": {
+    "observer": "REGULATORY-SOURCE-OBSERVER-0001",
+    "tls": "platform-default verification; no bypass or weakened policy",
+    "redirects": 0,
+    "maxBytes": 10485760,
+    "maxFiles": 128,
+    "timeoutSeconds": 30,
+    "runtimeNetwork": "denied",
+    "promotionRule": "entry pages require one successful authenticated observation; developer payloads require byte-identical successful observations on macOS and Windows",
+    "licence": "AEAT and BOE reuse notices retained; redistribution is source-attributed and unmodified"
+  },
+  "observations": [
+    {
+      "platform": "Linux-x86_64",
+      "observedAt": "2026-09-21T14:28:11Z",
+      "role": "entry-page and standards custody plus retained AEAT developer-host TLS negative",
+      "manifestSha256": "9a097e417b42e2ce97ed5c28320d81b739f90ba06917989f1b95dacd9ad04b30"
+    },
+    {
+      "platform": "Darwin-arm64",
+      "observedAt": "2026-09-21T14:15:46Z",
+      "role": "payload custody witness A",
+      "manifestSha256": "080721256fdd737bd96ebaff3826104b80ffcee93682810dceadd1d24b99cd36"
+    },
+    {
+      "platform": "Windows-X64",
+      "observedAt": "2026-09-21T14:16:23Z",
+      "role": "payload custody witness B",
+      "manifestSha256": "a0d9d5c3159a498f1dc3e5fbd5eea637b7be460ba225102584facf3aefa0bc86"
+    }
+  ],
+  "sources": [
+    {
+      "id": "SRC-0011",
+      "targetId": "entry-boe-rd-1007-2023",
+      "path": "sources/boe/SRC-0011.html",
+      "mediaType": "text/html",
+      "authority": "BOE",
+      "licence": "BOE-REUSE-TERMS",
+      "dependsOn": [],
+      "sha256": "20ebefa07aad823150b4eeca63486dba07885bf6bddbc6ce9347b0b08b6015cf",
+      "bytes": 145349
+    },
+    {
+      "id": "SRC-0014",
+      "targetId": "entry-boe-hac-1177-2024",
+      "path": "sources/boe/SRC-0014.html",
+      "mediaType": "text/html",
+      "authority": "BOE",
+      "licence": "BOE-REUSE-TERMS",
+      "dependsOn": ["SRC-0011"],
+      "sha256": "65186f2f861571d12b42031589a23e886e3a0e6a44a74c18919130b36c3b66dd",
+      "bytes": 150804
+    },
+    {
+      "id": "SRC-0016",
+      "targetId": "entry-aeat-applicability",
+      "path": "sources/aeat/SRC-0016.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0011"],
+      "sha256": "c4b621b1af643888b2c5196699b72d4db0f97b41580e6ecbc3db1f38d01d6844",
+      "bytes": 27386
+    },
+    {
+      "id": "SRC-0017",
+      "targetId": "entry-aeat-technical-index",
+      "path": "sources/aeat/SRC-0017.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0016"],
+      "sha256": "6b4a5cf333196747fb0029de3ceac2dcf9601dcff230d2cbe6e705e38c6217a9",
+      "bytes": 13445
+    },
+    {
+      "id": "SRC-0018",
+      "targetId": "entry-aeat-record-design",
+      "path": "sources/aeat/SRC-0018.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "584f9920d8bc57ad26382a6c45d60aff392b4660348aa05837b8cb2c29b2d960",
+      "bytes": 13969
+    },
+    {
+      "id": "SRC-0019",
+      "targetId": "entry-aeat-wsdl",
+      "path": "sources/aeat/SRC-0019.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "ea5b23eaf18185c881425f4cf155453a03662451cf8e5c9d209652bf4812251f",
+      "bytes": 13925
+    },
+    {
+      "id": "SRC-0020",
+      "targetId": "entry-aeat-xsd",
+      "path": "sources/aeat/SRC-0020.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "2a4dbd787374ac649b87c823c85a503bbbdd6e70a44f0508ef45197e2ac168f5",
+      "bytes": 13965
+    },
+    {
+      "id": "SRC-0021",
+      "targetId": "entry-aeat-validation",
+      "path": "sources/aeat/SRC-0021.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "5d288fe831f3c825852803e6f3a2181b73d998435b78c12af5cea56b08578246",
+      "bytes": 14065
+    },
+    {
+      "id": "SRC-0022",
+      "targetId": "entry-aeat-remission",
+      "path": "sources/aeat/SRC-0022.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "2609973a919fbbc3e830b95fd75a0a896176c708a0d543498c310836a222c26e",
+      "bytes": 14231
+    },
+    {
+      "id": "SRC-0023",
+      "targetId": "entry-aeat-hash",
+      "path": "sources/aeat/SRC-0023.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "bcb8d0056b7db10290d5807537d01fdac6d6c02312cf7948c370a53f052dd189",
+      "bytes": 14165
+    },
+    {
+      "id": "SRC-0024",
+      "targetId": "entry-aeat-signature",
+      "path": "sources/aeat/SRC-0024.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "e8867be23298e7585f33f7dda4196459937d4439d3894c02500d64bb5685fdb4",
+      "bytes": 14392
+    },
+    {
+      "id": "SRC-0025",
+      "targetId": "entry-aeat-qr",
+      "path": "sources/aeat/SRC-0025.html",
+      "mediaType": "text/html",
+      "authority": "AEAT",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0017"],
+      "sha256": "a7dfe4c954b45e18585cafc5b3e3dc15ea41b074d8f1e3968244db555f44d085",
+      "bytes": 14139
+    },
+    {
+      "id": "SRC-0019-WSDL",
+      "targetId": "wsdl",
+      "path": "sources/aeat/SistemaFacturacion.wsdl",
+      "mediaType": "application/wsdl+xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0019"],
+      "sha256": "05919120708ff7650612fa6683c9336eaf919335d9a4db10e86759190af48602",
+      "bytes": 8780
+    },
+    {
+      "id": "SRC-0020-XSD-01",
+      "targetId": "xsd-suministro-lr",
+      "path": "sources/aeat/SuministroLR.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "cbdac8d427cc5ab5d77ca48974cab0f35d6bb819c4c66db361681e3710aeba36",
+      "bytes": 1573
+    },
+    {
+      "id": "SRC-0020-XSD-02",
+      "targetId": "xsd-respuesta-suministro",
+      "path": "sources/aeat/RespuestaSuministro.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "82acf80f785643caac13087aae66808ed721a13f08ca5218cf8ae81b695549ef",
+      "bytes": 6259
+    },
+    {
+      "id": "SRC-0020-XSD-03",
+      "targetId": "xsd-consulta-lr",
+      "path": "sources/aeat/ConsultaLR.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "bf2cdb8fc4b95b291757a72b76d8fffca06a6d30d9329122ca2fd6b2d5f8f1b1",
+      "bytes": 3886
+    },
+    {
+      "id": "SRC-0020-XSD-04",
+      "targetId": "xsd-respuesta-consulta-lr",
+      "path": "sources/aeat/RespuestaConsultaLR.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "de35063acb8d9ba0d6ae51acc6b595de9c2b12333250e95e13108ef5f2670d45",
+      "bytes": 10058
+    },
+    {
+      "id": "SRC-0020-XSD-05",
+      "targetId": "xsd-suministro-informacion",
+      "path": "sources/aeat/SuministroInformacion.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "ee4c1655175644de44c4c25055ffeb8e5f4bb4bc3834ce8254d4222ef18c8aa1",
+      "bytes": 49540
+    },
+    {
+      "id": "SRC-0020-XSD-06",
+      "targetId": "xsd-eventos-sif",
+      "path": "sources/aeat/EventosSIF.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "cc7347c6a9a57a0c8edbc6b9ddcce55176452d0db0e68369477e207e9fbdd7e7",
+      "bytes": 30873
+    },
+    {
+      "id": "SRC-0020-XSD-07",
+      "targetId": "xsd-respuesta-validacion-no-verifactu",
+      "path": "sources/aeat/RespuestaValRegistNoVeriFactu.xsd",
+      "mediaType": "application/xml",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0020"],
+      "sha256": "8f47af4f3c49d29b6a62aed261c09f171e855ad6d6bb72ef3fc0b147dc9572f0",
+      "bytes": 4228
+    },
+    {
+      "id": "SRC-0021-PDF",
+      "targetId": "validation-errors",
+      "path": "sources/aeat/Validaciones_Errores_Veri-Factu.pdf",
+      "mediaType": "application/pdf",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0021"],
+      "sha256": "426eb926fc098a36a163f66ca5f40d9e0847ca23300bbe5008979832d3513440",
+      "bytes": 658946
+    },
+    {
+      "id": "SRC-0023-PDF",
+      "targetId": "hash-specification",
+      "path": "sources/aeat/Veri-Factu_especificaciones_huella_hash_registros.pdf",
+      "mediaType": "application/pdf",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0023"],
+      "sha256": "f4334c254bb875b417247b54315199f89d75a8c4814dfd1e86efec562653d7de",
+      "bytes": 1174110
+    },
+    {
+      "id": "SRC-0024-PDF",
+      "targetId": "signature-specification",
+      "path": "sources/aeat/EspecTecGenerFirmaElectRfact.pdf",
+      "mediaType": "application/pdf",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0024"],
+      "sha256": "60953acd5d437a745db9076377739d8ef3f05c31967c1424cd4f6a8ac04af481",
+      "bytes": 1497921
+    },
+    {
+      "id": "SRC-0024-INDEX",
+      "targetId": "signature-index",
+      "path": "sources/aeat/signature-index.html",
+      "mediaType": "text/html",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0024"],
+      "sha256": "9538db90c67d6b4bba125df728ec0b519bf56cc1120b15016fcdcbccf6d07592",
+      "bytes": 5329
+    },
+    {
+      "id": "SRC-0024-EXAMPLES",
+      "targetId": "signature-examples",
+      "path": "sources/aeat/AnexosEjemplosFirmaRegFact.zip",
+      "mediaType": "application/zip",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0024-INDEX"],
+      "sha256": "66fac533bef6c93c041b08704bf538843fe552052a2994899aba0875c2c4b24e",
+      "bytes": 5881
+    },
+    {
+      "id": "SRC-0025-PDF",
+      "targetId": "qr-specification",
+      "path": "sources/aeat/DetalleEspecificacTecnCodigoQRfactura.pdf",
+      "mediaType": "application/pdf",
+      "authority": "AEAT developer host",
+      "licence": "AEAT-REUSE-TERMS",
+      "dependsOn": ["SRC-0025"],
+      "sha256": "f86b3c260d8a4963dbc18c5007732b53199156c5d1db63242e68db71501b49eb",
+      "bytes": 786534
+    },
+    {
+      "id": "SRC-STD-XMLDSIG",
+      "targetId": "xmldsig-schema",
+      "path": "sources/standards/xmldsig-core-schema.xsd",
+      "mediaType": "application/xml+dtd",
+      "authority": "W3C",
+      "licence": "W3C-DOCUMENT-LICENSE",
+      "dependsOn": [],
+      "sha256": "d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d",
+      "bytes": 10292
+    }
+  ],
+  "requiredBeforeActivation": []
+}

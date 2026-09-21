@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "rules": [
+    {
+      "id": "HASH-ALGORITHM-001",
+      "kind": "hash-contract",
+      "statement": "The admitted hash algorithm is SHA-256.",
+      "sourceId": "SRC-0023-PDF",
+      "sourceVersion": "0.1.2",
+      "pages": [1, 4]
+    },
+    {
+      "id": "HASH-INPUT-ENCODING-001",
+      "kind": "hash-contract",
+      "statement": "The ordered name=value input string is encoded as UTF-8 before hashing.",
+      "sourceId": "SRC-0023-PDF",
+      "sourceVersion": "0.1.2",
+      "pages": [5, 7]
+    },
+    {
+      "id": "SIGNATURE-FORMAT-001",
+      "kind": "signature-contract",
+      "statement": "Electronic signatures use XAdES Enveloped, class EPES.",
+      "sourceId": "SRC-0024-PDF",
+      "sourceVersion": "0.1.5",
+      "pages": [6, 7]
+    },
+    {
+      "id": "SIGNATURE-DIGEST-001",
+      "kind": "signature-contract",
+      "statement": "The record-signing digest algorithm is SHA-256.",
+      "sourceId": "SRC-0024-PDF",
+      "sourceVersion": "0.1.5",
+      "pages": [7, 8]
+    },
+    {
+      "id": "QR-ENCODING-001",
+      "kind": "qr-contract",
+      "statement": "QR URLs use application/x-www-form-urlencoded mechanics with UTF-8.",
+      "sourceId": "SRC-0025-PDF",
+      "sourceVersion": "0.5.0",
+      "pages": [8, 10]
+    },
+    {
+      "id": "QR-PARAMETERS-001",
+      "kind": "qr-contract",
+      "statement": "Required QR parameters are nif, numserie, fecha and importe.",
+      "sourceId": "SRC-0025-PDF",
+      "sourceVersion": "0.5.0",
+      "pages": [10, 12]
+    },
+    {
+      "id": "VALIDATION-CATALOGUE-001",
+      "kind": "validation-contract",
+      "statement": "Validation and error semantics are governed by the admitted AEAT catalogue version 1.2.2; this P3 contract does not execute those fiscal validations.",
+      "sourceId": "SRC-0021-PDF",
+      "sourceVersion": "1.2.2",
+      "pages": [1, 35]
+    }
+  ]
+}

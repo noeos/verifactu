@@ -5,9 +5,11 @@ It never opens a URI. External entities, DTDs, path traversal, duplicate
 logical identities, oversized inputs and excessive nesting are rejected before
 any structural declaration is accepted.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
+import json
 import posixpath
 import re
 import sys
@@ -31,6 +33,7 @@ def parse(path: Path) -> dict:
     except ET.ParseError as exc:
         raise ValueError("XML_NOT_WELL_FORMED") from exc
     seen: set[str] = set()
+
     def walk(node: ET.Element, depth: int) -> int:
         if depth > MAX_DEPTH:
             raise ValueError("NESTING_LIMIT")
@@ -40,19 +43,29 @@ def parse(path: Path) -> dict:
             if logical in seen:
                 raise ValueError("DUPLICATE_LOGICAL_IDENTITY")
             seen.add(logical)
-        for child in list(node): count += walk(child, depth + 1)
+        for child in list(node):
+            count += walk(child, depth + 1)
         return count
+
     declarations = walk(root, 0)
     dependencies = []
     for attribute in ("schemaLocation", "location"):
-        for value in [element.attrib[attribute] for element in root.iter() if attribute in element.attrib]:
+        for value in [
+            element.attrib[attribute]
+            for element in root.iter()
+            if attribute in element.attrib
+        ]:
             if value.startswith(("http:", "https:", "file:")) or value.startswith("//"):
                 raise ValueError("REMOTE_DEPENDENCY")
             normalized = posixpath.normpath(value)
             if normalized == ".." or normalized.startswith("../"):
                 raise ValueError("PATH_TRAVERSAL")
             dependencies.append(normalized)
-    return {"root": root.tag, "declarations": declarations, "dependencies": sorted(dependencies)}
+    return {
+        "root": root.tag,
+        "declarations": declarations,
+        "dependencies": sorted(dependencies),
+    }
 
 
 def main() -> int:
@@ -66,7 +79,18 @@ def main() -> int:
                 failures.append(f"{path}:{exc} != {expected}")
         else:
             failures.append(f"{path}:accepted")
-    print({"status": "passed" if not failures else "failed", "fixtures": len(list(Path("fixtures/adversarial/regulatory").glob("*.xml"))), "failures": failures})
+    print(
+        json.dumps(
+            {
+                "status": "passed" if not failures else "failed",
+                "fixtures": len(
+                    list(Path("fixtures/adversarial/regulatory").glob("*.xml"))
+                ),
+                "failures": failures,
+            },
+            sort_keys=True,
+        )
+    )
     return int(bool(failures))
 
 

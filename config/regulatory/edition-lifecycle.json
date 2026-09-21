@@ -15,19 +15,12 @@
   "creationRule": "only active with non-null approval and zero blockers",
   "verificationRule": "historical, sunset and revoked editions may verify; no non-active edition may create",
   "current": {
-    "editionId": "rrsif-2026-09-21-observed-candidate",
-    "state": "blocked",
+    "editionId": "rrsif-2026-09-21-authoritative-candidate",
+    "state": "candidate",
     "immutable": true,
     "creationAllowed": false,
     "verificationAllowed": true,
-    "blockers": [
-      "SRC-0019-PAYLOAD",
-      "SRC-0020-PAYLOAD",
-      "SRC-0021-PAYLOAD",
-      "SRC-0023-PAYLOAD",
-      "SRC-0024-PAYLOAD",
-      "SRC-0025-PAYLOAD"
-    ],
+    "blockers": [],
     "approval": null
   },
   "transitions": {

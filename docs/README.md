@@ -25,10 +25,11 @@ maintained synthetic host, but MUST NOT claim or require a real Facturacion
 integration. That integration will be implemented and evidenced later in the
 separate Facturacion repository.
 
-This repository is currently at a documentation-only baseline. No P1 phase,
-product implementation, generated contract, executable test, package, workflow
-or release evidence has started. The approved specifications define future work
-and are not evidence that any phase has been executed.
+This repository has protected P1–P3 foundation, package-shell, source-custody,
+generated-contract and assurance infrastructure. P3-B is active and P4 has not
+started: there is no fiscal runtime behavior, compliance claim, published
+package or release authorization. The approved specifications and generated
+candidate contracts remain distinct from evidence that later phases ran.
 
 The approved documentation map and the rules for developing it are recorded in
 [`STRUCTURE.md`](STRUCTURE.md).

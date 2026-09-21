@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "P3B-REV-DISPOSITION-0001",
+  "population": "REV-001..REV-084",
+  "denominator": 84,
+  "groups": [
+    {
+      "status": "verified-prevented-in-p1-p3-scope",
+      "members": [
+        "REV-006",
+        "REV-008",
+        "REV-009",
+        "REV-019",
+        "REV-063",
+        "REV-065..REV-076",
+        "REV-079"
+      ],
+      "evidence": "immutable source custody, offline generated contracts, hostile parser negatives, independent oracle, exact-subject task graph, package/SBOM/provenance/reproducibility controls",
+      "reopen": "any source, generator, task graph, package, admission, CI or evidence-subject change"
+    },
+    {
+      "status": "retained-open-not-applicable-before-p4",
+      "members": [
+        "REV-001..REV-005",
+        "REV-007",
+        "REV-010..REV-018",
+        "REV-020..REV-062",
+        "REV-064",
+        "REV-077..REV-078",
+        "REV-080..REV-084"
+      ],
+      "evidence": "P3 regulatory-absence gate proves no P4 fiscal runtime exists; P3-B baseline binds these findings to mandatory first-commit and later phase policies",
+      "reopen": "the first P4 commit or any premature compliance, runtime, release or remediation claim"
+    }
+  ]
+}

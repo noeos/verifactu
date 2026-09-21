@@ -183,6 +183,16 @@ export function validateReportSubject(report, identity) {
   );
 }
 
+export function normalizeOutcomeStatus(outcome) {
+  const status = outcome?.status ?? "passed";
+  assert(
+    ["passed", "blocked"].includes(status),
+    "TASK_OUTCOME_STATUS",
+    String(status),
+  );
+  return status;
+}
+
 export function validateDeclaredWrites(before, after, task) {
   const changed = new Set([...before.keys(), ...after.keys()]);
   const undeclared = [];
@@ -346,11 +356,14 @@ async function executeTask(task, context, completed) {
     }
   }
   const identity = context.identity;
+  const outcomeStatus = operationError
+    ? "failed"
+    : normalizeOutcomeStatus(outcome);
   const report = {
     schemaVersion: 1,
     taskId: task.id,
     taskVersion: task.version,
-    status: operationError ? "failed" : "passed",
+    status: outcomeStatus,
     subject: identity.subject,
     tree: identity.tree,
     toolProfile: task.toolProfile,
@@ -359,7 +372,9 @@ async function executeTask(task, context, completed) {
     passed: operationError
       ? Number(outcome.passed ?? 0)
       : Number(outcome.passed ?? executed),
-    failed: operationError ? Math.max(1, Number(outcome.failed ?? 1)) : 0,
+    failed: operationError
+      ? Math.max(1, Number(outcome.failed ?? 1))
+      : Number(outcome.failed ?? 0),
     skipped: Number(outcome.skipped ?? 0),
     startedAt,
     finishedAt: new Date().toISOString(),
@@ -396,6 +411,11 @@ async function executeTask(task, context, completed) {
   await writeJsonAtomic(reportPath(context.evidenceDir, task.id), report);
   completed.set(task.id, report);
   if (operationError) throw operationError;
+  if (outcomeStatus === "blocked") {
+    const error = new Error(`TASK_BLOCKED: ${task.id}`);
+    error.code = "TASK_BLOCKED";
+    throw error;
+  }
   return report;
 }
 

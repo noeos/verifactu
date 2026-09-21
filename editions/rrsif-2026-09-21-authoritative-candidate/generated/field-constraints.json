@@ -1,0 +1,2717 @@
+{
+  "editionId": "rrsif-2026-09-21-authoritative-candidate",
+  "fields": [
+    {
+      "kind": "element",
+      "name": "Cabecera",
+      "sourceId": "SRC-0020-XSD-01",
+      "type": "sf:CabeceraType"
+    },
+    {
+      "kind": "element",
+      "name": "RegFactuSistemaFacturacion",
+      "sourceId": "SRC-0020-XSD-01"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "RegistroFactura",
+      "sourceId": "SRC-0020-XSD-01",
+      "type": "sfLR:RegistroFacturaType"
+    },
+    {
+      "kind": "element",
+      "ref": "sf:RegistroAlta",
+      "sourceId": "SRC-0020-XSD-01"
+    },
+    {
+      "kind": "element",
+      "ref": "sf:RegistroAnulacion",
+      "sourceId": "SRC-0020-XSD-01"
+    },
+    {
+      "kind": "element",
+      "name": "Cabecera",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:CabeceraType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CodigoErrorRegistro",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sfR:ErrorDetalleType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CSV",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "string"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DatosPresentacion",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:DatosPresentacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DescripcionErrorRegistro",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:TextMax1500Type"
+    },
+    {
+      "kind": "element",
+      "name": "EstadoEnvio",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sfR:EstadoEnvioType"
+    },
+    {
+      "kind": "element",
+      "name": "EstadoRegistro",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sfR:EstadoRegistroType"
+    },
+    {
+      "kind": "element",
+      "name": "IDFactura",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:IDFacturaExpedidaType"
+    },
+    {
+      "kind": "element",
+      "name": "Operacion",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:OperacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RefExterna",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RegistroDuplicado",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:RegistroDuplicadoType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "minOccurs": "0",
+      "name": "RespuestaLinea",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sfR:RespuestaExpedidaType"
+    },
+    {
+      "kind": "element",
+      "name": "RespuestaRegFactuSistemaFacturacion",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sfR:RespuestaRegFactuSistemaFacturacionType"
+    },
+    {
+      "kind": "element",
+      "name": "TiempoEsperaEnvio",
+      "sourceId": "SRC-0020-XSD-02",
+      "type": "sf:Tipo6Type"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ErrorDetalleType",
+      "sourceId": "SRC-0020-XSD-02"
+    },
+    {
+      "kind": "simpleType",
+      "name": "EstadoEnvioType",
+      "sourceId": "SRC-0020-XSD-02"
+    },
+    {
+      "kind": "simpleType",
+      "name": "EstadoRegistroType",
+      "sourceId": "SRC-0020-XSD-02"
+    },
+    {
+      "kind": "element",
+      "name": "Cabecera",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:CabeceraConsultaSf"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ClavePaginacion",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:IDFacturaExpedidaBCType"
+    },
+    {
+      "kind": "element",
+      "name": "ConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sfLRC:ConsultaFactuSistemaFacturacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Contraparte",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:ContraparteConsultaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DatosAdicionalesRespuesta",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sfLRC:DatosAdicionalesRespuestaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:FechaExpedicionConsultaType"
+    },
+    {
+      "kind": "element",
+      "name": "FiltroConsulta",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sfLRC:LRFiltroRegFacturacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "MostrarNombreRazonEmisor",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:MostrarNombreRazonEmisorType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "MostrarSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:MostrarSistemaInformaticoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:TextoIDFacturaType"
+    },
+    {
+      "kind": "element",
+      "name": "PeriodoImputacion",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:PeriodoImputacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RefExterna",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "SistemaInformatico",
+      "sourceId": "SRC-0020-XSD-03",
+      "type": "sf:SistemaInformaticoConsultaType"
+    },
+    {
+      "kind": "element",
+      "name": "Cabecera",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:CabeceraConsultaSf"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ClavePaginacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:IDFacturaExpedidaBCType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CodigoErrorRegistro",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:ErrorDetalleType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CuotaTotal",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Cupon",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:CuponType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DatosPresentacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:DatosPresentacion2Type"
+    },
+    {
+      "kind": "element",
+      "name": "DatosRegistroFacturacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:RespuestaDatosRegistroFacturacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DescripcionErrorRegistro",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax500Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DescripcionOperacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax500Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Desglose",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:DesgloseType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Destinatarios",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "element",
+      "name": "Ejercicio",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:YearType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "EmitidaPorTerceroODestinatario",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TercerosODestinatarioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Encadenamiento",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "element",
+      "name": "EstadoRegistro",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:EstadoRegistroType"
+    },
+    {
+      "kind": "element",
+      "name": "EstadoRegistro",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:EstadoRegFactuType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturaSimplificadaArt7273",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:SimplificadaCualificadaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturaSinIdentifDestinatarioArt61d",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:CompletaSinDestinatarioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturasRectificadas",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturasSustituidas",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaFinVeriFactu",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaHoraHusoGenRegistro",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaOperacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "GeneradoPor",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:GeneradoPorType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Generador",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Huella",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "IdAcuerdoSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax16Type"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "IDDestinatario",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "name": "IDFactura",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:IDFacturaExpedidaType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "IDFacturaRectificada",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:IDFacturaARType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "IDFacturaSustituida",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:IDFacturaARType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ImporteRectificacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:DesgloseRectificacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ImporteTotal",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Incidencia",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:IncidenciaType"
+    },
+    {
+      "kind": "element",
+      "name": "IndicadorPaginacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:IndicadorPaginacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Macrodato",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:MacrodatoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NifRepresentante",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NombreRazonEmisor",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumRegistroAcuerdoFacturacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax15Type"
+    },
+    {
+      "kind": "element",
+      "name": "Periodo",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TipoPeriodoType"
+    },
+    {
+      "kind": "element",
+      "name": "PeriodoImputacion",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "element",
+      "name": "PrimerRegistro",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:PrimerRegistroCadenaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RechazoPrevio",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:RechazoPrevioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RefExterna",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroAnterior",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:EncadenamientoFacturaAnteriorType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "10000",
+      "minOccurs": "0",
+      "name": "RegistroRespuestaConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:RegistroRespuestaConsultaRegFacturacionType"
+    },
+    {
+      "kind": "element",
+      "name": "RespuestaConsultaFactuSistemaFacturacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:RespuestaConsultaFactuSistemaFacturacionType"
+    },
+    {
+      "kind": "element",
+      "name": "ResultadoConsulta",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sfLRRC:ResultadoConsultaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "SinRegistroPrevio",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:SinRegistroPrevioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "SistemaInformatico",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:SistemaInformaticoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Subsanacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:SubsanacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Tercero",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "name": "TimestampUltimaModificacion",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoFactura",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:ClaveTipoFacturaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoHuella",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:TipoHuellaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoRectificativa",
+      "sourceId": "SRC-0020-XSD-04",
+      "type": "sf:ClaveTipoRectificativaType"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ErrorDetalleType",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "simpleType",
+      "name": "EstadoRegistroType",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "simpleType",
+      "name": "IndicadorPaginacionType",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ResultadoConsultaType",
+      "sourceId": "SRC-0020-XSD-04"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "BaseImponibleACoste",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "BaseImponibleOimporteNoSujeto",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "BaseRectificada",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "CalificacionOperacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:CalificacionOperacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ClaveRegimen",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IdOperacionesTrascendenciaTributariaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CodigoErrorRegistro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ErrorDetalleType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CodigoPais",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:CountryType2"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CuotaRecargoEquivalencia",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CuotaRecargoRectificado",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "CuotaRectificada",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CuotaRepercutida",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "CuotaTotal",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Cupon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:CuponType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DescripcionErrorRegistro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax500Type"
+    },
+    {
+      "kind": "element",
+      "name": "DescripcionOperacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax500Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Desde",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "Desglose",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:DesgloseType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Destinatario",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaESType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Destinatarios",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "12",
+      "name": "DetalleDesglose",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:DetalleType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "ref": "ds:Signature",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "ref": "ds:Signature",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "name": "Ejercicio",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:YearType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "EmitidaPorTerceroODestinatario",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TercerosODestinatarioType"
+    },
+    {
+      "kind": "element",
+      "name": "Encadenamiento",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "name": "Encadenamiento",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "name": "EstadoRegistroDuplicado",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:EstadoRegistroSFType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturaSimplificadaArt7273",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SimplificadaCualificadaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturaSinIdentifDestinatarioArt61d",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:CompletaSinDestinatarioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturasRectificadas",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FacturasSustituidas",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFacturaAnulada",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaFinVeriFactu",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoGenRegistro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoGenRegistro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FechaOperacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "FinRequerimiento",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:FinRequerimientoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "GeneradoPor",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:GeneradoPorType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Generador",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Hasta",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "Huella",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "Huella",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "Huella",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "ID",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax20Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "IdAcuerdoSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax16Type"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "IDDestinatario",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFacturaAnulada",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDFacturaExpedidaType"
+    },
+    {
+      "kind": "element",
+      "name": "IDFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDFacturaExpedidaBajaType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "IDFacturaRectificada",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDFacturaARType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "1000",
+      "name": "IDFacturaSustituida",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDFacturaARType"
+    },
+    {
+      "kind": "element",
+      "name": "IDOtro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDOtroType"
+    },
+    {
+      "kind": "element",
+      "name": "IDOtro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDOtroType"
+    },
+    {
+      "kind": "element",
+      "name": "IDOtro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDOtroType"
+    },
+    {
+      "kind": "element",
+      "name": "IDOtro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IDOtroType"
+    },
+    {
+      "kind": "element",
+      "name": "IdPeticion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax20Type"
+    },
+    {
+      "kind": "element",
+      "name": "IdPeticionRegistroDuplicado",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax20Type"
+    },
+    {
+      "kind": "element",
+      "name": "IdSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax2Type"
+    },
+    {
+      "kind": "element",
+      "name": "IdSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax2Type"
+    },
+    {
+      "kind": "element",
+      "name": "IDType",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaIDTypeType"
+    },
+    {
+      "kind": "element",
+      "name": "IDVersion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:VersionType"
+    },
+    {
+      "kind": "element",
+      "name": "IDVersion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:VersionType"
+    },
+    {
+      "kind": "element",
+      "name": "IDVersion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:VersionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ImporteRectificacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:DesgloseRectificacionType"
+    },
+    {
+      "kind": "element",
+      "name": "ImporteTotal",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Impuesto",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ImpuestoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Incidencia",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IncidenciaType"
+    },
+    {
+      "kind": "element",
+      "name": "IndicadorMultiplesOT",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "IndicadorMultiplesOT",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "IndicadorRepresentante",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:IndicadorRepresentanteType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Macrodato",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:MacrodatoType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIFPresentador",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIFPresentador",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazonEmisor",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax30Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NombreSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax30Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroInstalacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax100Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroInstalacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax100Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumRegistroAcuerdoFacturacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax15Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextoIDFacturaType"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextoIDFacturaType"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextoIDFacturaType"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFacturaAnulada",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextoIDFacturaType"
+    },
+    {
+      "kind": "element",
+      "name": "ObligadoEmision",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaESType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "ObligadoEmision",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ObligadoEmisionConsultaType"
+    },
+    {
+      "kind": "element",
+      "name": "OperacionExenta",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:OperacionExentaType"
+    },
+    {
+      "kind": "element",
+      "name": "Periodo",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TipoPeriodoType"
+    },
+    {
+      "kind": "element",
+      "name": "PrimerRegistro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PrimerRegistroCadenaType"
+    },
+    {
+      "kind": "element",
+      "name": "PrimerRegistro",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PrimerRegistroCadenaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RangoFechaExpedicion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:RangoFechaExpedicionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RechazoPrevio",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:RechazoPrevioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RechazoPrevio",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:RechazoPrevioAnulacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RechazoPrevio",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:RechazoPrevioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RefExterna",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RefExterna",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "name": "RefRequerimiento",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax18Type"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroAlta",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:RegistroFacturacionAltaType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroAnterior",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:EncadenamientoFacturaAnteriorType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroAnterior",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:EncadenamientoFacturaAnteriorType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroAnulacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:RegistroFacturacionAnulacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RemisionRequerimiento",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RemisionVoluntaria",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Representante",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaESType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "SinRegistroPrevio",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SinRegistroPrevioType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "SinRegistroPrevio",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SinRegistroPrevioType"
+    },
+    {
+      "kind": "element",
+      "name": "SistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SistemaInformaticoType"
+    },
+    {
+      "kind": "element",
+      "name": "SistemaInformatico",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SistemaInformaticoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Subsanacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SubsanacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Subsanacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SubsanacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Tercero",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "name": "TimestampPresentacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "TimestampPresentacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "TipoFactura",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ClaveTipoFacturaType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoHuella",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TipoHuellaType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoHuella",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TipoHuellaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoImpositivo",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:Tipo2.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "TipoOperacion",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TipoOperacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoRecargoEquivalencia",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:Tipo2.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoRectificativa",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:ClaveTipoRectificativaType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoUsoPosibleMultiOT",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoUsoPosibleMultiOT",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoUsoPosibleSoloVerifactu",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoUsoPosibleSoloVerifactu",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "Version",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax50Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "Version",
+      "sourceId": "SRC-0020-XSD-05",
+      "type": "sf:TextMax50Type"
+    },
+    {
+      "kind": "simpleType",
+      "name": "CalificacionOperacionType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ClaveTipoFacturaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ClaveTipoRectificativaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "CompletaSinDestinatarioType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "CountryType2",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "CuponType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ErrorDetalleType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "EstadoRegistroSFType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "fecha",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "FinRequerimientoType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "GeneradoPorType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "IdOperacionesTrascendenciaTributariaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ImporteSgn12.2Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ImporteSgn14.2Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ImpuestoType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "IncidenciaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "IndicadorRepresentanteType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "MacrodatoType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "MostrarNombreRazonEmisorType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "MostrarSistemaInformaticoType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "NIFType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "Numerico4Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "OperacionExentaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "PersonaFisicaJuridicaIDTypeType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "PrimerRegistroCadenaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "RechazoPrevioAnulacionType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "RechazoPrevioType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ReferenciaCatastralType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "SimplificadaCualificadaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "SiNoType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "SinRegistroPrevioType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "SubsanacionType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TercerosODestinatarioType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax100Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax120Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax1500Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax150Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax15Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax16Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax18Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax20Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax250Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax25Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax2Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax30Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax34Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax40Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax500Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax50Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax60Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax64Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax65Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax70Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextoIDenvioType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextoIDFacturaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "Timestamp",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "Tipo10Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "Tipo2.2Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "Tipo3Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "Tipo6Type",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TipoHuellaType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TipoOperacionType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TipoPeriodoType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "VersionType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "simpleType",
+      "name": "YearType",
+      "sourceId": "SRC-0020-XSD-05"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CodigoPais",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:CountryType2"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DatosPropiosEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DatosPropiosEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "DeteccionAnomaliasRegEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DeteccionAnomaliasRegEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "DeteccionAnomaliasRegFacturacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DeteccionAnomaliasRegFacturacionType"
+    },
+    {
+      "kind": "element",
+      "ref": "ds:Signature",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "EmitidaPorTerceroODestinatario",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TercerosODestinatarioType"
+    },
+    {
+      "kind": "element",
+      "name": "Encadenamiento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:EncadenamientoType"
+    },
+    {
+      "kind": "element",
+      "name": "Evento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:EventoType"
+    },
+    {
+      "kind": "element",
+      "name": "EventoAnterior",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:RegEventoAntType"
+    },
+    {
+      "kind": "element",
+      "name": "ExportacionRegEventoPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ExportacionRegEventoPeriodoType"
+    },
+    {
+      "kind": "element",
+      "name": "ExportacionRegFacturacionPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ExportacionRegFacturacionPeriodoType"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaExpedicionFactura",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:fecha"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoFinPeriodoExport",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoFinPeriodoExport",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoGenEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoGenEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoInicioPeriodoExport",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "FechaHoraHusoInicioPeriodoExport",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "dateTime"
+    },
+    {
+      "kind": "element",
+      "name": "Huella",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "HuellaEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "HuellaEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "HuellaEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax64Type"
+    },
+    {
+      "kind": "element",
+      "name": "ID",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax20Type"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFactura",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDEmisorFactura",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "IDOtro",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDOtroType"
+    },
+    {
+      "kind": "element",
+      "name": "IDOtro",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDOtroType"
+    },
+    {
+      "kind": "element",
+      "name": "IdSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax2Type"
+    },
+    {
+      "kind": "element",
+      "name": "IDType",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:PersonaFisicaJuridicaIDTypeType"
+    },
+    {
+      "kind": "element",
+      "name": "IDVersion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:VersionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "IndicadorMultiplesOT",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "LanzamientoProcesoDeteccionAnomaliasRegEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:LanzamientoProcesoDeteccionAnomaliasRegEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "LanzamientoProcesoDeteccionAnomaliasRegFacturacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:LanzamientoProcesoDeteccionAnomaliasRegFacturacionType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NIF",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:NIFType"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "name": "NombreRazon",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax120Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NombreSistemaInformatico",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax30Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroDeEventos",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax4Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroDeRegEventoExportados",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax7Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosEventoProcesadosSobreIntegridadFirmas",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax5Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosEventoProcesadosSobreIntegridadHuellas",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax5Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosEventoProcesadosSobreTrazabilidadCadena",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax5Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosEventoProcesadosSobreTrazabilidadFechas",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax5Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroDeRegistrosFacturacionAltaExportados",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax9Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroDeRegistrosFacturacionAltaGenerados",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax6Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroDeRegistrosFacturacionAnulacionExportados",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax9Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroDeRegistrosFacturacionAnulacionGenerados",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax6Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosFacturacionProcesadosSobreIntegridadFirmas",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax7Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosFacturacionProcesadosSobreIntegridadHuellas",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax7Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosFacturacionProcesadosSobreTrazabilidadCadena",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax7Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "NumeroDeRegistrosFacturacionProcesadosSobreTrazabilidadFechas",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:DigitosMax7Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumeroInstalacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax100Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "name": "NumSerieFactura",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "name": "ObligadoEmision",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:PersonaFisicaJuridicaESType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "OtrosDatosAnomalia",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax100Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "OtrosDatosAnomalia",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax100Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "OtrosDatosEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax100Type"
+    },
+    {
+      "kind": "element",
+      "name": "PrimerEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax1Type"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreIntegridadFirmasRegEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreIntegridadFirmasRegFacturacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreIntegridadHuellasRegEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreIntegridadHuellasRegFacturacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreTrazabilidadCadenaRegEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreTrazabilidadCadenaRegFacturacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreTrazabilidadFechasRegEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RealizadoProcesoSobreTrazabilidadFechasRegFacturacion",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RegEventoAnomalo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:RegEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "RegEventoExportadosDejanDeConservarse",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroEvento",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroEventoFinalPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:RegEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroEventoInicialPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:RegEventoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RegistroFacturacionAnomalo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDFacturaExpedidaType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroFacturacionFinalPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDFacturaExpedidaHuellaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RegistroFacturacionFinalPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDFacturaExpedidaHuellaType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistroFacturacionInicialPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDFacturaExpedidaHuellaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RegistroFacturacionInicialPeriodo",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:IDFacturaExpedidaHuellaType"
+    },
+    {
+      "kind": "element",
+      "name": "RegistrosFacturacionExportadosDejanDeConservarse",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "ResumenEventos",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ResumenEventosType"
+    },
+    {
+      "kind": "element",
+      "name": "SistemaInformatico",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SistemaInformaticoType"
+    },
+    {
+      "kind": "element",
+      "name": "SumaCuotaTotalAlta",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "SumaCuotaTotalAlta",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "SumaImporteTotalAlta",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "name": "SumaImporteTotalAlta",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:ImporteSgn12.2Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TerceroODestinatario",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:PersonaFisicaJuridicaType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoAnomalia",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoAnomaliaType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoAnomalia",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoAnomaliaType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoEventoType"
+    },
+    {
+      "kind": "element",
+      "maxOccurs": "20",
+      "name": "TipoEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoEventoAgrType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoEvento",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoEventoType"
+    },
+    {
+      "kind": "element",
+      "name": "TipoHuella",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TipoHuellaType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoUsoPosibleMultiOT",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "TipoUsoPosibleSoloVerifactu",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:SiNoType"
+    },
+    {
+      "kind": "element",
+      "name": "Version",
+      "sourceId": "SRC-0020-XSD-06",
+      "type": "sf:TextMax50Type"
+    },
+    {
+      "kind": "simpleType",
+      "name": "CountryType2",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "DigitosMax4Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "DigitosMax5Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "DigitosMax6Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "DigitosMax7Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "DigitosMax9Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "fecha",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ImporteSgn12.2Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "NIFType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "PersonaFisicaJuridicaIDTypeType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "SiNoType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TercerosODestinatarioType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax100Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax120Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax1Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax20Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax2Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax30Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax50Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax60Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TextMax64Type",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TipoAnomaliaType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TipoEventoType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "TipoHuellaType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "simpleType",
+      "name": "VersionType",
+      "sourceId": "SRC-0020-XSD-06"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "CodigoErrorRegistro",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sfR:ErrorDetalleType"
+    },
+    {
+      "kind": "element",
+      "name": "DescripcionErrorFormatoXML",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sf:TextMax1500Type"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "DescripcionErrorRegistro",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sf:TextMax1500Type"
+    },
+    {
+      "kind": "element",
+      "name": "EstadoRegistro",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sfR:EstadoRegistroType"
+    },
+    {
+      "kind": "element",
+      "name": "IDFactura",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sf:IDFacturaExpedidaType"
+    },
+    {
+      "kind": "element",
+      "name": "Operacion",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sf:OperacionType"
+    },
+    {
+      "kind": "element",
+      "minOccurs": "0",
+      "name": "RefExterna",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sf:TextMax60Type"
+    },
+    {
+      "kind": "element",
+      "name": "RespuestaValContenidoFactuSistemaFacturacion",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sfR:RespuestaValContenidoFactuSistemaFacturacionType"
+    },
+    {
+      "kind": "element",
+      "name": "RespuestaValidacion",
+      "sourceId": "SRC-0020-XSD-07",
+      "type": "sfR:RespuestaRegType"
+    },
+    {
+      "kind": "simpleType",
+      "name": "ErrorDetalleType",
+      "sourceId": "SRC-0020-XSD-07"
+    },
+    {
+      "kind": "simpleType",
+      "name": "EstadoEnvioType",
+      "sourceId": "SRC-0020-XSD-07"
+    },
+    {
+      "kind": "simpleType",
+      "name": "EstadoRegistroType",
+      "sourceId": "SRC-0020-XSD-07"
+    }
+  ],
+  "schemaVersion": 1
+}
