@@ -105,6 +105,12 @@
       "expectedCode": "ACTION_MUTABLE"
     },
     {
+      "id": "NEG-ACTION-RUNTIME-001",
+      "control": "action",
+      "mutation": "deprecated-action-runtime",
+      "expectedCode": "ACTION_RUNTIME"
+    },
+    {
       "id": "NEG-DEPENDENCY-001",
       "control": "dependency",
       "mutation": "range-spec",

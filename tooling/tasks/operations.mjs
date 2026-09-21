@@ -467,6 +467,9 @@ export function validateWorkflowText(
       "network",
       "credentialHandling",
       "bundledCodeReview",
+      "contractReview",
+      "reviewedAncestry",
+      "knownAdvisories",
       "replacement",
     ])
       assert(
@@ -474,6 +477,11 @@ export function validateWorkflowText(
         "ACTION_ADMISSION_FIELD",
         `${admission.name}.${field}`,
       );
+    assert(
+      ["node24", "composite"].includes(admission.runtime),
+      "ACTION_RUNTIME",
+      `${admission.name}.${admission.runtime}`,
+    );
   }
   assert(
     /^permissions:\s*\{\}\s*$/mu.test(workflowText),
@@ -1274,6 +1282,13 @@ async function testPolicy(context) {
         fixtureError(fixture.expectedCode, () =>
           validateActionReference("actions/checkout@v6", admissions),
         );
+        break;
+      case "deprecated-action-runtime":
+        fixtureError(fixture.expectedCode, () => {
+          const mutated = structuredClone(admissions);
+          mutated[0].runtime = "node20";
+          validateWorkflowText(workflow, mutated);
+        });
         break;
       case "range-spec":
         fixtureError(fixture.expectedCode, () =>
