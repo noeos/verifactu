@@ -326,7 +326,7 @@ jobs:
         with: *primary
       - name: Review pull-request dependency diff
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
         with:
           fail-on-severity: moderate
           deny-licenses: GPL-3.0-only, AGPL-3.0-only
@@ -502,7 +502,7 @@ jobs:
           node-version: 24.21.0
           check-latest: false
       - name: Download all leaf reports
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: required-report-*
           path: required-reports
