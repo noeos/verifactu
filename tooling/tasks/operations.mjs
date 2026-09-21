@@ -1109,7 +1109,13 @@ async function testPolicy(context) {
   const artifacts = await readJson(
     resolve(context.root, "config/repository/artifacts.json"),
   );
-  const files = await repositoryFiles(context.root);
+  const files = (
+    await walk(context.root, {
+      exclude: [".git", "node_modules", "evidence/runs"],
+    })
+  )
+    .filter((entry) => entry.type === "file")
+    .map((entry) => entry.relative);
   const generated = await readJson(
     resolve(context.root, "config/generated/toolchain.generated.json"),
   );
