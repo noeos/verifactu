@@ -7,6 +7,14 @@ const api = await import(
     "../../evidence/runs/artifacts/build/verifactu/dist/index.js"
 );
 const RUNS = 4096;
+const xmlProvider = await import(
+  process.env.VERIFACTU_XML_PROVIDER_ENTRY ??
+    new URL("../../internal/xml-provider/provider.mjs", import.meta.url).href
+);
+const xmlWorker = await import(
+  process.env.VERIFACTU_XML_WORKER_ENTRY ??
+    new URL("../../internal/xml-provider/worker.mjs", import.meta.url).href
+);
 let state = 0x4e4f454f;
 const next = () => {
   state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
@@ -287,5 +295,73 @@ test("P4-PROP-009 official projection preserves presence and order", () => {
     assert.equal(projection.fields[1].state, chosen);
     assert.equal(projection.fields[2].lexical, `value-${suffix}`);
     assert.equal(projection.fields[3].state, "empty");
+  }
+});
+
+test("P4-PROP-010 XML model serialize-parse preserves supported infoset", () => {
+  const decode = (value) =>
+    value
+      .replaceAll("&#xD;", "\r")
+      .replaceAll("&#xA;", "\n")
+      .replaceAll("&#x9;", "\t")
+      .replaceAll("&quot;", '"')
+      .replaceAll("&gt;", ">")
+      .replaceAll("&lt;", "<")
+      .replaceAll("&amp;", "&");
+  for (let index = 0; index < RUNS; index += 1) {
+    const suffix = next();
+    const attribute = `a&<"\r\n\t-${suffix}`;
+    const text = `t&<>\r-${suffix}`;
+    const result = api.serializeXmlDocument({
+      root: {
+        kind: "element",
+        name: { namespaceUri: "urn:property", prefix: "p", localName: "Root" },
+        namespaces: [{ prefix: "p", namespaceUri: "urn:property" }],
+        attributes: [
+          {
+            name: { namespaceUri: "", prefix: null, localName: "value" },
+            value: attribute,
+          },
+        ],
+        children: [{ kind: "text", value: text }],
+      },
+    });
+    assert.equal(result.status, "succeeded");
+    const serialized = new TextDecoder().decode(result.value);
+    const match =
+      /^<\?xml version="1\.0" encoding="UTF-8"\?><p:Root xmlns:p="urn:property" value="([\s\S]*?)">([\s\S]*?)<\/p:Root>$/u.exec(
+        serialized,
+      );
+    assert.notEqual(match, null);
+    assert.equal(decode(match[1]), attribute);
+    assert.equal(decode(match[2]), text);
+  }
+});
+
+test("P4-FUZZ-002 XML scanner and serializer handle 4096 bounded arbitrary inputs", () => {
+  const statuses = new Set(["succeeded", "invalid"]);
+  for (let index = 0; index < RUNS; index += 1) {
+    const input = new Uint8Array(next() % 1025);
+    for (let offset = 0; offset < input.length; offset += 1)
+      input[offset] = next() & 0xff;
+    const scanned = xmlProvider.scanXmlResources(
+      new TextDecoder().decode(input),
+      xmlProvider.DEFAULT_XML_LIMITS,
+    );
+    assert.equal(scanned === null || typeof scanned === "string", true);
+    const model = {
+      root: {
+        kind: "element",
+        name: {
+          namespaceUri: "urn:fuzz",
+          prefix: "f",
+          localName: index % 5 === 0 ? `${String.fromCharCode(next() & 31)}bad` : `N${next()}`,
+        },
+        namespaces: [{ prefix: "f", namespaceUri: "urn:fuzz" }],
+        attributes: [],
+        children: [{ kind: "text", value: new TextDecoder().decode(input) }],
+      },
+    };
+    assert.equal(statuses.has(api.serializeXmlDocument(model).status), true);
   }
 });

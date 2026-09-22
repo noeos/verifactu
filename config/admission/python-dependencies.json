@@ -3,12 +3,30 @@
   "source": "config/python/requirements.lock",
   "dependencies": [
     {
+      "name": "elementpath",
+      "version": "5.1.4",
+      "license": "MIT",
+      "sha256": [
+        "3c912a9c41311ac5244c038867670d7c0b0fec0e444813608e5b846dbb3428ac",
+        "5ec8d7bb44b16c98414a6a95e20cb150f3cbfc3cac65edc14773288c7a937376"
+      ]
+    },
+    {
       "name": "html5rdf",
       "version": "1.2.1",
       "license": "MIT",
       "sha256": [
         "1f519121bc366af3e485310dc8041d2e86e5173c1a320fac3dc9d2604069b83e",
         "ace9b420ce52995bb4f05e7425eedf19e433c981dfe7a831ab391e2fa2e1a195"
+      ]
+    },
+    {
+      "name": "lxml",
+      "version": "6.1.3",
+      "license": "BSD-3-Clause",
+      "sha256": [
+        "45222d94ddd511536f3b2f7d9deae3b2339b4ce0f075f1ca25703b07cad9dd21",
+        "d85dfab42dd672f87a7f76e9de7172962aee69fa12044f0d6e1a23cbd53fb80e"
       ]
     },
     {
@@ -72,6 +90,15 @@
       "sha256": [
         "2097bb1d28a0ba8fe177c2eb607317f9b1627b03f33ebebfd3da670b337a65ba",
         "2dae09efa25253ae2874188e86d6861af3b1652aef4118cdf3f0bda288a957fb"
+      ]
+    },
+    {
+      "name": "xmlschema",
+      "version": "4.3.2",
+      "license": "MIT",
+      "sha256": [
+        "cf5c970a30f6ebcb3da35260e694704cc0b6794d8ace46125bb2a95e38ed9307",
+        "f3b33a21a2b2cdc404ddc3fb599d8bc1dee90b155d547370672e6e684746b8d6"
       ]
     }
   ]

@@ -149,14 +149,14 @@ jobs:
       - name: Install hash-locked SPDX validation runtime
         shell: bash
         run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
-      - name: Run cumulative P4-B planning and artifact assurance gate
+      - name: Run cumulative P4-C XML and offline XSD assurance gate
         env:
           VERIFACTU_PYTHON: python
         shell: bash
-        run: node tooling/tasks/run-task.mjs --task gate:p4b
+        run: node tooling/tasks/run-task.mjs --task gate:p4c
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json --task-report evidence/runs/gate--p4b.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json --task-report evidence/runs/gate--p4c.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-quality

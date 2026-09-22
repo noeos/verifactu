@@ -86,7 +86,7 @@ export function validateP4QualityPlan(candidate) {
   );
 
   assert(
-    candidate.productionModules.length === 43,
+    candidate.productionModules.length === 44,
     "P4_PLAN_MODULE_POPULATION",
     candidate.productionModules.length,
   );
@@ -97,13 +97,14 @@ export function validateP4QualityPlan(candidate) {
         path.startsWith("packages/verifactu/src/") ||
         path.startsWith("internal/xml-provider/") ||
         path.startsWith("internal/xades-provider/") ||
-        path === "internal/independent-oracles/p4_oracle.py",
+        path === "internal/independent-oracles/p4_oracle.py" ||
+        path === "internal/independent-oracles/p4c_xml_oracle.py",
     ),
     "P4_PLAN_MODULE_SCOPE",
     "path outside P4 production/provider/oracle scope",
   );
   assert(
-    candidate.testFiles.length === 26,
+    candidate.testFiles.length === 27,
     "P4_PLAN_TEST_POPULATION",
     candidate.testFiles.length,
   );
@@ -256,7 +257,8 @@ const discoveredProduction = tracked.filter(
     (path.startsWith("packages/verifactu/src/") && path.endsWith(".ts")) ||
     (path.startsWith("internal/xml-provider/") && path.endsWith(".mjs")) ||
     (path.startsWith("internal/xades-provider/") && path.endsWith(".mjs")) ||
-    path === "internal/independent-oracles/p4_oracle.py",
+    path === "internal/independent-oracles/p4_oracle.py" ||
+    path === "internal/independent-oracles/p4c_xml_oracle.py",
 );
 assert(
   discoveredProduction.every((path) => plan.productionModules.includes(path)),

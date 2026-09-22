@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Independent P4-B oracle for admitted AEAT fingerprint vectors."""
+"""Independent P4-B oracle for fingerprint vectors."""
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]

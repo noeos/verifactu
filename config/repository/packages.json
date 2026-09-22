@@ -29,7 +29,8 @@
         "./domain/mode-tenure.js",
         "./domain/records.js",
         "./domain/sequences.js",
-        "./domain/states.js"
+        "./domain/states.js",
+        "./ports/xml-xsd.js"
       ],
       "bin": null,
       "allowlist": [

@@ -159,4 +159,21 @@ test("P4-CB-006 date and instant parsing rejects impossible or implicit values",
   const later = api.parseFiscalInstant("2026-09-21T09:00:00-01:00").value;
   assert.equal(api.compareFiscalInstants(left, later), -1);
   assert.equal(api.compareFiscalInstants(later, left), 1);
+  const instant = (value) => {
+    const result = api.parseFiscalInstant(value);
+    assert.equal(result.status, "succeeded", value);
+    return result.value;
+  };
+  for (const [before, after] of [
+    ["1970-01-01T00:00:00Z", "1970-01-01T00:00:01Z"],
+    ["2024-02-28T23:59:59Z", "2024-02-29T00:00:00Z"],
+    ["2024-02-29T23:59:59Z", "2024-03-01T00:00:00Z"],
+    ["2023-12-31T23:59:59Z", "2024-01-01T00:00:00Z"],
+    ["2000-02-29T23:59:59Z", "2000-03-01T00:00:00Z"],
+    ["2026-01-01T00:00:00+14:00", "2025-12-31T10:00:01Z"],
+    ["2026-01-01T00:00:00-12:59", "2026-01-01T12:59:01Z"],
+  ]) {
+    assert.equal(api.compareFiscalInstants(instant(before), instant(after)), -1);
+    assert.equal(api.compareFiscalInstants(instant(after), instant(before)), 1);
+  }
 });
