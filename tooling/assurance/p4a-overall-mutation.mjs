@@ -17,6 +17,17 @@ const root = resolve(import.meta.dirname, "../..");
 const build = resolve(root, "evidence/runs/artifacts/build/verifactu/dist");
 const testMap = [
   [
+    /application\/(?:operation-plan|record-planner)/u,
+    [
+      "tests/unit/p4-plans-artifacts.test.mjs",
+      "tests/property/p4-properties.test.mjs",
+    ],
+  ],
+  [
+    /application\/(?:official-projection|official-serialization|fingerprint|xml-artifacts)/u,
+    ["tests/unit/p4-plans-artifacts.test.mjs"],
+  ],
+  [
     /contracts\/staged-codec|contracts\/limits/u,
     ["tests/unit/p4-codecs.test.mjs"],
   ],

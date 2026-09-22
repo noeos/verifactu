@@ -24,3 +24,18 @@ test("P4-A public contract exposes only explicit pure capabilities", () => {
     "candidate edition does not expose creation",
   );
 });
+
+test("P4-B public contract exposes pure planning and artifact capabilities", () => {
+  for (const name of [
+    "projectOfficialFields",
+    "serializeOfficialProjection",
+    "computeFingerprint",
+    "verifyFingerprint",
+    "createByteArtifact",
+    "transitionByteArtifact",
+    "defineOperationPlan",
+    "planRecord",
+  ]) {
+    assert.equal(typeof api[name], "function", name);
+  }
+});

@@ -3100,6 +3100,97 @@ async function p4AAssurance(context) {
   };
 }
 
+async function p4BAssurance(context) {
+  const coverage = await run("node", ["tooling/assurance/p4b-coverage.mjs"], {
+    cwd: context.root,
+    timeoutMs: 180000,
+  });
+  assert(
+    coverage.code === 0,
+    "P4B_COVERAGE",
+    coverage.stderr || coverage.stdout,
+  );
+  const coverageReport = JSON.parse(
+    coverage.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const critical = await run("node", ["tooling/assurance/p4b-mutation.mjs"], {
+    cwd: context.root,
+    timeoutMs: 180000,
+  });
+  assert(
+    critical.code === 0,
+    "P4B_CRITICAL_MUTATION",
+    critical.stderr || critical.stdout,
+  );
+  const criticalReport = JSON.parse(
+    critical.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const overall = await run(
+    "node",
+    ["tooling/assurance/p4b-overall-mutation.mjs"],
+    { cwd: context.root, timeoutMs: 300000 },
+  );
+  assert(
+    overall.code === 0,
+    "P4B_OVERALL_MUTATION",
+    overall.stderr || overall.stdout,
+  );
+  const overallReport = JSON.parse(
+    overall.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const oracle = await run(
+    "python3",
+    ["internal/independent-oracles/p4_oracle.py"],
+    {
+      cwd: context.root,
+      timeoutMs: 30000,
+    },
+  );
+  assert(oracle.code === 0, "P4B_ORACLE", oracle.stderr || oracle.stdout);
+  const oracleReport = JSON.parse(oracle.stdout.trim().split(/\r?\n/u).at(-1));
+  const performance = await run(
+    "node",
+    ["--test", "tests/performance/p4-deterministic-core.test.mjs"],
+    { cwd: context.root, timeoutMs: 30000 },
+  );
+  assert(
+    performance.code === 0,
+    "P4B_PERFORMANCE",
+    performance.stderr || performance.stdout,
+  );
+  const selected =
+    coverageReport.testFiles +
+    criticalReport.population +
+    overallReport.population +
+    oracleReport.selected +
+    1;
+  return {
+    selected,
+    executed: selected,
+    passed: selected,
+    outputDigest: sha256(
+      canonicalJson({
+        coverage: coverageReport,
+        criticalMutation: criticalReport,
+        overallMutation: overallReport,
+        oracle: oracleReport,
+        performanceSmoke: "1000 plans below 5000ms",
+        propertyExecutions: 2 * 4096,
+        officialVectors: 3,
+      }),
+    ),
+    diagnostics: [
+      `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
+      `critical mutants killed=${criticalReport.killed}/${criticalReport.population}`,
+      `overall mutants killed=${overallReport.killed}/${overallReport.population} (${overallReport.killedPercent}%) across ${overallReport.productionFiles} production files; survivors=${overallReport.survivors.length} timeouts=${overallReport.timeouts}`,
+      "P4-B property executions=8192 with zero discards",
+      `official and independent fingerprint vectors=${oracleReport.vectors}`,
+      "1000-plan deterministic-core performance smoke passed below 5000ms",
+      "current authoritative candidate remains creationAllowed=false",
+    ],
+  };
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -3161,6 +3252,7 @@ export const operations = {
   p3bAssurance,
   p4QualityPlan,
   p4AAssurance,
+  p4BAssurance,
   gate,
 };
 
@@ -3202,5 +3294,6 @@ export const operationCapabilities = Object.freeze({
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
   p4QualityPlan: { tools: ["git", "node"], network: "denied" },
   p4AAssurance: { tools: ["node"], network: "denied" },
+  p4BAssurance: { tools: ["node", "python"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 
 const api = await import(
@@ -13,6 +14,12 @@ const next = () => {
 };
 const id = (kind, value) => api.identity(kind, value).value;
 const at = (value) => api.parseFiscalInstant(value).value;
+const hash = (algorithm, bytes) =>
+  new Uint8Array(
+    createHash(algorithm === "SHA-256" ? "sha256" : "sha512")
+      .update(bytes)
+      .digest(),
+  );
 
 test("P4-PROP-001 failed syntax never invokes structural decoding", () => {
   let calls = 0;
@@ -192,5 +199,93 @@ test("P4-PROP-007 chain recomputation detects every link mutation", () => {
       },
     ];
     assert.equal(api.verifyChain(mutated, digest).status, "conflict");
+  }
+});
+
+test("P4-PROP-008 plans are deterministic and deeply immutable", () => {
+  const editionId = id("edition", "property-active-edition");
+  for (let index = 0; index < RUNS; index += 1) {
+    const suffix = next();
+    const input = {
+      planId: `plan-${suffix}`,
+      commandId: `command-${suffix}`,
+      idempotencyKey: id("idempotency", `idem-${suffix}`),
+      contextId: `context-${suffix}`,
+      editionId,
+      configurationId: id("configuration", `configuration-${suffix}`),
+      preparedAt: at("2026-09-21T10:00:00+02:00"),
+      expiresAt: at("2026-09-21T10:05:00+02:00"),
+      observedHead: {
+        scope: `chain-${suffix}`,
+        version: `v-${suffix}`,
+        recordId: null,
+        fingerprint: null,
+      },
+      recordId: id("record", `record-${suffix}`),
+      artifactIds: [id("artifact", `artifact-${suffix}`)],
+      editionPolicy: {
+        edition: editionId,
+        creationAllowed: true,
+        allowedModes: ["verifactu"],
+      },
+      fingerprint: suffix.toString(16).padStart(64, "0").slice(-64),
+      semanticInputDigest: suffix.toString(16).padStart(64, "0"),
+      configurationDigest: (suffix + 1).toString(16).padStart(64, "0"),
+    };
+    const first = api.planRecord(input, hash).value;
+    const second = api.planRecord(structuredClone(input), hash).value;
+    assert.deepEqual(
+      api.operationPlanBytes(first),
+      api.operationPlanBytes(second),
+    );
+    assert.equal(Object.isFrozen(first), true);
+    assert.equal(Object.isFrozen(first.observedHead), true);
+    assert.equal(Object.isFrozen(first.binding), true);
+    assert.equal(Object.isFrozen(first.artifactIds), true);
+    assert.equal(Object.isFrozen(first.effects), true);
+    assert.equal(first.effects.every(Object.isFrozen), true);
+  }
+});
+
+test("P4-PROP-009 official projection preserves presence and order", () => {
+  const editionId = id("edition", "property-projection-edition");
+  const states = ["absent", "empty", "xsi-nil"];
+  for (let index = 0; index < RUNS; index += 1) {
+    const suffix = next();
+    const ordered = [
+      `a-${suffix}`,
+      `b-${suffix}`,
+      `c-${suffix}`,
+      `d-${suffix}`,
+    ];
+    const descriptor = {
+      id: `projection-${suffix}`,
+      editionId,
+      fields: ordered.map((source, position) => ({
+        source,
+        label: `F${position}-${suffix}`,
+        lexical: "text",
+        whitespace: "preserve",
+      })),
+    };
+    const chosen = states[next() % states.length];
+    const input = {
+      [ordered[1]]: { state: chosen },
+      [ordered[2]]: { state: "text", value: `value-${suffix}` },
+      [ordered[3]]: { state: "empty" },
+    };
+    const projection = api.projectOfficialFields(
+      descriptor,
+      editionId,
+      input,
+    ).value;
+    assert.deepEqual(
+      projection.fields.map((field) => field.source),
+      ordered,
+    );
+    assert.equal(projection.fields[0].state, "absent");
+    assert.equal(projection.fields[1].state, chosen);
+    assert.equal(projection.fields[2].lexical, `value-${suffix}`);
+    assert.equal(projection.fields[3].state, "empty");
   }
 });
