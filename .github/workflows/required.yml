@@ -147,13 +147,15 @@ jobs:
           python-version: 3.13.15
           check-latest: false
       - name: Create isolated hash-locked XML validation runtime
+        env:
+          VERIFACTU_CI_PYTHON: ${{ runner.temp }}/verifactu-p4c-python
         shell: bash
         run: |
-          python -m venv .ci-python
-          .ci-python/bin/python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
+          python -m venv "$VERIFACTU_CI_PYTHON"
+          "$VERIFACTU_CI_PYTHON/bin/python" -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
       - name: Run cumulative P4-C XML and offline XSD assurance gate
         env:
-          VERIFACTU_PYTHON: ${{ github.workspace }}/.ci-python/bin/python
+          VERIFACTU_PYTHON: ${{ runner.temp }}/verifactu-p4c-python/bin/python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:p4c
       - name: Write leaf report
