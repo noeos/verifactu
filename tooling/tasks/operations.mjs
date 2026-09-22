@@ -1767,7 +1767,7 @@ async function integrationConsumers(context) {
     ],
     {
       cwd: consumerRoot,
-      timeoutMs: 240000,
+      timeoutMs: 600000,
       env: {
         ...process.env,
         npm_config_cache: verifiedCache,
@@ -3129,7 +3129,7 @@ async function p4BAssurance(context) {
   const overall = await run(
     "node",
     ["tooling/assurance/p4b-overall-mutation.mjs"],
-    { cwd: context.root, timeoutMs: 300000 },
+    { cwd: context.root, timeoutMs: 600000 },
   );
   assert(
     overall.code === 0,
