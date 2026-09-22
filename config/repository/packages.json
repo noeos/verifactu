@@ -7,6 +7,12 @@
       "name": "@noeos/verifactu",
       "root": "packages/verifactu",
       "publicExports": [
+        "./application/fingerprint.js",
+        "./application/official-projection.js",
+        "./application/official-serialization.js",
+        "./application/operation-plan.js",
+        "./application/record-planner.js",
+        "./application/xml-artifacts.js",
         "./contracts/configuration.js",
         "./contracts/limits.js",
         "./contracts/results.js",
