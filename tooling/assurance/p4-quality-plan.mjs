@@ -104,7 +104,7 @@ export function validateP4QualityPlan(candidate) {
     "path outside P4 production/provider/oracle scope",
   );
   assert(
-    candidate.testFiles.length === 28,
+    candidate.testFiles.length === 29,
     "P4_PLAN_TEST_POPULATION",
     candidate.testFiles.length,
   );

@@ -102,6 +102,7 @@
     "tests/property/p4-xml-worker-properties.test.mjs",
     "tests/mutation/p4-mutation.test.mjs",
     "tests/integration/p4-offline-xsd.test.mjs",
+    "tests/integration/p4-xades-official-vector.test.mjs",
     "tests/security/p4-pki-attacks.test.mjs",
     "tests/integration/p4-qr-roundtrip.test.mjs",
     "tests/integration/p4-engine-tarball.test.mjs",

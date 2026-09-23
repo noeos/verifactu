@@ -23,6 +23,7 @@ const tests = [
   "tests/security/p4-resource-attacks.test.mjs",
   "tests/security/p4-xades-attacks.test.mjs",
   "tests/security/p4-pki-attacks.test.mjs",
+  "tests/integration/p4-xades-official-vector.test.mjs",
   "tests/property/p4-properties.test.mjs",
   "tests/property/p4-xml-worker-properties.test.mjs",
   "tests/mutation/p4-mutation.test.mjs",

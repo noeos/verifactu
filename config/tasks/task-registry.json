@@ -1080,6 +1080,7 @@
         "tests/unit/p4-xades-policy.test.mjs",
         "tests/security/p4-xades-attacks.test.mjs",
         "tests/security/p4-pki-attacks.test.mjs",
+        "tests/integration/p4-xades-official-vector.test.mjs",
         "tooling/assurance/p4d-coverage.mjs",
         "tooling/assurance/p4d-mutation.mjs",
         "config/quality/p4-quality-plan.json"
