@@ -5,6 +5,28 @@
   "coolingPeriodDays": 7,
   "dependencies": [
     {
+      "name": "@nuintun/qrcode",
+      "version": "5.0.3",
+      "publishedAt": "2026-02-06T09:02:23.447Z",
+      "source": "https://registry.npmjs.org/@nuintun/qrcode/-/qrcode-5.0.3.tgz",
+      "integrity": "sha512-eKxU05NO2A5ycOiAKu9XKaf5akfR0wJHgjBvy4Wgy2dOgBjMh58IHz8gvMwS2IBiqWq63ITntuzP/iuVA2wOHg==",
+      "repository": "git+https://github.com/nuintun/qrcode.git",
+      "maintainers": ["nuintun"],
+      "installLifecycle": false,
+      "nativeCode": false,
+      "optionalCode": false,
+      "transitiveGraph": "package-lock.json",
+      "permissions": "none during ignore-scripts install",
+      "network": "registry.npmjs.org during dependency preparation only",
+      "scope": "runtime",
+      "purpose": "Deterministic QR ISO/IEC 18004 matrix encoder behind the QR renderer boundary",
+      "alternatives": "Handwritten QR matrix generation is prohibited; node-qrcode has a larger transitive runtime graph",
+      "maintainerRisk": "Single maintainer; exact integrity, independent decode and vulnerability gates required",
+      "advisories": "npm audit and OSV required",
+      "license": "MIT",
+      "exit": "Replace behind the QR renderer port with regenerated vector and tarball evidence"
+    },
+    {
       "name": "@noeos/verification-engine",
       "version": "1.0.1",
       "publishedAt": "2026-09-02T22:34:32.906Z",
