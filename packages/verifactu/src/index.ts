@@ -8,6 +8,7 @@ export * from "./application/official-serialization.js";
 export * from "./application/operation-plan.js";
 export * from "./application/record-planner.js";
 export * from "./application/xml-artifacts.js";
+export * from "./application/qr.js";
 export * from "./domain/chains.js";
 export * from "./domain/context.js";
 export * from "./domain/corrections.js";
@@ -22,6 +23,7 @@ export * from "./domain/records.js";
 export * from "./domain/sequences.js";
 export * from "./domain/states.js";
 export * from "./ports/xml-xsd.js";
+export * from "./ports/qr.js";
 export * from "./verification/claims.js";
 export {
   VERIFACTU_ENGINE_ADMISSION,
