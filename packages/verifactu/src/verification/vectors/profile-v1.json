@@ -1,0 +1,25 @@
+{
+  "profile": "es.noeos.verifactu.record@1.0.0",
+  "encoding": "UTF-8 JSON in declared field order; no fiscal plaintext",
+  "valid": {
+    "contextId": "tenant-a.install-a",
+    "sequenceId": "series-2026",
+    "recordId": "record-1",
+    "editionId": "edition-1",
+    "operation": "alta",
+    "officialArtifactDigests": [
+      "0000000000000000000000000000000000000000000000000000000000000000"
+    ],
+    "previousEvidenceDigest": null,
+    "algorithm": "sha-256"
+  },
+  "invalid": [
+    { "reason": "fiscal-plaintext", "field": "invoice" },
+    { "reason": "unknown-operation", "field": "operation", "value": "other" },
+    {
+      "reason": "malformed-digest",
+      "field": "officialArtifactDigests",
+      "value": "not-a-digest"
+    }
+  ]
+}
