@@ -12,10 +12,13 @@ export type CertificateValidationStatus =
 export interface CertificateValidationRequest {
   readonly editionId: EditionId;
   readonly certificateChainDer: readonly Uint8Array[];
+  /** Explicit trust input; ambient OS trust stores are never consulted. */
+  readonly trustAnchorDer: Uint8Array;
   readonly certificateFingerprintSha256: string;
   readonly validationInstant: FiscalInstant;
   readonly requireRevocationEvidence: boolean;
   readonly requiredSubject: string;
+  readonly requiredKeyUsages: readonly string[];
   readonly minimumRsaBits: number;
 }
 

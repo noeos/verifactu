@@ -56,6 +56,7 @@ test("P4-D validates an explicit local RSA trust anchor and refuses missing revo
     certificateFingerprintSha256: fingerprint,
     validationInstant: new Date().toISOString(),
     requiredSubject: "CN=Noeos Test",
+    requiredKeyUsages: [],
     minimumRsaBits: 2048,
   };
   assert.deepEqual(
@@ -87,6 +88,14 @@ test("P4-D validates an explicit local RSA trust anchor and refuses missing revo
     validateCertificateChain({
       ...base,
       requiredSubject: "CN=other",
+      requireRevocationEvidence: false,
+    }).authorization,
+    "invalid",
+  );
+  assert.equal(
+    validateCertificateChain({
+      ...base,
+      requiredKeyUsages: ["digitalSignature"],
       requireRevocationEvidence: false,
     }).authorization,
     "invalid",

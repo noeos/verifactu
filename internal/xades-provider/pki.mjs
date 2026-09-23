@@ -80,8 +80,11 @@ export function validateCertificateChain(request) {
   const instant = Date.parse(request.validationInstant);
   if (
     !Number.isFinite(instant) ||
-    instant < Date.parse(leaf.validFrom) ||
-    instant > Date.parse(leaf.validTo)
+    certificates.some(
+      (certificate) =>
+        instant < Date.parse(certificate.validFrom) ||
+        instant > Date.parse(certificate.validTo),
+    )
   )
     return result(
       "invalid",
@@ -108,6 +111,14 @@ export function validateCertificateChain(request) {
   if (!leaf.subject.includes(request.requiredSubject))
     return result("invalid", "valid", "valid", "not-evaluated", "invalid", [
       "DIAG-XADES-CERTIFICATE-SUBJECT",
+    ]);
+  if (
+    request.requiredKeyUsages.some(
+      (usage) => !(leaf.keyUsage ?? []).includes(usage),
+    )
+  )
+    return result("invalid", "valid", "valid", "not-evaluated", "invalid", [
+      "DIAG-XADES-CERTIFICATE-USAGE",
     ]);
   if (request.requireRevocationEvidence)
     return result("indeterminate", "valid", "valid", "indeterminate", "valid", [
@@ -136,6 +147,11 @@ function validRequest(value) {
     typeof value.validationInstant === "string" &&
     typeof value.requiredSubject === "string" &&
     value.requiredSubject.length > 0 &&
+    Array.isArray(value.requiredKeyUsages) &&
+    value.requiredKeyUsages.every(
+      (usage) => typeof usage === "string" && usage.length > 0,
+    ) &&
+    new Set(value.requiredKeyUsages).size === value.requiredKeyUsages.length &&
     Number.isSafeInteger(value.minimumRsaBits) &&
     value.minimumRsaBits >= 2048 &&
     typeof value.requireRevocationEvidence === "boolean"
