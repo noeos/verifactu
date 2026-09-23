@@ -15,12 +15,36 @@ import ts from "typescript";
 
 const root = resolve(import.meta.dirname, "../..");
 const build = resolve(root, "evidence/runs/artifacts/build/verifactu/dist");
+const xmlProvider = resolve(root, "internal/xml-provider");
+const includeXmlProvider = process.env.P4C_MUTATION === "1";
 const testMap = [
+  [/ports\/xml-xsd/u, ["tests/unit/p4-xml-model.test.mjs"]],
+  [
+    /internal\/xml-provider\/provider\.mjs/u,
+    [
+      "tests/security/p4-xml-attacks.test.mjs",
+      "tests/security/p4-resource-attacks.test.mjs",
+      "tests/contract/p4-xml-xsd-provider.test.mjs",
+      "tests/integration/p4-offline-xsd.test.mjs",
+    ],
+  ],
+  [
+    /internal\/xml-provider\/worker\.mjs/u,
+    [
+      "tests/property/p4-properties.test.mjs",
+      "tests/property/p4-xml-worker-properties.test.mjs",
+      "tests/security/p4-xml-attacks.test.mjs",
+      "tests/security/p4-resource-attacks.test.mjs",
+      "tests/contract/p4-xml-xsd-provider.test.mjs",
+      "tests/integration/p4-offline-xsd.test.mjs",
+    ],
+  ],
   [
     /application\/(?:operation-plan|record-planner)/u,
     [
       "tests/unit/p4-plans-artifacts.test.mjs",
       "tests/property/p4-properties.test.mjs",
+      "tests/property/p4-xml-worker-properties.test.mjs",
     ],
   ],
   [
@@ -89,7 +113,7 @@ async function javascriptFiles(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = resolve(directory, entry.name);
     if (entry.isDirectory()) files.push(...(await javascriptFiles(path)));
-    else if (entry.isFile() && entry.name.endsWith(".js")) files.push(path);
+    else if (entry.isFile() && /\.m?js$/u.test(entry.name)) files.push(path);
   }
   return files.sort();
 }
@@ -176,7 +200,10 @@ function discoverMutants(path, source) {
   return mutants;
 }
 
-const files = await javascriptFiles(build);
+const files = [
+  ...(await javascriptFiles(build)),
+  ...(includeXmlProvider ? await javascriptFiles(xmlProvider) : []),
+];
 const sources = new Map();
 const mutants = [];
 for (const path of files) {
@@ -202,9 +229,18 @@ const results = [];
 try {
   for (const [index, mutant] of deduplicated.entries()) {
     const mutantRoot = resolve(temporary, String(index).padStart(4, "0"));
+    const external = mutant.path.startsWith(xmlProvider);
     await cp(build, mutantRoot, { recursive: true });
-    const relativePath = relative(build, mutant.path);
-    const target = resolve(mutantRoot, relativePath);
+    if (external)
+      await cp(xmlProvider, resolve(mutantRoot, "xml-provider"), {
+        recursive: true,
+      });
+    const relativePath = external
+      ? relative(root, mutant.path)
+      : relative(build, mutant.path);
+    const target = external
+      ? resolve(mutantRoot, "xml-provider", relative(xmlProvider, mutant.path))
+      : resolve(mutantRoot, relativePath);
     const source = sources.get(mutant.path);
     if (source === undefined)
       throw new Error(`P4A_MUTATION_SOURCE: ${mutant.path}`);
@@ -219,8 +255,20 @@ try {
       encoding: "utf8",
       env: {
         ...isolatedEnvironment,
-        VERIFACTU_TEST_ENTRY: pathToFileURL(resolve(mutantRoot, "index.js"))
-          .href,
+        ...(external
+          ? {
+              VERIFACTU_XML_PROVIDER_ENTRY: pathToFileURL(
+                resolve(mutantRoot, "xml-provider/provider.mjs"),
+              ).href,
+              VERIFACTU_XML_WORKER_ENTRY: pathToFileURL(
+                resolve(mutantRoot, "xml-provider/worker.mjs"),
+              ).href,
+            }
+          : {
+              VERIFACTU_TEST_ENTRY: pathToFileURL(
+                resolve(mutantRoot, "index.js"),
+              ).href,
+            }),
       },
       timeout: 10_000,
     });

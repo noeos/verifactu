@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sfLR:RegFactuSistemaFacturacion xmlns:sfLR="https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroLR.xsd" xmlns:sf="https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroInformacion.xsd">
+  <sfLR:Cabecera>
+    <sf:ObligadoEmision>
+      <sf:NombreRazon>NOEOS PRUEBA</sf:NombreRazon>
+      <sf:NIF>B12345678</sf:NIF>
+    </sf:ObligadoEmision>
+  </sfLR:Cabecera>
+  <sfLR:RegistroFactura>
+    <sf:RegistroAlta>
+      <sf:IDVersion>1.0</sf:IDVersion>
+      <sf:IDFactura>
+        <sf:IDEmisorFactura>B12345678</sf:IDEmisorFactura>
+        <sf:NumSerieFactura>F-1</sf:NumSerieFactura>
+        <sf:FechaExpedicionFactura>21-09-2026</sf:FechaExpedicionFactura>
+      </sf:IDFactura>
+      <sf:NombreRazonEmisor>NOEOS PRUEBA</sf:NombreRazonEmisor>
+      <sf:TipoFactura>F1</sf:TipoFactura>
+      <sf:DescripcionOperacion>Prueba de conformidad sin efectos fiscales</sf:DescripcionOperacion>
+      <sf:Desglose>
+        <sf:DetalleDesglose>
+          <sf:Impuesto>01</sf:Impuesto>
+          <sf:ClaveRegimen>01</sf:ClaveRegimen>
+          <sf:CalificacionOperacion>S1</sf:CalificacionOperacion>
+          <sf:TipoImpositivo>21</sf:TipoImpositivo>
+          <sf:BaseImponibleOimporteNoSujeto>100.00</sf:BaseImponibleOimporteNoSujeto>
+          <sf:CuotaRepercutida>21.00</sf:CuotaRepercutida>
+        </sf:DetalleDesglose>
+      </sf:Desglose>
+      <sf:CuotaTotal>21.00</sf:CuotaTotal>
+      <sf:ImporteTotal>121.00</sf:ImporteTotal>
+      <sf:Encadenamiento>
+        <sf:PrimerRegistro>S</sf:PrimerRegistro>
+      </sf:Encadenamiento>
+      <sf:SistemaInformatico>
+        <sf:NombreRazon>NOEOS PRUEBA</sf:NombreRazon>
+        <sf:NIF>B12345678</sf:NIF>
+        <sf:NombreSistemaInformatico>VeriFactu Test</sf:NombreSistemaInformatico>
+        <sf:IdSistemaInformatico>01</sf:IdSistemaInformatico>
+        <sf:Version>0.0.0-test</sf:Version>
+        <sf:NumeroInstalacion>TEST-1</sf:NumeroInstalacion>
+        <sf:TipoUsoPosibleSoloVerifactu>S</sf:TipoUsoPosibleSoloVerifactu>
+        <sf:TipoUsoPosibleMultiOT>N</sf:TipoUsoPosibleMultiOT>
+        <sf:IndicadorMultiplesOT>N</sf:IndicadorMultiplesOT>
+      </sf:SistemaInformatico>
+      <sf:FechaHoraHusoGenRegistro>2026-09-21T12:00:00+02:00</sf:FechaHoraHusoGenRegistro>
+      <sf:TipoHuella>01</sf:TipoHuella>
+      <sf:Huella>0000000000000000000000000000000000000000000000000000000000000000</sf:Huella>
+    </sf:RegistroAlta>
+  </sfLR:RegistroFactura>
+</sfLR:RegFactuSistemaFacturacion>

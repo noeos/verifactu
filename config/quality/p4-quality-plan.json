@@ -79,7 +79,8 @@
     "internal/xades-provider/provider.mjs",
     "internal/xades-provider/pki.mjs",
     "internal/xades-provider/worker.mjs",
-    "internal/independent-oracles/p4_oracle.py"
+    "internal/independent-oracles/p4_oracle.py",
+    "internal/independent-oracles/p4c_xml_oracle.py"
   ],
   "testFiles": [
     "tests/unit/p4-codecs.test.mjs",
@@ -97,6 +98,7 @@
     "tests/contract/p4-qr-provider.test.mjs",
     "tests/contract/p4-engine-adapter.test.mjs",
     "tests/property/p4-properties.test.mjs",
+    "tests/property/p4-xml-worker-properties.test.mjs",
     "tests/mutation/p4-mutation.test.mjs",
     "tests/integration/p4-offline-xsd.test.mjs",
     "tests/integration/p4-xades-pki.test.mjs",

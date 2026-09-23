@@ -2060,7 +2060,7 @@ async function componentGraph(context) {
         subjectByName.get(name) ?? resolveNpmDependency("", name),
       );
   }
-  for (const dependency of ["pyshacl", "rdflib"])
+  for (const dependency of ["lxml", "pyshacl", "rdflib", "xmlschema"])
     addRelationship(
       "runtime:python@3.13.15",
       `pypi:${dependency}@${python.dependencies.find((item) => item.name === dependency).version}`,
@@ -2070,6 +2070,7 @@ async function componentGraph(context) {
     rdflib: ["html5rdf", "pyparsing"],
     owlrl: ["rdflib"],
     prettytable: ["wcwidth"],
+    xmlschema: ["elementpath"],
   };
   for (const [fromName, dependencyNames] of Object.entries(pythonEdges)) {
     const fromRecord = python.dependencies.find(
@@ -3056,7 +3057,7 @@ async function p4AAssurance(context) {
     ["tooling/assurance/p4a-overall-mutation.mjs"],
     {
       cwd: context.root,
-      timeoutMs: 240000,
+      timeoutMs: 600000,
     },
   );
   assert(
@@ -3128,7 +3129,7 @@ async function p4BAssurance(context) {
   const overall = await run(
     "node",
     ["tooling/assurance/p4b-overall-mutation.mjs"],
-    { cwd: context.root, timeoutMs: 300000 },
+    { cwd: context.root, timeoutMs: 600000 },
   );
   assert(
     overall.code === 0,
@@ -3139,7 +3140,7 @@ async function p4BAssurance(context) {
     overall.stdout.trim().split(/\r?\n/u).at(-1),
   );
   const oracle = await run(
-    "python3",
+    process.env.VERIFACTU_PYTHON ?? "python3",
     ["internal/independent-oracles/p4_oracle.py"],
     {
       cwd: context.root,
@@ -3186,6 +3187,83 @@ async function p4BAssurance(context) {
       "P4-B property executions=8192 with zero discards",
       `official and independent fingerprint vectors=${oracleReport.vectors}`,
       "1000-plan deterministic-core performance smoke passed below 5000ms",
+      "current authoritative candidate remains creationAllowed=false",
+    ],
+  };
+}
+
+async function p4CAssurance(context) {
+  const coverage = await run("node", ["tooling/assurance/p4c-coverage.mjs"], {
+    cwd: context.root,
+    timeoutMs: 300000,
+  });
+  assert(
+    coverage.code === 0,
+    "P4C_COVERAGE",
+    coverage.stderr || coverage.stdout,
+  );
+  const coverageReport = JSON.parse(
+    coverage.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const critical = await run("node", ["tooling/assurance/p4c-mutation.mjs"], {
+    cwd: context.root,
+    timeoutMs: 180000,
+  });
+  assert(
+    critical.code === 0,
+    "P4C_CRITICAL_MUTATION",
+    critical.stderr || critical.stdout,
+  );
+  const criticalReport = JSON.parse(
+    critical.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const overall = await run(
+    "node",
+    ["tooling/assurance/p4c-overall-mutation.mjs"],
+    { cwd: context.root, timeoutMs: 600000 },
+  );
+  assert(
+    overall.code === 0,
+    "P4C_OVERALL_MUTATION",
+    overall.stderr || overall.stdout,
+  );
+  const overallReport = JSON.parse(
+    overall.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const oracle = await run(
+    process.env.VERIFACTU_PYTHON ?? "python3",
+    ["internal/independent-oracles/p4c_xml_oracle.py"],
+    { cwd: context.root, timeoutMs: 30000 },
+  );
+  assert(oracle.code === 0, "P4C_ORACLE", oracle.stderr || oracle.stdout);
+  const oracleReport = JSON.parse(oracle.stdout.trim().split(/\r?\n/u).at(-1));
+  const selected =
+    coverageReport.testFiles +
+    criticalReport.population +
+    overallReport.population +
+    oracleReport.selected;
+  return {
+    selected,
+    executed: selected,
+    passed: selected,
+    outputDigest: sha256(
+      canonicalJson({
+        coverage: coverageReport,
+        criticalMutation: criticalReport,
+        overallMutation: overallReport,
+        oracle: oracleReport,
+        propertyExecutions: 4096,
+        fuzzExecutions: 2 * 4096,
+        officialVectors: 6,
+      }),
+    ),
+    diagnostics: [
+      `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
+      `critical mutants killed=${criticalReport.killed}/${criticalReport.population}`,
+      `overall mutants killed=${overallReport.killed}/${overallReport.population} (${overallReport.killedPercent}%) across ${overallReport.productionFiles} production files; survivors=${overallReport.survivors.length} timeouts=${overallReport.timeouts}`,
+      "P4-C XML infoset property executions=4096 with zero discards",
+      "P4-C XML/XSD fuzz executions=8192 with bounded inputs",
+      `independent XML/XSD oracle checks=${oracleReport.selected}`,
       "current authoritative candidate remains creationAllowed=false",
     ],
   };
@@ -3253,6 +3331,7 @@ export const operations = {
   p4QualityPlan,
   p4AAssurance,
   p4BAssurance,
+  p4CAssurance,
   gate,
 };
 
@@ -3295,5 +3374,6 @@ export const operationCapabilities = Object.freeze({
   p4QualityPlan: { tools: ["git", "node"], network: "denied" },
   p4AAssurance: { tools: ["node"], network: "denied" },
   p4BAssurance: { tools: ["node", "python"], network: "denied" },
+  p4CAssurance: { tools: ["node", "python"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });

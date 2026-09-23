@@ -15,11 +15,16 @@ const tests = [
   "tests/unit/p4-xml-model.test.mjs",
   "tests/contract/p4-public-contract.test.mjs",
   "tests/contract/p4-edition-contract.test.mjs",
+  "tests/contract/p4-xml-xsd-provider.test.mjs",
+  "tests/integration/p4-offline-xsd.test.mjs",
   "tests/security/p4-isolation-redaction.test.mjs",
+  "tests/security/p4-xml-attacks.test.mjs",
+  "tests/security/p4-resource-attacks.test.mjs",
   "tests/property/p4-properties.test.mjs",
+  "tests/property/p4-xml-worker-properties.test.mjs",
   "tests/mutation/p4-mutation.test.mjs",
 ];
-const temporary = await mkdtemp(join(tmpdir(), "verifactu-p4b-coverage-"));
+const temporary = await mkdtemp(join(tmpdir(), "verifactu-p4c-coverage-"));
 
 try {
   const execution = spawnSync(
@@ -29,8 +34,14 @@ try {
       "--all",
       "--src",
       "evidence/runs/artifacts/build/verifactu/dist",
+      "--src",
+      "internal/xml-provider",
       "--include",
       "**/*.js",
+      "--include",
+      "**/*.mjs",
+      "--reporter",
+      "text-summary",
       "--check-coverage",
       "--lines",
       "98",
@@ -40,8 +51,6 @@ try {
       "95",
       "--statements",
       "98",
-      "--reporter",
-      "text-summary",
       "--reports-dir",
       resolve(temporary, "report"),
       "--temp-directory",
@@ -50,17 +59,17 @@ try {
       "--test",
       ...tests,
     ],
-    { cwd: root, encoding: "utf8", timeout: 180_000 },
+    { cwd: root, encoding: "utf8", timeout: 240_000 },
   );
   if (execution.error !== undefined || execution.status !== 0)
     throw new Error(
-      `P4B_COVERAGE_EXECUTION: ${execution.error?.message ?? ""}\n${execution.stdout}\n${execution.stderr}`,
+      `P4C_COVERAGE_EXECUTION: ${execution.error?.message ?? ""}\n${execution.stdout}\n${execution.stderr}`,
     );
   const output = `${execution.stdout}\n${execution.stderr}`;
   const metric = (name) => {
     const match = new RegExp(`${name}\\s*:\\s*([\\d.]+)%`, "u").exec(output);
     if (match?.[1] === undefined)
-      throw new Error(`P4B_COVERAGE_METRIC: ${name}`);
+      throw new Error(`P4C_COVERAGE_METRIC: ${name}`);
     return Number(match[1]);
   };
   const report = {
