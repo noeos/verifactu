@@ -3,6 +3,7 @@ import {
   succeeded,
   type OperationResult,
 } from "../contracts/results.js";
+import { TextEncoder } from "node:util";
 import { parseFiscalDate, type FiscalDate } from "../domain/date-time.js";
 import { diagnostic } from "../domain/diagnostics.js";
 import type { OperatingMode } from "../domain/mode-tenure.js";

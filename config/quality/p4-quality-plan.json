@@ -90,6 +90,7 @@
     "tests/unit/p4-sequences-chains.test.mjs",
     "tests/unit/p4-plans-artifacts.test.mjs",
     "tests/unit/p4-xml-model.test.mjs",
+    "tests/unit/p4-qr-payload.test.mjs",
     "tests/unit/p4-claims.test.mjs",
     "tests/contract/p4-public-contract.test.mjs",
     "tests/contract/p4-edition-contract.test.mjs",
