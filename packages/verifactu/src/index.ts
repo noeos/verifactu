@@ -28,9 +28,7 @@ export {
   VERIFACTU_EVIDENCE_PROFILE,
   buildNoeosEvidence,
   createNoeosEvidenceAdapter,
+  type NoeosEvidenceAdapter,
+  type NoeosEvidenceProjection,
   verifyNoeosEvidence,
-} from "./verification/engine-adapter.js";
-export type {
-  NoeosEvidenceAdapter,
-  NoeosEvidenceProjection,
 } from "./verification/engine-adapter.js";
