@@ -5,6 +5,28 @@
   "coolingPeriodDays": 7,
   "dependencies": [
     {
+      "name": "@zxing/library",
+      "version": "0.23.0",
+      "publishedAt": "2026-04-29T06:28:09.349Z",
+      "source": "https://registry.npmjs.org/@zxing/library/-/library-0.23.0.tgz",
+      "integrity": "sha512-6fkkoFwP8CHxl6ugnPsj74PLJgX2iRv5zczGAyt5OBzQgxFhuhF0NCEc4t4OvSr8xAv2MRLlI0Iu9ZGDZQ2urA==",
+      "repository": "git+https://github.com/zxing-js/library.git",
+      "maintainers": ["odahcam"],
+      "installLifecycle": false,
+      "nativeCode": false,
+      "optionalCode": false,
+      "transitiveGraph": "package-lock.json",
+      "permissions": "none during ignore-scripts install",
+      "network": "registry.npmjs.org during dependency preparation only",
+      "scope": "runtime",
+      "purpose": "Independent QR decode oracle for rendered-symbol verification",
+      "alternatives": "Using the encoder as its own decoder is not independent evidence",
+      "maintainerRisk": "Exact integrity, independent vector and vulnerability gates required",
+      "advisories": "npm audit and OSV required",
+      "license": "Apache-2.0",
+      "exit": "Replace behind the QR verification boundary with regenerated vectors"
+    },
+    {
       "name": "@nuintun/qrcode",
       "version": "5.0.3",
       "publishedAt": "2026-02-06T09:02:23.447Z",
