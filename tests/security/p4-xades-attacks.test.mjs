@@ -8,8 +8,15 @@ const encode = (value) => new TextEncoder().encode(value);
 const transform = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
 const c14n = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 const policy = "urn:oid:2.16.724.1.3.1.1.2.1.9";
+const withSignatureValue = (xml) =>
+  xml.includes("<ds:SignatureValue")
+    ? xml
+    : xml.replace(
+        "</ds:SignedInfo>",
+        "</ds:SignedInfo><ds:SignatureValue>test-signature</ds:SignatureValue>",
+      );
 const request = (xml) => ({
-  xml: encode(xml),
+  xml: encode(withSignatureValue(xml)),
   targetType: "RegistroAlta",
   documentTransforms: [transform],
   signedPropertiesTransforms: [c14n],
@@ -64,6 +71,16 @@ test("P4-D rejects wrapping, external references, transform and profile drift", 
       kind: "invalid",
       diagnostics: [diagnostic],
     });
+});
+test("P4-D rejects a profile-shaped envelope with no SignatureValue", () => {
+  const input = request(valid);
+  assert.deepEqual(
+    inspectXadesEnvelope({ ...input, xml: encode(valid) }, options),
+    {
+      kind: "invalid",
+      diagnostics: ["DIAG-XADES-SIGNATURE"],
+    },
+  );
 });
 test("P4-D rejects hostile XML and absent isolated engines fail closed", () => {
   assert.deepEqual(

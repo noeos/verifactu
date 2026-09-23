@@ -38,6 +38,9 @@ def main():
     signature_method = signature.xpath('./ds:SignedInfo/ds:SignatureMethod/@Algorithm', namespaces=ns)
     if signature_method != ["http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"]:
         return invalid("DIAG-XADES-ALGORITHM")
+    signature_values = signature.xpath('./ds:SignatureValue/text()', namespaces=ns)
+    if len(signature_values) != 1 or not signature_values[0].strip():
+        return invalid("DIAG-XADES-SIGNATURE")
     references = signature.xpath('./ds:SignedInfo/ds:Reference', namespaces=ns)
     if len(references) != 2:
         return invalid("DIAG-XADES-REFERENCE")
