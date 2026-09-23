@@ -19,21 +19,21 @@ const mutations = [
     "verification/engine-adapter.js",
     "officialArtifactDigests: digests,",
     "officialArtifactDigests: Object.freeze([]),",
-    ["tests/contract/p4-engine-adapter.test.mjs"],
+    ["tests/integration/p4-engine-tarball.test.mjs"],
   ],
   [
     "P4-MUT-034",
     "verification/engine-adapter.js",
     'case "invalid":\n            case "indeterminate":\n                return succeeded(result.status);',
     'case "invalid":\n                return succeeded("valid");\n            case "indeterminate":\n                return succeeded(result.status);',
-    ["tests/contract/p4-engine-adapter.test.mjs"],
+    ["tests/integration/p4-engine-tarball.test.mjs"],
   ],
   [
     "P4-MUT-035",
     "verification/engine-adapter.js",
     '    catch {\n        return succeeded("unavailable");\n    }\n}\nfunction sameInstalledEngine()',
     '    catch {\n        return succeeded("valid");\n    }\n}\nfunction sameInstalledEngine()',
-    ["tests/contract/p4-engine-adapter.test.mjs"],
+    ["tests/integration/p4-engine-tarball.test.mjs"],
   ],
 ];
 

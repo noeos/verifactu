@@ -96,7 +96,10 @@ const testMap = [
   ],
   [
     /verification\/(?:engine-profile|engine-adapter)|ports\/verification-engine/u,
-    ["tests/contract/p4-engine-adapter.test.mjs"],
+    [
+      "tests/contract/p4-engine-adapter.test.mjs",
+      "tests/integration/p4-engine-tarball.test.mjs",
+    ],
   ],
   [/index\.js$/u, ["tests/contract/p4-public-contract.test.mjs"]],
 ];

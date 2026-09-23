@@ -10,6 +10,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { basename, dirname, extname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { createGunzip } from "node:zlib";
 import Ajv from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
@@ -1828,10 +1829,34 @@ async function integrationConsumers(context) {
     "CONSUMER_DEEP_IMPORT",
     "private deep import succeeded",
   );
+  const packedEntry = resolve(
+    consumerRoot,
+    "node_modules/@noeos/verifactu/dist/index.js",
+  );
+  const engineConsumer = await run(
+    process.execPath,
+    [
+      "--test",
+      resolve(context.root, "tests/integration/p4-engine-tarball.test.mjs"),
+    ],
+    {
+      cwd: consumerRoot,
+      timeoutMs: 30000,
+      env: {
+        ...process.env,
+        VERIFACTU_TEST_ENTRY: pathToFileURL(packedEntry).href,
+      },
+    },
+  );
+  assert(
+    engineConsumer.code === 0,
+    "P4_ENGINE_TARBALL_CONSUMER",
+    `${engineConsumer.stdout}${engineConsumer.stderr}`.trim(),
+  );
   return {
-    selected: PACKAGE_NAMES.length + 1,
-    executed: PACKAGE_NAMES.length + 1,
-    passed: passed + 1,
+    selected: PACKAGE_NAMES.length + 2,
+    executed: PACKAGE_NAMES.length + 2,
+    passed: passed + 2,
   };
 }
 

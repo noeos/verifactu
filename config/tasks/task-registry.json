@@ -398,7 +398,9 @@
       "dependencies": ["package:allowlists"],
       "inputs": [
         "evidence/runs/artifacts/packages/**",
-        "config/repository/packages.json"
+        "config/repository/packages.json",
+        "tests/integration/p4-engine-tarball.test.mjs",
+        "tooling/tasks/operations.mjs"
       ],
       "outputs": [
         "evidence/runs/integration--tarball-consumers.json",
@@ -897,6 +899,7 @@
         "packages/verifactu/src/**",
         "tests/unit/p4-*.test.mjs",
         "tests/contract/p4-*.test.mjs",
+        "tests/integration/p4-engine-tarball.test.mjs",
         "tests/property/p4-properties.test.mjs",
         "tests/property/p4-xml-worker-properties.test.mjs",
         "tests/mutation/p4-mutation.test.mjs",
@@ -957,6 +960,7 @@
         "tests/unit/p4-plans-artifacts.test.mjs",
         "tests/unit/p4-claims.test.mjs",
         "tests/contract/p4-engine-adapter.test.mjs",
+        "tests/integration/p4-engine-tarball.test.mjs",
         "tests/vectors/p4b-aeat-fingerprint.json",
         "tests/property/p4-properties.test.mjs",
         "tests/mutation/p4-mutation.test.mjs",
@@ -1023,6 +1027,7 @@
         "tests/unit/p4-xml-model.test.mjs",
         "tests/contract/p4-xml-xsd-provider.test.mjs",
         "tests/contract/p4-engine-adapter.test.mjs",
+        "tests/integration/p4-engine-tarball.test.mjs",
         "tests/unit/p4-claims.test.mjs",
         "tests/integration/p4-offline-xsd.test.mjs",
         "tests/security/p4-xml-attacks.test.mjs",

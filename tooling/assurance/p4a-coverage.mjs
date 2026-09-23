@@ -18,6 +18,7 @@ const tests = [
   "tests/contract/p4-xml-xsd-provider.test.mjs",
   "tests/contract/p4-engine-adapter.test.mjs",
   "tests/integration/p4-offline-xsd.test.mjs",
+  "tests/integration/p4-engine-tarball.test.mjs",
   "tests/security/p4-isolation-redaction.test.mjs",
   "tests/security/p4-xml-attacks.test.mjs",
   "tests/security/p4-resource-attacks.test.mjs",

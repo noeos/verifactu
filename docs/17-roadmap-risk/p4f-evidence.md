@@ -42,16 +42,20 @@ not an official fingerprint, XAdES or certificate claim, and not AEAT status.
   profile fixture digest, deterministic and digest-bound evidence, invalid
   inputs, hostile objects, engine failures and aborts, and 4,096 bounded fuzz
   cases.
+- `tests/integration/p4-engine-tarball.test.mjs` runs against the clean packed
+  public package and its installed engine dependency; both packed tests pass.
 - `P4-PROP-012` executes 4,096 status combinations with zero discards.
 - `tooling/assurance/p4f-mutation.mjs` kills `P4-MUT-032` through
   `P4-MUT-035`: 4/4 killed, with zero compile errors, test errors, timeouts or
   survivors.
-- The cumulative 19-file coverage population reports 99.53% statements/lines,
+- The cumulative 20-file coverage population reports 99.53% statements/lines,
   96.35% branches and 100% functions for P4-A/B coverage; P4-C coverage is
   99.26%, 96.21% and 100%, respectively.
 - The cumulative 31-module whole-production campaign reports 1,113/1,113
   mutants killed across all six declared operators, zero survivors and zero
   timeouts.
+- The offline clean-consumer tarball installation and all five import/deep
+  import/packed-engine assertions pass.
 
 Local reports were generated from a dirty development tree and are diagnostic
 only. The draft vertical PR's protected final-head required checks remain the
