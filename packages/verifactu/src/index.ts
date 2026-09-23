@@ -22,3 +22,4 @@ export * from "./domain/records.js";
 export * from "./domain/sequences.js";
 export * from "./domain/states.js";
 export * from "./ports/xml-xsd.js";
+export * from "./verification/claims.js";
