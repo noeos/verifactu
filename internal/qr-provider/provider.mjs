@@ -24,12 +24,16 @@ export function renderQrSvg(payload, options = {}) {
     );
     const edge = encoded.size + quietZoneModules * 2;
     const modules = [];
+    const matrix = [];
+    for (let y = 0; y < encoded.size; y += 1) matrix.push([]);
     for (let y = 0; y < encoded.size; y += 1)
       for (let x = 0; x < encoded.size; x += 1)
-        if (encoded.get(x, y) === 1)
+        if (encoded.get(x, y) === 1) {
+          matrix[y][x] = true;
           modules.push(
             `M${x + quietZoneModules},${y + quietZoneModules}h1v1h-1z`,
           );
+        } else matrix[y][x] = false;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${edge} ${edge}" role="img" aria-label="QR tributario"><path fill="#fff" d="M0,0h${edge}v${edge}H0z"/><path fill="#000" d="${modules.join("")}"/></svg>`;
     return Object.freeze({
       kind: "rendered",
@@ -37,6 +41,7 @@ export function renderQrSvg(payload, options = {}) {
       size: encoded.size,
       level: "M",
       quietZoneModules,
+      matrix: Object.freeze(matrix.map((row) => Object.freeze(row))),
     });
   } catch {
     return outcome("defect", ["DIAG-QR-PROVIDER"]);
