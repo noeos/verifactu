@@ -90,6 +90,17 @@ const testMap = [
     /domain\/(?:sequences|chains)/u,
     ["tests/unit/p4-sequences-chains.test.mjs"],
   ],
+  [
+    /verification\/claims/u,
+    ["tests/unit/p4-claims.test.mjs", "tests/property/p4-properties.test.mjs"],
+  ],
+  [
+    /verification\/(?:engine-profile|engine-adapter)|ports\/verification-engine/u,
+    [
+      "tests/contract/p4-engine-adapter.test.mjs",
+      "tests/integration/p4-engine-tarball.test.mjs",
+    ],
+  ],
   [/index\.js$/u, ["tests/contract/p4-public-contract.test.mjs"]],
 ];
 const binaryMutations = new Map([

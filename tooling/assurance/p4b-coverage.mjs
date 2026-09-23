@@ -15,9 +15,17 @@ const tests = [
   "tests/unit/p4-xml-model.test.mjs",
   "tests/contract/p4-public-contract.test.mjs",
   "tests/contract/p4-edition-contract.test.mjs",
+  "tests/contract/p4-xml-xsd-provider.test.mjs",
+  "tests/contract/p4-engine-adapter.test.mjs",
+  "tests/integration/p4-offline-xsd.test.mjs",
+  "tests/integration/p4-engine-tarball.test.mjs",
   "tests/security/p4-isolation-redaction.test.mjs",
+  "tests/security/p4-xml-attacks.test.mjs",
+  "tests/security/p4-resource-attacks.test.mjs",
   "tests/property/p4-properties.test.mjs",
+  "tests/property/p4-xml-worker-properties.test.mjs",
   "tests/mutation/p4-mutation.test.mjs",
+  "tests/unit/p4-claims.test.mjs",
 ];
 const temporary = await mkdtemp(join(tmpdir(), "verifactu-p4b-coverage-"));
 

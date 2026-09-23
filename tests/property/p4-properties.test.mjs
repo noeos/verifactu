@@ -355,7 +355,10 @@ test("P4-FUZZ-002 XML scanner and serializer handle 4096 bounded arbitrary input
         name: {
           namespaceUri: "urn:fuzz",
           prefix: "f",
-          localName: index % 5 === 0 ? `${String.fromCharCode(next() & 31)}bad` : `N${next()}`,
+          localName:
+            index % 5 === 0
+              ? `${String.fromCharCode(next() & 31)}bad`
+              : `N${next()}`,
         },
         namespaces: [{ prefix: "f", namespaceUri: "urn:fuzz" }],
         attributes: [],
@@ -363,5 +366,23 @@ test("P4-FUZZ-002 XML scanner and serializer handle 4096 bounded arbitrary input
       },
     };
     assert.equal(statuses.has(api.serializeXmlDocument(model).status), true);
+  }
+});
+
+test("P4-PROP-012 claim aggregation preserves every component status", () => {
+  const statuses = ["valid", "invalid", "indeterminate", "unavailable"];
+  const priority = ["invalid", "indeterminate", "unavailable", "valid"];
+  for (let index = 0; index < RUNS; index += 1) {
+    const claims = {
+      official: statuses[next() % statuses.length],
+      cryptographic: statuses[next() % statuses.length],
+      aeat: statuses[next() % statuses.length],
+      noeosEvidence: statuses[next() % statuses.length],
+    };
+    const expected = priority.find((status) =>
+      Object.values(claims).includes(status),
+    );
+    assert.equal(api.defineVerificationClaims(claims).status, "succeeded");
+    assert.equal(api.aggregateVerificationClaims(claims), expected);
   }
 });

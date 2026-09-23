@@ -30,7 +30,9 @@
         "./domain/records.js",
         "./domain/sequences.js",
         "./domain/states.js",
-        "./ports/xml-xsd.js"
+        "./ports/xml-xsd.js",
+        "./verification/claims.js",
+        "./verification/engine-adapter.js"
       ],
       "bin": null,
       "allowlist": [

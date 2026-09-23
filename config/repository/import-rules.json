@@ -4,7 +4,11 @@
   "packages": {
     "@noeos/verifactu": {
       "root": "packages/verifactu/src",
-      "mayImportPackages": [],
+      "mayImportPackages": [
+        "@noeos/verification-engine",
+        "@noeos/verification-engine/profiles",
+        "@noeos/verification-engine/vectors"
+      ],
       "forbiddenBuiltins": [
         "node:child_process",
         "node:crypto",
