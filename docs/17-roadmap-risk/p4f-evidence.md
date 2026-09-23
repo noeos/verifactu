@@ -48,12 +48,14 @@ not an official fingerprint, XAdES or certificate claim, and not AEAT status.
 - `tooling/assurance/p4f-mutation.mjs` kills `P4-MUT-032` through
   `P4-MUT-035`: 4/4 killed, with zero compile errors, test errors, timeouts or
   survivors.
-- The cumulative 20-file coverage population reports 99.53% statements/lines,
-  96.35% branches and 100% functions for P4-A/B coverage; P4-C coverage is
-  99.26%, 96.21% and 100%, respectively.
-- The cumulative 31-module whole-production campaign reports 1,113/1,113
-  mutants killed across all six declared operators, zero survivors and zero
-  timeouts.
+- The cumulative 20-file coverage population reports 99.39% statements/lines,
+  96.26% branches and 100% functions for P4-A/B coverage; P4-C coverage is
+  99.15%, 96.14% and 100%, respectively.
+- The cumulative 31-module whole-production campaign killed 1,101/1,119
+  mutants (98.39%) across all six declared operators. Its 18 surviving mutants
+  are in the XML provider/worker population; the separate critical XML and
+  engine mutation sets remain fully killed. There were zero timeouts, compile
+  errors or test errors, and the campaign exceeds the declared 95% threshold.
 - The offline clean-consumer tarball installation and all five import/deep
   import/packed-engine assertions pass.
 
