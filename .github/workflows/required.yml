@@ -153,14 +153,14 @@ jobs:
         run: |
           python -m venv "$VERIFACTU_CI_PYTHON"
           "$VERIFACTU_CI_PYTHON/bin/python" -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
-      - name: Run cumulative P4-C XML and offline XSD assurance gate
+      - name: Run cumulative P4-D XAdES and PKI assurance gate
         env:
           VERIFACTU_PYTHON: ${{ runner.temp }}/verifactu-p4c-python/bin/python
         shell: bash
-        run: node tooling/tasks/run-task.mjs --task gate:p4c
+        run: node tooling/tasks/run-task.mjs --task gate:p4d
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json --task-report evidence/runs/gate--p4c.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json --task-report evidence/runs/gate--p4d.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-quality

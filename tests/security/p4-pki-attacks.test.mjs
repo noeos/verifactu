@@ -7,7 +7,8 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 const { validateCertificateChain } = await import(
-  new URL("../../internal/xades-provider/pki.mjs", import.meta.url).href
+  process.env.VERIFACTU_PKI_PROVIDER_ENTRY ??
+    new URL("../../internal/xades-provider/pki.mjs", import.meta.url).href
 );
 
 async function certificate() {

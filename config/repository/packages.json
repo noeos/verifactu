@@ -13,6 +13,7 @@
         "./application/operation-plan.js",
         "./application/record-planner.js",
         "./application/xml-artifacts.js",
+        "./application/xades.js",
         "./contracts/configuration.js",
         "./contracts/limits.js",
         "./contracts/results.js",
@@ -30,6 +31,8 @@
         "./domain/records.js",
         "./domain/sequences.js",
         "./domain/states.js",
+        "./ports/certificate.js",
+        "./ports/signature.js",
         "./ports/xml-xsd.js"
       ],
       "bin": null,

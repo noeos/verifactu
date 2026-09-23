@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 const { inspectXadesEnvelope } = await import(
-  new URL("../../internal/xades-provider/provider.mjs", import.meta.url).href
+  process.env.VERIFACTU_XADES_PROVIDER_ENTRY ??
+    new URL("../../internal/xades-provider/provider.mjs", import.meta.url).href
 );
 const encode = (value) => new TextEncoder().encode(value);
 const transform = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";

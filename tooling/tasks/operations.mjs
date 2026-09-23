@@ -3269,6 +3269,53 @@ async function p4CAssurance(context) {
   };
 }
 
+async function p4DAssurance(context) {
+  const coverage = await run("node", ["tooling/assurance/p4d-coverage.mjs"], {
+    cwd: context.root,
+    timeoutMs: 300000,
+  });
+  assert(
+    coverage.code === 0,
+    "P4D_COVERAGE",
+    coverage.stderr || coverage.stdout,
+  );
+  const coverageReport = JSON.parse(
+    coverage.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const critical = await run("node", ["tooling/assurance/p4d-mutation.mjs"], {
+    cwd: context.root,
+    timeoutMs: 180000,
+  });
+  assert(
+    critical.code === 0,
+    "P4D_CRITICAL_MUTATION",
+    critical.stderr || critical.stdout,
+  );
+  const criticalReport = JSON.parse(
+    critical.stdout.trim().split(/\r?\n/u).at(-1),
+  );
+  const selected = coverageReport.testFiles + criticalReport.population;
+  return {
+    selected,
+    executed: selected,
+    passed: selected,
+    outputDigest: sha256(
+      canonicalJson({
+        coverage: coverageReport,
+        criticalMutation: criticalReport,
+        officialVector:
+          "AEAT AnexosEjemplosFirmaRegFact.zip:ejemploRegistro-firmado-epes-xades4j.xml",
+      }),
+    ),
+    diagnostics: [
+      `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
+      `critical mutants killed=${criticalReport.killed}/${criticalReport.population}`,
+      "official AEAT EPES vector accepted by isolated XAdES inspector",
+      "current authoritative candidate remains creationAllowed=false",
+    ],
+  };
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -3332,6 +3379,7 @@ export const operations = {
   p4AAssurance,
   p4BAssurance,
   p4CAssurance,
+  p4DAssurance,
   gate,
 };
 
@@ -3375,5 +3423,6 @@ export const operationCapabilities = Object.freeze({
   p4AAssurance: { tools: ["node"], network: "denied" },
   p4BAssurance: { tools: ["node", "python"], network: "denied" },
   p4CAssurance: { tools: ["node", "python"], network: "denied" },
+  p4DAssurance: { tools: ["node", "python", "openssl"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });
