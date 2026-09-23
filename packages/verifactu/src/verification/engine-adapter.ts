@@ -69,10 +69,11 @@ export const VERIFACTU_ENGINE_ADMISSION = Object.freeze({
 });
 
 export interface NoeosEvidenceAdapter {
-  readonly engine: Engine;
   readonly profile: typeof VERIFACTU_EVIDENCE_PROFILE;
   readonly engineAdmission: typeof VERIFACTU_ENGINE_ADMISSION;
 }
+
+const ENGINE_BY_ADAPTER = new WeakMap<NoeosEvidenceAdapter, Engine>();
 
 const PROFILE = Object.freeze({
   id: VERIFACTU_EVIDENCE_PROFILE.id,
@@ -110,13 +111,7 @@ export function createNoeosEvidenceAdapter(): OperationResult<NoeosEvidenceAdapt
       ],
       limits: PROFILE.manifest.limits,
     });
-    return succeeded(
-      Object.freeze({
-        engine,
-        profile: VERIFACTU_EVIDENCE_PROFILE,
-        engineAdmission: VERIFACTU_ENGINE_ADMISSION,
-      }),
-    );
+    return succeeded(adapterFor(engine));
   } catch {
     return failed("unavailable", [
       diagnostic(
@@ -129,6 +124,13 @@ export function createNoeosEvidenceAdapter(): OperationResult<NoeosEvidenceAdapt
   }
 }
 
+/** Internal fault-injection seam; deliberately not re-exported from the package root. */
+export function createNoeosEvidenceAdapterWithEngineForTesting(
+  engine: Engine,
+): OperationResult<NoeosEvidenceAdapter> {
+  return succeeded(adapterFor(engine));
+}
+
 export function buildNoeosEvidence(
   adapter: NoeosEvidenceAdapter,
   projection: NoeosEvidenceProjection,
@@ -139,7 +141,17 @@ export function buildNoeosEvidence(
       diagnostic("DIAG-ENGINE-PROJECTION", "input", "structure", "/evidence"),
     ]);
   try {
-    const result = adapter.engine.hashRecord({
+    const engine = ENGINE_BY_ADAPTER.get(adapter);
+    if (engine === undefined)
+      return failed("unavailable", [
+        diagnostic(
+          "DIAG-ENGINE-UNAVAILABLE",
+          "availability",
+          "edition",
+          "/engine",
+        ),
+      ]);
+    const result = engine.hashRecord({
       contextId: checked.value.contextId,
       recordId: checked.value.recordId,
       payload: checked.value,
@@ -164,7 +176,9 @@ export function verifyNoeosEvidence(
   evidence: unknown,
 ): OperationResult<ClaimStatus> {
   try {
-    const result = adapter.engine.verifyRecord({
+    const engine = ENGINE_BY_ADAPTER.get(adapter);
+    if (engine === undefined) return succeeded("unavailable");
+    const result = engine.verifyRecord({
       payload: projection,
       evidence,
     });
@@ -180,6 +194,15 @@ export function verifyNoeosEvidence(
   } catch {
     return succeeded("unavailable");
   }
+}
+
+function adapterFor(engine: Engine): NoeosEvidenceAdapter {
+  const adapter = Object.freeze({
+    profile: VERIFACTU_EVIDENCE_PROFILE,
+    engineAdmission: VERIFACTU_ENGINE_ADMISSION,
+  });
+  ENGINE_BY_ADAPTER.set(adapter, engine);
+  return adapter;
 }
 
 function sameInstalledEngine(): boolean {

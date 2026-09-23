@@ -8,6 +8,13 @@ const api = await import(
       import.meta.url,
     ).href
 );
+const adapterInternals = await import(
+  process.env.VERIFACTU_ENGINE_ADAPTER_ENTRY ??
+    new URL(
+      "../../evidence/runs/artifacts/build/verifactu/dist/verification/engine-adapter.js",
+      import.meta.url,
+    ).href
+);
 
 const projection = Object.freeze({
   contextId: "tenant-a.install-a",
@@ -23,6 +30,7 @@ const projection = Object.freeze({
 test("packed public package loads its exact engine dependency and verifies opaque evidence", () => {
   const adapter = api.createNoeosEvidenceAdapter();
   assert.equal(adapter.status, "succeeded");
+  assert.equal(Object.hasOwn(adapter.value, "engine"), false);
   assert.equal(adapter.value.engineAdmission.version, "1.0.1");
   const evidence = api.buildNoeosEvidence(adapter.value, projection);
   assert.equal(evidence.status, "succeeded");
@@ -44,14 +52,38 @@ test("packed public package loads its exact engine dependency and verifies opaqu
     ).value,
     "invalid",
   );
-  const throwingEngine = Object.create(adapter.value.engine);
-  throwingEngine.hashRecord = () => {
-    throw new Error("packed engine fault");
-  };
-  throwingEngine.verifyRecord = () => {
-    throw new Error("packed verifier fault");
-  };
-  const throwing = { ...adapter.value, engine: throwingEngine };
+  for (const malformedEvidence of [
+    {},
+    { ...evidence.value, profile: { id: "unknown.profile", version: "1.0.0" } },
+    {
+      ...evidence.value,
+      profile: { ...evidence.value.profile, version: "9.9.9" },
+    },
+    { ...evidence.value, recordDigest: "0".repeat(64) },
+  ]) {
+    assert.equal(
+      api.verifyNoeosEvidence(adapter.value, projection, malformedEvidence)
+        .value,
+      "invalid",
+    );
+  }
+  assert.equal(
+    api.verifyNoeosEvidence(
+      adapter.value,
+      { ...projection, previousEvidenceDigest: "c".repeat(64) },
+      evidence.value,
+    ).value,
+    "invalid",
+  );
+  const throwing =
+    adapterInternals.createNoeosEvidenceAdapterWithEngineForTesting({
+      hashRecord() {
+        throw new Error("packed engine fault");
+      },
+      verifyRecord() {
+        throw new Error("packed verifier fault");
+      },
+    }).value;
   assert.equal(
     api.buildNoeosEvidence(throwing, projection).status,
     "unavailable",
@@ -61,10 +93,11 @@ test("packed public package loads its exact engine dependency and verifies opaqu
     "unavailable",
   );
 
-  const abortedEngine = Object.create(adapter.value.engine);
-  abortedEngine.hashRecord = () => ({ ok: false, diagnostics: [] });
-  abortedEngine.verifyRecord = () => ({ status: "aborted" });
-  const aborted = { ...adapter.value, engine: abortedEngine };
+  const aborted =
+    adapterInternals.createNoeosEvidenceAdapterWithEngineForTesting({
+      hashRecord: () => ({ ok: false, diagnostics: [] }),
+      verifyRecord: () => ({ status: "aborted" }),
+    }).value;
   assert.equal(
     api.buildNoeosEvidence(aborted, projection).status,
     "unavailable",

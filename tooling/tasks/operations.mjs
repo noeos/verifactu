@@ -1845,6 +1845,12 @@ async function integrationConsumers(context) {
       env: {
         ...process.env,
         VERIFACTU_TEST_ENTRY: pathToFileURL(packedEntry).href,
+        VERIFACTU_ENGINE_ADAPTER_ENTRY: pathToFileURL(
+          resolve(
+            consumerRoot,
+            "node_modules/@noeos/verifactu/dist/verification/engine-adapter.js",
+          ),
+        ).href,
       },
     },
   );

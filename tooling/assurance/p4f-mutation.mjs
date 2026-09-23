@@ -31,8 +31,8 @@ const mutations = [
   [
     "P4-MUT-035",
     "verification/engine-adapter.js",
-    '    catch {\n        return succeeded("unavailable");\n    }\n}\nfunction sameInstalledEngine()',
-    '    catch {\n        return succeeded("valid");\n    }\n}\nfunction sameInstalledEngine()',
+    '    catch {\n        return succeeded("unavailable");\n    }\n}\nfunction adapterFor(engine)',
+    '    catch {\n        return succeeded("valid");\n    }\n}\nfunction adapterFor(engine)',
     ["tests/integration/p4-engine-tarball.test.mjs"],
   ],
 ];
@@ -63,6 +63,9 @@ try {
         ...isolatedEnvironment,
         VERIFACTU_TEST_ENTRY: pathToFileURL(resolve(mutantRoot, "index.js"))
           .href,
+        VERIFACTU_ENGINE_ADAPTER_ENTRY: pathToFileURL(
+          resolve(mutantRoot, "verification/engine-adapter.js"),
+        ).href,
       },
       timeout: 30_000,
     });

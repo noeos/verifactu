@@ -7,6 +7,13 @@ const api = await import(
   process.env.VERIFACTU_TEST_ENTRY ??
     "../../evidence/runs/artifacts/build/verifactu/dist/index.js"
 );
+const adapterInternals = await import(
+  process.env.VERIFACTU_ENGINE_ADAPTER_ENTRY ??
+    new URL(
+      "../../evidence/runs/artifacts/build/verifactu/dist/verification/engine-adapter.js",
+      import.meta.url,
+    ).href
+);
 
 const projection = Object.freeze({
   contextId: "tenant-a.install-a",
@@ -41,6 +48,7 @@ test("profile fixture digest, engine admission and vector pins are explicit", as
 test("Noeos evidence hashes only the opaque projection and verifies repeatably", () => {
   const adapter = api.createNoeosEvidenceAdapter();
   assert.equal(adapter.status, "succeeded");
+  assert.equal(Object.hasOwn(adapter.value, "engine"), false);
   const first = api.buildNoeosEvidence(adapter.value, projection);
   const again = api.buildNoeosEvidence(adapter.value, projection);
   assert.equal(first.status, "succeeded");
@@ -81,16 +89,15 @@ test("Noeos evidence hashes only the opaque projection and verifies repeatably",
 });
 
 test("engine exceptions, failures and aborts never become valid claims", () => {
-  const created = api.createNoeosEvidenceAdapter();
-  assert.equal(created.status, "succeeded");
-  const throwingEngine = Object.create(created.value.engine);
-  throwingEngine.hashRecord = () => {
-    throw new Error("simulated engine fault");
-  };
-  throwingEngine.verifyRecord = () => {
-    throw new Error("simulated verifier fault");
-  };
-  const throwingAdapter = { ...created.value, engine: throwingEngine };
+  const throwingAdapter =
+    adapterInternals.createNoeosEvidenceAdapterWithEngineForTesting({
+      hashRecord() {
+        throw new Error("simulated engine fault");
+      },
+      verifyRecord() {
+        throw new Error("simulated verifier fault");
+      },
+    }).value;
   assert.equal(
     api.buildNoeosEvidence(throwingAdapter, projection).status,
     "unavailable",
@@ -100,10 +107,11 @@ test("engine exceptions, failures and aborts never become valid claims", () => {
     "unavailable",
   );
 
-  const limitedEngine = Object.create(created.value.engine);
-  limitedEngine.hashRecord = () => ({ ok: false, diagnostics: [] });
-  limitedEngine.verifyRecord = () => ({ status: "aborted" });
-  const limitedAdapter = { ...created.value, engine: limitedEngine };
+  const limitedAdapter =
+    adapterInternals.createNoeosEvidenceAdapterWithEngineForTesting({
+      hashRecord: () => ({ ok: false, diagnostics: [] }),
+      verifyRecord: () => ({ status: "aborted" }),
+    }).value;
   assert.equal(
     api.buildNoeosEvidence(limitedAdapter, projection).status,
     "unavailable",
@@ -113,14 +121,12 @@ test("engine exceptions, failures and aborts never become valid claims", () => {
     "unavailable",
   );
 
-  const indeterminateEngine = Object.create(created.value.engine);
-  indeterminateEngine.verifyRecord = () => ({ status: "indeterminate" });
+  const indeterminateAdapter =
+    adapterInternals.createNoeosEvidenceAdapterWithEngineForTesting({
+      verifyRecord: () => ({ status: "indeterminate" }),
+    }).value;
   assert.equal(
-    api.verifyNoeosEvidence(
-      { ...created.value, engine: indeterminateEngine },
-      projection,
-      {},
-    ).value,
+    api.verifyNoeosEvidence(indeterminateAdapter, projection, {}).value,
     "indeterminate",
   );
 });
