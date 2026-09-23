@@ -16,26 +16,59 @@ def main():
         dtd_validation=False, huge_tree=False, load_dtd=False, no_network=True,
         recover=False, resolve_entities=False)
     root = etree.fromstring(base64.b64decode(request["xml"], validate=True), parser)
-    target_id = request["targetId"]
     expected_type = request["targetType"]
-    transforms = request["transforms"]
+    document_transforms = request["documentTransforms"]
+    properties_transforms = request["signedPropertiesTransforms"]
+    canonicalization = request["canonicalization"]
+    policy_identifier = request["policyIdentifier"]
     identifiers = root.xpath('//*[@Id]')
-    if sum(1 for node in identifiers if node.get("Id") == target_id) != 1:
+    ids = [node.get("Id") for node in identifiers]
+    if len(ids) != len(set(ids)):
         return invalid("DIAG-XADES-UNIQUE-ID")
-    target = next(node for node in identifiers if node.get("Id") == target_id)
-    if etree.QName(target).localname != expected_type:
+    if etree.QName(root).localname != expected_type:
         return invalid("DIAG-XADES-TARGET")
-    ns = {"ds":"http://www.w3.org/2000/09/xmldsig#"}
-    signatures = root.xpath('.//ds:Signature', namespaces=ns)
-    references = root.xpath('.//ds:Signature/ds:SignedInfo/ds:Reference', namespaces=ns)
-    if len(signatures) != 1 or len(references) != 1:
+    ns = {"ds":"http://www.w3.org/2000/09/xmldsig#", "xades":"http://uri.etsi.org/01903/v1.3.2#"}
+    signatures = root.xpath('./ds:Signature', namespaces=ns)
+    if len(root.xpath('.//ds:Signature', namespaces=ns)) != 1 or len(signatures) != 1:
         return invalid("DIAG-XADES-REFERENCE")
-    reference = references[0]
-    if reference.get("URI") != "#" + target_id:
+    signature = signatures[0]
+    canonical = signature.xpath('./ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm', namespaces=ns)
+    if canonical != [canonicalization]:
+        return invalid("DIAG-XADES-CANONICALIZATION")
+    signature_method = signature.xpath('./ds:SignedInfo/ds:SignatureMethod/@Algorithm', namespaces=ns)
+    if signature_method != ["http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"]:
+        return invalid("DIAG-XADES-ALGORITHM")
+    references = signature.xpath('./ds:SignedInfo/ds:Reference', namespaces=ns)
+    if len(references) != 2:
         return invalid("DIAG-XADES-REFERENCE")
-    actual = [node.get("Algorithm") for node in reference.xpath('./ds:Transforms/ds:Transform', namespaces=ns)]
-    if actual != transforms or any(value is None for value in actual):
+    document = references[0]
+    properties = references[1]
+    if document.get("URI") != "" or document.get("Type") is not None:
+        return invalid("DIAG-XADES-REFERENCE")
+    actual = [node.get("Algorithm") for node in document.xpath('./ds:Transforms/ds:Transform', namespaces=ns)]
+    if actual != document_transforms or any(value is None for value in actual):
         return invalid("DIAG-XADES-TRANSFORM")
+    uri = properties.get("URI")
+    if properties.get("Type") != "http://uri.etsi.org/01903#SignedProperties" or not uri or not uri.startswith("#"):
+        return invalid("DIAG-XADES-REFERENCE")
+    properties_id = uri[1:]
+    if properties_id not in ids:
+        return invalid("DIAG-XADES-REFERENCE")
+    signed_properties = next(node for node in identifiers if node.get("Id") == properties_id)
+    if etree.QName(signed_properties).namespace != ns["xades"] or etree.QName(signed_properties).localname != "SignedProperties":
+        return invalid("DIAG-XADES-REFERENCE")
+    actual = [node.get("Algorithm") for node in properties.xpath('./ds:Transforms/ds:Transform', namespaces=ns)]
+    if actual != properties_transforms or any(value is None for value in actual):
+        return invalid("DIAG-XADES-TRANSFORM")
+    digest_methods = signature.xpath('./ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm', namespaces=ns)
+    digest_values = signature.xpath('./ds:SignedInfo/ds:Reference/ds:DigestValue/text()', namespaces=ns)
+    if digest_methods != ["http://www.w3.org/2001/04/xmlenc#sha256"] * 2 or len(digest_values) != 2 or any(not value.strip() for value in digest_values):
+        return invalid("DIAG-XADES-ALGORITHM")
+    policy = signed_properties.xpath('./xades:SignedSignatureProperties/xades:SignaturePolicyIdentifier/xades:SignaturePolicyId/xades:SigPolicyId/xades:Identifier/text()', namespaces=ns)
+    signing_time = signed_properties.xpath('./xades:SignedSignatureProperties/xades:SigningTime/text()', namespaces=ns)
+    certificates = signed_properties.xpath('./xades:SignedSignatureProperties/xades:SigningCertificate/xades:Cert', namespaces=ns)
+    if policy != [policy_identifier] or len(signing_time) != 1 or len(certificates) < 1:
+        return invalid("DIAG-XADES-PROPERTIES")
     return {"kind":"valid","diagnostics":[]}
 
 try:
@@ -67,9 +100,11 @@ export function inspectXadesEnvelope(request, options = {}) {
       env: {},
       input: JSON.stringify({
         xml: Buffer.from(request.xml).toString("base64"),
-        targetId: request.targetId,
         targetType: request.targetType,
-        transforms: request.transforms,
+        documentTransforms: request.documentTransforms,
+        signedPropertiesTransforms: request.signedPropertiesTransforms,
+        canonicalization: request.canonicalization,
+        policyIdentifier: request.policyIdentifier,
       }),
       killSignal: "SIGKILL",
       timeout: options.deadlineMs ?? 5_000,
@@ -102,13 +137,16 @@ function validRequest(value) {
     value !== null &&
     typeof value === "object" &&
     value.xml instanceof Uint8Array &&
-    typeof value.targetId === "string" &&
-    value.targetId.length > 0 &&
     typeof value.targetType === "string" &&
     value.targetType.length > 0 &&
-    Array.isArray(value.transforms) &&
-    value.transforms.length > 0 &&
-    value.transforms.every((item) => typeof item === "string")
+    typeof value.canonicalization === "string" &&
+    typeof value.policyIdentifier === "string" &&
+    Array.isArray(value.documentTransforms) &&
+    Array.isArray(value.signedPropertiesTransforms) &&
+    value.documentTransforms.length > 0 &&
+    value.signedPropertiesTransforms.length > 0 &&
+    value.documentTransforms.every((item) => typeof item === "string") &&
+    value.signedPropertiesTransforms.every((item) => typeof item === "string")
   );
 }
 

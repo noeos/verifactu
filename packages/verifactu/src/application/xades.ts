@@ -19,10 +19,11 @@ export interface XadesProfile {
   readonly signaturePlacement: "enveloped";
   readonly digestAlgorithm: "SHA-256";
   readonly signatureAlgorithm: "RSA-SHA256";
-  readonly canonicalization: "http://www.w3.org/2001/10/xml-exc-c14n#";
+  readonly canonicalization: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
   readonly policyIdentifier: string;
   readonly expectedTargetType: string;
-  readonly requiredTransforms: readonly string[];
+  readonly documentTransforms: readonly string[];
+  readonly signedPropertiesTransforms: readonly string[];
   readonly minimumRsaBits: number;
 }
 
@@ -36,6 +37,7 @@ export interface VerifiedXadesSignature {
 const SHA256 = /^[a-f0-9]{64}$/u;
 const XMLDSIG_ENVELOPED =
   "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
+const XADES_SIGNED_PROPERTIES = "http://uri.etsi.org/01903#SignedProperties";
 
 export function defineXadesProfile(
   input: XadesProfile,
@@ -47,19 +49,24 @@ export function defineXadesProfile(
     input.signaturePlacement !== "enveloped" ||
     input.digestAlgorithm !== "SHA-256" ||
     input.signatureAlgorithm !== "RSA-SHA256" ||
-    input.canonicalization !== "http://www.w3.org/2001/10/xml-exc-c14n#" ||
+    input.canonicalization !==
+      "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" ||
     input.policyIdentifier.length === 0 ||
     input.expectedTargetType.length === 0 ||
     input.minimumRsaBits < 2048 ||
-    input.requiredTransforms.length === 0 ||
-    input.requiredTransforms[0] !== XMLDSIG_ENVELOPED ||
-    new Set(input.requiredTransforms).size !== input.requiredTransforms.length
+    input.documentTransforms.length !== 1 ||
+    input.documentTransforms[0] !== XMLDSIG_ENVELOPED ||
+    input.signedPropertiesTransforms.length !== 1 ||
+    input.signedPropertiesTransforms[0] !== input.canonicalization
   )
     return xadesFailure("DIAG-XADES-PROFILE");
   return succeeded(
     Object.freeze({
       ...input,
-      requiredTransforms: Object.freeze([...input.requiredTransforms]),
+      documentTransforms: Object.freeze([...input.documentTransforms]),
+      signedPropertiesTransforms: Object.freeze([
+        ...input.signedPropertiesTransforms,
+      ]),
     }),
   );
 }
@@ -74,7 +81,6 @@ export function verifyXadesProviderResponse(
     request.editionId !== profile.editionId ||
     request.profileId !== profile.id ||
     !SHA256.test(request.artifactSha256) ||
-    request.expectedTargetId.length === 0 ||
     request.key.providerId.length === 0 ||
     request.key.keyId.length === 0 ||
     !SHA256.test(request.key.certificateFingerprintSha256)
@@ -95,17 +101,26 @@ export function verifyXadesProviderResponse(
       request.key.certificateFingerprintSha256
   )
     return xadesFailure("DIAG-XADES-CERTIFICATE");
-  if (response.references.length !== 1)
+  if (response.references.length !== 2)
     return xadesFailure("DIAG-XADES-REFERENCE");
-  const reference = response.references[0]!;
+  const document = response.references[0]!;
+  const signedProperties = response.references[1]!;
   if (
-    reference.uri !== `#${request.expectedTargetId}` ||
-    reference.targetId !== request.expectedTargetId ||
-    reference.targetType !== profile.expectedTargetType ||
-    reference.digestAlgorithm !== profile.digestAlgorithm ||
-    reference.transforms.length !== profile.requiredTransforms.length ||
-    reference.transforms.some(
-      (transform, index) => transform !== profile.requiredTransforms[index],
+    document.uri !== "" ||
+    document.type !== "" ||
+    document.targetId !== "" ||
+    document.targetType !== profile.expectedTargetType ||
+    document.digestAlgorithm !== profile.digestAlgorithm ||
+    !sameTransforms(document.transforms, profile.documentTransforms) ||
+    !signedProperties.uri.startsWith("#") ||
+    signedProperties.targetId.length === 0 ||
+    signedProperties.uri !== `#${signedProperties.targetId}` ||
+    signedProperties.type !== XADES_SIGNED_PROPERTIES ||
+    signedProperties.targetType !== "SignedProperties" ||
+    signedProperties.digestAlgorithm !== profile.digestAlgorithm ||
+    !sameTransforms(
+      signedProperties.transforms,
+      profile.signedPropertiesTransforms,
     )
   )
     return xadesFailure("DIAG-XADES-REFERENCE");
@@ -123,6 +138,16 @@ export function verifyXadesProviderResponse(
         ),
       ),
     }),
+  );
+}
+
+function sameTransforms(
+  actual: readonly string[],
+  expected: readonly string[],
+): boolean {
+  return (
+    actual.length === expected.length &&
+    actual.every((transform, index) => transform === expected[index])
   );
 }
 

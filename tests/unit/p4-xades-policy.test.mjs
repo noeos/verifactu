@@ -8,13 +8,14 @@ const api = await import(
       import.meta.url,
     ).href
 );
-
 const value = (result) => {
   assert.equal(result.status, "succeeded");
   return result.value;
 };
 const edition = value(api.identity("edition", "rrsif-test-active"));
 const fingerprint = "a".repeat(64);
+const enveloped = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
+const c14n = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 const profile = () => ({
   id: "AEAT-XADES-EPES",
   editionId: edition,
@@ -22,18 +23,18 @@ const profile = () => ({
   signaturePlacement: "enveloped",
   digestAlgorithm: "SHA-256",
   signatureAlgorithm: "RSA-SHA256",
-  canonicalization: "http://www.w3.org/2001/10/xml-exc-c14n#",
+  canonicalization: c14n,
   policyIdentifier: "urn:oid:2.16.724.1.3.1.1.2.1.9",
   expectedTargetType: "RegistroAlta",
-  requiredTransforms: ["http://www.w3.org/2000/09/xmldsig#enveloped-signature"],
+  documentTransforms: [enveloped],
+  signedPropertiesTransforms: [c14n],
   minimumRsaBits: 2048,
 });
 const request = () => ({
   editionId: edition,
   profileId: "AEAT-XADES-EPES",
   artifactSha256: fingerprint,
-  unsignedXml: new TextEncoder().encode('<RegistroAlta Id="r1"/>'),
-  expectedTargetId: "r1",
+  unsignedXml: new TextEncoder().encode("<RegistroAlta/>"),
   key: {
     providerId: "isolated",
     keyId: "opaque-handle",
@@ -54,15 +55,24 @@ const certificate = (overrides = {}) => ({
 });
 const response = (overrides = {}) => ({
   signedXml: new TextEncoder().encode(
-    '<RegistroAlta Id="r1"><Signature/></RegistroAlta>',
+    "<RegistroAlta><Signature/></RegistroAlta>",
   ),
   certificateChainDer: [Uint8Array.of(1)],
   references: [
     {
-      uri: "#r1",
-      targetId: "r1",
+      uri: "",
+      targetId: "",
       targetType: "RegistroAlta",
-      transforms: ["http://www.w3.org/2000/09/xmldsig#enveloped-signature"],
+      type: "",
+      transforms: [enveloped],
+      digestAlgorithm: "SHA-256",
+    },
+    {
+      uri: "#signed-properties-1",
+      targetId: "signed-properties-1",
+      targetType: "SignedProperties",
+      type: "http://uri.etsi.org/01903#SignedProperties",
+      transforms: [c14n],
       digestAlgorithm: "SHA-256",
     },
   ],
@@ -70,38 +80,55 @@ const response = (overrides = {}) => ({
   ...overrides,
 });
 
-test("P4-D fixes EPES/SHA-256/enveloped profile and rejects downgrade drift", () => {
+test("P4-D fixes the official EPES reference topology and rejects profile downgrade drift", () => {
   assert.equal(api.defineXadesProfile(profile()).status, "succeeded");
   for (const invalid of [
     { ...profile(), form: "XAdES-BES" },
     { ...profile(), digestAlgorithm: "SHA-1" },
     { ...profile(), signatureAlgorithm: "RSA-SHA1" },
+    { ...profile(), canonicalization: "wrong" },
     { ...profile(), minimumRsaBits: 1024 },
-    { ...profile(), requiredTransforms: [] },
-    { ...profile(), requiredTransforms: ["wrong"] },
+    { ...profile(), documentTransforms: [] },
+    { ...profile(), signedPropertiesTransforms: [] },
   ])
     assert.equal(api.defineXadesProfile(invalid).status, "invalid");
 });
-
-test("P4-D accepts only one exact expected local reference and valid certificate evidence", () => {
-  const result = api.verifyXadesProviderResponse(
-    value(api.defineXadesProfile(profile())),
-    request(),
-    response(),
-    certificate(),
+test("P4-D accepts only exact document and SignedProperties references with valid certificate evidence", () => {
+  assert.equal(
+    api.verifyXadesProviderResponse(
+      value(api.defineXadesProfile(profile())),
+      request(),
+      response(),
+      certificate(),
+    ).status,
+    "succeeded",
   );
-  assert.equal(result.status, "succeeded");
   for (const [changedResponse, changedCertificate] of [
     [response({ references: [] }), certificate()],
     [
       response({
-        references: [{ ...response().references[0], uri: "#other" }],
+        references: [
+          { ...response().references[0], uri: "#other" },
+          response().references[1],
+        ],
       }),
       certificate(),
     ],
     [
       response({
-        references: [{ ...response().references[0], transforms: [] }],
+        references: [
+          response().references[0],
+          { ...response().references[1], type: "" },
+        ],
+      }),
+      certificate(),
+    ],
+    [
+      response({
+        references: [
+          response().references[0],
+          { ...response().references[1], transforms: [] },
+        ],
       }),
       certificate(),
     ],

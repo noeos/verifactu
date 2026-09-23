@@ -12,6 +12,8 @@ export interface SignatureReference {
   readonly uri: string;
   readonly targetId: string;
   readonly targetType: string;
+  /** XMLDSIG Reference/@Type. The document reference is the empty string. */
+  readonly type: string;
   readonly transforms: readonly string[];
   readonly digestAlgorithm: "SHA-256";
 }
@@ -21,7 +23,6 @@ export interface XadesSigningRequest {
   readonly profileId: string;
   readonly artifactSha256: string;
   readonly unsignedXml: Uint8Array;
-  readonly expectedTargetId: string;
   readonly key: SigningKeyHandle;
   readonly signingInstant: FiscalInstant;
   readonly deadlineMs: number;
