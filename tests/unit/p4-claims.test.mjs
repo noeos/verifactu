@@ -26,4 +26,25 @@ test("P4-F keeps official, crypto, AEAT and Noeos claims distinct", () => {
     api.aggregateVerificationClaims({ ...claims, official: "indeterminate" }),
     "indeterminate",
   );
+  assert.equal(
+    api.defineVerificationClaims({ ...claims, invoice: "secret" }).status,
+    "invalid",
+  );
+  assert.equal(
+    api.aggregateVerificationClaims({ ...claims, aeat: "bad" }),
+    "indeterminate",
+  );
+  const accessorClaims = { ...claims };
+  Object.defineProperty(accessorClaims, "aeat", { get: () => "valid" });
+  assert.equal(api.defineVerificationClaims(accessorClaims).status, "invalid");
+  assert.equal(
+    api.defineVerificationClaims(
+      new Proxy(claims, {
+        getPrototypeOf: () => {
+          throw new Error("hostile proxy");
+        },
+      }),
+    ).status,
+    "invalid",
+  );
 });
