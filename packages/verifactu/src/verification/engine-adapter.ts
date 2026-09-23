@@ -17,6 +17,7 @@ import {
   type OperationResult,
 } from "../contracts/results.js";
 import { diagnostic } from "../domain/diagnostics.js";
+import type { ClaimStatus } from "./claims.js";
 import {
   VERIFACTU_EVIDENCE_PROFILE,
   type NoeosEvidenceProjection,
@@ -132,27 +133,53 @@ export function buildNoeosEvidence(
   adapter: NoeosEvidenceAdapter,
   projection: NoeosEvidenceProjection,
 ): OperationResult<unknown> {
-  const result = adapter.engine.hashRecord({
-    contextId: projection.contextId,
-    recordId: projection.recordId,
-    payload: projection,
-    profile: { id: adapter.profile.id, version: adapter.profile.version },
-    algorithm: "sha-256",
-  });
-  return result.ok
-    ? succeeded(result.value)
-    : failed("invalid", [
-        diagnostic("DIAG-ENGINE-HASH", "integrity", "structure", "/evidence"),
-      ]);
+  const checked = validateProjection(projection, PROFILE.manifest.limits);
+  if (!checked.ok)
+    return failed("invalid", [
+      diagnostic("DIAG-ENGINE-PROJECTION", "input", "structure", "/evidence"),
+    ]);
+  try {
+    const result = adapter.engine.hashRecord({
+      contextId: checked.value.contextId,
+      recordId: checked.value.recordId,
+      payload: checked.value,
+      profile: { id: adapter.profile.id, version: adapter.profile.version },
+      algorithm: "sha-256",
+    });
+    return result.ok
+      ? succeeded(result.value)
+      : failed("unavailable", [
+          diagnostic("DIAG-ENGINE-HASH", "integrity", "structure", "/evidence"),
+        ]);
+  } catch {
+    return failed("unavailable", [
+      diagnostic("DIAG-ENGINE-HASH", "availability", "edition", "/engine"),
+    ]);
+  }
 }
 
 export function verifyNoeosEvidence(
   adapter: NoeosEvidenceAdapter,
   projection: NoeosEvidenceProjection,
   evidence: unknown,
-): OperationResult<"valid" | "invalid"> {
-  const result = adapter.engine.verifyRecord({ payload: projection, evidence });
-  return succeeded(result.status === "valid" ? "valid" : "invalid");
+): OperationResult<ClaimStatus> {
+  try {
+    const result = adapter.engine.verifyRecord({
+      payload: projection,
+      evidence,
+    });
+    switch (result.status) {
+      case "valid":
+      case "invalid":
+      case "indeterminate":
+        return succeeded(result.status);
+      case "aborted":
+      default:
+        return succeeded("unavailable");
+    }
+  } catch {
+    return succeeded("unavailable");
+  }
 }
 
 function sameInstalledEngine(): boolean {

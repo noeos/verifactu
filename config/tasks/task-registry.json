@@ -854,6 +854,7 @@
       "environment": [
         "CI",
         "PATH",
+        "VERIFACTU_PYTHON",
         "VERIFACTU_SUBJECT_SHA",
         "VERIFACTU_SUBJECT_TREE"
       ],
@@ -911,6 +912,7 @@
       "environment": [
         "CI",
         "PATH",
+        "VERIFACTU_PYTHON",
         "VERIFACTU_SUBJECT_SHA",
         "VERIFACTU_SUBJECT_TREE"
       ],
@@ -953,6 +955,8 @@
         "packages/verifactu/src/**",
         "internal/independent-oracles/p4_oracle.py",
         "tests/unit/p4-plans-artifacts.test.mjs",
+        "tests/unit/p4-claims.test.mjs",
+        "tests/contract/p4-engine-adapter.test.mjs",
         "tests/vectors/p4b-aeat-fingerprint.json",
         "tests/property/p4-properties.test.mjs",
         "tests/mutation/p4-mutation.test.mjs",
@@ -968,6 +972,7 @@
       "environment": [
         "CI",
         "PATH",
+        "VERIFACTU_PYTHON",
         "VERIFACTU_SUBJECT_SHA",
         "VERIFACTU_SUBJECT_TREE"
       ],
@@ -1014,8 +1019,11 @@
         "config/python/requirements.lock",
         "config/admission/python-dependencies.json",
         "docs/17-roadmap-risk/p4c-evidence.md",
+        "docs/17-roadmap-risk/p4f-evidence.md",
         "tests/unit/p4-xml-model.test.mjs",
         "tests/contract/p4-xml-xsd-provider.test.mjs",
+        "tests/contract/p4-engine-adapter.test.mjs",
+        "tests/unit/p4-claims.test.mjs",
         "tests/integration/p4-offline-xsd.test.mjs",
         "tests/security/p4-xml-attacks.test.mjs",
         "tests/security/p4-resource-attacks.test.mjs",
@@ -1025,8 +1033,10 @@
         "tests/mutation/p4-mutation.test.mjs",
         "tooling/assurance/p4c-coverage.mjs",
         "tooling/assurance/p4c-mutation.mjs",
+        "tooling/assurance/p4f-mutation.mjs",
         "tooling/assurance/p4c-overall-mutation.mjs",
         "tooling/assurance/p4a-overall-mutation.mjs",
+        "tooling/tasks/operations.mjs",
         "config/quality/p4-quality-plan.json"
       ],
       "outputs": ["evidence/runs/p4c--assurance.json"],

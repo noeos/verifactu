@@ -3217,6 +3217,22 @@ async function p4CAssurance(context) {
   const criticalReport = JSON.parse(
     critical.stdout.trim().split(/\r?\n/u).at(-1),
   );
+  const p4fCritical = await run(
+    "node",
+    ["tooling/assurance/p4f-mutation.mjs"],
+    {
+      cwd: context.root,
+      timeoutMs: 180000,
+    },
+  );
+  assert(
+    p4fCritical.code === 0,
+    "P4F_CRITICAL_MUTATION",
+    p4fCritical.stderr || p4fCritical.stdout,
+  );
+  const p4fCriticalReport = JSON.parse(
+    p4fCritical.stdout.trim().split(/\r?\n/u).at(-1),
+  );
   const overall = await run(
     "node",
     ["tooling/assurance/p4c-overall-mutation.mjs"],
@@ -3240,6 +3256,7 @@ async function p4CAssurance(context) {
   const selected =
     coverageReport.testFiles +
     criticalReport.population +
+    p4fCriticalReport.population +
     overallReport.population +
     oracleReport.selected;
   return {
@@ -3250,6 +3267,7 @@ async function p4CAssurance(context) {
       canonicalJson({
         coverage: coverageReport,
         criticalMutation: criticalReport,
+        p4fCriticalMutation: p4fCriticalReport,
         overallMutation: overallReport,
         oracle: oracleReport,
         propertyExecutions: 4096,
@@ -3260,6 +3278,7 @@ async function p4CAssurance(context) {
     diagnostics: [
       `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
       `critical mutants killed=${criticalReport.killed}/${criticalReport.population}`,
+      `P4-F critical mutants killed=${p4fCriticalReport.killed}/${p4fCriticalReport.population}`,
       `overall mutants killed=${overallReport.killed}/${overallReport.population} (${overallReport.killedPercent}%) across ${overallReport.productionFiles} production files; survivors=${overallReport.survivors.length} timeouts=${overallReport.timeouts}`,
       "P4-C XML infoset property executions=4096 with zero discards",
       "P4-C XML/XSD fuzz executions=8192 with bounded inputs",
