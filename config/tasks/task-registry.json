@@ -398,6 +398,7 @@
       "dependencies": ["package:allowlists"],
       "inputs": [
         "evidence/runs/artifacts/packages/**",
+        ".github/actions/setup-engineering/action.yml",
         "config/repository/packages.json",
         "tests/integration/p4-engine-tarball.test.mjs",
         "tooling/tasks/operations.mjs"
