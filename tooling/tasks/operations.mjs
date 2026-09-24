@@ -3264,6 +3264,19 @@ async function p4CAssurance(context) {
   const p4fCriticalReport = JSON.parse(
     p4fCritical.stdout.trim().split(/\r?\n/u).at(-1),
   );
+  const p4eCritical = await run(
+    "node",
+    ["tooling/assurance/p4e-mutation.mjs"],
+    { cwd: context.root, timeoutMs: 60000 },
+  );
+  assert(
+    p4eCritical.code === 0,
+    "P4E_CRITICAL_MUTATION",
+    p4eCritical.stderr || p4eCritical.stdout,
+  );
+  const p4eCriticalReport = JSON.parse(
+    p4eCritical.stdout.trim().split(/\r?\n/u).at(-1),
+  );
   const overall = await run(
     "node",
     ["tooling/assurance/p4c-overall-mutation.mjs"],
@@ -3288,6 +3301,7 @@ async function p4CAssurance(context) {
     coverageReport.testFiles +
     criticalReport.population +
     p4fCriticalReport.population +
+    p4eCriticalReport.population +
     overallReport.population +
     oracleReport.selected;
   return {
@@ -3299,6 +3313,7 @@ async function p4CAssurance(context) {
         coverage: coverageReport,
         criticalMutation: criticalReport,
         p4fCriticalMutation: p4fCriticalReport,
+        p4eCriticalMutation: p4eCriticalReport,
         overallMutation: overallReport,
         oracle: oracleReport,
         propertyExecutions: 4096,
@@ -3310,6 +3325,7 @@ async function p4CAssurance(context) {
       `coverage statements=${coverageReport.statements} branches=${coverageReport.branches} functions=${coverageReport.functions} lines=${coverageReport.lines}`,
       `critical mutants killed=${criticalReport.killed}/${criticalReport.population}`,
       `P4-F critical mutants killed=${p4fCriticalReport.killed}/${p4fCriticalReport.population}`,
+      `P4-E critical mutants killed=${p4eCriticalReport.killed}/${p4eCriticalReport.population}`,
       `overall mutants killed=${overallReport.killed}/${overallReport.population} (${overallReport.killedPercent}%) across ${overallReport.productionFiles} production files; survivors=${overallReport.survivors.length} timeouts=${overallReport.timeouts}`,
       "P4-C XML infoset property executions=4096 with zero discards",
       "P4-C XML/XSD fuzz executions=8192 with bounded inputs",

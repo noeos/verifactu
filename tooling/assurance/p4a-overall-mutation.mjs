@@ -16,8 +16,25 @@ import ts from "typescript";
 const root = resolve(import.meta.dirname, "../..");
 const build = resolve(root, "evidence/runs/artifacts/build/verifactu/dist");
 const xmlProvider = resolve(root, "internal/xml-provider");
+const qrProvider = resolve(root, "internal/qr-provider");
 const includeXmlProvider = process.env.P4C_MUTATION === "1";
 const testMap = [
+  [
+    /application\/qr/u,
+    [
+      "tests/unit/p4-qr-payload.test.mjs",
+      "tests/property/p4-properties.test.mjs",
+    ],
+  ],
+  [/ports\/qr/u, ["tests/contract/p4-qr-provider.test.mjs"]],
+  [
+    /internal\/qr-provider\/provider\.mjs/u,
+    [
+      "tests/contract/p4-qr-provider.test.mjs",
+      "tests/security/p4-qr-renderer.test.mjs",
+      "tests/integration/p4-qr-roundtrip.test.mjs",
+    ],
+  ],
   [/ports\/xml-xsd/u, ["tests/unit/p4-xml-model.test.mjs"]],
   [
     /internal\/xml-provider\/provider\.mjs/u,
@@ -214,6 +231,7 @@ function discoverMutants(path, source) {
 const files = [
   ...(await javascriptFiles(build)),
   ...(includeXmlProvider ? await javascriptFiles(xmlProvider) : []),
+  ...(await javascriptFiles(qrProvider)),
 ];
 const sources = new Map();
 const mutants = [];
@@ -240,17 +258,23 @@ const results = [];
 try {
   for (const [index, mutant] of deduplicated.entries()) {
     const mutantRoot = resolve(temporary, String(index).padStart(4, "0"));
-    const external = mutant.path.startsWith(xmlProvider);
+    const external =
+      mutant.path.startsWith(xmlProvider) || mutant.path.startsWith(qrProvider);
+    const provider = mutant.path.startsWith(xmlProvider)
+      ? xmlProvider
+      : qrProvider;
+    const providerName =
+      provider === xmlProvider ? "xml-provider" : "qr-provider";
     await cp(build, mutantRoot, { recursive: true });
     if (external)
-      await cp(xmlProvider, resolve(mutantRoot, "xml-provider"), {
+      await cp(provider, resolve(mutantRoot, providerName), {
         recursive: true,
       });
     const relativePath = external
       ? relative(root, mutant.path)
       : relative(build, mutant.path);
     const target = external
-      ? resolve(mutantRoot, "xml-provider", relative(xmlProvider, mutant.path))
+      ? resolve(mutantRoot, providerName, relative(provider, mutant.path))
       : resolve(mutantRoot, relativePath);
     const source = sources.get(mutant.path);
     if (source === undefined)
@@ -267,14 +291,20 @@ try {
       env: {
         ...isolatedEnvironment,
         ...(external
-          ? {
-              VERIFACTU_XML_PROVIDER_ENTRY: pathToFileURL(
-                resolve(mutantRoot, "xml-provider/provider.mjs"),
-              ).href,
-              VERIFACTU_XML_WORKER_ENTRY: pathToFileURL(
-                resolve(mutantRoot, "xml-provider/worker.mjs"),
-              ).href,
-            }
+          ? providerName === "xml-provider"
+            ? {
+                VERIFACTU_XML_PROVIDER_ENTRY: pathToFileURL(
+                  resolve(mutantRoot, "xml-provider/provider.mjs"),
+                ).href,
+                VERIFACTU_XML_WORKER_ENTRY: pathToFileURL(
+                  resolve(mutantRoot, "xml-provider/worker.mjs"),
+                ).href,
+              }
+            : {
+                VERIFACTU_QR_PROVIDER_ENTRY: pathToFileURL(
+                  resolve(mutantRoot, "qr-provider/provider.mjs"),
+                ).href,
+              }
           : {
               VERIFACTU_TEST_ENTRY: pathToFileURL(
                 resolve(mutantRoot, "index.js"),

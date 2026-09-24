@@ -23,12 +23,17 @@ snapshot, candidate generation digest and exact installed Verification Engine
 1.0.1 SRI. The edition remains `creationAllowed=false`; this declaration does
 not activate fiscal creation or establish a compliance, AEAT or release claim.
 
-The manifest fixes 43 production modules and 26 test files for waves P4-A–P4-G.
+The manifest fixes 45 production modules and 29 test files for waves P4-A–P4-G.
 Every later production path must already be present in that population. A new or
 renamed path requires a standalone protected quality-plan change before the
 affected implementation PR. Generated declarations and test fixtures are the
 only class exclusions; handwritten semantics and private runtime providers stay
 in the denominator.
+
+The original population count omitted the private QR renderer and its explicit
+security/fuzz test from the denominators. The machine manifest and validator
+were corrected before accepting P4-E evidence; the QR provider is now included
+in both coverage and mutation campaigns.
 
 ## Quantitative gates
 

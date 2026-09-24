@@ -86,7 +86,7 @@ export function validateP4QualityPlan(candidate) {
   );
 
   assert(
-    candidate.productionModules.length === 44,
+    candidate.productionModules.length === 45,
     "P4_PLAN_MODULE_POPULATION",
     candidate.productionModules.length,
   );
@@ -96,6 +96,7 @@ export function validateP4QualityPlan(candidate) {
       (path) =>
         path.startsWith("packages/verifactu/src/") ||
         path.startsWith("internal/xml-provider/") ||
+        path.startsWith("internal/qr-provider/") ||
         path.startsWith("internal/xades-provider/") ||
         path === "internal/independent-oracles/p4_oracle.py" ||
         path === "internal/independent-oracles/p4c_xml_oracle.py",
@@ -104,7 +105,7 @@ export function validateP4QualityPlan(candidate) {
     "path outside P4 production/provider/oracle scope",
   );
   assert(
-    candidate.testFiles.length === 28,
+    candidate.testFiles.length === 29,
     "P4_PLAN_TEST_POPULATION",
     candidate.testFiles.length,
   );

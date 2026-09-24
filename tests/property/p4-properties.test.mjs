@@ -369,6 +369,58 @@ test("P4-FUZZ-002 XML scanner and serializer handle 4096 bounded arbitrary input
   }
 });
 
+test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () => {
+  const printable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -._~!$&'()*+,;=:@/?%";
+  const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  for (let index = 0; index < RUNS; index += 1) {
+    const year = 2000 + (next() % 100);
+    const month = 1 + (next() % 12);
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const monthDays = month === 2 && leap ? 29 : days[month - 1];
+    const day = 1 + (next() % monthDays);
+    let series = "";
+    const seriesLength = 1 + (next() % 60);
+    for (let position = 0; position < seriesLength; position += 1)
+      series += printable[next() % printable.length];
+    const whole = String(next() % 1_000_000_000_000);
+    const fraction =
+      next() % 3 === 0 ? "" : `.${String(next() % 100).padStart(2, "0")}`;
+    const magnitude = `${whole}${fraction}`;
+    const importe = index % 2 === 0 ? `-${magnitude}` : magnitude;
+    const facts = {
+      nif: "89890001K",
+      numserie: series,
+      fecha: api.parseFiscalDate(
+        `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+      ).value,
+      importe,
+    };
+    const profile = {
+      profileId: "aeat.qr@0.5.0",
+      editionId: id("edition", "rrsif-2026-09-21-authoritative-candidate"),
+      environment: next() % 2 === 0 ? "test" : "production",
+      mode: next() % 2 === 0 ? "verifactu" : "non-verifactu",
+      maximumPayloadBytes: 512,
+    };
+    const payload = api.buildQrPayload(profile, facts);
+    assert.equal(payload.status, "succeeded");
+    assert.deepEqual(
+      payload.value.bytes,
+      new TextEncoder().encode(payload.value.text),
+    );
+    assert.equal(
+      payload.value.artifactDigest,
+      createHash("sha256").update(payload.value.bytes).digest("hex"),
+    );
+    assert.equal(payload.value.editionId, profile.editionId);
+    const parsed = api.parseQrPayload(profile, payload.value.text);
+    assert.deepEqual(parsed, { status: "succeeded", value: facts });
+    const rebuilt = api.buildQrPayload(profile, parsed.value);
+    assert.equal(rebuilt.status, "succeeded");
+    assert.deepEqual(rebuilt.value.bytes, payload.value.bytes);
+  }
+});
+
 test("P4-PROP-012 claim aggregation preserves every component status", () => {
   const statuses = ["valid", "invalid", "indeterminate", "unavailable"];
   const priority = ["invalid", "indeterminate", "unavailable", "valid"];

@@ -18,14 +18,23 @@ selection policy, quiet zone, module scale, colors/contrast, raster dimensions,
 SVG viewBox and deterministic metadata. It cannot truncate or replace content
 to fit.
 
+The AEAT matrix itself is rendered at 32 × 32 mm, within the required 30–40 mm
+range; its quiet zone is outside that matrix and at least 2 mm per side. The
+complete SVG remains at most 40 × 40 mm. If a payload/version cannot satisfy
+all three bounds, rendering returns a limit outcome rather than shrinking the
+symbol or quiet zone.
+
 SVG output contains only static geometry and declared accessibility text: no
 script, external resource, event handler, foreign object or attacker-controlled
-markup. PNG has bounded dimensions/pixels and deterministic encoding policy.
-The visible VERI*FACTU/QR legend is a separate layout requirement returned to
-the host; an image alone does not prove invoice placement or print quality.
+markup. This package emits SVG only; rasterization and PNG output are a host
+concern and must enforce their own pixel bounds. The visible VERI\*FACTU/QR
+legend is a separate layout requirement returned to the host; an image alone
+does not prove invoice placement or print quality.
 
-Verification decodes the rendered artifact with an independent scanner and
-compares exact payload bytes. The corpus covers supported sizes, print/scan,
-rotation, scaling, compression and bounded degradation, while pristine output
-must decode in all required independent readers. Payload validity and rendering
-quality are separate claims.
+Verification reconstructs pixels from the closed SVG geometry, decodes the
+rendered artifact with an independent scanner and compares exact payload text.
+The executable corpus covers supported sizes, 90-degree rotation, 2× scaling,
+lossless compression/decompression and five-module bounded degradation.
+Pristine output must decode in all required independent readers. Real printer,
+paper, camera, grayscale and optical scan behavior remain external validation;
+payload validity and rendering quality are separate claims.

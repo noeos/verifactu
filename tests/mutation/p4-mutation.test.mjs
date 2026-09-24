@@ -75,3 +75,25 @@ test("P4-MUT-023..025 are killed by tests against mutated XML provider code", ()
   assert.equal(report.testErrors, 0);
   assert.equal(report.timeouts, 0);
 });
+
+test("P4-MUT-030..031 are killed by tests against mutated QR production code", () => {
+  const execution = spawnSync(
+    process.execPath,
+    ["tooling/assurance/p4e-mutation.mjs"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      timeout: 60_000,
+      env: { ...process.env, VERIFACTU_TEST_ENTRY: undefined },
+    },
+  );
+  assert.equal(execution.error, undefined);
+  assert.equal(execution.status, 0, `${execution.stdout}\n${execution.stderr}`);
+  const report = JSON.parse(execution.stdout.trim().split(/\r?\n/u).at(-1));
+  assert.equal(report.population, 2);
+  assert.equal(report.killed, 2);
+  assert.deepEqual(report.survivors, []);
+  assert.equal(report.compileErrors, 0);
+  assert.equal(report.testErrors, 0);
+  assert.equal(report.timeouts, 0);
+});

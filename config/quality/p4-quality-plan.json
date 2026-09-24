@@ -76,6 +76,7 @@
     "packages/verifactu/src/verification/engine-adapter.ts",
     "internal/xml-provider/provider.mjs",
     "internal/xml-provider/worker.mjs",
+    "internal/qr-provider/provider.mjs",
     "internal/xades-provider/provider.mjs",
     "internal/xades-provider/pki.mjs",
     "internal/xades-provider/worker.mjs",
@@ -108,6 +109,7 @@
     "tests/security/p4-xml-attacks.test.mjs",
     "tests/security/p4-signature-attacks.test.mjs",
     "tests/security/p4-resource-attacks.test.mjs",
+    "tests/security/p4-qr-renderer.test.mjs",
     "tests/security/p4-isolation-redaction.test.mjs",
     "tests/performance/p4-deterministic-core.test.mjs",
     "tests/packaging/p4-clean-consumer.test.mjs"
@@ -327,7 +329,7 @@
       "id": "P4-CB-031",
       "path": "packages/verifactu/src/application/qr.ts",
       "decision": "reject duplicate, unknown, missing, noncanonical and cross-environment payloads",
-      "test": "tests/security/p4-resource-attacks.test.mjs",
+      "test": "tests/unit/p4-qr-payload.test.mjs",
       "mutant": "P4-MUT-031"
     },
     {
