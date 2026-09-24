@@ -3,12 +3,12 @@ import {
   succeeded,
   type OperationResult,
 } from "../contracts/results.js";
-import { createHash } from "node:crypto";
 import { TextEncoder } from "node:util";
 import { parseFiscalDate, type FiscalDate } from "../domain/date-time.js";
 import { diagnostic } from "../domain/diagnostics.js";
 import type { EditionId } from "../domain/identities.js";
 import type { OperatingMode } from "../domain/mode-tenure.js";
+import type { DigestComputer } from "./fingerprint.js";
 
 export interface QrInvoiceFacts {
   readonly nif: string;
@@ -47,24 +47,24 @@ const MAXIMUM_QR_PAYLOAD_BYTES = 512;
 export function buildQrPayload(
   profile: QrEditionProfile,
   facts: QrInvoiceFacts,
+  digest: DigestComputer,
 ): OperationResult<QrPayload> {
   try {
     if (!validProfile(profile) || !validFacts(facts)) return qrFailure();
-    const date = `${facts.fecha.slice(8, 10)}-${facts.fecha.slice(5, 7)}-${facts.fecha.slice(0, 4)}`;
-    const values = [facts.nif, facts.numserie, date, facts.importe];
-    const text = `${urlPrefix(profile)}?${PARAMETERS.map((name, index) => `${name}=${encodeQueryComponent(values[index]!)}`).join("&")}`;
+    const normalizedFacts = Object.freeze({ ...facts });
+    const text = canonicalQrText(profile, normalizedFacts);
     const bytes = new TextEncoder().encode(text);
     if (bytes.byteLength > profile.maximumPayloadBytes) return qrFailure();
     const immutableBytes = Uint8Array.from(bytes);
-    const artifactDigest = createHash("sha256")
-      .update(immutableBytes)
-      .digest("hex");
+    const digestBytes = digest("SHA-256", Uint8Array.from(immutableBytes));
+    if (digestBytes.length !== 32) return qrFailure();
+    const artifactDigest = hex(digestBytes);
     return succeeded(
       Object.freeze({
         profileId: profile.profileId,
         editionId: profile.editionId,
         text,
-        facts: Object.freeze({ ...facts }),
+        facts: normalizedFacts,
         get bytes() {
           return Uint8Array.from(immutableBytes);
         },
@@ -110,17 +110,18 @@ export function parseQrPayload(
       !validFacts({ nif, numserie, fecha: parsedDate.value, importe })
     )
       return qrFailure();
-    const canonical = buildQrPayload(profile, {
+    const normalizedFacts = {
       nif,
       numserie,
       fecha: parsedDate.value,
       importe,
-    });
-    if (canonical.status !== "succeeded" || canonical.value.text !== text)
+    };
+    if (
+      !validFacts(normalizedFacts) ||
+      canonicalQrText(profile, normalizedFacts) !== text
+    )
       return qrFailure();
-    return succeeded(
-      Object.freeze({ nif, numserie, fecha: parsedDate.value, importe }),
-    );
+    return succeeded(Object.freeze(normalizedFacts));
   } catch {
     return qrFailure();
   }
@@ -162,6 +163,17 @@ function encodeQueryComponent(value: string): string {
     /[!'()*]/gu,
     (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
   );
+}
+function canonicalQrText(
+  profile: QrEditionProfile,
+  facts: QrInvoiceFacts,
+): string {
+  const date = `${facts.fecha.slice(8, 10)}-${facts.fecha.slice(5, 7)}-${facts.fecha.slice(0, 4)}`;
+  const values = [facts.nif, facts.numserie, date, facts.importe];
+  return `${urlPrefix(profile)}?${PARAMETERS.map((name, index) => `${name}=${encodeQueryComponent(values[index]!)}`).join("&")}`;
+}
+function hex(bytes: Uint8Array): string {
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 function urlPrefix(profile: QrEditionProfile): string {
   const host =

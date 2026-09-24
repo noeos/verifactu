@@ -19,10 +19,13 @@ and production endpoints/legends cannot be inferred from a loose boolean.
 
 The builder accepts validated invoice/record facts and an edition endpoint
 identity, not an arbitrary URL. It returns canonical payload text/bytes, parsed
-field view, lowercase-hex SHA-256 artifact digest and required visible legend. Returned bytes
-are defensive copies and parsed facts are immutable. Verification parses
-strictly, rejects duplicate/unknown/missing parameters, wrong environment/mode,
-noncanonical encoding and mismatch with expected invoice/record.
+field view, lowercase-hex SHA-256 artifact digest and required visible legend.
+SHA-256 is computed only through an explicitly injected `DigestComputer`; a
+missing, throwing or wrong-length provider result fails closed. The application
+does not select an ambient cryptographic provider. Returned bytes are defensive
+copies and parsed facts are immutable. Verification parses strictly, rejects
+duplicate/unknown/missing parameters, wrong environment/mode, noncanonical
+encoding and mismatch with expected invoice/record.
 
 Vectors cover reserved printable-ASCII series, rejection of non-ASCII values,
 boundary dates, zero and negative/credit amounts where legally valid, decimal

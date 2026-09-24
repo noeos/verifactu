@@ -18,7 +18,12 @@ const mutations = [
   },
   {
     id: "P4-MUT-031",
-    original: "canonical.value.text !== text",
+    original: "canonicalQrText(profile, normalizedFacts) !== text",
+    replacement: "false",
+  },
+  {
+    id: "P4-MUT-037",
+    original: "digestBytes.length !== 32",
     replacement: "false",
   },
 ];

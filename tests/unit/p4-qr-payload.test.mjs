@@ -29,9 +29,13 @@ const facts = (overrides = {}) => ({
   importe: "241.4",
   ...overrides,
 });
+const digest = (_algorithm, bytes) =>
+  new Uint8Array(createHash("sha256").update(bytes).digest());
+const buildQrPayload = (qrProfile, qrFacts) =>
+  api.buildQrPayload(qrProfile, qrFacts, digest);
 
 test("P4-E produces the captured AEAT ordered and percent-encoded QR URL", () => {
-  const result = api.buildQrPayload(profile(), facts());
+  const result = buildQrPayload(profile(), facts());
   assert.equal(result.status, "succeeded");
   assert.equal(
     result.value.text,
@@ -75,7 +79,7 @@ test("P4-E matches all four captured environment and mode endpoints", () => {
       "www2.agenciatributaria.gob.es",
     ],
   ]) {
-    const result = api.buildQrPayload(
+    const result = buildQrPayload(
       profile({ environment, mode }),
       facts({ numserie: "A-1" }),
     );
@@ -95,7 +99,7 @@ test("P4-E matches all four captured environment and mode endpoints", () => {
 });
 
 test("P4-E binds endpoint and visible legend to exact environment and mode", () => {
-  const result = api.buildQrPayload(
+  const result = buildQrPayload(
     profile({ environment: "production", mode: "non-verifactu" }),
     facts({ numserie: "F-1" }),
   );
@@ -110,7 +114,7 @@ test("P4-E binds endpoint and visible legend to exact environment and mode", () 
 });
 
 test("P4-E rejects URL ambiguity, noncanonical facts and cross-profile payloads", () => {
-  const payload = api.buildQrPayload(profile(), facts());
+  const payload = buildQrPayload(profile(), facts());
   assert.equal(payload.status, "succeeded");
   for (const value of [
     payload.value.text.replace("&fecha", "&unknown=x&fecha"),
@@ -140,7 +144,7 @@ test("P4-E rejects URL ambiguity, noncanonical facts and cross-profile payloads"
     ),
   ])
     assert.equal(api.parseQrPayload(profile(), value).status, "invalid");
-  const slash = api.buildQrPayload(profile(), facts({ numserie: "A/B" }));
+  const slash = buildQrPayload(profile(), facts({ numserie: "A/B" }));
   assert.equal(slash.status, "succeeded");
   assert.equal(slash.value.text.includes("numserie=A%2FB"), true);
   assert.equal(
@@ -156,30 +160,30 @@ test("P4-E rejects URL ambiguity, noncanonical facts and cross-profile payloads"
     "invalid",
   );
   assert.equal(
-    api.buildQrPayload(profile(), facts({ numserie: "ñ" })).status,
+    buildQrPayload(profile(), facts({ numserie: "ñ" })).status,
     "invalid",
   );
   assert.equal(
-    api.buildQrPayload(profile(), facts({ importe: "-210.00" })).status,
+    buildQrPayload(profile(), facts({ importe: "-210.00" })).status,
     "succeeded",
   );
   assert.match(
-    api.buildQrPayload(profile(), facts({ importe: "-210.00" })).value.text,
+    buildQrPayload(profile(), facts({ importe: "-210.00" })).value.text,
     /importe=-210\.00$/u,
   );
   for (const importe of ["-", "--1", "+1", "-1000000000000", "-1.001"])
     assert.equal(
-      api.buildQrPayload(profile(), facts({ importe })).status,
+      buildQrPayload(profile(), facts({ importe })).status,
       "invalid",
     );
-  assert.equal(api.buildQrPayload(profile(), null).status, "invalid");
-  assert.equal(api.buildQrPayload(null, facts()).status, "invalid");
+  assert.equal(buildQrPayload(profile(), null).status, "invalid");
+  assert.equal(buildQrPayload(null, facts()).status, "invalid");
   assert.equal(
-    api.buildQrPayload(profile({ profileId: "untrusted-profile" }), facts()).status,
+    buildQrPayload(profile({ profileId: "untrusted-profile" }), facts()).status,
     "invalid",
   );
   assert.equal(
-    api.buildQrPayload(
+    buildQrPayload(
       profile({
         editionId: api.editionId("rrsif-2026-09-21-authoritative").value,
       }),
@@ -188,7 +192,7 @@ test("P4-E rejects URL ambiguity, noncanonical facts and cross-profile payloads"
     "invalid",
   );
   assert.equal(
-    api.buildQrPayload(
+    buildQrPayload(
       Object.defineProperty({}, "profileId", {
         get() {
           throw new Error("hostile getter");
@@ -207,35 +211,47 @@ test("P4-E accepts official field boundaries and enforces byte ceiling exactly",
     importe: "999999999999.99",
   });
   const base = profile();
-  const size = api.buildQrPayload(base, boundary);
+  const size = buildQrPayload(base, boundary);
   assert.equal(size.status, "succeeded");
   assert.equal(
-    api.buildQrPayload(base, { ...boundary, importe: "-999999999999.99" })
-      .status,
+    buildQrPayload(base, { ...boundary, importe: "-999999999999.99" }).status,
     "succeeded",
   );
   const exact = profile({ maximumPayloadBytes: size.value.bytes.byteLength });
-  assert.equal(api.buildQrPayload(exact, boundary).status, "succeeded");
+  assert.equal(buildQrPayload(exact, boundary).status, "succeeded");
   assert.equal(
-    api.buildQrPayload(
+    buildQrPayload(
       profile({ maximumPayloadBytes: size.value.bytes.byteLength - 1 }),
       boundary,
     ).status,
     "invalid",
   );
   assert.equal(
-    api.buildQrPayload(profile({ maximumPayloadBytes: 513 }), boundary).status,
+    buildQrPayload(profile({ maximumPayloadBytes: 513 }), boundary).status,
     "invalid",
   );
   assert.equal(
-    api.buildQrPayload(
+    buildQrPayload(
       profile(),
       facts({ fecha: date("2024-02-29"), importe: "0" }),
     ).status,
     "succeeded",
   );
   assert.equal(
-    api.buildQrPayload(profile(), facts({ fecha: "2024-02-30" })).status,
+    buildQrPayload(profile(), facts({ fecha: "2024-02-30" })).status,
+    "invalid",
+  );
+});
+
+test("P4-E rejects a failed or malformed SHA-256 provider", () => {
+  assert.equal(
+    api.buildQrPayload(profile(), facts(), () => {
+      throw new Error("digest provider fault");
+    }).status,
+    "invalid",
+  );
+  assert.equal(
+    api.buildQrPayload(profile(), facts(), () => new Uint8Array(31)).status,
     "invalid",
   );
 });

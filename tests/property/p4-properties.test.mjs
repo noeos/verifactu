@@ -28,6 +28,8 @@ const hash = (algorithm, bytes) =>
       .update(bytes)
       .digest(),
   );
+const buildQrPayload = (profile, facts) =>
+  api.buildQrPayload(profile, facts, hash);
 
 test("P4-PROP-001 failed syntax never invokes structural decoding", () => {
   let calls = 0;
@@ -402,7 +404,7 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () 
       mode: next() % 2 === 0 ? "verifactu" : "non-verifactu",
       maximumPayloadBytes: 512,
     };
-    const payload = api.buildQrPayload(profile, facts);
+    const payload = buildQrPayload(profile, facts);
     assert.equal(payload.status, "succeeded");
     assert.deepEqual(
       payload.value.bytes,
@@ -415,7 +417,7 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () 
     assert.equal(payload.value.editionId, profile.editionId);
     const parsed = api.parseQrPayload(profile, payload.value.text);
     assert.deepEqual(parsed, { status: "succeeded", value: facts });
-    const rebuilt = api.buildQrPayload(profile, parsed.value);
+    const rebuilt = buildQrPayload(profile, parsed.value);
     assert.equal(rebuilt.status, "succeeded");
     assert.deepEqual(rebuilt.value.bytes, payload.value.bytes);
   }

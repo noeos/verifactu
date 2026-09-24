@@ -44,8 +44,8 @@ wrong-subject reports are `blocked`.
 | Population        | Exact rule                                                                                         | Threshold                                                                   |
 | ----------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | coverage          | all declared production modules plus rejection of undeclared discovered modules                    | ≥98% statements/lines/functions, ≥95% branches                              |
-| critical branches | 36 versioned decisions in `criticalCatalogue`                                                      | 100% conditions and outcomes                                                |
-| critical mutation | `P4-MUT-001`–`P4-MUT-036`, one per critical decision                                               | 100% killed, no compile/error/timeout/NoCoverage                            |
+| critical branches | 37 versioned decisions in `criticalCatalogue`                                                      | 100% conditions and outcomes                                                |
+| critical mutation | `P4-MUT-001`–`P4-MUT-037`, one per critical decision                                               | 100% killed, no compile/error/timeout/NoCoverage                            |
 | other mutation    | all compilable non-equivalent applications of the six declared operators to all production modules | ≥95% killed; no unreviewed regulatory/security survivor                     |
 | property          | 12 named properties × 4,096 executions                                                             | 49,152 executed with declared discard ceilings and shrinking                |
 | fuzz              | six named targets × 4,096 executions                                                               | 24,576 executed; zero crash, hang, leak, nondeterminism or forbidden effect |

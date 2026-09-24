@@ -366,6 +366,13 @@
       "decision": "redact prohibited data and preserve deterministic stage/path/code order",
       "test": "tests/security/p4-isolation-redaction.test.mjs",
       "mutant": "P4-MUT-036"
+    },
+    {
+      "id": "P4-CB-037",
+      "path": "packages/verifactu/src/application/qr.ts",
+      "decision": "reject failed SHA-256 providers and outputs with the wrong digest length",
+      "test": "tests/unit/p4-qr-payload.test.mjs",
+      "mutant": "P4-MUT-037"
     }
   ],
   "mutation": {

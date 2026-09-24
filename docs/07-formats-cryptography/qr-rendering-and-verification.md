@@ -33,6 +33,9 @@ does not prove invoice placement or print quality.
 
 Verification reconstructs pixels from the closed SVG geometry, decodes the
 rendered artifact with an independent scanner and compares exact payload text.
+The scanner is an exact-version development-only dependency, excluded from the
+published VeriFactu package; optional decoder fallback code remains omitted by
+the repository installation profile.
 The executable corpus covers supported sizes, 90-degree rotation, 2× scaling,
 lossless compression/decompression and five-module bounded degradation.
 Pristine output must decode in all required independent readers. Real printer,

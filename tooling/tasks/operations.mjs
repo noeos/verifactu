@@ -2,6 +2,7 @@ import { createReadStream } from "node:fs";
 import {
   cp,
   copyFile,
+  access,
   lstat,
   mkdir,
   readFile,
@@ -1048,17 +1049,45 @@ async function policySupplyChain(context) {
       "DEPENDENCY_ORIGIN",
       name,
     );
+    const optionalDependencies = Object.keys(locked.optionalDependencies ?? {});
     assert(
       admission.installLifecycle === false &&
         locked.hasInstallScript !== true &&
         admission.optionalCode === false &&
-        Object.keys(locked.optionalDependencies ?? {}).length === 0,
+        canonicalJson(optionalDependencies.sort()) ===
+          canonicalJson(
+            [...(admission.omittedOptionalDependencies ?? [])].sort(),
+          ),
       "DEPENDENCY_EXECUTION_SURFACE",
       name,
     );
     const installedFiles = await walk(
       resolve(context.root, "node_modules", name),
     );
+    for (const optionalName of optionalDependencies) {
+      for (const optionalPath of [
+        resolve(context.root, "node_modules", optionalName),
+        resolve(
+          context.root,
+          "node_modules",
+          name,
+          "node_modules",
+          optionalName,
+        ),
+      ]) {
+        let optionalIsInstalled = true;
+        try {
+          await access(optionalPath);
+        } catch {
+          optionalIsInstalled = false;
+        }
+        assert(
+          !optionalIsInstalled,
+          "DEPENDENCY_OPTIONAL_PRESENT",
+          `${name} -> ${optionalName}`,
+        );
+      }
+    }
     const nativeFiles = installedFiles.filter(
       (entry) =>
         entry.type === "file" &&

@@ -51,14 +51,26 @@ the static SVG contains no script, reference, event handler or foreign object.
 - Independent ZXing decoding reconstructs from the emitted SVG paths and
   confirms exact URL text, including a negative-total case. Rotated, 2× scaled,
   gzip/restored and five-module-degraded matrices remain decodable.
-- `P4-MUT-030` swaps the mode endpoints; `P4-MUT-031` removes canonical-text
-  enforcement. Both are killed by the focused payload tests (2/2).
+- `P4-MUT-030` swaps mode endpoints, `P4-MUT-031` removes canonical-text
+  enforcement and `P4-MUT-037` accepts an invalid digest length. All three are
+  killed by focused payload tests (3/3).
+- `p4c:assurance` executes 1,268/1,268 checks on current development tree
+  `568bb63b71a008533b01af222587e94bf23eb8d7`: cumulative coverage is 99.01%
+  statements/lines, 95.77% branches and 100% functions; critical QR mutations
+  are 3/3; overall mutation is 1,210/1,228 (98.53%) with 18 identified XML
+  provider/worker survivors, no compile/test errors and no timeouts.
+  The task report records input digest
+  `ddaa16ec7ade07a8b0da49a22d6cd459dd38c04cdba46b5c057ea10627318c52` and
+  output digest
+  `3c890057985dc8d994404b2d344b3b50075efacd20f5eadf7d4d8f8bebd7db4c`.
+  It is dirty-tree development evidence, not a final-head result.
 - Three local cumulative coverage runs pass the declared thresholds: P4-A/B
   99.32% statements/lines, 95.95% branches and 100% functions; P4-C 99.01%,
-  95.67% and 100%, respectively.
-- The cumulative mutation run kills 1,210/1,228 mutants (98.53%), with zero
-  compile errors, test errors or timeouts. All 18 survivors are in the
-  pre-existing XML provider/worker population; none are in QR production code.
+  95.77% and 100%, respectively.
+- The independent ZXing decoder is development-only and is omitted from the
+  published package. Its declared optional text-encoding fallback is recorded
+  but required to remain physically absent under the repository's `omit=optional`
+  installation policy.
 - These runs are dirty-tree diagnostic evidence only. Protected final-head CI
   must repeat and bind the evidence before merge.
 

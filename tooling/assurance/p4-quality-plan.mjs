@@ -136,7 +136,7 @@ export function validateP4QualityPlan(candidate) {
   );
 
   assert(
-    candidate.criticalCatalogue.length === 36,
+    candidate.criticalCatalogue.length === 37,
     "P4_PLAN_CRITICAL_POPULATION",
     candidate.criticalCatalogue.length,
   );

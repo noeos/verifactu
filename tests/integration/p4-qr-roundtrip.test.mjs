@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { BitMatrix, QRCodeReader } from "@zxing/library";
 import { svgMatrix } from "../support/p4-qr-svg.mjs";
@@ -14,6 +15,8 @@ const { renderQrSvg } = await import(
   process.env.VERIFACTU_QR_PROVIDER_ENTRY ??
     new URL("../../internal/qr-provider/provider.mjs", import.meta.url).href
 );
+const digest = (_algorithm, bytes) =>
+  new Uint8Array(createHash("sha256").update(bytes).digest());
 
 test("P4-E canonical edition QR renders and independently decodes to exact facts", () => {
   const profile = {
@@ -29,7 +32,7 @@ test("P4-E canonical edition QR renders and independently decodes to exact facts
     fecha: api.parseFiscalDate("2024-02-29").value,
     importe: "-241.40",
   };
-  const payload = api.buildQrPayload(profile, facts);
+  const payload = api.buildQrPayload(profile, facts, digest);
   assert.equal(payload.status, "succeeded");
   assert.deepEqual(payload.value.facts, facts);
   const rendered = renderQrSvg(payload.value.bytes);
