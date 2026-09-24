@@ -42,12 +42,16 @@ the static SVG contains no script, reference, event handler or foreign object.
 
 ## Executable evidence
 
-- `P4-PROP-011`: 4,096 encode/decode/rebuild cases, including signed and
-  unsigned values, printable reserved characters, calendar boundaries, both
-  environments and both modes; zero discards.
-- `P4-FUZZ-005`: 4,096 deterministic bounded byte inputs; no uncaught provider
-  exception. Over-limit, malformed UTF-8/ASCII and geometry-limit outcomes are
-  distinguished.
+- `P4-PROP-011`: 4,096 encode/decode/rebuild cases from fixed seed
+  `0x4e4f454f`, including signed and unsigned values, printable reserved
+  characters, calendar boundaries, both environments and both modes; the
+  test asserts non-empty label classes and zero discards. A seeded property
+  fault verifies shrinking: three reductions produce `numserie=S`,
+  `fecha=2000-01-01`, `importe=-0`, while preserving the failure predicate.
+- `P4-FUZZ-005`: 4,096 deterministic bounded byte inputs are sent through both
+  the QR payload parser and renderer; every rendered SVG is reconstructed and
+  decoded with ZXing to the exact source text. No uncaught provider exception
+  occurred; malformed input and geometry-limit outcomes remain distinct.
 - Independent ZXing decoding reconstructs from the emitted SVG paths and
   confirms exact URL text, including a negative-total case. Rotated, 2× scaled,
   gzip/restored and five-module-degraded matrices remain decodable.

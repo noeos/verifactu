@@ -31,6 +31,107 @@ const hash = (algorithm, bytes) =>
 const buildQrPayload = (profile, facts) =>
   api.buildQrPayload(profile, facts, hash);
 
+function shrinkQrCounterexample(sample, fails) {
+  let current = structuredClone(sample);
+  const steps = [];
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    const candidates = [
+      [
+        "numserie-prefix",
+        {
+          ...current,
+          facts: {
+            ...current.facts,
+            numserie:
+              current.facts.numserie.length > 1
+                ? current.facts.numserie[0]
+                : current.facts.numserie,
+          },
+        },
+      ],
+      [
+        "importe-negative-zero",
+        { ...current, facts: { ...current.facts, importe: "-0" } },
+      ],
+      [
+        "fecha-anchor",
+        {
+          ...current,
+          facts: {
+            ...current.facts,
+            fecha: api.parseFiscalDate("2000-01-01").value,
+          },
+        },
+      ],
+      [
+        "environment-test",
+        { ...current, profile: { ...current.profile, environment: "test" } },
+      ],
+      [
+        "mode-verifactu",
+        { ...current, profile: { ...current.profile, mode: "verifactu" } },
+      ],
+    ];
+    const reduced = candidates.find(
+      ([, candidate]) =>
+        JSON.stringify(candidate) !== JSON.stringify(current) &&
+        fails(candidate),
+    );
+    if (reduced === undefined) break;
+    current = reduced[1];
+    steps.push(reduced[0]);
+  }
+  return Object.freeze({
+    counterexample: current,
+    steps: Object.freeze(steps),
+  });
+}
+
+function qrRoundTripHolds(sample) {
+  const payload = buildQrPayload(sample.profile, sample.facts);
+  if (payload.status !== "succeeded") return false;
+  if (JSON.stringify(payload.value.facts) !== JSON.stringify(sample.facts))
+    return false;
+  if (
+    Buffer.compare(
+      Buffer.from(payload.value.bytes),
+      Buffer.from(payload.value.text, "utf8"),
+    ) !== 0
+  )
+    return false;
+  if (
+    payload.value.artifactDigest !==
+    createHash("sha256").update(payload.value.bytes).digest("hex")
+  )
+    return false;
+  if (payload.value.editionId !== sample.profile.editionId) return false;
+  const parsed = api.parseQrPayload(sample.profile, payload.value.text);
+  if (
+    parsed.status !== "succeeded" ||
+    JSON.stringify(parsed.value) !== JSON.stringify(sample.facts)
+  )
+    return false;
+  const rebuilt = buildQrPayload(sample.profile, parsed.value);
+  return (
+    rebuilt.status === "succeeded" &&
+    Buffer.compare(
+      Buffer.from(rebuilt.value.bytes),
+      Buffer.from(payload.value.bytes),
+    ) === 0
+  );
+}
+
+function assertQrProperty(sample, seed, execution) {
+  if (qrRoundTripHolds(sample)) return;
+  const shrunk = shrinkQrCounterexample(
+    sample,
+    (candidate) => !qrRoundTripHolds(candidate),
+  );
+  assert.fail(
+    `P4-PROP-011 seed=${seed} execution=${execution} shrink=${shrunk.steps.join(",")} counterexample=${JSON.stringify(shrunk.counterexample)}`,
+  );
+}
+
 test("P4-PROP-001 failed syntax never invokes structural decoding", () => {
   let calls = 0;
   const decoder = { decode: () => (calls += 1) };
@@ -374,19 +475,37 @@ test("P4-FUZZ-002 XML scanner and serializer handle 4096 bounded arbitrary input
 test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () => {
   const printable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -._~!$&'()*+,;=:@/?%";
   const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const seed = 0x4e4f454f;
+  const histogram = {
+    environments: { test: 0, production: 0 },
+    modes: { verifactu: 0, "non-verifactu": 0 },
+    amounts: { negative: 0, nonnegative: 0 },
+    leapDays: 0,
+  };
+  const reservedCharacters = new Set();
+  const reserved = " -._~!$&'()*+,;=:@/?%";
+  let qrState = seed;
+  const nextQr = () => {
+    qrState = (Math.imul(qrState, 1664525) + 1013904223) >>> 0;
+    return qrState;
+  };
   for (let index = 0; index < RUNS; index += 1) {
-    const year = 2000 + (next() % 100);
-    const month = 1 + (next() % 12);
+    const generatedYear = 2000 + (nextQr() % 100);
+    const generatedMonth = 1 + (nextQr() % 12);
+    const leapBoundary = index % 64 === 0;
+    const year = leapBoundary ? 2000 + 4 * ((index / 64) % 25) : generatedYear;
+    const month = leapBoundary ? 2 : generatedMonth;
     const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
     const monthDays = month === 2 && leap ? 29 : days[month - 1];
-    const day = 1 + (next() % monthDays);
+    const generatedDay = 1 + (nextQr() % monthDays);
+    const day = leapBoundary ? 29 : generatedDay;
     let series = "";
-    const seriesLength = 1 + (next() % 60);
+    const seriesLength = 1 + (nextQr() % 60);
     for (let position = 0; position < seriesLength; position += 1)
-      series += printable[next() % printable.length];
-    const whole = String(next() % 1_000_000_000_000);
+      series += printable[nextQr() % printable.length];
+    const whole = String(nextQr() % 1_000_000_000_000);
     const fraction =
-      next() % 3 === 0 ? "" : `.${String(next() % 100).padStart(2, "0")}`;
+      nextQr() % 3 === 0 ? "" : `.${String(nextQr() % 100).padStart(2, "0")}`;
     const magnitude = `${whole}${fraction}`;
     const importe = index % 2 === 0 ? `-${magnitude}` : magnitude;
     const facts = {
@@ -400,27 +519,63 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () 
     const profile = {
       profileId: "aeat.qr@0.5.0",
       editionId: id("edition", "rrsif-2026-09-21-authoritative-candidate"),
-      environment: next() % 2 === 0 ? "test" : "production",
-      mode: next() % 2 === 0 ? "verifactu" : "non-verifactu",
+      environment: nextQr() % 2 === 0 ? "test" : "production",
+      mode: nextQr() % 2 === 0 ? "verifactu" : "non-verifactu",
       maximumPayloadBytes: 512,
     };
-    const payload = buildQrPayload(profile, facts);
-    assert.equal(payload.status, "succeeded");
-    assert.deepEqual(
-      payload.value.bytes,
-      new TextEncoder().encode(payload.value.text),
-    );
-    assert.equal(
-      payload.value.artifactDigest,
-      createHash("sha256").update(payload.value.bytes).digest("hex"),
-    );
-    assert.equal(payload.value.editionId, profile.editionId);
-    const parsed = api.parseQrPayload(profile, payload.value.text);
-    assert.deepEqual(parsed, { status: "succeeded", value: facts });
-    const rebuilt = buildQrPayload(profile, parsed.value);
-    assert.equal(rebuilt.status, "succeeded");
-    assert.deepEqual(rebuilt.value.bytes, payload.value.bytes);
+    histogram.environments[profile.environment] += 1;
+    histogram.modes[profile.mode] += 1;
+    histogram.amounts[importe.startsWith("-") ? "negative" : "nonnegative"] +=
+      1;
+    if (month === 2 && day === 29) histogram.leapDays += 1;
+    for (const character of series)
+      if (reserved.includes(character)) reservedCharacters.add(character);
+    assertQrProperty({ profile, facts }, seed, index);
   }
+  assert.ok(Object.values(histogram.environments).every((count) => count > 0));
+  assert.ok(Object.values(histogram.modes).every((count) => count > 0));
+  assert.ok(Object.values(histogram.amounts).every((count) => count > 0));
+  assert.ok(histogram.leapDays > 0);
+  assert.equal(
+    [...reserved].every((character) => reservedCharacters.has(character)),
+    true,
+  );
+});
+
+test("P4-PROP-011 shrinker minimizes a seeded QR property counterexample", () => {
+  const counterexample = {
+    profile: {
+      profileId: "aeat.qr@0.5.0",
+      editionId: id("edition", "rrsif-2026-09-21-authoritative-candidate"),
+      environment: "production",
+      mode: "non-verifactu",
+      maximumPayloadBytes: 512,
+    },
+    facts: {
+      nif: "89890001K",
+      numserie: "SERIES-AB/123456789",
+      fecha: api.parseFiscalDate("2024-02-29").value,
+      importe: "-241.40",
+    },
+  };
+  const seededFault = (sample) =>
+    sample.profile.environment === "production" &&
+    sample.profile.mode === "non-verifactu" &&
+    sample.facts.numserie.length > 0 &&
+    sample.facts.importe.startsWith("-");
+  const shrunk = shrinkQrCounterexample(counterexample, seededFault);
+  assert.equal(seededFault(shrunk.counterexample), true);
+  assert.equal(shrunk.counterexample.facts.numserie, "S");
+  assert.equal(shrunk.counterexample.facts.importe, "-0");
+  assert.equal(
+    shrunk.counterexample.facts.fecha,
+    api.parseFiscalDate("2000-01-01").value,
+  );
+  assert.deepEqual(shrunk.steps, [
+    "numserie-prefix",
+    "importe-negative-zero",
+    "fecha-anchor",
+  ]);
 });
 
 test("P4-PROP-012 claim aggregation preserves every component status", () => {

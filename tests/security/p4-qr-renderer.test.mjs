@@ -7,11 +7,27 @@ const { renderQrSvg } = await import(
   process.env.VERIFACTU_QR_PROVIDER_ENTRY ??
     new URL("../../internal/qr-provider/provider.mjs", import.meta.url).href
 );
+const api = await import(
+  process.env.VERIFACTU_TEST_ENTRY ??
+    new URL(
+      "../../evidence/runs/artifacts/build/verifactu/dist/index.js",
+      import.meta.url,
+    ).href
+);
+const profile = {
+  profileId: "aeat.qr@0.5.0",
+  editionId: api.editionId("rrsif-2026-09-21-authoritative-candidate").value,
+  environment: "test",
+  mode: "verifactu",
+  maximumPayloadBytes: 512,
+};
 const bytes = (text) => new TextEncoder().encode(text);
 const decode = (matrix) =>
-  new QRCodeReader().decode({
-    getBlackMatrix: () => BitMatrix.parseFromBooleanArray(matrix),
-  }).getText();
+  new QRCodeReader()
+    .decode({
+      getBlackMatrix: () => BitMatrix.parseFromBooleanArray(matrix),
+    })
+    .getText();
 const rotateClockwise = (matrix) =>
   matrix.map((_, y) => matrix.map((row) => row[y]).reverse());
 const scaleByTwo = (matrix) =>
@@ -82,18 +98,25 @@ test("P4-E renders deterministic static level-M QR SVG with a four-module quiet 
   assert.equal(decode(scaleByTwo(matrix)), payload);
 });
 
-test("P4-FUZZ-005 renderer handles 4096 bounded arbitrary byte payloads", () => {
+test("P4-FUZZ-005 parser and renderer handle 4096 bounded inputs and decode rendered symbols", () => {
   let state = 0x51524335;
   const next = () => {
     state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
     return state;
   };
   const outcomes = new Set(["rendered", "invalid", "limit", "defect"]);
+  const parseOutcomes = new Set(["succeeded", "invalid"]);
+  let decodedSymbols = 0;
   for (let index = 0; index < 4096; index += 1) {
     const length = index % 32 === 0 ? index % 513 : next() % 1025;
     const input = new Uint8Array(length);
     for (let offset = 0; offset < length; offset += 1)
       input[offset] = index % 32 === 0 ? 65 : next() & 0xff;
+    const text = new TextDecoder().decode(input);
+    assert.equal(
+      parseOutcomes.has(api.parseQrPayload(profile, text).status),
+      true,
+    );
     const result = renderQrSvg(input);
     assert.equal(outcomes.has(result.kind), true);
     if (result.kind === "rendered") {
@@ -101,6 +124,9 @@ test("P4-FUZZ-005 renderer handles 4096 bounded arbitrary byte payloads", () => 
       assert.equal(result.errorCorrection, "M");
       assert.equal(result.symbolWidthMillimetres, 32);
       assert.ok(result.widthMillimetres <= 40);
+      assert.equal(decode(svgMatrix(result.svg)), text);
+      decodedSymbols += 1;
     }
   }
+  assert.ok(decodedSymbols > 0);
 });
