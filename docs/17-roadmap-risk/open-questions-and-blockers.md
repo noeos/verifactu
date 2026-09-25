@@ -41,11 +41,12 @@ release and external-acceptance questions remain prospective.
 | P4 offline revocation boundary                              | ADR-0055 assigns CRL/OCSP retrieval/cache to future commercial Facturacion; this package validates supplied evidence offline | Blocks P4-D until typed evidence contract and hostile/freshness tests pass |
 | P4 XAdES/PKI implementation                                 | ADR-0057 selects local DSS 6.5; exact artifacts, JDK/Maven, LGPL notices/shade and profile admission remain required | Blocks P4-D; no demo service, legal advice or AEAT claim may substitute |
 | P4 QR encoder/decode                                        | ADR-0056 selects pinned `@nuintun/qrcode@5.0.3` and test-only `@zxing/library@0.23.0` candidates | Blocks P4-E until dependency/licence/vulnerability admission and exact vectors pass |
-| P4 order/whole-population assurance                         | ADR-0058 and `p4-quality-plan.md`; exact manifest/validator/required gate must be protected before P4-A | Blocks every P4 wave until `gate:p4-readiness` is green |
+| P4 order/whole-population assurance                         | ADR-0058 and `p4-quality-plan.md`; protected readiness PR `#53`, exact head `763b58239d9e589e377b86928ecfc953d72f321b` | Resolved for P4-A entry; each later wave remains blocked until its predecessor's protected closure/read-back |
 
-Each item remains open until its authority, owner, deadline, conservative behavior
-and exact unblock evidence are recorded. No later execution observation may be
-treated as current without a fresh read-back against the implementation subject.
+Every unresolved item remains open until its authority, owner, deadline,
+conservative behavior and exact unblock evidence are recorded. Resolved items
+retain their evidence links. No later execution observation may be treated as
+current without a fresh read-back against the implementation subject.
 
 ## P3-B blocker disposition
 
@@ -58,8 +59,7 @@ treated as current without a fresh read-back against the implementation subject.
 | Organizationally independent assessment and stable performance runner | assurance-owner   | Before P7 closure                                        | Downstream prerequisite; the P3-B oracle is implementation-independent only.                                  |
 | Real Facturacion integration                                          | integration-owner | Separate Facturacion product schedule                    | Explicitly outside VeriFactu P3-B/P4-start authority; the synthetic boundary remains the only current claim.  |
 
-The historical P3-B handoff authorizes P4 only under its first-commit policies.
-For this clean restart, P4-A remains blocked until the separate readiness gate
-in `p4-quality-plan.md` is implemented and passes. Any scope expansion that
-makes a downstream row applicable changes it to `blocked` immediately; absence
-of a calendar date for a future phase is not evidence that a prerequisite passed.
+P4-A may begin under the protected readiness baseline and its first-commit
+policies. Any scope expansion that makes a downstream row applicable changes
+it to `blocked` immediately; absence of a calendar date for a future phase is
+not evidence that a prerequisite passed.

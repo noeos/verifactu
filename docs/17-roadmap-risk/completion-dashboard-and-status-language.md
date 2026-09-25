@@ -23,10 +23,8 @@ cannot edit underlying status or hide blocked work.
 
 ## Current scoped status
 
-P1, P2, P3 and the mandatory P3-B pre-P4 assurance gate are evidence-complete
-at their protected recovery points. P4 is planned but blocked: in addition to
-`P3B-BASELINE-0001` and its first-commit policies, ADR-0055–0058 and the exact
-machine-readable population, validator and required `gate:p4-readiness` from
-[`p4-quality-plan.md`](p4-quality-plan.md) must be protected and green before
-P4-A. P4–P8 remain unimplemented. `creationAllowed=false` and no fiscal-
-compliance, AEAT-acceptance, publication or release claim is made.
+P1, P2, P3, P3-B and the zero-code P4-readiness gate are evidence-complete at
+their protected subjects. P4-A is ready at protected `main`
+`763b58239d9e589e377b86928ecfc953d72f321b`; no P4 implementation has started.
+P4–P8 remain unimplemented. `creationAllowed=false` and no fiscal-compliance,
+AEAT-acceptance, publication or release claim is made.
