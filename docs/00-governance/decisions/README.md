@@ -75,3 +75,4 @@ capabilities have been implemented.
 | [ADR-0056](ADR-0056-edition-bound-qr-codec-and-rendering.md) | Bind QR payload/rendering to immutable editions and verify output with an independent decoder. |
 | [ADR-0057](ADR-0057-local-eu-dss-provider.md) | Use local EU DSS 6.5 behind a private, fully admitted XAdES/PKI provider boundary. |
 | [ADR-0058](ADR-0058-p4-order-and-exhaustive-assurance.md) | Enforce serial P4-A→G delivery and frozen whole-population quality gates. |
+| [ADR-0059](ADR-0059-xml-xsd-provider.md) | Admit lxml as P4-C provider candidate and xmlschema as independent oracle. |
