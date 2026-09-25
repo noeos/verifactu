@@ -111,10 +111,19 @@ def set_process_limits(limits):
     try:
         import resource
         resource.setrlimit(resource.RLIMIT_CPU, (limits["maximumCpuSeconds"], limits["maximumCpuSeconds"] + 1))
-        if hasattr(resource, "RLIMIT_AS"):
-            resource.setrlimit(resource.RLIMIT_AS, (memory, memory))
-        elif hasattr(resource, "RLIMIT_DATA"):
-            resource.setrlimit(resource.RLIMIT_DATA, (memory, memory))
+        memory_limit_set = False
+        for limit_name in ("RLIMIT_AS", "RLIMIT_DATA", "RLIMIT_RSS"):
+            limit_kind = getattr(resource, limit_name, None)
+            if limit_kind is None:
+                continue
+            try:
+                resource.setrlimit(limit_kind, (memory, memory))
+                memory_limit_set = True
+                break
+            except (OSError, ValueError):
+                continue
+        if not memory_limit_set:
+            raise ResourceLimit("DIAG-XML-MEMORY")
     except (ImportError, OSError, ValueError):
         if os.name != "nt":
             raise ResourceLimit("DIAG-XML-MEMORY")
