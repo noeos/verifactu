@@ -322,6 +322,25 @@ jobs:
           SOURCE_DATE_EPOCH: 315532800
         shell: bash
         run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
+      - name: Check macOS Python worker resource limits
+        shell: bash
+        run: |
+          python - <<'PY'
+          import resource
+          for name in ("RLIMIT_CPU", "RLIMIT_AS", "RLIMIT_DATA", "RLIMIT_RSS"):
+              kind = getattr(resource, name, None)
+              if kind is None:
+                  print(f"{name}: unavailable")
+                  continue
+              soft, hard = resource.getrlimit(kind)
+              print(f"{name}: soft={soft} hard={hard}")
+              requested = (5, 6) if name == "RLIMIT_CPU" else (536870912, 536870912)
+              try:
+                  resource.setrlimit(kind, requested)
+                  print(f"{name}: requested limit accepted")
+              except (OSError, ValueError) as error:
+                  print(f"{name}: {type(error).__name__} errno={getattr(error, 'errno', None)} {error}")
+          PY
       - name: Run portable platform gate
         env:
           VERIFACTU_PYTHON: python
