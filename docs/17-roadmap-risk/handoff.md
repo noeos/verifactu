@@ -94,12 +94,12 @@ Historical detail belongs in phase records below.
 | Field                        | Current value                                                                                                                                                                           |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                              |
-| Current phase                | P4-A is ready; no P4 implementation is present. P4 readiness is evidence-complete at protected PR `#53`, commit `763b58239d9e589e377b86928ecfc953d72f321b`.                             |
-| Phase status                 | P1–P3-B and zero-code P4 readiness are evidence-complete. P4-A may start under the frozen census and serial-wave rules; fiscal creation remains disabled.                               |
-| Last evidence-complete phase | P4 readiness: PR `#53`, merged `2026-09-25T08:42:49Z`; exact protected checks and push read-back are recorded in the append-only amendment below.                                       |
-| Local repository             | P2 foundation, P3 source custody/contracts/oracle, P4 readiness manifest/validator/gates; no P4 fiscal runtime or creation behavior.                                                    |
-| Protected `main` SHA         | `e7df2649e9ee148a61ccda0d8d4af6b8d3e0fe0f`, tree `6133182c9bb4776923fd1a9d03b1f9c5c810ba03`; PR `#57` contains the final readiness handoff read-back.                                   |
-| GitHub effective state       | Active zero-bypass protected-main ruleset; PR `#53` exact-head required/auxiliary checks and protected-push checks passed. This documentation PR requires its own read-back.            |
+| Current phase                | P4-A is evidence-complete; P4-B entry is blocked until the current-capsule correction has its own exact-head and protected-push closure.                                                |
+| Phase status                 | P1–P4-A are evidence-complete. P4 readiness is recorded at PR `#53`; P4-A implementation and final protected read-back are recorded at PRs `#62` and `#64`. `creationAllowed=false`.    |
+| Last evidence-complete phase | P4-A: implementation squash `8b0724350b9e30ec6616e837d7605bd7ab839e17`; final read-back squash `5089970fb3407ce464587a3aa5ff1d561e7630a0`; both exact protected-push matrices passed.   |
+| Local repository             | P4-A contracts/domain core, codec, unit/property/security/mutation tests and task-enforced coverage/fuzz/fault evidence. P4-B application modules are not started.                      |
+| Protected `main` SHA         | `5089970fb3407ce464587a3aa5ff1d561e7630a0`, tree `55cc0d758640e42dadfb583e5c0f5c0fb8db935f`; PR `#64` carries the P4-A final protected read-back.                                       |
+| GitHub effective state       | Active zero-bypass protected-main ruleset. PR `#62` and final read-back PR `#64` passed all 17 required contexts and auxiliary checks; both protected-push closures passed.             |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                            |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                          |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                        |
@@ -2910,3 +2910,32 @@ documentation read-back is merged and its own final-head/protected-push checks
 are read back. Start any later wave from the resulting latest protected main.
 `creationAllowed=false`; no fiscal-compliance, AEAT-acceptance, publication or
 release claim follows from this state.
+
+## Current context capsule correction after P4-A — 2026-09-25
+
+This append-only correction is linked to issue `#65`. It preserves the former
+capsule text above and records why it no longer described the protected tree.
+
+- **Old statement:** “P4-A is ready; no P4 implementation is present” and “P4-A
+  may start.”
+- **Reason:** P4-A implementation PR `#62` and its final protected read-back PR
+  `#64` have merged; both exact protected-push matrices passed. The old capsule
+  was not refreshed after those protected transitions.
+- **Exact evidence:** PR `#62` squash
+  `8b0724350b9e30ec6616e837d7605bd7ab839e17` / tree
+  `b38dc4f459cf0aff99e1bbc1807ea7ad99e99d1b`; PR `#64` squash
+  `5089970fb3407ce464587a3aa5ff1d561e7630a0` / tree
+  `55cc0d758640e42dadfb583e5c0f5c0fb8db935f`. Both have valid GitHub
+  signatures and canonical DCO trailers. PR `#64` closed issue `#63`, passed
+  26/26 exact-head check-runs, and passed 25/25 protected-push check-runs,
+  including all 17 required contexts and required-check closure. Its five
+  exact-SHA push workflows are Required engineering foundation `36152312844`,
+  Engineering CI `36152312791`, Conformance `36152312655`, Regulatory source
+  observation `36152312803`, and Security `36152312932`.
+- **Actor/time:** Daniel David, 2026-09-25 15:14:38 UTC.
+- **Invalidated decision:** The previous “P4-A may start” instruction is
+  superseded. P4-A is evidence-complete; P4-B remains blocked until issue `#65`
+  and its documentation PR pass exact-head and protected-push closure. Then
+  P4-B may branch from the latest protected `main`. No P4 population, threshold,
+  or later-wave authorization was changed. `creationAllowed=false`; no
+  compliance, AEAT-acceptance, publication or release claim is made.
