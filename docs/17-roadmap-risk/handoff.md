@@ -2939,3 +2939,54 @@ capsule text above and records why it no longer described the protected tree.
   P4-B may branch from the latest protected `main`. No P4 population, threshold,
   or later-wave authorization was changed. `creationAllowed=false`; no
   compliance, AEAT-acceptance, publication or release claim is made.
+
+## P4-B local implementation handoff — 2026-09-25
+
+This append-only amendment supersedes the earlier P4-A capsule correction
+
+after its own protected closure. It records P4-B work before the implementation
+PR is opened; it is not protected-merge evidence.
+
+- **Predecessor closure:** PR #66 closed issue #65 and merged to protected
+  main at 3415fd5540b3b8663fc6aec9b44535b4aac6b0c2 (tree
+  ea058baf138e1b1aec77622c877cbc9beb42ae2a), sole parent
+  5089970fb3407ce464587a3aa5ff1d561e7630a0. The squash has a valid GitHub
+  signature and canonical DCO trailer. Its exact protected-push subject has
+  25/25 successful App 15368 check-runs, all 17 required contexts and
+  Required · required-check closure; all five push workflows succeeded:
+  Required engineering foundation 36153624030, Conformance 36153624080,
+  Engineering CI 36153624053, Security 36153624014, and Regulatory source
+  observation 36153624029.
+- **P4-B work item/base:** issue #67,
+  https://github.com/noeos/verifactu/issues/67; branch
+  build/67-p4b-plans-artifacts, based exactly on the protected predecessor
+  above. No P4-C branch or implementation has started.
+- **Implementation:** the six planned application modules now implement
+  effect-free operation plans; deterministic validated-record planning;
+  ordered official projection with distinct absent/empty/zero/nil states;
+  UTF-8 official serialization with edition identity and explicit nil token;
+  edition-bound SHA-256/SHA-512 fingerprint recomputation; and immutable
+  exact-byte artifact snapshots with length, parents and both digests.
+  ports/digest.ts is the explicit digest dependency already present in the
+  frozen 44-production-path census. Operation identity extends the existing
+  identity type in place. No export was added to the package entrypoint.
+- **Local evidence (dirty worktree, development only):** test:p4-a selected,
+  executed and passed 9/9 registered campaigns; 37 Node test cases passed with
+  zero skip. The accumulated property suite covers P4-PROP-001–009, 4,096
+  executions each, zero retries/discards. P4-MUT-001–022 all killed. Overall
+  coverage was 99.92% lines, 95.28% branches, 100% functions. P4-FUZZ-001
+  remains at 4,096 bounded deterministic inputs, and all 12/12 A seeded
+  faults were detected. gate:p2 passed 6/6 tasks; gate:p4-readiness
+  passed 2/2 subgates. The reports bind the protected base because the tree
+  was dirty; they are not exact-commit proof.
+- **Boundaries:** the artifact byte custody map is process-local; durable
+  custody and rehydration belong to later persistence work. Edition-specific
+  profiles must supply the explicit validated rules and digest provider. This
+  generic implementation does not assert any official acceptance, legal
+  compliance, AEAT result or release readiness.
+- **Next gate:** finish and sign the P4-B implementation commit, rerun
+  gate:p2 and gate:p4-readiness on its clean exact SHA, open the vertical PR
+  against the protected base, and complete exact-head plus protected-push
+  read-back. Follow with a separate final protected read-back before P4-C.
+  Frozen P4 populations, thresholds, budgets, provider admissions and controls
+  remain unchanged; creationAllowed=false.

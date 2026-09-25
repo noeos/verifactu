@@ -68,3 +68,31 @@ changelog and makes no compliance, publication or support claim.
   its documentation PR have completed exact-head and protected-push closure.
   The frozen P4 populations are unchanged. No fiscal-compliance,
   AEAT-acceptance, publication or release claim is made.
+
+## 2026-09-25 — P4-B implementation started
+
+- The P4-A handoff correction PR #66 is protected at
+  3415fd5540b3b8663fc6aec9b44535b4aac6b0c2 (tree
+  ea058baf138e1b1aec77622c877cbc9beb42ae2a), with valid GitHub signature
+  and canonical DCO. All 25/25 App 15368 check-runs passed, including the
+  17 required contexts and required-check closure; all five push workflows
+  succeeded. Issue #65 is closed.
+- P4-B issue #67 and branch build/67-p4b-plans-artifacts start from that
+  exact protected main. The implementation adds effect-free operation and
+  record plans, edition-bound official field projection/serialization and
+  fingerprinting, explicit digest-port use, and process-bound exact-byte
+  custody transitions. It adds no public package export and keeps
+  creationAllowed=false.
+- The local cumulative campaign passed 9/9 selected tasks: 37 test cases,
+  properties P4-PROP-001–009 at 4,096 executions each, 22/22 critical mutants,
+  99.92% lines, 95.28% branches, 100% functions and 12/12 P4-A seeded faults.
+  Local gate:p2 passed 6/6 tasks and gate:p4-readiness passed 2/2 subgates.
+  These runs were on the dirty implementation worktree and are development
+  evidence; the signed commit and its exact-head checks must regenerate final
+  evidence. P4-C remains blocked until P4-B's protected closure and final
+  read-back complete.
+- This transition changes no frozen P4 path/test population, threshold, budget
+  or control mapping. The generic internal serialization rules require an
+  explicit edition identity, exact field order and a declared nil token where
+  nil is serialized. No fiscal-compliance, AEAT-acceptance, publication or
+  release claim is made.
