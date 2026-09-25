@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import threading
 
 from lxml import etree
 
@@ -74,7 +75,11 @@ class InvalidInput(Exception):
     def __init__(self, code):
         self.code = code
 
+MEMORY_GUARD_STOP = None
+
 def write_result(kind, code=None):
+    if MEMORY_GUARD_STOP is not None:
+        MEMORY_GUARD_STOP.set()
     result = {"kind": kind, "diagnostics": [] if code is None else [code]}
     sys.stdout.write(json.dumps(result, sort_keys=True, separators=(",", ":")))
 
@@ -129,11 +134,27 @@ def set_process_limits(limits):
             except (OSError, ValueError):
                 continue
         if not memory_limit_set:
+            if sys.platform == "darwin":
+                return "rss-monitor"
             raise ResourceLimit("DIAG-XML-MEMORY")
     except (ImportError, OSError, ValueError):
         if os.name != "nt":
             raise ResourceLimit("DIAG-XML-MEMORY")
     return None
+
+def start_peak_rss_guard(maximum_memory_bytes):
+    global MEMORY_GUARD_STOP
+    MEMORY_GUARD_STOP = threading.Event()
+    def monitor():
+        import resource
+        while not MEMORY_GUARD_STOP.is_set():
+            if resource.getrusage(resource.RUSAGE_SELF).ru_maxrss > maximum_memory_bytes:
+                write_result("limit", "DIAG-XML-MEMORY")
+                sys.stdout.flush()
+                os._exit(0)
+            MEMORY_GUARD_STOP.wait(0.01)
+    guard = threading.Thread(target=monitor, name="xml-rss-guard", daemon=True)
+    guard.start()
 
 def decode_request():
     wire = sys.stdin.buffer.read(MAX_WIRE_BYTES + 1)
@@ -247,6 +268,8 @@ def parse_bounded(xml_bytes, resolver, limits):
 
 def main():
     hard_limits_job = set_process_limits(HARD_LIMITS)
+    if hard_limits_job == "rss-monitor":
+        start_peak_rss_guard(HARD_LIMITS["maximumMemoryBytes"])
     request = decode_request()
     limits = request.get("limits")
     if not valid_limits(limits):
