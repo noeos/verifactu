@@ -23,6 +23,17 @@
       "sha256": "f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be",
       "maximumBytes": 200000000,
       "executable": "osv-scanner"
+    },
+    {
+      "id": "uv",
+      "version": "0.12.5",
+      "publishedAt": "2026-08-14T19:57:52Z",
+      "license": "Apache-2.0 OR MIT",
+      "platform": "linux-x64",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.5/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2",
+      "maximumBytes": 30000000,
+      "executable": "uv"
     }
   ]
 }

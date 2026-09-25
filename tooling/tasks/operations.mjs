@@ -2232,7 +2232,7 @@ async function componentGraph(context) {
         subjectByName.get(name) ?? resolveNpmDependency("", name),
       );
   }
-  for (const dependency of ["pyshacl", "rdflib"])
+  for (const dependency of ["pyshacl", "rdflib", "lxml", "xmlschema"])
     addRelationship(
       "runtime:python@3.13.15",
       `pypi:${dependency}@${python.dependencies.find((item) => item.name === dependency).version}`,
@@ -2242,6 +2242,7 @@ async function componentGraph(context) {
     rdflib: ["html5rdf", "pyparsing"],
     owlrl: ["rdflib"],
     prettytable: ["wcwidth"],
+    xmlschema: ["elementpath"],
   };
   for (const [fromName, dependencyNames] of Object.entries(pythonEdges)) {
     const fromRecord = python.dependencies.find(
