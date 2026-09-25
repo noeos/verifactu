@@ -334,7 +334,7 @@ jobs:
                   continue
               soft, hard = resource.getrlimit(kind)
               print(f"{name}: soft={soft} hard={hard}")
-              requested = (5, 6) if name == "RLIMIT_CPU" else (536870912, 536870912)
+              requested = (5, hard) if name == "RLIMIT_CPU" else (min(536870912, hard), hard)
               try:
                   resource.setrlimit(kind, requested)
                   print(f"{name}: requested limit accepted")

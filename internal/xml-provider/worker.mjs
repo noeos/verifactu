@@ -123,7 +123,7 @@ def set_process_limits(limits):
                     if hard_limit == resource.RLIM_INFINITY
                     else min(memory, hard_limit)
                 )
-                resource.setrlimit(limit_kind, (target_limit, target_limit))
+                resource.setrlimit(limit_kind, (target_limit, hard_limit))
                 memory_limit_set = True
                 break
             except (OSError, ValueError):
