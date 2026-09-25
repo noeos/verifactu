@@ -1,6 +1,11 @@
 export default [
   {
-    files: ["tooling/**/*.mjs", "scripts/**/*.mjs", "packages/**/*.ts"],
+    files: [
+      "tooling/**/*.mjs",
+      "scripts/**/*.mjs",
+      "packages/**/*.ts",
+      "packages/**/*.lint.js",
+    ],
     ignores: ["node_modules/**", "evidence/runs/**"],
     languageOptions: {
       ecmaVersion: 2024,
@@ -8,6 +13,8 @@ export default [
       globals: {
         AbortSignal: "readonly",
         Buffer: "readonly",
+        TextDecoder: "readonly",
+        TextEncoder: "readonly",
         URL: "readonly",
         fetch: "readonly",
         process: "readonly",

@@ -330,6 +330,35 @@
       "tools": ["node", "typescript"]
     },
     {
+      "id": "test:p4-a",
+      "version": 1,
+      "owner": "quality-owner",
+      "dependencies": ["build:packages"],
+      "inputs": [
+        "tests/unit/p4-codecs.test.mjs",
+        "tests/unit/p4-values-identities.test.mjs",
+        "tests/unit/p4-records-corrections.test.mjs",
+        "tests/unit/p4-modes-events-states.test.mjs",
+        "tests/unit/p4-sequences-chains.test.mjs",
+        "tests/mutation/p4-mutation.test.mjs",
+        "tests/property/p4-properties.test.mjs",
+        "tests/security/p4-isolation-redaction.test.mjs"
+      ],
+      "outputs": ["evidence/runs/test--p4-a.json"],
+      "workingDirectory": ".",
+      "toolProfile": "primary",
+      "environment": ["CI", "PATH", "VERIFACTU_SUBJECT_SHA"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 120,
+      "concurrencyLock": "p4-a-unit-tests",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "testP4A",
+      "tools": ["node"]
+    },
+    {
       "id": "package:allowlists",
       "version": 1,
       "owner": "build-owner",
@@ -740,7 +769,8 @@
         "policy:supply-chain",
         "package:reproducibility",
         "integration:tarball-consumers",
-        "provenance:rehearsal"
+        "provenance:rehearsal",
+        "test:p4-a"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],
