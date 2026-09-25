@@ -96,3 +96,14 @@ changelog and makes no compliance, publication or support claim.
   explicit edition identity, exact field order and a declared nil token where
   nil is serialized. No fiscal-compliance, AEAT-acceptance, publication or
   release claim is made.
+
+## 2026-09-25 — P4-B clean exact implementation commit
+
+- Signed+DCO commit 9c0d1ff575707ca42b07e88f7508d5eefa04cc31 (tree
+  84fc6b38e43b933286aa6ed3c4858b07cbb335c8), sole parent
+  3415fd5540b3b8663fc6aec9b44535b4aac6b0c2, passed test:p4-a (9/9 campaigns),
+  gate:p2 (6/6 tasks) and gate:p4-readiness (2/2 subgates) on a clean tree.
+  Coverage was 99.92% lines, 95.28% branches and 100% functions; 22/22
+  critical mutants were killed and P4-PROP-001–009 each ran 4,096 executions.
+- The exact PR-head and protected-push matrices are still required. P4-C remains
+  blocked until P4-B is protected and has a final protected read-back.

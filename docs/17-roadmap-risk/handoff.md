@@ -2990,3 +2990,24 @@ PR is opened; it is not protected-merge evidence.
   read-back. Follow with a separate final protected read-back before P4-C.
   Frozen P4 populations, thresholds, budgets, provider admissions and controls
   remain unchanged; creationAllowed=false.
+
+## P4-B exact clean implementation-commit evidence — 2026-09-25
+
+The preceding local handoff recorded the implementation before a clean signed
+commit existed. This append-only amendment supersedes that limitation.
+
+- Signed implementation commit: 9c0d1ff575707ca42b07e88f7508d5eefa04cc31;
+  tree 84fc6b38e43b933286aa6ed3c4858b07cbb335c8; sole parent
+  3415fd5540b3b8663fc6aec9b44535b4aac6b0c2. Git reports a valid signature
+  and the canonical Signed-off-by trailer.
+- The exact clean commit passed test:p4-a (9/9 selected campaigns, 37 tests,
+  zero skips), gate:p2 (6/6 tasks) and gate:p4-readiness (2/2 subgates).
+  P4-PROP-001–009 ran 4,096 cases each with zero retries/discards; critical
+  mutants P4-MUT-001–022 were all killed; coverage was 99.92% lines, 95.28%
+  branches and 100% functions. P4-FUZZ-001 ran 4,096 bounded deterministic
+  inputs; all 12/12 P4-A seeded faults were detected.
+- Reports bind commit 9c0d1ff and tree 84fc6b3 with no dirty-tree diagnostic.
+  This is local exact-commit evidence only. The vertical P4-B PR and GitHub
+  exact-head/protected-push checks remain outstanding. P4-C stays blocked.
+  The implementation changes no frozen census, thresholds or admission, and
+  creationAllowed remains false.
