@@ -28,11 +28,12 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The append-only P4-readiness read-back below supersedes the stale restart
-capsule and P3-B-era status statements where they conflict. The current
-protected baseline is `763b58239d9e589e377b86928ecfc953d72f321b`; P1–P3-B and
-the zero-code P4-readiness gate are evidence-complete. P4-A is ready to begin,
-but no P4 implementation is present. Later P4–P7 sections below remain
-historical records and do not establish current implementation or evidence.
+capsule and P3-B-era status statements where they conflict. The latest
+protected `main` is `f92424f3eabe7551224795d9ccaf99aa9ad6b149`; the zero-code
+P4-readiness gate is evidence-complete at PR `#53` (`763b582…`). P4-A is ready
+to begin from current protected `main`, but no P4 implementation is present.
+Later P4–P7 sections below remain historical records and do not establish
+current implementation or evidence.
 
 ## Historical initial baseline control — retained
 
@@ -87,7 +88,7 @@ Historical detail belongs in phase records below.
 | Phase status                 | P1–P3-B and zero-code P4 readiness are evidence-complete. P4-A may start under the frozen census and serial-wave rules; fiscal creation remains disabled. |
 | Last evidence-complete phase | P4 readiness: PR `#53`, merged `2026-09-25T08:42:49Z`; exact protected checks and push read-back are recorded in the append-only amendment below. |
 | Local repository             | P2 foundation, P3 source custody/contracts/oracle, P4 readiness manifest/validator/gates; no P4 fiscal runtime or creation behavior. |
-| Protected `main` SHA         | `763b58239d9e589e377b86928ecfc953d72f321b`, tree `287a46ba4bfa43143ce6ccecae6d3a3ed56e9e02`; P4 readiness protected baseline. |
+| Protected `main` SHA         | `f92424f3eabe7551224795d9ccaf99aa9ad6b149`, tree `edd2ce97ec6a7d20ff4b9f0b7c103c1c5a091f0e`; PR `#55` contains the readiness handoff read-back. |
 | GitHub effective state       | Active zero-bypass protected-main ruleset; PR `#53` exact-head required/auxiliary checks and protected-push checks passed. This documentation PR requires its own read-back. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                     |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                   |
@@ -2788,3 +2789,36 @@ resource limits are unchanged by this correction. `creationAllowed=false`;
 there is no fiscal-compliance, AEAT-acceptance, npm-publication or release
 claim. P4-D/E exact external-artifact admission still remains required before
 those waves.
+
+## Final handoff read-back for readiness record — 2026-09-25
+
+This non-self-referential amendment records PR `#55` after its merge and
+protected-push closure. It confirms the readiness state above and sets the
+current `main` identity from which P4-A must branch.
+
+- Work item: issue `#56`,
+  https://github.com/noeos/verifactu/issues/56. Prior readiness correction
+  issue `#54` is closed after PR `#55`.
+- PR `#55`, https://github.com/noeos/verifactu/pull/55, final head
+  `6c744a405e6dcad7525c0714247c2d2eadf844c9`, one SSH-signed+DCO commit;
+  all 17 required contexts and eight auxiliary checks passed on the exact head.
+- Protected squash `f92424f3eabe7551224795d9ccaf99aa9ad6b149`, tree
+  `edd2ce97ec6a7d20ff4b9f0b7c103c1c5a091f0e`, sole parent
+  `763b58239d9e589e377b86928ecfc953d72f321b`, merged
+  `2026-09-25T12:10:35Z`. The native squash signature is GitHub-verified,
+  includes the canonical DCO trailer, and its source branch is deleted.
+- The exact protected-push check-run set contains 25/25 successful checks
+  from required App `15368`, including all 17 required contexts and the
+  `Required · required-check closure` job. Required engineering run
+  `36133440461` concluded success; sibling push runs were Conformance
+  `36133440258`, Engineering CI `36133440291`, Regulatory source observation
+  `36133440354`, and Security `36133440338`, all successful on this SHA.
+- The active `protected-main` ruleset targets the default branch, has no bypass
+  actors, requires strict checks from App `15368`, signed commits, PR+squash,
+  linear history and resolved threads, and forbids deletion/force updates. It
+  requires zero approvals and no CODEOWNERS/last-push/unattributed approval.
+- P4-A entry is authorized from protected main
+  `f92424f3eabe7551224795d9ccaf99aa9ad6b149` only. P4-B remains blocked until
+  A's protected closure and exact final-head read-back. The readiness census,
+  thresholds, admissions and report schemas are unchanged. `creationAllowed=false`;
+  no fiscal-compliance, AEAT-acceptance, publication or release claim follows.
