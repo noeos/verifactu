@@ -14,16 +14,26 @@ async function mutation(id, control, module, before, after, observe) {
   try {
     const dist = join(temporary, "dist");
     await cp(built, dist, { recursive: true });
+    const internal = join(temporary, "internal");
+    await cp(resolve("internal/xml-provider"), join(internal, "xml-provider"), {
+      recursive: true,
+    });
     await writeFile(join(temporary, "package.json"), '{"type":"module"}\n');
-    const target = join(dist, module);
+    const target = module.startsWith("internal/")
+      ? join(temporary, module)
+      : join(dist, module);
     const original = await readFile(target, "utf8");
     assert(
       original.includes(before),
       `mutation source span missing: ${module}`,
     );
     await writeFile(target, original.replace(before, after));
-    const load = async (path) =>
-      import(`${pathToFileURL(join(dist, path)).href}?mutation=${serial++}`);
+    const load = async (path) => {
+      const base = path.startsWith("internal/") ? temporary : dist;
+      return import(
+        `${pathToFileURL(join(base, path)).href}?mutation=${serial++}`
+      );
+    };
     try {
       await observe({ dist, load });
     } catch (error) {
@@ -766,6 +776,137 @@ test("P4-MUT-022 kills exact artifact byte custody substitution", async () => {
         ).status,
         "invalid",
         "P4-CB-022 byte custody assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-023 kills a permissive DTD and entity declaration policy", async () => {
+  await mutation(
+    "P4-MUT-023",
+    "P4-CB-023",
+    "internal/xml-provider/worker.mjs",
+    "if docinfo.doctype or docinfo.internalDTD is not None or docinfo.externalDTD is not None:",
+    "if False:",
+    async ({ load }) => {
+      const { createXmlXsdProvider, PINNED_SCHEMAS, XML_EDITION_ID } =
+        await load("internal/xml-provider/provider.mjs");
+      const base = resolve(
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources",
+      );
+      const schemas = [
+        {
+          id: "xsd-suministro-informacion",
+          bytes: await readFile(join(base, "aeat/SuministroInformacion.xsd")),
+          sha256: PINNED_SCHEMAS["xsd-suministro-informacion"].sha256,
+        },
+        {
+          id: "xmldsig-schema",
+          bytes: await readFile(
+            join(base, "standards/xmldsig-core-schema.xsd"),
+          ),
+          sha256: PINNED_SCHEMAS["xmldsig-schema"].sha256,
+        },
+      ];
+      const result = await createXmlXsdProvider().validate({
+        editionId: XML_EDITION_ID,
+        rootSchemaId: "xsd-suministro-informacion",
+        schemas,
+        xml: Buffer.from("<!DOCTYPE RegistroAlta><RegistroAlta/>", "utf8"),
+      });
+      assert.equal(
+        result.diagnostics[0],
+        "DIAG-XML-DOCTYPE",
+        "P4-CB-023 DTD rejection assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-024 kills missing in-parse node-count enforcement", async () => {
+  await mutation(
+    "P4-MUT-024",
+    "P4-CB-024",
+    "internal/xml-provider/worker.mjs",
+    "nodes += 1\n                attributes += len(item.attrib)",
+    "nodes += 0\n                attributes += len(item.attrib)",
+    async ({ load }) => {
+      const { createXmlXsdProvider, PINNED_SCHEMAS, XML_EDITION_ID } =
+        await load("internal/xml-provider/provider.mjs");
+      const base = resolve(
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources",
+      );
+      const schemas = [
+        {
+          id: "xsd-suministro-informacion",
+          bytes: await readFile(join(base, "aeat/SuministroInformacion.xsd")),
+          sha256: PINNED_SCHEMAS["xsd-suministro-informacion"].sha256,
+        },
+        {
+          id: "xmldsig-schema",
+          bytes: await readFile(
+            join(base, "standards/xmldsig-core-schema.xsd"),
+          ),
+          sha256: PINNED_SCHEMAS["xmldsig-schema"].sha256,
+        },
+      ];
+      const xml = Buffer.from(`<r>${"<n/>".repeat(100_001)}</r>`, "utf8");
+      const result = await createXmlXsdProvider().validate({
+        editionId: XML_EDITION_ID,
+        rootSchemaId: "xsd-suministro-informacion",
+        schemas,
+        xml,
+      });
+      assert.equal(result.status, "limit", "P4-CB-024 limit status assertion");
+      assert.equal(
+        result.diagnostics[0],
+        "DIAG-XML-NODES",
+        "P4-CB-024 node-count assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-025 kills semantic-validity promotion by the XSD provider", async () => {
+  await mutation(
+    "P4-MUT-025",
+    "P4-CB-025",
+    "internal/xml-provider/provider.mjs",
+    'return outcome("valid", "valid", semantic, []);',
+    'return outcome("valid", "valid", "valid", []);',
+    async ({ load }) => {
+      const { createXmlXsdProvider, PINNED_SCHEMAS, XML_EDITION_ID } =
+        await load("internal/xml-provider/provider.mjs");
+      const base = resolve(
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources",
+      );
+      const schemas = [
+        {
+          id: "xsd-suministro-informacion",
+          bytes: await readFile(join(base, "aeat/SuministroInformacion.xsd")),
+          sha256: PINNED_SCHEMAS["xsd-suministro-informacion"].sha256,
+        },
+        {
+          id: "xmldsig-schema",
+          bytes: await readFile(
+            join(base, "standards/xmldsig-core-schema.xsd"),
+          ),
+          sha256: PINNED_SCHEMAS["xmldsig-schema"].sha256,
+        },
+      ];
+      const result = await createXmlXsdProvider({
+        execute: async () => ({ kind: "valid", diagnostics: [] }),
+      }).validate({
+        editionId: XML_EDITION_ID,
+        rootSchemaId: "xsd-suministro-informacion",
+        schemas,
+        xml: Buffer.from("<valid/>", "utf8"),
+        semanticStatus: "invalid",
+      });
+      assert.equal(
+        result.semantic,
+        "invalid",
+        "P4-CB-025 semantic separation assertion",
       );
     },
   );

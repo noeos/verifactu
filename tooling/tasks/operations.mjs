@@ -1552,12 +1552,12 @@ async function testP4A(context) {
     ["chain-field-swap", "P4-MUT-015"],
   ];
   assert(
-    Number(mutants) === 23 &&
-      Number(killed) === 23 &&
+    Number(mutants) === 26 &&
+      Number(killed) === 26 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
-      criticalMutants.length === 22,
+      criticalMutants.length === 25,
     "P4A_MUTATION_COMPLETENESS",
     `${killed}/${mutants} killed, fail=${mutantFailures}, cancelled=${mutantCancelled}, skipped=${mutantSkipped}`,
   );
@@ -1630,10 +1630,102 @@ async function testP4A(context) {
       `coverage.line=${lines}`,
       `coverage.branch=${branches}`,
       `coverage.function=${functions}`,
-      "criticalMutants=22/22 P4-MUT-001..022",
+      "criticalMutants=25/25 P4-MUT-001..025",
       `seededFaults=${p4AFaults.length}/${p4AFaults.length} ${p4AFaults.map(([fault]) => fault).join(",")}`,
       "properties=9x4096 seed=1346650369 retries=0 discards=0",
       "fuzz=P4-FUZZ-001x4096 seed=1346651649 retries=0 discards=0",
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
+async function testP4C(context) {
+  const files = [
+    "tests/unit/p4-xml-model.test.mjs",
+    "tests/contract/p4-xml-xsd-provider.test.mjs",
+    "tests/integration/p4-offline-xsd.test.mjs",
+    "tests/security/p4-xml-attacks.test.mjs",
+  ];
+  const result = await run(
+    process.execPath,
+    ["--experimental-test-coverage", "--test", "--test-reporter=tap", ...files],
+    { cwd: context.root, timeoutMs: 300000 },
+  );
+  assert(
+    result.code === 0,
+    "P4C_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.trim(),
+  );
+  const report = `${result.stdout}${result.stderr}`;
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P4C_TEST_REPORT", result.stdout.slice(-1000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P4C_TEST_COMPLETENESS",
+    `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  const mutationResult = await run(
+    process.execPath,
+    ["--test", "--test-reporter=tap", "tests/mutation/p4-mutation.test.mjs"],
+    { cwd: context.root, timeoutMs: 300000 },
+  );
+  assert(
+    mutationResult.code === 0,
+    "P4C_MUTATION_EXECUTION",
+    `${mutationResult.stdout}${mutationResult.stderr}`.trim(),
+  );
+  const mutationStats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      mutationResult.stdout,
+    );
+  assert(
+    mutationStats,
+    "P4C_MUTATION_REPORT",
+    mutationResult.stdout.slice(-1000),
+  );
+  const [, mutants, , killed, mutantFailures, mutantCancelled, mutantSkipped] =
+    mutationStats;
+  const p4cMutants = [
+    ...mutationResult.stdout.matchAll(/# Subtest: P4-MUT-\d{3}\b/gu),
+  ];
+  assert(
+    Number(mutants) === 26 &&
+      Number(killed) === 26 &&
+      Number(mutantFailures) === 0 &&
+      Number(mutantCancelled) === 0 &&
+      Number(mutantSkipped) === 0 &&
+      p4cMutants.length === 25,
+    "P4C_MUTATION_COMPLETENESS",
+    `${killed}/${mutants} killed, fail=${mutantFailures}, cancelled=${mutantCancelled}, skipped=${mutantSkipped}`,
+  );
+  for (const evidence of ["P4-MUT-023", "P4-MUT-024", "P4-MUT-025"])
+    assert(
+      mutationResult.stdout.includes(`# Subtest: ${evidence}`),
+      "P4C_MUTATION_MISSING",
+      evidence,
+    );
+  return {
+    selected: files.length + 1,
+    executed: files.length + 1,
+    passed: files.length + 1,
+    outputDigest: sha256(
+      report + mutationResult.stdout + mutationResult.stderr,
+    ),
+    diagnostics: [
+      `testCases=${tests}`,
+      `skipped=${skipped}`,
+      "criticalMutants=25/25 P4-MUT-001..025",
+      "seededP4CFaults=3/3 P4-MUT-023..025",
+      "independentOracle=xmlschema@4.3.2/elementpath@5.1.4",
+      "schemaClosure=8 exact digest-pinned AEAT/W3C sources",
       `subject=${context.identity.subject}`,
     ],
   };
@@ -3263,6 +3355,7 @@ export const operations = {
   policySupplyChain,
   testPolicy,
   testP4A,
+  testP4C,
   buildPackages,
   packageAllowlists,
   packageReproducibility,
@@ -3298,6 +3391,7 @@ export const operationCapabilities = Object.freeze({
   policySupplyChain: { tools: [], network: "denied" },
   testPolicy: { tools: [], network: "denied" },
   testP4A: { tools: ["node"], network: "denied" },
+  testP4C: { tools: ["node", "python"], network: "denied" },
   buildPackages: { tools: ["node", "typescript"], network: "denied" },
   packageAllowlists: {
     tools: ["node", "typescript", "npm"],

@@ -179,7 +179,18 @@ jobs:
         with:
           node-version: 22.14.0
           npm-version: 10.9.2
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Install hash-locked XML/XSD runtime
+        env:
+          SOURCE_DATE_EPOCH: 315532800
+        shell: bash
+        run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
       - name: Run portable platform gate
+        env:
+          VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
@@ -203,7 +214,18 @@ jobs:
         with:
           node-version: 22.23.2
           npm-version: 11.19.1
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Install hash-locked XML/XSD runtime
+        env:
+          SOURCE_DATE_EPOCH: 315532800
+        shell: bash
+        run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
       - name: Run portable platform gate
+        env:
+          VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
@@ -225,7 +247,18 @@ jobs:
         with: *checkout
       - uses: ./.github/actions/setup-engineering
         with: *primary
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Install hash-locked XML/XSD runtime
+        env:
+          SOURCE_DATE_EPOCH: 315532800
+        shell: bash
+        run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
       - name: Run portable platform gate
+        env:
+          VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
@@ -247,7 +280,18 @@ jobs:
         with: *checkout
       - uses: ./.github/actions/setup-engineering
         with: *primary
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Install hash-locked XML/XSD runtime
+        env:
+          SOURCE_DATE_EPOCH: 315532800
+        shell: bash
+        run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
       - name: Run portable platform gate
+        env:
+          VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
@@ -269,7 +313,37 @@ jobs:
         with: *checkout
       - uses: ./.github/actions/setup-engineering
         with: *primary
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: 3.13.15
+          check-latest: false
+      - name: Install hash-locked XML/XSD runtime
+        env:
+          SOURCE_DATE_EPOCH: 315532800
+        shell: bash
+        run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
+      - name: Check macOS Python worker resource limits
+        shell: bash
+        run: |
+          python - <<'PY'
+          import resource
+          for name in ("RLIMIT_CPU", "RLIMIT_AS", "RLIMIT_DATA", "RLIMIT_RSS"):
+              kind = getattr(resource, name, None)
+              if kind is None:
+                  print(f"{name}: unavailable")
+                  continue
+              soft, hard = resource.getrlimit(kind)
+              print(f"{name}: soft={soft} hard={hard}")
+              requested = (5, hard) if name == "RLIMIT_CPU" else (min(536870912, hard), hard)
+              try:
+                  resource.setrlimit(kind, requested)
+                  print(f"{name}: requested limit accepted")
+              except (OSError, ValueError) as error:
+                  print(f"{name}: {type(error).__name__} errno={getattr(error, 'errno', None)} {error}")
+          PY
       - name: Run portable platform gate
+        env:
+          VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
       - name: Write leaf report
