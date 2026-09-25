@@ -117,7 +117,13 @@ def set_process_limits(limits):
             if limit_kind is None:
                 continue
             try:
-                resource.setrlimit(limit_kind, (memory, memory))
+                _, hard_limit = resource.getrlimit(limit_kind)
+                target_limit = (
+                    memory
+                    if hard_limit == resource.RLIM_INFINITY
+                    else min(memory, hard_limit)
+                )
+                resource.setrlimit(limit_kind, (target_limit, target_limit))
                 memory_limit_set = True
                 break
             except (OSError, ValueError):
