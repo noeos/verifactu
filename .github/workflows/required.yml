@@ -105,9 +105,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-        with: &checkout
+        with:
           ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
-          fetch-depth: 1
+          # Read the exact frozen P3-B tree for readiness-baseline validation.
+          fetch-depth: 0
           persist-credentials: false
       - uses: ./.github/actions/setup-engineering
         with: &primary
@@ -120,12 +121,12 @@ jobs:
       - name: Install hash-locked SPDX validation runtime
         shell: bash
         run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
-      - name: Run P3 source, contract and oracle gate
+      - name: Run P3 closure and P4 readiness gate
         shell: bash
-        run: node tooling/tasks/run-task.mjs --task gate:p3b
+        run: node tooling/tasks/run-task.mjs --task gate:p4-readiness
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p3b.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p4-readiness.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-regulatory
@@ -139,7 +140,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-        with: *checkout
+        with: &checkout
+          ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
       - uses: ./.github/actions/setup-engineering
         with: *primary
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1

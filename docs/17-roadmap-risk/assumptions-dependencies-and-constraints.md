@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-13
+last-reviewed: 2026-09-25
 decisions: [ADR-0051]
 ---
 
@@ -25,3 +25,11 @@ Facturacion is a future product, not an available external dependency. Its absen
 does not block VeriFactu `1.0.0`; the required present evidence is conformance of
 the versioned public host contract and maintained synthetic host. Real integration
 will be implemented and evidenced later in the Facturacion repository.
+
+For P4, Facturacion is not a runtime dependency: the future commercial host may
+retrieve and cache CRL/OCSP responses, but the library accepts and validates
+only explicit bounded evidence offline (ADR-0055). This boundary does not assert
+that the commercial host exists or that its retrieval service is implemented.
+The selected QR and DSS dependency candidates are exact-version design inputs,
+not admitted build evidence; dependency, licence, vulnerability and platform
+admission remain P4 readiness work.

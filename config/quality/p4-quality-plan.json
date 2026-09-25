@@ -1,0 +1,838 @@
+{
+  "schemaVersion": 1,
+  "id": "P4-QUALITY-PLAN-0001",
+  "phaseState": "pre-implementation",
+  "declaredBeforeImplementation": true,
+  "governingProtectedMain": "999d78c19b0e1be3097201a0cc61947a10760bbe",
+  "governingProtectedTree": "8375829168e5eb11150cfbb297fcd4125c922fc3",
+  "edition": {
+    "id": "rrsif-2026-09-21-authoritative-candidate",
+    "sourceSnapshot": "rrsif-2026-09-21-authoritative",
+    "sourceManifestSha256": "0856118bfb3d528ffa2acc6322c3484616ba6aff978f620db5e7aab916ba60c6",
+    "generatedOutputSha256": "561005c36d5c3ae0b00a98215f59e24769b7b4dec9b1a6cba878f00eacb90482",
+    "creationAllowed": false
+  },
+  "verificationEngine": {
+    "name": "@noeos/verification-engine",
+    "version": "1.0.1",
+    "integrity": "sha512-x6BXhKZt2NejyTK8UOvUDe5oZKYAmCNFG2w5NszT167juFwPcNb4rdS//oey4k912XNRAN9aN25Y4aTxHciHnQ==",
+    "allowedExports": [".", "./profiles", "./schemas", "./vectors"],
+    "profileId": "es.noeos.verifactu.record",
+    "profileVersion": "1.0.0"
+  },
+  "coverage": {
+    "instrumentation": "node:test v8 coverage over compiled JavaScript with source maps",
+    "productionSelector": "every path in productionModules; no discovered production path may be absent",
+    "exclude": [
+      "generated declarations",
+      "type-only declarations",
+      "test fixtures"
+    ],
+    "thresholds": {
+      "linesPercent": 98,
+      "functionsPercent": 98,
+      "branchesPercent": 95,
+      "criticalBranchesPercent": 100,
+      "statementsPercent": 98
+    },
+    "missingOrEmpty": "blocked"
+  },
+  "productionModules": [
+    "packages/verifactu/src/index.ts",
+    "packages/verifactu/src/contracts/staged-codec.ts",
+    "packages/verifactu/src/contracts/results.ts",
+    "packages/verifactu/src/contracts/limits.ts",
+    "packages/verifactu/src/contracts/configuration.ts",
+    "packages/verifactu/src/domain/diagnostics.ts",
+    "packages/verifactu/src/domain/identities.ts",
+    "packages/verifactu/src/domain/context.ts",
+    "packages/verifactu/src/domain/decimal.ts",
+    "packages/verifactu/src/domain/date-time.ts",
+    "packages/verifactu/src/domain/records.ts",
+    "packages/verifactu/src/domain/corrections.ts",
+    "packages/verifactu/src/domain/mode-tenure.ts",
+    "packages/verifactu/src/domain/events.ts",
+    "packages/verifactu/src/domain/states.ts",
+    "packages/verifactu/src/domain/invariants.ts",
+    "packages/verifactu/src/domain/sequences.ts",
+    "packages/verifactu/src/domain/chains.ts",
+    "packages/verifactu/src/application/operation-plan.ts",
+    "packages/verifactu/src/application/record-planner.ts",
+    "packages/verifactu/src/application/official-projection.ts",
+    "packages/verifactu/src/application/official-serialization.ts",
+    "packages/verifactu/src/application/fingerprint.ts",
+    "packages/verifactu/src/application/xml-artifacts.ts",
+    "packages/verifactu/src/application/xades.ts",
+    "packages/verifactu/src/application/qr.ts",
+    "packages/verifactu/src/ports/xml-xsd.ts",
+    "packages/verifactu/src/ports/digest.ts",
+    "packages/verifactu/src/ports/signature.ts",
+    "packages/verifactu/src/ports/certificate.ts",
+    "packages/verifactu/src/ports/qr.ts",
+    "packages/verifactu/src/ports/verification-engine.ts",
+    "packages/verifactu/src/editions/registry.ts",
+    "packages/verifactu/src/editions/rrsif-2026-09-21.ts",
+    "packages/verifactu/src/verification/claims.ts",
+    "packages/verifactu/src/verification/engine-profile.ts",
+    "packages/verifactu/src/verification/engine-adapter.ts",
+    "internal/xml-provider/provider.mjs",
+    "internal/xml-provider/worker.mjs",
+    "internal/xades-provider/provider.mjs",
+    "internal/xades-provider/pki.mjs",
+    "internal/xades-provider/worker.mjs",
+    "internal/independent-oracles/p4_oracle.py",
+    "internal/xades-provider/dss/src/main/java/eu/noeos/verifactu/bridge/DssBridge.java"
+  ],
+  "testFiles": [
+    "tests/unit/p4-codecs.test.mjs",
+    "tests/unit/p4-values-identities.test.mjs",
+    "tests/unit/p4-records-corrections.test.mjs",
+    "tests/unit/p4-modes-events-states.test.mjs",
+    "tests/unit/p4-sequences-chains.test.mjs",
+    "tests/unit/p4-plans-artifacts.test.mjs",
+    "tests/unit/p4-xml-model.test.mjs",
+    "tests/unit/p4-claims.test.mjs",
+    "tests/contract/p4-public-contract.test.mjs",
+    "tests/contract/p4-edition-contract.test.mjs",
+    "tests/contract/p4-xml-xsd-provider.test.mjs",
+    "tests/contract/p4-xades-provider.test.mjs",
+    "tests/contract/p4-qr-provider.test.mjs",
+    "tests/contract/p4-engine-adapter.test.mjs",
+    "tests/property/p4-properties.test.mjs",
+    "tests/mutation/p4-mutation.test.mjs",
+    "tests/integration/p4-offline-xsd.test.mjs",
+    "tests/integration/p4-xades-pki.test.mjs",
+    "tests/integration/p4-qr-roundtrip.test.mjs",
+    "tests/integration/p4-engine-tarball.test.mjs",
+    "tests/security/p4-xml-attacks.test.mjs",
+    "tests/security/p4-signature-attacks.test.mjs",
+    "tests/security/p4-resource-attacks.test.mjs",
+    "tests/security/p4-isolation-redaction.test.mjs",
+    "tests/performance/p4-deterministic-core.test.mjs",
+    "tests/packaging/p4-clean-consumer.test.mjs"
+  ],
+  "criticalCatalogue": [
+    {
+      "id": "P4-CB-001",
+      "path": "packages/verifactu/src/contracts/staged-codec.ts",
+      "decision": "reject byte, UTF-8, JSON, structure, domain and edition-stage failures without advancing",
+      "test": "tests/unit/p4-codecs.test.mjs",
+      "mutant": "P4-MUT-001"
+    },
+    {
+      "id": "P4-CB-002",
+      "path": "packages/verifactu/src/contracts/staged-codec.ts",
+      "decision": "reject duplicate JSON members and unknown closed-schema fields",
+      "test": "tests/unit/p4-codecs.test.mjs",
+      "mutant": "P4-MUT-002"
+    },
+    {
+      "id": "P4-CB-003",
+      "path": "packages/verifactu/src/domain/identities.ts",
+      "decision": "reject cross-kind and noncanonical fiscal identities",
+      "test": "tests/unit/p4-values-identities.test.mjs",
+      "mutant": "P4-MUT-003"
+    },
+    {
+      "id": "P4-CB-004",
+      "path": "packages/verifactu/src/domain/context.ts",
+      "decision": "reject missing, mismatched or cross-taxpayer context",
+      "test": "tests/security/p4-isolation-redaction.test.mjs",
+      "mutant": "P4-MUT-004"
+    },
+    {
+      "id": "P4-CB-005",
+      "path": "packages/verifactu/src/domain/decimal.ts",
+      "decision": "reject scale, precision, sign and unsafe-number violations",
+      "test": "tests/unit/p4-values-identities.test.mjs",
+      "mutant": "P4-MUT-005"
+    },
+    {
+      "id": "P4-CB-006",
+      "path": "packages/verifactu/src/domain/date-time.ts",
+      "decision": "reject impossible, noncanonical and implicit-time values",
+      "test": "tests/unit/p4-values-identities.test.mjs",
+      "mutant": "P4-MUT-006"
+    },
+    {
+      "id": "P4-CB-007",
+      "path": "packages/verifactu/src/domain/records.ts",
+      "decision": "enforce exhaustive alta and anulacion kind-specific requirements",
+      "test": "tests/unit/p4-records-corrections.test.mjs",
+      "mutant": "P4-MUT-007"
+    },
+    {
+      "id": "P4-CB-008",
+      "path": "packages/verifactu/src/domain/corrections.ts",
+      "decision": "correction and substitution add history and never rewrite the target",
+      "test": "tests/unit/p4-records-corrections.test.mjs",
+      "mutant": "P4-MUT-008"
+    },
+    {
+      "id": "P4-CB-009",
+      "path": "packages/verifactu/src/domain/mode-tenure.ts",
+      "decision": "allow only listed mode transitions and reject VERI*FACTU rollback by default",
+      "test": "tests/unit/p4-modes-events-states.test.mjs",
+      "mutant": "P4-MUT-009"
+    },
+    {
+      "id": "P4-CB-010",
+      "path": "packages/verifactu/src/domain/mode-tenure.ts",
+      "decision": "bind operation to the tenure effective at explicit fiscal time",
+      "test": "tests/unit/p4-modes-events-states.test.mjs",
+      "mutant": "P4-MUT-010"
+    },
+    {
+      "id": "P4-CB-011",
+      "path": "packages/verifactu/src/domain/events.ts",
+      "decision": "separate regulated event chronology from billing chains",
+      "test": "tests/unit/p4-modes-events-states.test.mjs",
+      "mutant": "P4-MUT-011"
+    },
+    {
+      "id": "P4-CB-012",
+      "path": "packages/verifactu/src/domain/states.ts",
+      "decision": "preserve rejected, conflict, unavailable and indeterminate as distinct terminal outcomes",
+      "test": "tests/unit/p4-modes-events-states.test.mjs",
+      "mutant": "P4-MUT-012"
+    },
+    {
+      "id": "P4-CB-013",
+      "path": "packages/verifactu/src/domain/invariants.ts",
+      "decision": "invalid or indeterminate input cannot advance chain eligibility",
+      "test": "tests/unit/p4-modes-events-states.test.mjs",
+      "mutant": "P4-MUT-013"
+    },
+    {
+      "id": "P4-CB-014",
+      "path": "packages/verifactu/src/domain/sequences.ts",
+      "decision": "reject gap, duplicate identity, chronology and wrong-scope predecessor",
+      "test": "tests/unit/p4-sequences-chains.test.mjs",
+      "mutant": "P4-MUT-014"
+    },
+    {
+      "id": "P4-CB-015",
+      "path": "packages/verifactu/src/domain/chains.ts",
+      "decision": "distinguish genesis from link and predecessor digest from current digest",
+      "test": "tests/unit/p4-sequences-chains.test.mjs",
+      "mutant": "P4-MUT-015"
+    },
+    {
+      "id": "P4-CB-016",
+      "path": "packages/verifactu/src/domain/chains.ts",
+      "decision": "complete verification rejects forks, missing links and head mismatch",
+      "test": "tests/unit/p4-sequences-chains.test.mjs",
+      "mutant": "P4-MUT-016"
+    },
+    {
+      "id": "P4-CB-017",
+      "path": "packages/verifactu/src/application/operation-plan.ts",
+      "decision": "plan contains descriptions only and rejects undeclared effects",
+      "test": "tests/unit/p4-plans-artifacts.test.mjs",
+      "mutant": "P4-MUT-017"
+    },
+    {
+      "id": "P4-CB-018",
+      "path": "packages/verifactu/src/application/record-planner.ts",
+      "decision": "same explicit inputs yield byte-identical immutable plans",
+      "test": "tests/property/p4-properties.test.mjs",
+      "mutant": "P4-MUT-018"
+    },
+    {
+      "id": "P4-CB-019",
+      "path": "packages/verifactu/src/application/official-projection.ts",
+      "decision": "preserve absence, empty, zero and xsi:nil distinctions and official order",
+      "test": "tests/unit/p4-plans-artifacts.test.mjs",
+      "mutant": "P4-MUT-019"
+    },
+    {
+      "id": "P4-CB-020",
+      "path": "packages/verifactu/src/application/official-serialization.ts",
+      "decision": "fix UTF-8, separators, labels, lexical forms and field order",
+      "test": "tests/unit/p4-plans-artifacts.test.mjs",
+      "mutant": "P4-MUT-020"
+    },
+    {
+      "id": "P4-CB-021",
+      "path": "packages/verifactu/src/application/fingerprint.ts",
+      "decision": "reject unsupported algorithm, edition mismatch and supplied-digest trust",
+      "test": "tests/unit/p4-plans-artifacts.test.mjs",
+      "mutant": "P4-MUT-021"
+    },
+    {
+      "id": "P4-CB-022",
+      "path": "packages/verifactu/src/application/xml-artifacts.ts",
+      "decision": "preserve exact bytes, length, parents and SHA-256/SHA-512 across transitions",
+      "test": "tests/unit/p4-plans-artifacts.test.mjs",
+      "mutant": "P4-MUT-022"
+    },
+    {
+      "id": "P4-CB-023",
+      "path": "internal/xml-provider/provider.mjs",
+      "decision": "deny DTD, entities, XInclude, network, file and open resolver access",
+      "test": "tests/security/p4-xml-attacks.test.mjs",
+      "mutant": "P4-MUT-023"
+    },
+    {
+      "id": "P4-CB-024",
+      "path": "internal/xml-provider/provider.mjs",
+      "decision": "enforce byte, depth, node, attribute, namespace, text and deadline limits",
+      "test": "tests/security/p4-resource-attacks.test.mjs",
+      "mutant": "P4-MUT-024"
+    },
+    {
+      "id": "P4-CB-025",
+      "path": "internal/xml-provider/provider.mjs",
+      "decision": "keep XSD result separate from semantic validity and fail provider faults closed",
+      "test": "tests/integration/p4-offline-xsd.test.mjs",
+      "mutant": "P4-MUT-025"
+    },
+    {
+      "id": "P4-CB-026",
+      "path": "packages/verifactu/src/application/xades.ts",
+      "decision": "select one expected signed target and reject duplicate IDs or wrapping",
+      "test": "tests/security/p4-signature-attacks.test.mjs",
+      "mutant": "P4-MUT-026"
+    },
+    {
+      "id": "P4-CB-027",
+      "path": "packages/verifactu/src/application/xades.ts",
+      "decision": "reject missing, extra, external, weak or unordered transforms and references",
+      "test": "tests/security/p4-signature-attacks.test.mjs",
+      "mutant": "P4-MUT-027"
+    },
+    {
+      "id": "P4-CB-028",
+      "path": "internal/xades-provider/pki.mjs",
+      "decision": "separate chain, trust, time, usage, revocation and authorization outcomes",
+      "test": "tests/integration/p4-xades-pki.test.mjs",
+      "mutant": "P4-MUT-028"
+    },
+    {
+      "id": "P4-CB-029",
+      "path": "internal/xades-provider/pki.mjs",
+      "decision": "map absent or stale revocation evidence to indeterminate, never valid",
+      "test": "tests/integration/p4-xades-pki.test.mjs",
+      "mutant": "P4-MUT-029"
+    },
+    {
+      "id": "P4-CB-030",
+      "path": "packages/verifactu/src/application/qr.ts",
+      "decision": "bind endpoint, parameter order, encoding and legend to edition and mode",
+      "test": "tests/integration/p4-qr-roundtrip.test.mjs",
+      "mutant": "P4-MUT-030"
+    },
+    {
+      "id": "P4-CB-031",
+      "path": "packages/verifactu/src/application/qr.ts",
+      "decision": "reject duplicate, unknown, missing, noncanonical and cross-environment payloads",
+      "test": "tests/security/p4-resource-attacks.test.mjs",
+      "mutant": "P4-MUT-031"
+    },
+    {
+      "id": "P4-CB-032",
+      "path": "packages/verifactu/src/verification/claims.ts",
+      "decision": "official, cryptographic, certificate, AEAT and Noeos claims never collapse to global valid",
+      "test": "tests/unit/p4-claims.test.mjs",
+      "mutant": "P4-MUT-032"
+    },
+    {
+      "id": "P4-CB-033",
+      "path": "packages/verifactu/src/verification/engine-profile.ts",
+      "decision": "profile projection excludes fiscal plaintext and binds every artifact digest",
+      "test": "tests/contract/p4-engine-adapter.test.mjs",
+      "mutant": "P4-MUT-033"
+    },
+    {
+      "id": "P4-CB-034",
+      "path": "packages/verifactu/src/verification/engine-adapter.ts",
+      "decision": "reject unknown profile, malformed evidence, wrong predecessor and version mismatch",
+      "test": "tests/integration/p4-engine-tarball.test.mjs",
+      "mutant": "P4-MUT-034"
+    },
+    {
+      "id": "P4-CB-035",
+      "path": "packages/verifactu/src/verification/engine-adapter.ts",
+      "decision": "Engine exceptions, aborts and limits cannot become valid evidence",
+      "test": "tests/integration/p4-engine-tarball.test.mjs",
+      "mutant": "P4-MUT-035"
+    },
+    {
+      "id": "P4-CB-036",
+      "path": "packages/verifactu/src/domain/diagnostics.ts",
+      "decision": "redact prohibited data and preserve deterministic stage/path/code order",
+      "test": "tests/security/p4-isolation-redaction.test.mjs",
+      "mutant": "P4-MUT-036"
+    },
+    {
+      "id": "P4-CB-037",
+      "path": "internal/xades-provider/provider.mjs",
+      "decision": "enforce the exact admitted XAdES EPES profile with explicit artifact digest and opaque key handle",
+      "test": "tests/contract/p4-xades-provider.test.mjs",
+      "mutant": "P4-MUT-037"
+    },
+    {
+      "id": "P4-CB-038",
+      "path": "internal/xades-provider/provider.mjs",
+      "decision": "independently verify returned signature bytes over the expected target; reject wrapping, altered bytes and reference drift",
+      "test": "tests/security/p4-signature-attacks.test.mjs",
+      "mutant": "P4-MUT-038"
+    },
+    {
+      "id": "P4-CB-039",
+      "path": "internal/xades-provider/pki.mjs",
+      "decision": "validate caller-supplied CRL/OCSP bytes offline for authority, signature, certificate binding, time and freshness",
+      "test": "tests/integration/p4-xades-pki.test.mjs",
+      "mutant": "P4-MUT-039"
+    },
+    {
+      "id": "P4-CB-040",
+      "path": "internal/xades-provider/pki.mjs",
+      "decision": "map revoked to rejection and unknown, stale or absent evidence to indeterminate, never valid",
+      "test": "tests/integration/p4-xades-pki.test.mjs",
+      "mutant": "P4-MUT-040"
+    },
+    {
+      "id": "P4-CB-041",
+      "path": "internal/xades-provider/worker.mjs",
+      "decision": "deny implicit DNS, HTTP, AIA/CDP and fail closed on timeout, cancellation, malformed bridge data or exhaustion",
+      "test": "tests/security/p4-resource-attacks.test.mjs",
+      "mutant": "P4-MUT-041"
+    },
+    {
+      "id": "P4-CB-042",
+      "path": "packages/verifactu/src/application/qr.ts",
+      "decision": "preserve edition/mode-bound QR bytes and reject overflow without truncation or fallback",
+      "test": "tests/security/p4-resource-attacks.test.mjs",
+      "mutant": "P4-MUT-042"
+    },
+    {
+      "id": "P4-CB-043",
+      "path": "packages/verifactu/src/application/qr.ts",
+      "decision": "verify rendered QR with independent decoder and exact byte comparison; self-decode cannot satisfy oracle",
+      "test": "tests/integration/p4-qr-roundtrip.test.mjs",
+      "mutant": "P4-MUT-043"
+    }
+  ],
+  "mutation": {
+    "operators": [
+      "conditional-boundary",
+      "boolean-substitution",
+      "arithmetic-operator",
+      "equality-negation",
+      "return-value",
+      "optional-removal"
+    ],
+    "criticalPopulation": "one exact mutant ID for every criticalCatalogue row",
+    "overallPopulation": "every compilable non-equivalent mutant produced by the declared operators over productionModules",
+    "thresholds": {
+      "criticalKilledPercent": 100,
+      "overallKilledPercent": 95,
+      "unreviewedCriticalSurvivors": 0,
+      "compileErrors": 0,
+      "testErrors": 0,
+      "timeouts": 0,
+      "noCoverage": 0
+    },
+    "equivalentRequires": [
+      "per-mutant rationale",
+      "quality-owner review",
+      "project-owner second review"
+    ]
+  },
+  "propertyCampaigns": [
+    {
+      "id": "P4-PROP-001",
+      "property": "staged decoding never advances after failure",
+      "executions": 4096,
+      "maxDiscardPercent": 0
+    },
+    {
+      "id": "P4-PROP-002",
+      "property": "identity kinds and contexts never substitute",
+      "executions": 4096,
+      "maxDiscardPercent": 0
+    },
+    {
+      "id": "P4-PROP-003",
+      "property": "decimal parse-format-parse is exact",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    },
+    {
+      "id": "P4-PROP-004",
+      "property": "date/time parse-format-parse is exact",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    },
+    {
+      "id": "P4-PROP-005",
+      "property": "record state transitions are total and reject unlisted edges",
+      "executions": 4096,
+      "maxDiscardPercent": 2
+    },
+    {
+      "id": "P4-PROP-006",
+      "property": "mode tenure intervals never overlap or disappear",
+      "executions": 4096,
+      "maxDiscardPercent": 2
+    },
+    {
+      "id": "P4-PROP-007",
+      "property": "chain recomputation detects every link mutation",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    },
+    {
+      "id": "P4-PROP-008",
+      "property": "plans are deterministic and deeply immutable",
+      "executions": 4096,
+      "maxDiscardPercent": 0
+    },
+    {
+      "id": "P4-PROP-009",
+      "property": "official projection preserves presence and order",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    },
+    {
+      "id": "P4-PROP-010",
+      "property": "XML model serialize-parse preserves supported infoset",
+      "executions": 4096,
+      "maxDiscardPercent": 2
+    },
+    {
+      "id": "P4-PROP-011",
+      "property": "QR payload encode-decode preserves exact canonical bytes",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    },
+    {
+      "id": "P4-PROP-012",
+      "property": "claim aggregation preserves every component status",
+      "executions": 4096,
+      "maxDiscardPercent": 0
+    },
+    {
+      "id": "P4-PROP-013",
+      "property": "revocation outcome and freshness never upgrade uncertainty to valid",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    },
+    {
+      "id": "P4-PROP-014",
+      "property": "QR bytes round-trip exactly through independent decode",
+      "executions": 4096,
+      "maxDiscardPercent": 1
+    }
+  ],
+  "fuzzCampaigns": [
+    {
+      "id": "P4-FUZZ-001",
+      "target": "staged JSON codec",
+      "executions": 4096,
+      "maximumInputBytes": 1048576
+    },
+    {
+      "id": "P4-FUZZ-002",
+      "target": "XML parser and serializer",
+      "executions": 4096,
+      "maximumInputBytes": 4194304
+    },
+    {
+      "id": "P4-FUZZ-003",
+      "target": "offline XSD resolver and validator",
+      "executions": 4096,
+      "maximumInputBytes": 4194304
+    },
+    {
+      "id": "P4-FUZZ-004",
+      "target": "XMLDSig and XAdES verifier",
+      "executions": 4096,
+      "maximumInputBytes": 8388608
+    },
+    {
+      "id": "P4-FUZZ-005",
+      "target": "QR payload and rendered symbol decoder",
+      "executions": 4096,
+      "maximumInputBytes": 1048576
+    },
+    {
+      "id": "P4-FUZZ-006",
+      "target": "Verification Engine evidence adapter",
+      "executions": 4096,
+      "maximumInputBytes": 1048576
+    },
+    {
+      "id": "P4-FUZZ-007",
+      "target": "bounded CRL/OCSP evidence parser",
+      "executions": 4096,
+      "maximumInputBytes": 8388608
+    },
+    {
+      "id": "P4-FUZZ-008",
+      "target": "DSS bridge protocol and worker isolation",
+      "executions": 4096,
+      "maximumInputBytes": 8388608
+    }
+  ],
+  "seededFaults": [
+    "codec-stage-skip",
+    "duplicate-member-accept",
+    "identity-kind-substitution",
+    "context-omission",
+    "decimal-float-coercion",
+    "implicit-clock-read",
+    "record-choice-drop",
+    "correction-rewrite",
+    "mode-transition-bypass",
+    "event-chain-mixing",
+    "indeterminate-to-success",
+    "chain-field-swap",
+    "field-order-swap",
+    "separator-change",
+    "encoding-change",
+    "artifact-byte-copy-loss",
+    "xsd-network-resolution",
+    "xsd-provider-crash-valid",
+    "signature-reference-wrap",
+    "signature-transform-extra",
+    "certificate-time-bypass",
+    "revocation-unknown-valid",
+    "qr-environment-swap",
+    "claim-global-boolean",
+    "engine-profile-version-swap",
+    "engine-malformed-evidence-valid",
+    "dss-altered-signed-bytes-success",
+    "provider-serializes-or-logs-private-key",
+    "stale-crl-ocsp-promoted-valid",
+    "unauthorized-revocation-responder-trusted",
+    "provider-attempts-network-without-evidence",
+    "qr-payload-truncated-or-rewritten",
+    "qr-oracle-uses-production-decoder"
+  ],
+  "compatibilityMatrix": [
+    {
+      "id": "P4-COMPAT-001",
+      "os": "ubuntu-24.04",
+      "node": "22.14.0",
+      "npm": "10.9.2",
+      "module": "esm",
+      "status": "required"
+    },
+    {
+      "id": "P4-COMPAT-002",
+      "os": "ubuntu-24.04",
+      "node": "22.23.2",
+      "npm": "11.19.1",
+      "module": "esm",
+      "status": "required"
+    },
+    {
+      "id": "P4-COMPAT-003",
+      "os": "ubuntu-24.04",
+      "node": "24.21.0",
+      "npm": "11.19.1",
+      "module": "esm",
+      "status": "required"
+    },
+    {
+      "id": "P4-COMPAT-004",
+      "os": "windows-2025",
+      "node": "24.21.0",
+      "npm": "11.19.1",
+      "module": "esm",
+      "status": "required"
+    },
+    {
+      "id": "P4-COMPAT-005",
+      "os": "macos-15",
+      "node": "24.21.0",
+      "npm": "11.19.1",
+      "module": "esm",
+      "status": "required"
+    }
+  ],
+  "performanceBudgets": [
+    {
+      "id": "P4-BUD-001",
+      "class": "security-ceiling",
+      "operation": "staged decode",
+      "metric": "input bytes",
+      "threshold": 1048576,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-002",
+      "class": "security-ceiling",
+      "operation": "XML/XSD parse and validation",
+      "metric": "expanded bytes",
+      "threshold": 4194304,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-003",
+      "class": "security-ceiling",
+      "operation": "signed XML parse and verification",
+      "metric": "expanded bytes",
+      "threshold": 8388608,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-004",
+      "class": "security-ceiling",
+      "operation": "XML parse",
+      "metric": "element depth",
+      "threshold": 64,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-005",
+      "class": "security-ceiling",
+      "operation": "XML parse",
+      "metric": "nodes plus attributes",
+      "threshold": 200000,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-006",
+      "class": "security-ceiling",
+      "operation": "one deterministic operation",
+      "metric": "wall milliseconds",
+      "threshold": 5000,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-007",
+      "class": "resource-ceiling",
+      "operation": "maximum single operation",
+      "metric": "peak RSS bytes",
+      "threshold": 268435456,
+      "direction": "maximum",
+      "environment": "ubuntu-24.04-node-24.21.0"
+    },
+    {
+      "id": "P4-BUD-008",
+      "class": "regression-smoke",
+      "operation": "1000 representative effect-free record plans",
+      "metric": "wall milliseconds",
+      "threshold": 5000,
+      "direction": "maximum",
+      "environment": "ubuntu-24.04-node-24.21.0"
+    },
+    {
+      "id": "P4-BUD-009",
+      "class": "resource-ceiling",
+      "operation": "QR raster render",
+      "metric": "width or height pixels",
+      "threshold": 4096,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-010",
+      "class": "resource-ceiling",
+      "operation": "QR raster render",
+      "metric": "total pixels",
+      "threshold": 16777216,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    },
+    {
+      "id": "P4-BUD-011",
+      "class": "resource-ceiling",
+      "operation": "QR raster render",
+      "metric": "encoded output bytes",
+      "threshold": 67108864,
+      "direction": "maximum",
+      "environment": "all-supported-cells"
+    }
+  ],
+  "officialPerformanceClaim": {
+    "status": "calibration-required",
+    "reason": "No qualified stable hardware manifest or measured product capacity need exists; P4 enforces correctness, security and gross-regression ceilings only.",
+    "blockingGate": "P7 performance closure"
+  },
+  "requiredEvidence": [
+    "coverage-report",
+    "critical-branch-report",
+    "mutation-report",
+    "property-report-with-seeds-and-shrinks",
+    "fuzz-report-with-corpus-and-seeds",
+    "seeded-fault-report",
+    "official-and-independent-vector-report",
+    "security-attack-report",
+    "performance-and-resource-report",
+    "compatibility-matrix-report",
+    "clean-packed-consumer-report",
+    "DSS reproducible offline build and bridge coverage",
+    "Maven/SBOM/shade/licence/NOTICE reconciliation"
+  ],
+  "changeRule": "The quality plan may change only in a standalone signed+DCO protected PR before affected implementation; thresholds may not be lowered and every change invalidates mapped P4 evidence. P4-A through P4-G must integrate serially, and readiness must reject any undeclared runtime or test path, critical branch/mutant, campaign, seeded fault, report, toolchain cell or budget.",
+  "providerCandidates": {
+    "qrEncoder": {
+      "name": "@nuintun/qrcode",
+      "version": "5.0.3",
+      "integrity": "sha512-eKxU05NO2A5ycOiAKu9XKaf5akfR0wJHgjBvy4Wgy2dOgBjMh58IHz8gvMwS2IBiqWq63ITntuzP/iuVA2wOHg==",
+      "license": "MIT",
+      "role": "private runtime encoder",
+      "admissionState": "exact candidate frozen; full dependency admission before P4-E"
+    },
+    "qrDecoder": {
+      "name": "@zxing/library",
+      "version": "0.23.0",
+      "integrity": "sha512-6fkkoFwP8CHxl6ugnPsj74PLJgX2iRv5zczGAyt5OBzQgxFhuhF0NCEc4t4OvSr8xAv2MRLlI0Iu9ZGDZQ2urA==",
+      "license": "Apache-2.0",
+      "role": "test-only independent decode oracle",
+      "maintenanceState": "maintenance-only; compare maintained alternatives before admission",
+      "admissionState": "exact candidate frozen; full dependency admission before P4-E"
+    },
+    "xadesProvider": {
+      "name": "EU Digital Signature Services",
+      "version": "6.5",
+      "source": "https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/985432396/DSS+v6.5",
+      "license": "LGPL-2.1",
+      "role": "local-only private XAdES/PKI provider",
+      "admissionState": "exact release candidate frozen; source/artifact/dependency/license/NOTICE/SBOM admission before P4-D",
+      "noRemoteDemoService": true
+    }
+  },
+  "providerToolchainCandidates": {
+    "java": {
+      "vendor": "Eclipse Temurin",
+      "version": "21.0.12.1+1",
+      "package": "jdk",
+      "license": "GPL-2.0-only WITH Classpath-exception-2.0",
+      "supportedArchivesSha256": {
+        "ubuntu-24.04-x64": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94",
+        "windows-2025-x64": "f9d6e191ab098c0d416e7d588a24420a8621cd2f4720dab2459b8b7b2d2d8b4e",
+        "macos-15-x64": "44db0f08196daf19a47f90d13388b0c943b67663cb537f998fe29e836fa842ce",
+        "macos-15-arm64": "3623232f33a9c3baadf304480b2535f9a3cba8a58d42ecbb438ba267315d9998",
+        "ubuntu-24.04-arm64": "23e37e026f12f3e706f18938ff611db3032d075b09d0879a25d06718c773e223"
+      },
+      "admissionState": "exact per-runner JDK release and checksums frozen; action and artifact admission before P4-D"
+    },
+    "setupJavaAction": {
+      "name": "actions/setup-java",
+      "tag": "v6.0.1",
+      "sha": "de7274f081f381c8f8158605e0321c36c376e2e6",
+      "treeSha": "0ce6b787d77e67a1dbf0cb529055ed508de8e545",
+      "license": "MIT",
+      "commitSignature": "GitHub verified",
+      "runtime": "node24",
+      "admissionState": "candidate fixed; executable/bundled code and license admission before workflow use"
+    },
+    "maven": {
+      "version": "3.9.12",
+      "distributionSha512": "0a1be79f02466533fc1a80abbef8796e4f737c46c6574ede5658b110899942a94db634477dfd3745501c80aef9aac0d4f841d38574373f7e2d24cce89d694f70",
+      "license": "Apache-2.0",
+      "admissionState": "exact distribution fixed; offline dependency/plugin graph admission before P4-D"
+    }
+  }
+}

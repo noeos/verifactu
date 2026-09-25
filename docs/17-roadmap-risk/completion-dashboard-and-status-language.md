@@ -5,8 +5,8 @@ status: approved
 authority: normative
 owner: documentation-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
-decisions: [ADR-0051, ADR-0052, ADR-0053]
+last-reviewed: 2026-09-25
+decisions: [ADR-0051, ADR-0052, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
 historical-inputs: [REV-063, REV-074, REV-080]
 ---
 
@@ -24,7 +24,9 @@ cannot edit underlying status or hide blocked work.
 ## Current scoped status
 
 P1, P2, P3 and the mandatory P3-B pre-P4 assurance gate are evidence-complete
-at their protected recovery points. P4 is ready to begin only under
-`P3B-BASELINE-0001` and its first-commit policies; P4–P8 remain unimplemented.
-`creationAllowed=false` and no fiscal-compliance, AEAT-acceptance, publication
-or release claim is made.
+at their protected recovery points. P4 is planned but blocked: in addition to
+`P3B-BASELINE-0001` and its first-commit policies, ADR-0055–0058 and the exact
+machine-readable population, validator and required `gate:p4-readiness` from
+[`p4-quality-plan.md`](p4-quality-plan.md) must be protected and green before
+P4-A. P4–P8 remain unimplemented. `creationAllowed=false` and no fiscal-
+compliance, AEAT-acceptance, publication or release claim is made.

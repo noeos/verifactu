@@ -5,8 +5,9 @@ status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-25
 dependencies: [SEC-DOC-0002, SEC-DOC-0003, ARCH-DOC-0003]
+decisions: [ADR-0020, ADR-0055, ADR-0057, ADR-0058]
 ---
 
 # Trust boundaries and data flows
@@ -14,7 +15,14 @@ dependencies: [SEC-DOC-0002, SEC-DOC-0003, ARCH-DOC-0003]
 Boundary crossings are: host input to codec; decoded facts to domain; domain to
 edition assets; core to store/UoW; core to XML/XAdES process; key handle to
 credential provider; outbox to network; network to bounded parser; durable data
-to export/auditor; and VeriFactu projection to Verification Engine.
+to export/auditor; VeriFactu projection to Verification Engine; and host-supplied
+CRL/OCSP bytes into offline certificate verification.
+
+The future commercial billing host owns network discovery, retrieval and cache
+refresh for CRL/OCSP. Supplied bytes and host provenance are untrusted input;
+the private provider verifies evidence signature/issuer, certificate binding,
+validation time and freshness itself. No certificate-status URL lookup or
+network/cache effect is available from the core library.
 
 For each crossing the canonical DFD records data classification, sender,
 receiver, authentication/authorization, schema and edition, maximum bytes/count/

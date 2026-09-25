@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: cryptography-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-25
 dependencies: [REG-INDEX, DOM-INDEX, SEC-INDEX]
 historical-inputs: [REV-007, REV-021, REV-045, REV-046]
 ---
@@ -47,3 +47,8 @@ Approved specifications (17):
 Exit requires pinned official inputs, real bounded XSD validation, exact
 artifact custody and independent positive/negative evidence for every format,
 cryptographic, certificate, QR and generic-evidence claim.
+
+P4-specific boundaries are governed by ADR-0055 (offline CRL/OCSP evidence),
+ADR-0056 (edition-bound QR and independent decode), ADR-0057 (local EU DSS
+provider) and ADR-0021 (separate integrity claims). These decisions add
+verification obligations; they do not assert that P4 is implemented.

@@ -16,7 +16,8 @@ Required PR contexts are exactly:
 
 - `Required · governance signatures and DCO`;
 - `Required · documentation and traceability`;
-- `Required · regulatory sources and generated contracts`;
+- `Required · regulatory sources and generated contracts` (runs the P3-B
+  closure and fail-closed P4 pre-implementation readiness gate);
 - `Required · quality and policy`;
 - `Required · ubuntu-24.04 · Node 22.14.0`;
 - `Required · ubuntu-24.04 · Node 22.23.2`;

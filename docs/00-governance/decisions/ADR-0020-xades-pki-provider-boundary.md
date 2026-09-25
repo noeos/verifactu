@@ -5,7 +5,7 @@ status: accepted
 authority: decision
 owner: cryptography-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-24
 sources: [SRC-0024, SRC-0043, SRC-0045, SRC-0046]
 historical-inputs: [REV-012, REV-013, REV-014, REV-015, REV-016]
 ---
@@ -14,10 +14,13 @@ historical-inputs: [REV-012, REV-013, REV-014, REV-015, REV-016]
 
 ## Decision
 
-Do not implement XAdES, canonicalization or PKI validation from scratch. Admit
-a locally controlled, pinned provider/reference implementation after exact
-AEAT-profile, ETSI, security, licence and reproducibility evaluation; EU DSS is
-the preferred candidate, never its public demo service.
+Do not implement XAdES, canonicalization or PKI validation from scratch. Use
+the locally controlled EU Digital Signature Services (DSS) library behind a
+private provider boundary, pinned to an exact release and admitted only after
+the exact AEAT profile, cryptographic behavior, PKI policy, security, licence,
+toolchain and reproducibility gates pass. The DSS public demonstration service
+and remote demo endpoints are never a runtime dependency. The exact version and
+admission conditions are recorded in [ADR-0057](ADR-0057-local-eu-dss-provider.md).
 
 Keys remain behind non-exportable handles where the platform permits. Signing
 requests bind artifact digest, edition, profile, algorithm, signer expectation
@@ -28,6 +31,9 @@ authorization. Caller booleans and signer metadata are untrusted input.
 
 ## Consequences
 
-Offline and online validation evidence, trust anchors and revocation freshness
-are explicit. Provider unavailability, timeout, malformed output and
-authorization failure are distinct durable diagnostics and negative tests.
+Validation evidence, trust anchors, validation instant and revocation freshness
+are explicit. The local provider performs no implicit network retrieval.
+Provider unavailability, timeout, malformed output and authorization failure
+are distinct typed results and negative tests. This decision does not enable
+fiscal creation, establish AEAT acceptance or expose provider internals in a
+public package.

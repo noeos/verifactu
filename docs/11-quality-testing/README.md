@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: quality-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-25
 dependencies: [REQ-INDEX, DOM-INDEX, SEC-INDEX, PERF-INDEX]
 historical-inputs: [REV-056, REV-057, REV-058, REV-059, REV-060, REV-062, REV-063, REV-064, REV-079]
 ---
@@ -52,3 +52,9 @@ claim, independent challenge at critical boundaries, honest coverage and real
 code mutation, semantic property/fuzz campaigns, durable crash/recovery tests,
 lawful fixtures and exact-commit requirement-to-report traceability. The
 approved elaboration contract and thresholds are in [`PLAN-L3`](../lot-3-assurance-delivery-plan.md).
+
+The phase-specific preimplementation population, exact proposed module/test
+inventory and immutable thresholds for P4 are controlled by
+[`p4-quality-plan.md`](../17-roadmap-risk/p4-quality-plan.md) and ADR-0058. No
+P4 implementation may begin until its machine-readable denominator and
+fail-closed readiness task are admitted and green on protected `main`.

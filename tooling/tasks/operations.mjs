@@ -2999,6 +2999,27 @@ async function p3bAssurance(context) {
   return outcome;
 }
 
+async function p4QualityPlan(context) {
+  const result = await run("node", ["tooling/assurance/p4-quality-plan.mjs"], {
+    cwd: context.root,
+    timeoutMs: 60000,
+  });
+  assert(
+    result.code === 0,
+    "P4_QUALITY_PLAN_EXECUTION",
+    result.stderr || result.stdout,
+  );
+  const outcome = JSON.parse(result.stdout.trim().split(/\r?\n/u).at(-1));
+  assert(
+    outcome.status === "passed" &&
+      outcome.failed === 0 &&
+      outcome.skipped === 0,
+    "P4_QUALITY_PLAN_STATUS",
+    outcome.status,
+  );
+  return outcome;
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -3058,6 +3079,7 @@ export const operations = {
   regulatoryDrift,
   gateP3,
   p3bAssurance,
+  p4QualityPlan,
   gate,
 };
 
@@ -3097,5 +3119,6 @@ export const operationCapabilities = Object.freeze({
   regulatoryDrift: { tools: ["node"], network: "denied" },
   gateP3: { tools: [], network: "denied" },
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
+  p4QualityPlan: { tools: ["git", "node"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });
