@@ -107,3 +107,20 @@ changelog and makes no compliance, publication or support claim.
   critical mutants were killed and P4-PROP-001–009 each ran 4,096 executions.
 - The exact PR-head and protected-push matrices are still required. P4-C remains
   blocked until P4-B is protected and has a final protected read-back.
+
+## 2026-09-25 — P4-B implementation protected
+
+- PR #68 closed issue #67. Its exact head a5a8dde811bd1d386381536bddde15463bde1bb9
+  passed 26/26 App 15368 check-runs, including all 17 required contexts and
+  required-check closure.
+- The protected squash is b06b2ffea2a9bf914a131450fc4e84c70d51a50f
+  (tree 11f538c42701492fffac151ffd2a3d514a74cd94), sole parent
+  3415fd5540b3b8663fc6aec9b44535b4aac6b0c2; valid GitHub signature and
+  canonical DCO. Its protected push passed all 25 App 15368 check-runs and
+  all five workflows: required foundation 36163538219, Engineering CI
+  36163537937, Conformance 36163538438, Regulatory observation 36163538058,
+  and Security 36163537976.
+- P4-B is implemented and protected. Issue #69 / the final read-back PR records
+  this exact evidence and must pass its own exact-head and protected-push
+  closure before P4-C starts. creationAllowed=false; no tax-compliance,
+  AEAT-acceptance, publication or release claim is made.
