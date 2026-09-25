@@ -50,3 +50,21 @@ changelog and makes no compliance, publication or support claim.
   observation; it does not alter the successful required closure.
 - `creationAllowed=false`; this status transition grants no fiscal-compliance,
   AEAT-acceptance, publication or release claim.
+
+## 2026-09-25 — P4-A protected implementation
+
+- PR `#62` implements the staged JSON codec and effect-free domain core from
+  the frozen P4-A inventory. It adds task-enforced coverage, property, fuzz,
+  critical mutation and seeded-fault evidence; it keeps `creationAllowed=false`
+  and adds no package entrypoint exports.
+- Exact PR head `3f5c4bee7b67a2ff8bee447d5c6489bf12dc6b68` passed all 17 required
+  App `15368` contexts plus nine auxiliary checks. Protected squash
+  `8b0724350b9e30ec6616e837d7605bd7ab839e17` has tree
+  `b38dc4f459cf0aff99e1bbc1807ea7ad99e99d1b`, a valid GitHub signature and
+  canonical DCO trailer. All five protected-push workflows and all 25
+  check-runs passed on the exact squash; see `handoff.md` for the full
+  read-back.
+- P4-A is implemented. P4-B remains blocked until read-back issue `#63` and
+  its documentation PR have completed exact-head and protected-push closure.
+  The frozen P4 populations are unchanged. No fiscal-compliance,
+  AEAT-acceptance, publication or release claim is made.
