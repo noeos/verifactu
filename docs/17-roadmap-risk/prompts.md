@@ -5,9 +5,9 @@ status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-09-13
+last-reviewed: 2026-09-25
 dependencies: [ROADMAP-DOC-0004, ROADMAP-DOC-0017]
-decisions: [ADR-0001, ADR-0031, ADR-0051]
+decisions: [ADR-0001, ADR-0031, ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
 historical-inputs: [REV-063, REV-074, REV-079, REV-084]
 ---
 
@@ -216,38 +216,68 @@ Do not start P4 until P3-B is protected, green and independently understandable.
 
 ```text
 Execute Phase P4 of docs/17-roadmap-risk/implementation-roadmap.md completely.
-Read all current docs and validate the handoff/source editions on protected main.
-Prioritize all 04-domain, 05-architecture, 06-contracts, 07-formats-cryptography,
-XML/signature security, testing and Verification Engine documents and mapped
-historical failures. Inspect the exact admitted Verification Engine public package.
+Read every current document outside previous-docs in indexed batches and validate
+the handoff, exact source editions, repository, package admission, CI and GitHub
+protected-main state. Prioritize all 04-domain, 05-architecture, 06-contracts,
+07-formats-cryptography, XML/signature/PKI security, the entire 11-quality-testing
+area, 12-performance, 14-supply-chain, 16-integrations-conformance, ADR-0020,
+ADR-0021, ADR-0055–0058, p4-quality-plan.md and mapped REV-001..084 findings.
+Inspect the exact installed/admitted Verification Engine public artifact and
+confirm no P4 source/runtime from an earlier attempt is present or reused as
+evidence.
 
-Implement waves P4-A through P4-G in dependency order using multiple vertical
-signed+DCO PRs. Complete staged codecs, identities/context/values, all record and
-correction operations, modes/tenure, events/states/invariants/sequences/chains and
-diagnostics. Implement effect-free plans, official projection, encoding/order/
-decimal/date, fingerprint and exact byte custody. Add hardened XML serialization,
-real offline XSD provider, XAdES/PKI creation and verification, certificate chain/
-time/revocation/algorithm handling, QR content/render/decode, separate claims and
-the exact installed Verification Engine profile adapter. No implicit clock,
-randomness, storage, network or key state; no internal/oracle public leak.
+Do not implement fiscal or provider code until the zero-code P4-readiness gate
+is protected and green: exact machine-readable whole-production/test populations,
+critical catalogue, seeds/operators, report schemas, thresholds, supported
+OS/runtime/JDK/Maven/DSS matrix, exact dependency/action/artifact digests,
+performance/resource ceilings and fail-closed readiness task must all be frozen
+and seed-tested. Keep creation disabled, do not publish to npm and make no legal,
+AEAT, fiscal-conformity or release claim.
 
-Before the first P4 implementation PR, publish the exact P4 quality population,
-critical-branch/mutation catalogue, thresholds, toolchain/OS matrix and
-performance budgets. Every P4 work package must add its tests and quality
-evidence together; no later P7 campaign may be the first measurement.
+Implement strictly serial waves P4-A → P4-B → P4-C → P4-D → P4-E → P4-F → P4-G
+using coherent vertical signed+DCO PRs. Do not start the next wave until the
+preceding wave is merged through protected main with its final-head evidence read
+back. No parallel sibling waves, stale-base merges, skipped wave or mega-PR.
+P4-A completes staged codecs, identities/context/values, every record/correction,
+modes/tenure, events/states/invariants/sequences/chains and diagnostics. P4-B
+completes effect-free plans, official projection, ordering/encoding/decimal/date,
+fingerprint and exact bytes. P4-C completes hardened XML serialization and a real
+bounded offline XSD provider. P4-D uses locally executed EU DSS 6.5 behind a
+private adapter for actual XAdES creation and cryptographic verification; enforce
+the exact AEAT profile, signature references/transforms, certificate chain/time/
+usage/algorithm/key policy and cancellation/resource bounds. CRL/OCSP retrieval,
+refresh and cache belong only to the future commercial Facturacion host. The
+library receives original bounded evidence bytes and validates them offline:
+valid requires authenticated fresh evidence, revoked rejects, and unknown/stale/
+absent evidence stays indeterminate, never valid. No implicit network, DNS,
+clock, randomness, storage, trust store, key or provider state. P4-E binds QR
+content to immutable edition/mode; admit the exact pinned encoder and use an
+independent test-only decoder, with no truncation and explicit byte/image/CPU/RSS
+limits. P4-F preserves separate official-format, crypto, certificate/authorization,
+AEAT and Noeos claims and adapts the exact installed Engine profile/version/digest.
+P4-G is cumulative closure, not the first run of earlier tests.
 
-Develop positive/boundary/negative tests with implementation: unit, contract,
-property/shrinking, official/independent vectors, mutation, fuzz, parser/signature/
-wrapping/resource attacks and clean packed consumers. Meet 100% critical branch
-and mutation behavior and project global thresholds for this scope; do not game
-coverage or mutation. Seed faults to demonstrate the oracles detect them. Preserve
-exact bytes through every boundary and keep official, crypto, AEAT and Noeos
-claims distinct.
+Every production module, including private providers and authored Java bridge
+code, is in coverage and mutation denominators. Require ≥98% statements/lines,
+≥98% functions and ≥95% branches per public package, 100% critical branch/condition
+coverage, 100% killed critical non-equivalent mutants and ≥95% all other
+non-equivalent mutants; zero unreviewed security/regulatory survivors. Use unit,
+contract, property+shrinking, official/independent vectors, complete seeded faults,
+mutation, fuzz, parser/signature/wrapping/CRL/OCSP/QR/resource attacks, clean
+packed consumers and every declared compatibility/performance cell. NoCoverage,
+empty discovery, skipped work, timeouts, compile/test errors, hidden retries,
+unreviewed survivors, narrowed denominators or stale evidence block. Preserve
+first failures, fix causes/variants and rerun all invalidated work.
 
-Fix every scoped defect and affected variant, rerun all invalidated evidence and
-merge only protected final-head greens. Close via handoff PR with public/contract/
-artifact/provider/Engine identities, test metrics, evidence, remaining external
-items and exact P5 prerequisites.
+Do not stop or end this goal with a status-only answer while any safe scoped work,
+P4 wave, required PR, gate or exact-head verification remains. Continue until
+P4-G is completely implemented and the final protected-main handoff is verified.
+If an actual external authority/credential/permission blocker prevents a specific
+cell, finish all safe work, record its owner and exact unblock evidence, mark the
+goal blocked (never complete) and resume after it changes. Close through a
+dedicated P4-G handoff PR with exact SHAs/trees, signatures/DCO, claims/artifact/
+provider/Engine identities, every metric/report digest, survivors/exceptions and
+remaining external prerequisites; reread protected main and every required check.
 ```
 
 ## Prompt P5 — Durable consistency and AEAT operation

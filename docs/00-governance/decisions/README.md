@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-25
 ---
 
 # Governance decision records
@@ -71,3 +71,7 @@ capabilities have been implemented.
 | [ADR-0052](ADR-0052-assurance-independence-and-claim-language.md) | Distinguish self, tool, independent and authority evidence in every claim. |
 | [ADR-0053](ADR-0053-canonical-evidence-and-reference-graph.md) | Generate audits and references from one retained evidence graph. |
 | [ADR-0054](ADR-0054-apache-2.0-project-license.md) | Use Apache License 2.0 for project-owned material with explicit third-party license boundaries. |
+| [ADR-0055](ADR-0055-offline-revocation-evidence-boundary.md) | Keep CRL/OCSP retrieval in the commercial host and validate supplied evidence offline. |
+| [ADR-0056](ADR-0056-edition-bound-qr-codec-and-rendering.md) | Bind QR payload/rendering to immutable editions and verify output with an independent decoder. |
+| [ADR-0057](ADR-0057-local-eu-dss-provider.md) | Use local EU DSS 6.5 behind a private, fully admitted XAdES/PKI provider boundary. |
+| [ADR-0058](ADR-0058-p4-order-and-exhaustive-assurance.md) | Enforce serial P4-A→G delivery and frozen whole-population quality gates. |

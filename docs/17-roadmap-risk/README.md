@@ -5,22 +5,23 @@ status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-13
+last-reviewed: 2026-09-25
 dependencies: [GOV-INDEX, REQ-INDEX]
 historical-inputs: [REV-001, REV-084]
 ---
 
 # Roadmap and risk
 
-Status: all 20 substantive specifications are approved as design authority under
-`PLAN-L4`; the complete execution roadmap, initial phase handoff and derived
-Codex prompts are present. No implementation phase or executable evidence has
-started.
+Status: all 21 substantive specifications are approved as design authority under
+`PLAN-L4`; P1–P3-B are evidence-complete. P4 is planned from the protected P3-B
+baseline and has no current implementation. Its ADRs, strict wave order and
+whole-population quality plan are being prepared; P4-A remains blocked until the
+machine manifest and required readiness gate pass on protected `main`.
 
 Authority for dependency-driven execution, readiness, completion and visible
 risk. Phases order work; they do not reduce final scope.
 
-Substantive documents (20):
+Substantive documents (21):
 
 - `delivery-principles.md`
 - `dependency-map.md`
@@ -38,6 +39,7 @@ Substantive documents (20):
 - `issue-and-pull-request-mapping.md`
 - `phase-exit-criteria.md`
 - `p3b-pre-p4-assurance.md`
+- `p4-quality-plan.md`
 - `phase-close-control-matrix.md`
 - `release-1.0.0-criteria.md`
 - `scope-change-policy.md`

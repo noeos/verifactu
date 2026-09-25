@@ -5,9 +5,10 @@ status: approved
 authority: normative
 owner: security-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-09-25
 review-by: 2026-10-12
 dependencies: [SEC-DOC-0005, REG-DOC-0005]
+decisions: [ADR-0055, ADR-0057, ADR-0058]
 historical-inputs: [REV-010, REV-011, REV-012, REV-013, REV-014]
 ---
 
@@ -16,6 +17,11 @@ historical-inputs: [REV-010, REV-011, REV-012, REV-013, REV-014]
 Core domain packages have no ambient network capability. Submission uses an
 injected adapter and an immutable endpoint profile owned by the regulatory
 edition and deployment environment. Arbitrary caller URLs are prohibited.
+
+Certificate revocation lookup is not an exception: this repository performs no
+ambient AIA/CDP, OCSP or CRL retrieval. A future commercial Facturacion host
+owns retrieval and cache refresh and passes bounded evidence bytes to the
+offline verifier under [ADR-0055](../00-governance/decisions/ADR-0055-offline-revocation-evidence-boundary.md).
 
 ## Endpoint policy
 

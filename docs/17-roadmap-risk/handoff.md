@@ -5,10 +5,10 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-09-21
+last-reviewed: 2026-09-25
 dependencies:
   [ROADMAP-DOC-0004, ROADMAP-DOC-0005, ROADMAP-DOC-0007, ROADMAP-DOC-0013]
-decisions: [ADR-0026, ADR-0031, ADR-0051, ADR-0053]
+decisions: [ADR-0026, ADR-0031, ADR-0051, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
 historical-inputs: [REV-063, REV-074, REV-079, REV-080, REV-084]
 ---
 
@@ -28,12 +28,14 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current execution has completed the mandatory P3-B sequence entered from
-protected P3 read-back `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`.
+protected P3 read-back `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` and reset its
+current baseline to the final P3-B pointer correction `999d78c19b0e1be3097201a0cc61947a10760bbe`.
 The current context capsule, phase ledger and
 [`p3b-evidence.md`](p3b-evidence.md) are authoritative for resumption. Later
 P4–P7 sections are preserved records from prior attempts and are explicitly
-superseded; they do not establish current implementation or evidence. P4 may
-begin only under the frozen first-commit controls recorded by this closure.
+superseded; they do not establish current implementation or evidence. Under the
+restart, P4-A may begin only after the ADR-0055–0058 decisions and the separate
+P4-readiness gate defined by `p4-quality-plan.md` are protected and green.
 
 ## Historical initial baseline control — retained
 
@@ -84,18 +86,18 @@ Historical detail belongs in phase records below.
 | Field                        | Initial value                                                                                                                                                                                    |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                       |
-| Current phase                | P3-B assurance is evidence-complete; P4 is ready under the frozen first-commit policies and remains unimplemented.                                                                               |
-| Phase status                 | Protected source/contract/oracle assurance and exact-subject handoff/read-back are complete; no P4 fiscal runtime exists.                                                                        |
-| Last evidence-complete phase | P3-B, through protected handoff PR `#33`, retained failed push evidence and forward-correction/read-back PR `#34`.                                                                               |
+| Current phase                | P3-B is evidence-complete at the restart baseline; P4 is planned, its new readiness gate is not yet green, and no P4 implementation is present.                                                  |
+| Phase status                 | P3-B source/contract/oracle assurance is complete. P4 is blocked at the zero-code readiness gate until the exact manifest/validator/required context are protected and green.                       |
+| Last evidence-complete phase | P3-B: original protected handoff/read-back PRs `#31`–`#34`, followed by authoritative-edition pointer correction PR `#38` at restart SHA `999d78c19b0e1be3097201a0cc61947a10760bbe`.              |
 | Local repository             | Deterministic P2 foundation plus corrected authoritative P3 source custody, structural candidate contracts, independent oracle and P3-B assurance; no fiscal behavior or release claim.          |
-| Protected `main` SHA         | P3-B handoff squash `f6614f8d1ebd17c12e11d0149803d002e201c13e`; final forward-correction/read-back subject is the protected result of PR `#34` and its authenticated API audit.                  |
-| GitHub effective state       | Rulesets `23705155`/`23705170` are active with zero bypass; all 17 strict contexts are bound to App `15368`. PR `#34` restores canonical DCO and must pass its exact-head and final-main matrix. |
+| Protected `main` SHA         | P3-B restart baseline `999d78c19b0e1be3097201a0cc61947a10760bbe`, tree `8375829168e5eb11150cfbb297fcd4125c922fc3`; exact target before P4 quality declaration/implementation. |
+| GitHub effective state       | At reset read-back, `main` remained protected by active zero-bypass rulesets; 50/50 checks on the exact baseline passed. This docs amendment still requires its own final-head checks/read-back. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                     |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                   |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                                 |
 | Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                            |
 | External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                        |
-| Immediate instruction        | Begin P4 only by consuming `P3B-BASELINE-0001` and every `p4FirstCommitPolicies` threshold in its first commit; keep fiscal creation disabled until later gates authorize it.                    |
+| Immediate instruction        | Accept ADR-0055–0058 and `p4-quality-plan.md`; add/freeze the exact machine manifest and seeded fail-closed `gate:p4-readiness` before P4-A. Preserve `creationAllowed=false`.                 |
 
 ## Phase ledger
 
@@ -104,8 +106,8 @@ Historical detail belongs in phase records below.
 | P1    | evidence-complete | `fa2998d4e7f5e36715b95ee2618b4eaf73cc03c0` | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `#8`–`#10`  | W1–W7, protected closure, audit correction/finalization and read-back complete; documentation-only scope preserved.      |
 | P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa` | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`       | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b` | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30` | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
-| P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | protected PR `#34` result                  | `#31`–`#34` | Source observation, implementation, handoff, retained DCO failure and protected forward-correction/read-back complete.   |
-| P4    | planned           | P3-B closure required                      | —                                          | —           | Deterministic fiscal core and verification boundaries.                                                                   |
+| P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete. |
+| P4    | planned           | P3-B restart baseline `999d78c19b0e1be3097201a0cc61947a10760bbe` | — | readiness + A–G | Readiness decisions and plan are prepared; machine gate must pass before any wave starts. |
 | P5    | planned           | P4 closure required                        | —                                          | —           | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
 | P6    | planned           | P5 closure required                        | —                                          | —           | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                        | —                                          | —           | Whole-product assurance, external validation and release rehearsal.                                                      |
@@ -115,9 +117,12 @@ Historical detail belongs in phase records below.
 
 P1–P3 and P3-B are evidence-complete at their recorded protected points. P3-B
 corrected the formerly blocked source graph and executed the pre-P4 assurance
-campaign. No P4 source or fiscal behavior is admitted. The next operational
-action is the first bounded P4 commit under the canonical P3-B policies; any
-missing denominator, skipped cell, lowered threshold or stale subject blocks it.
+campaign. The current `main` restart baseline is the pointer correction
+`999d78c`; it contains no P4 quality plan or P4 runtime. This amendment makes
+CRL/OCSP ownership, QR dependency/oracle, DSS 6.5 and claim separation explicit.
+P4 remains blocked until the machine-readable population and fail-closed
+readiness context specified in `p4-quality-plan.md` are admitted. No source from
+a prior P4 attempt is implementation or test evidence for the restart.
 
 ## Required phase-record schema
 

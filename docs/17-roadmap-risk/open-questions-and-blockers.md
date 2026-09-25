@@ -5,8 +5,8 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-16
-decisions: [ADR-0051]
+last-reviewed: 2026-09-25
+decisions: [ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
 ---
 
 # Open questions and blockers
@@ -38,6 +38,10 @@ release and external-acceptance questions remain prospective.
 | AEAT certificates, test service and transport               | Confirm authorized non-production access and credential custody                                       | Blocks transport and external-validation evidence                     |
 | Independent assurance and performance runner                | Define competent reviewers, workloads, baselines and evidence custody                                 | Blocks assurance and release closure                                  |
 | Future Facturacion boundary                                 | Maintain the versioned host contract and synthetic host without claiming the real product             | Blocks only the corresponding conformance claim, not VeriFactu itself |
+| P4 offline revocation boundary                              | ADR-0055 assigns CRL/OCSP retrieval/cache to future commercial Facturacion; this package validates supplied evidence offline | Blocks P4-D until typed evidence contract and hostile/freshness tests pass |
+| P4 XAdES/PKI implementation                                 | ADR-0057 selects local DSS 6.5; exact artifacts, JDK/Maven, LGPL notices/shade and profile admission remain required | Blocks P4-D; no demo service, legal advice or AEAT claim may substitute |
+| P4 QR encoder/decode                                        | ADR-0056 selects pinned `@nuintun/qrcode@5.0.3` and test-only `@zxing/library@0.23.0` candidates | Blocks P4-E until dependency/licence/vulnerability admission and exact vectors pass |
+| P4 order/whole-population assurance                         | ADR-0058 and `p4-quality-plan.md`; exact manifest/validator/required gate must be protected before P4-A | Blocks every P4 wave until `gate:p4-readiness` is green |
 
 Each item remains open until its authority, owner, deadline, conservative behavior
 and exact unblock evidence are recorded. No later execution observation may be
@@ -48,13 +52,14 @@ treated as current without a fresh read-back against the implementation subject.
 | Item                                                                  | Owner             | Due date/gate                                            | P3-B disposition                                                                                              |
 | --------------------------------------------------------------------- | ----------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | Authoritative source custody and semantic contract                    | regulatory-owner  | 2026-09-21 P3-B closure                                  | Resolved by the immutable 27-artifact snapshot, generated candidate and independent oracle; drift reopens it. |
-| P4 quantitative instrumentation                                       | quality-owner     | First protected P4 commit                                | Policy is complete in `P3B-BASELINE-0001`; omission blocks that commit.                                       |
+| P4 quantitative instrumentation                                       | quality-owner     | Before P4-A product implementation                       | P3-B freezes policies; `p4-quality-plan.md` freezes planned populations; executable exact manifest/validator/readiness gate remains mandatory before A. |
 | Legal/applicability/declaration review                                | legal-owner       | Before P7 external-assurance entry and before release    | Downstream prerequisite; no fiscal behavior or compliance claim exists in P3-B.                               |
 | AEAT credentials/test service and provider custody                    | security-owner    | Before the first phase that exercises external transport | Downstream prerequisite; P3-B generation and assurance are offline.                                           |
 | Organizationally independent assessment and stable performance runner | assurance-owner   | Before P7 closure                                        | Downstream prerequisite; the P3-B oracle is implementation-independent only.                                  |
 | Real Facturacion integration                                          | integration-owner | Separate Facturacion product schedule                    | Explicitly outside VeriFactu P3-B/P4-start authority; the synthetic boundary remains the only current claim.  |
 
-No unresolved row affects authorization to begin P4 under its first-commit
-policies. Any scope expansion that makes a downstream row applicable changes it
-to `blocked` immediately; absence of a calendar date for a future phase is not
-used as evidence that its prerequisite passed.
+The historical P3-B handoff authorizes P4 only under its first-commit policies.
+For this clean restart, P4-A remains blocked until the separate readiness gate
+in `p4-quality-plan.md` is implemented and passes. Any scope expansion that
+makes a downstream row applicable changes it to `blocked` immediately; absence
+of a calendar date for a future phase is not evidence that a prerequisite passed.

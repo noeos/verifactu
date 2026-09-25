@@ -5,8 +5,8 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
-decisions: [ADR-0051, ADR-0052]
+last-reviewed: 2026-09-25
+decisions: [ADR-0051, ADR-0052, ADR-0058]
 historical-inputs: [REV-063, REV-074]
 ---
 
@@ -34,6 +34,12 @@ describes only a subset of the declared population, or a test is skipped,
 retried, flaky, synthetic or local-only without that limitation being part of
 the criterion. A later phase cannot be an implicit repair for an earlier phase.
 P3-B is the mandatory readiness gate before P4.
+
+P4 has an additional zero-code readiness gate defined by ADR-0058 and
+[`p4-quality-plan.md`](p4-quality-plan.md). Waves close and open serially in
+P4-A, P4-B, P4-C, P4-D, P4-E, P4-F, P4-G order; a later wave cannot start from
+an unmerged or stale predecessor. Every wave includes its own tests and
+evidence, and P4-G is a cumulative rerun/closure rather than first measurement.
 
 The detailed rows are maintained in
 [`phase-close-control-matrix.md`](phase-close-control-matrix.md).

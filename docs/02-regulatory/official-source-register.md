@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: regulatory-owner
 created: 2026-09-12
-last-reviewed: 2026-09-16
+last-reviewed: 2026-09-25
 review-by: 2026-10-12
 decisions: [ADR-0006, ADR-0009]
 requirements: [REG-0010, REG-0011]
@@ -107,6 +107,9 @@ historical-inputs: [REV-004, REV-005, REV-006, REV-008, REV-012, REV-037, REV-03
 | `SRC-0086` | [AEAT publication/manual conditions](https://sede.agenciatributaria.gob.es/Sede/condiciones-uso-sede-electronica/aviso-legal/cesion-manuales-programas-ayuda.html)                                                                                                                                                                                                                                  | Free unaltered distribution and prescribed attribution conditions for manuals.                                                                     |
 | `SRC-0087` | [BOE legal notice and reuse conditions](https://www.boe.es/informacion/aviso_legal/index.php)                                                                                                                                                                                                                                                                                                       | Reuse and official-text custody terms for BOE material.                                                                                            |
 | `SRC-0088` | [W3C software and document notice](https://www.w3.org/Consortium/Legal/copyright-software-19980720)                                                                                                                                                                                                                                                                                                 | Redistribution identity for the imported XMLDSig schema.                                                                                           |
+| `SRC-0089` | [RFC 5280 — Internet X.509 PKI Certificate and CRL Profile](https://www.rfc-editor.org/rfc/rfc5280)                                                                                                                                                                                                                                                                                                   | Certificate path and CRL semantics for offline caller-supplied evidence; implementation remains subordinate to the admitted policy.               |
+| `SRC-0090` | [RFC 6960 — Online Certificate Status Protocol (OCSP)](https://www.rfc-editor.org/rfc/rfc6960)                                                                                                                                                                                                                                                                                                       | OCSP response/status semantics for offline caller-supplied evidence; implementation remains subordinate to the admitted policy.                   |
+| `SRC-0091` | [European Commission DSS 6.5 release](https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/985432396/DSS%2Bv6.5)                                                                                                                                                                                                                                                                  | Official DSS 6.5 release identity and feature reference; exact Maven artifacts, licence graph and execution profile require separate admission.    |
 
 ## Record requirements
 

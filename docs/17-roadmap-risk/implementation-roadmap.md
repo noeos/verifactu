@@ -5,9 +5,9 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-13
+last-reviewed: 2026-09-25
 dependencies: [DOCS-INDEX, ROADMAP-DOC-0002, ROADMAP-DOC-0003, ROADMAP-DOC-0005, ROADMAP-DOC-0006, ROADMAP-DOC-0007, ROADMAP-DOC-0013, ROADMAP-DOC-0014, REPO-DOC-0022]
-decisions: [ADR-0001, ADR-0002, ADR-0015, ADR-0026, ADR-0030, ADR-0031, ADR-0033, ADR-0038, ADR-0040, ADR-0051, ADR-0053]
+decisions: [ADR-0001, ADR-0002, ADR-0015, ADR-0026, ADR-0030, ADR-0031, ADR-0033, ADR-0038, ADR-0040, ADR-0051, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
 historical-inputs: [REV-001, REV-063, REV-065, REV-066, REV-067, REV-071, REV-072, REV-073, REV-074, REV-075, REV-076, REV-077, REV-078, REV-079, REV-080, REV-081, REV-082, REV-083, REV-084]
 ---
 
@@ -284,10 +284,11 @@ P3-B executes [`p3b-pre-p4-assurance.md`](p3b-pre-p4-assurance.md). It validates
 the documentation/REV graph, source custody, generated contracts and
 independent oracles, toolchain and OS matrix, CI and required checks,
 security/privacy controls, negative fixtures, supply chain, SBOM/provenance,
-reproducibility, compatibility and evidence binding. It also establishes the
-exact P4 quality population, critical catalogue, coverage/mutation policy and
-performance baseline format. Any missing denominator or applicable control
-blocks P4.
+reproducibility, compatibility and evidence binding. It freezes the coverage,
+mutation, property, fuzz, fault/recovery, compatibility and performance
+policies P4 must use. The exact P4 module/test population and executable
+readiness gate are frozen in the separate preimplementation plan before P4-A;
+neither an absent denominator nor an unexecuted gate authorizes implementation.
 
 ## P4 — Deterministic fiscal core, artifacts, cryptography and verification
 
@@ -300,20 +301,34 @@ depend only on explicit inputs.
 [`10-security-privacy`](../10-security-privacy/) and
 [`16-integrations-conformance`](../16-integrations-conformance/).
 
+**Mandatory start gate:** P3-B must be protected and evidence-complete;
+ADR-0055–0058 and [the P4 quality plan](p4-quality-plan.md) must be accepted;
+the exact machine-readable source/test population, toolchain/provider admission,
+critical catalogue, reports and fail-closed `gate:p4-readiness` must pass on
+protected main before any P4-A product code. This is a readiness task, not an
+extra implementation wave.
+
+**Strict dependency order:** P4 waves are serial, not merely alphabetically
+named. Finish and protect the closure of each wave before starting the next:
+**P4-A → P4-B → P4-C → P4-D → P4-E → P4-F → P4-G**. No parallel child-wave
+branches, stale bases, skipped waves or mega-PRs.
+
 | Wave                    | Required implementation                                                                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | P4-A domain             | Staged codecs; identities/context/values; alta/anulacion/correction/substitution; modes/tenure; events/states/invariants/sequences/chains/diagnostics. |
 | P4-B planning/artifacts | Effect-free operation plans, official projection, decimal/date/encoding/order, fingerprint and exact byte custody.                                     |
 | P4-C XML/XSD            | Hardened model/serializer and admitted offline bounded XSD backend with exact diagnostics and independent round trips.                                 |
-| P4-D XAdES/PKI          | Provider boundary, transforms/references, creation/verification profiles, chain/time/revocation, algorithm policy/agility and key isolation.           |
-| P4-E QR                 | Edition/mode-bound content, encoding/render/decode and independent size/error/boundary verification.                                                   |
-| P4-F claims/Engine      | Separate official/crypto/AEAT/Noeos claims and exact installed Verification Engine profile/version/digest integration.                                 |
+| P4-D XAdES/PKI          | Private local EU DSS 6.5 provider, exact profile/crypto verification, chain/time/usage/algorithms, explicit offline CRL/OCSP evidence and key isolation; retrieval stays in future commercial Facturacion. |
+| P4-E QR                 | Edition/mode-bound exact content, admitted encoder, deterministic render, independent test-only decode, byte/geometry/resource limits.                  |
+| P4-F claims/Engine      | Separate official-format, crypto, certificate/authorization, AEAT and Noeos claims; exact installed Engine profile/version/digest adapter.                 |
 | P4-G closure            | Unit/contract/property/mutation/fuzz/vector/security/resource/public-export and installed-tarball campaigns.                                           |
 
-Exit requires tests for every invariant/illegal transition; 100% critical branch
-and valid mutation coverage plus global project thresholds; independent XML/XSD/
-XAdES/PKI/QR oracles and attacks; preserved exact bytes; no internal/oracle leak;
-and no implicit storage, clock, randomness, network or provider state.
+Exit requires all thresholds and populations in the P4 quality plan; 100%
+critical branches and critical mutants plus ≥95% noncritical mutants; complete
+global line/function/branch thresholds; independent XML/XSD/XAdES/PKI/QR
+oracles and attacks; preserved exact bytes; no internal/oracle leak; and no
+implicit storage, clock, randomness, network, revocation retrieval or provider
+state. Each row must pass on the exact final protected head.
 
 ## P5 — Durable consistency and AEAT operation
 

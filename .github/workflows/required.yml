@@ -120,12 +120,12 @@ jobs:
       - name: Install hash-locked SPDX validation runtime
         shell: bash
         run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock
-      - name: Run P3 source, contract and oracle gate
+      - name: Run P3 closure and P4 readiness gate
         shell: bash
-        run: node tooling/tasks/run-task.mjs --task gate:p3b
+        run: node tooling/tasks/run-task.mjs --task gate:p4-readiness
       - name: Write leaf report
         shell: bash
-        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p3b.json
+        run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p4-readiness.json
       - uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-regulatory
