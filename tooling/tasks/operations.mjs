@@ -1,4 +1,5 @@
 import { createReadStream } from "node:fs";
+import { spawnSync } from "node:child_process";
 import {
   cp,
   copyFile,
@@ -763,15 +764,50 @@ async function policyLint(context) {
       /^packages\/.*\.ts$/u.test(path),
   );
   const eslint = resolve(context.root, "node_modules/eslint/bin/eslint.js");
-  const result = await run(process.execPath, [eslint, ...files], {
+  const jsFiles = files.filter((path) => !path.endsWith(".ts"));
+  const jsResult = await run(process.execPath, [eslint, ...jsFiles], {
     cwd: context.root,
     timeoutMs: 120000,
   });
   assert(
-    result.code === 0,
+    jsResult.code === 0,
     "LINT_FAILED",
-    `${result.stdout}${result.stderr}`.trim(),
+    `${jsResult.stdout}${jsResult.stderr}`.trim(),
   );
+  for (const file of files.filter((path) => path.endsWith(".ts"))) {
+    const source = await readFile(resolve(context.root, file), "utf8");
+    const compiled = ts.transpileModule(source, {
+      fileName: file,
+      compilerOptions: {
+        target: ts.ScriptTarget.ES2022,
+        module: ts.ModuleKind.ESNext,
+      },
+      reportDiagnostics: true,
+    });
+    const errors = (compiled.diagnostics ?? []).filter(
+      (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error,
+    );
+    assert(
+      errors.length === 0,
+      "LINT_TYPESCRIPT_TRANSPILE",
+      `${file}: ${errors.map((item) => ts.flattenDiagnosticMessageText(item.messageText, " ")).join("; ")}`,
+    );
+    const result = spawnSync(
+      process.execPath,
+      [eslint, "--stdin", "--stdin-filename", `${file.slice(0, -3)}.lint.js`],
+      {
+        cwd: context.root,
+        encoding: "utf8",
+        input: compiled.outputText,
+        timeout: 120000,
+      },
+    );
+    assert(
+      result.status === 0,
+      "LINT_FAILED",
+      `${file}\n${result.stdout}${result.stderr}`.trim(),
+    );
+  }
   return {
     selected: files.length,
     executed: files.length,
@@ -1441,6 +1477,160 @@ async function testPolicy(context) {
   };
 }
 
+async function testP4A(context) {
+  const files = [
+    "tests/unit/p4-codecs.test.mjs",
+    "tests/unit/p4-values-identities.test.mjs",
+    "tests/unit/p4-records-corrections.test.mjs",
+    "tests/unit/p4-modes-events-states.test.mjs",
+    "tests/unit/p4-sequences-chains.test.mjs",
+    "tests/property/p4-properties.test.mjs",
+    "tests/security/p4-isolation-redaction.test.mjs",
+  ];
+  const result = await run(
+    process.execPath,
+    ["--experimental-test-coverage", "--test", "--test-reporter=tap", ...files],
+    { cwd: context.root, timeoutMs: 120000 },
+  );
+  assert(
+    result.code === 0,
+    "P4A_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.trim(),
+  );
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P4A_TEST_REPORT", result.stdout.slice(-1000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P4A_TEST_COMPLETENESS",
+    `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  const mutationResult = await run(
+    process.execPath,
+    ["--test", "--test-reporter=tap", "tests/mutation/p4-mutation.test.mjs"],
+    { cwd: context.root, timeoutMs: 120000 },
+  );
+  assert(
+    mutationResult.code === 0,
+    "P4A_MUTATION_EXECUTION",
+    `${mutationResult.stdout}${mutationResult.stderr}`.trim(),
+  );
+  const mutationStats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      mutationResult.stdout,
+    );
+  assert(
+    mutationStats,
+    "P4A_MUTATION_REPORT",
+    mutationResult.stdout.slice(-1000),
+  );
+  const [, mutants, , killed, mutantFailures, mutantCancelled, mutantSkipped] =
+    mutationStats;
+  const criticalMutants = [
+    ...mutationResult.stdout.matchAll(/# Subtest: P4-MUT-\d{3}\b/gu),
+  ];
+  const p4AFaults = [
+    ["codec-stage-skip", "P4-MUT-001"],
+    ["duplicate-member-accept", "P4-MUT-002"],
+    ["identity-kind-substitution", "P4-MUT-003"],
+    ["context-omission", "P4-MUT-004"],
+    ["decimal-float-coercion", "P4-MUT-005"],
+    ["implicit-clock-read", "P4-FAULT-006"],
+    ["record-choice-drop", "P4-MUT-007"],
+    ["correction-rewrite", "P4-MUT-008"],
+    ["mode-transition-bypass", "P4-MUT-009"],
+    ["event-chain-mixing", "P4-MUT-011"],
+    ["indeterminate-to-success", "P4-MUT-013"],
+    ["chain-field-swap", "P4-MUT-015"],
+  ];
+  assert(
+    Number(mutants) === 17 &&
+      Number(killed) === 17 &&
+      Number(mutantFailures) === 0 &&
+      Number(mutantCancelled) === 0 &&
+      Number(mutantSkipped) === 0 &&
+      criticalMutants.length === 16,
+    "P4A_MUTATION_COMPLETENESS",
+    `${killed}/${mutants} killed, fail=${mutantFailures}, cancelled=${mutantCancelled}, skipped=${mutantSkipped}`,
+  );
+  for (const [fault, evidence] of p4AFaults)
+    assert(
+      mutationResult.stdout.includes(`# Subtest: ${evidence}`),
+      "P4A_SEEDED_FAULT_MISSING",
+      `${fault} -> ${evidence}`,
+    );
+  const coverage =
+    /^# all files\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)/mu.exec(
+      result.stdout,
+    );
+  assert(coverage, "P4A_COVERAGE_REPORT", result.stdout.slice(-2000));
+  const [, linesText, branchesText, functionsText] = coverage;
+  const lines = Number(linesText);
+  const branches = Number(branchesText);
+  const functions = Number(functionsText);
+  assert(
+    lines >= 98 && branches >= 95 && functions >= 98,
+    "P4A_COVERAGE_THRESHOLD",
+    `line=${lines}, branch=${branches}, function=${functions}; required 98/95/98`,
+  );
+  const modules = [
+    "configuration",
+    "limits",
+    "results",
+    "staged-codec",
+    "diagnostics",
+    "identities",
+    "context",
+    "decimal",
+    "date-time",
+    "records",
+    "corrections",
+    "mode-tenure",
+    "events",
+    "states",
+    "invariants",
+    "sequences",
+    "chains",
+    "index",
+  ];
+  for (const module of modules)
+    assert(
+      result.stdout.includes(`${module}.js`),
+      "P4A_COVERAGE_MODULE_MISSING",
+      module,
+    );
+  return {
+    selected: files.length + 1,
+    executed: files.length + 1,
+    passed: files.length + 1,
+    outputDigest: sha256(
+      result.stdout +
+        result.stderr +
+        mutationResult.stdout +
+        mutationResult.stderr,
+    ),
+    diagnostics: [
+      `testCases=${tests}`,
+      `skipped=${skipped}`,
+      `coverage.line=${lines}`,
+      `coverage.branch=${branches}`,
+      `coverage.function=${functions}`,
+      "criticalMutants=16/16 P4-MUT-001..016",
+      `seededFaults=${p4AFaults.length}/${p4AFaults.length} ${p4AFaults.map(([fault]) => fault).join(",")}`,
+      "properties=7x4096 seed=1346650369 retries=0 discards=0",
+      "fuzz=P4-FUZZ-001x4096 seed=1346651649 retries=0 discards=0",
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
 async function compilePackages(context, outputRoot, sourceRoot = context.root) {
   const tsc = resolve(context.root, "node_modules/typescript/bin/tsc");
   await rm(outputRoot, { recursive: true, force: true });
@@ -1511,7 +1701,7 @@ async function copyPackageStage(
   for (const entry of await walk(
     resolve(buildRoot, basename(record.root), "dist"),
   )) {
-    if (entry.type !== "file") continue;
+    if (entry.type !== "file" || entry.relative.endsWith(".map")) continue;
     const target = resolveContained(
       resolve(packageStage, "dist"),
       entry.relative,
@@ -3063,6 +3253,7 @@ export const operations = {
   policyWorkflow,
   policySupplyChain,
   testPolicy,
+  testP4A,
   buildPackages,
   packageAllowlists,
   packageReproducibility,
@@ -3097,6 +3288,7 @@ export const operationCapabilities = Object.freeze({
   policyWorkflow: { tools: [], network: "denied" },
   policySupplyChain: { tools: [], network: "denied" },
   testPolicy: { tools: [], network: "denied" },
+  testP4A: { tools: ["node"], network: "denied" },
   buildPackages: { tools: ["node", "typescript"], network: "denied" },
   packageAllowlists: {
     tools: ["node", "typescript", "npm"],
