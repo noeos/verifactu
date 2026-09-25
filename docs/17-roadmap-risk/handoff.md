@@ -29,7 +29,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 The append-only P4-readiness read-back below supersedes the stale restart
 capsule and P3-B-era status statements where they conflict. The latest
-protected `main` is `f92424f3eabe7551224795d9ccaf99aa9ad6b149`; the zero-code
+protected `main` is `e7df2649e9ee148a61ccda0d8d4af6b8d3e0fe0f`; the zero-code
 P4-readiness gate is evidence-complete at PR `#53` (`763b582…`). P4-A is ready
 to begin from current protected `main`, but no P4 implementation is present.
 Later P4–P7 sections below remain historical records and do not establish
@@ -88,7 +88,7 @@ Historical detail belongs in phase records below.
 | Phase status                 | P1–P3-B and zero-code P4 readiness are evidence-complete. P4-A may start under the frozen census and serial-wave rules; fiscal creation remains disabled. |
 | Last evidence-complete phase | P4 readiness: PR `#53`, merged `2026-09-25T08:42:49Z`; exact protected checks and push read-back are recorded in the append-only amendment below. |
 | Local repository             | P2 foundation, P3 source custody/contracts/oracle, P4 readiness manifest/validator/gates; no P4 fiscal runtime or creation behavior. |
-| Protected `main` SHA         | `f92424f3eabe7551224795d9ccaf99aa9ad6b149`, tree `edd2ce97ec6a7d20ff4b9f0b7c103c1c5a091f0e`; PR `#55` contains the readiness handoff read-back. |
+| Protected `main` SHA         | `e7df2649e9ee148a61ccda0d8d4af6b8d3e0fe0f`, tree `6133182c9bb4776923fd1a9d03b1f9c5c810ba03`; PR `#57` contains the final readiness handoff read-back. |
 | GitHub effective state       | Active zero-bypass protected-main ruleset; PR `#53` exact-head required/auxiliary checks and protected-push checks passed. This documentation PR requires its own read-back. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                     |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                   |
@@ -2821,4 +2821,32 @@ current `main` identity from which P4-A must branch.
   `f92424f3eabe7551224795d9ccaf99aa9ad6b149` only. P4-B remains blocked until
   A's protected closure and exact final-head read-back. The readiness census,
   thresholds, admissions and report schemas are unchanged. `creationAllowed=false`;
-  no fiscal-compliance, AEAT-acceptance, publication or release claim follows.
+no fiscal-compliance, AEAT-acceptance, publication or release claim follows.
+
+## Final protected read-back before P4-A — 2026-09-25
+
+This append-only amendment records PR `#57`'s post-merge result and confirms the
+latest protected base for P4-A. It does not change the readiness manifest or
+authorize any later P4 wave.
+
+- Work item: issue `#59`,
+  https://github.com/noeos/verifactu/issues/59. Issue `#58` is closed after
+  this protected-main evidence was observed.
+- PR `#57`, https://github.com/noeos/verifactu/pull/57, head
+  `9c30be400370b65d7463f24ad5858377c5abf316`; exact head had 25/25 check-runs
+  pass, comprising all 17 required contexts and eight auxiliary runs.
+- Protected squash `e7df2649e9ee148a61ccda0d8d4af6b8d3e0fe0f`, tree
+  `6133182c9bb4776923fd1a9d03b1f9c5c810ba03`, sole parent
+  `f92424f3eabe7551224795d9ccaf99aa9ad6b149`, merged at
+  `2026-09-25T12:20:56Z`. GitHub reports a valid signature, the canonical DCO
+  trailer is present, and the PR source branch is deleted.
+- The protected-push check-run set is 25/25 successful from required App
+  `15368`; its `Required · required-check closure` job completed successfully.
+  Exact push runs: Required engineering foundation `36134411631`, Engineering
+  CI `36134411620`, Conformance `36134411632`, Regulatory source observation
+  `36134411652`, and Security `36134411440`; each concluded `success` on this
+  SHA.
+- P4-A may now branch from protected `main`
+  `e7df2649e9ee148a61ccda0d8d4af6b8d3e0fe0f`. P4-B remains blocked until A's
+  protected closure and exact final-head read-back. `creationAllowed=false`;
+  no fiscal-compliance, AEAT-acceptance, publication or release claim is made.
