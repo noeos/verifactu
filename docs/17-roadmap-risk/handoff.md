@@ -27,15 +27,12 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The current execution has completed the mandatory P3-B sequence entered from
-protected P3 read-back `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` and reset its
-current baseline to the final P3-B pointer correction `999d78c19b0e1be3097201a0cc61947a10760bbe`.
-The current context capsule, phase ledger and
-[`p3b-evidence.md`](p3b-evidence.md) are authoritative for resumption. Later
-P4–P7 sections are preserved records from prior attempts and are explicitly
-superseded; they do not establish current implementation or evidence. Under the
-restart, P4-A may begin only after the ADR-0055–0058 decisions and the separate
-P4-readiness gate defined by `p4-quality-plan.md` are protected and green.
+The append-only P4-readiness read-back below supersedes the stale restart
+capsule and P3-B-era status statements where they conflict. The current
+protected baseline is `763b58239d9e589e377b86928ecfc953d72f321b`; P1–P3-B and
+the zero-code P4-readiness gate are evidence-complete. P4-A is ready to begin,
+but no P4 implementation is present. Later P4–P7 sections below remain
+historical records and do not establish current implementation or evidence.
 
 ## Historical initial baseline control — retained
 
@@ -83,21 +80,21 @@ unknown evidence is `blocked`, never `passed`.
 This capsule is intentionally short and MUST be refreshed by the active phase.
 Historical detail belongs in phase records below.
 
-| Field                        | Initial value                                                                                                                                                                                    |
+| Field                        | Current value                                                                                                                                                                                    |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                       |
-| Current phase                | P3-B is evidence-complete at the restart baseline; P4 is planned, its new readiness gate is not yet green, and no P4 implementation is present.                                                  |
-| Phase status                 | P3-B source/contract/oracle assurance is complete. P4 is blocked at the zero-code readiness gate until the exact manifest/validator/required context are protected and green.                       |
-| Last evidence-complete phase | P3-B: original protected handoff/read-back PRs `#31`–`#34`, followed by authoritative-edition pointer correction PR `#38` at restart SHA `999d78c19b0e1be3097201a0cc61947a10760bbe`.              |
-| Local repository             | Deterministic P2 foundation plus corrected authoritative P3 source custody, structural candidate contracts, independent oracle and P3-B assurance; no fiscal behavior or release claim.          |
-| Protected `main` SHA         | P3-B restart baseline `999d78c19b0e1be3097201a0cc61947a10760bbe`, tree `8375829168e5eb11150cfbb297fcd4125c922fc3`; exact target before P4 quality declaration/implementation. |
-| GitHub effective state       | At reset read-back, `main` remained protected by active zero-bypass rulesets; 50/50 checks on the exact baseline passed. This docs amendment still requires its own final-head checks/read-back. |
+| Current phase                | P4-A is ready; no P4 implementation is present. P4 readiness is evidence-complete at protected PR `#53`, commit `763b58239d9e589e377b86928ecfc953d72f321b`. |
+| Phase status                 | P1–P3-B and zero-code P4 readiness are evidence-complete. P4-A may start under the frozen census and serial-wave rules; fiscal creation remains disabled. |
+| Last evidence-complete phase | P4 readiness: PR `#53`, merged `2026-09-25T08:42:49Z`; exact protected checks and push read-back are recorded in the append-only amendment below. |
+| Local repository             | P2 foundation, P3 source custody/contracts/oracle, P4 readiness manifest/validator/gates; no P4 fiscal runtime or creation behavior. |
+| Protected `main` SHA         | `763b58239d9e589e377b86928ecfc953d72f321b`, tree `287a46ba4bfa43143ce6ccecae6d3a3ed56e9e02`; P4 readiness protected baseline. |
+| GitHub effective state       | Active zero-bypass protected-main ruleset; PR `#53` exact-head required/auxiliary checks and protected-push checks passed. This documentation PR requires its own read-back. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                                     |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                                   |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                                 |
 | Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                            |
 | External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                                        |
-| Immediate instruction        | Accept ADR-0055–0058 and `p4-quality-plan.md`; add/freeze the exact machine manifest and seeded fail-closed `gate:p4-readiness` before P4-A. Preserve `creationAllowed=false`.                 |
+| Immediate instruction        | Start only P4-A from current protected `main`, with its own issue and vertical signed+DCO PR. Preserve `creationAllowed=false`; do not begin P4-B before protected A closure/read-back. |
 
 ## Phase ledger
 
@@ -2739,3 +2736,55 @@ This correction changes no source snapshot, generated contract, denominator,
 threshold or P4 policy and implements no P4 runtime. It restores governance of
 the newest protected subject and reruns all evidence invalidated by the new
 documentation subject.
+
+## P4-readiness protected read-back — 2026-09-25
+
+This append-only amendment corrects the current-context capsule, the old
+readiness statements in this handoff, and the historical P3-B-era plan/dashboard
+language where those statements say P4 readiness is still pending. The older
+phase narratives above remain intact as history. This amendment records the
+protected state observed before P4-A and authorizes only P4-A entry.
+
+### Exact protected identity and checks
+
+- Work item: issue `#54`,
+  https://github.com/noeos/verifactu/issues/54.
+- Readiness PR: `#53`,
+  https://github.com/noeos/verifactu/pull/53; merged at
+  `2026-09-25T08:42:49Z`.
+- Final PR head: `d34dd1b50eb9f0e691799365f7057c07ed76aaab`; its two commits
+  were GitHub-verified and carried canonical DCO trailers. Exact-head checks
+  from required App `15368` completed with 25/25 successes: all 17 required
+  contexts and eight auxiliary check runs. The required regulatory context
+  executed `gate:p4-readiness`.
+- Protected squash: `763b58239d9e589e377b86928ecfc953d72f321b`, tree
+  `287a46ba4bfa43143ce6ccecae6d3a3ed56e9e02`, sole parent
+  `999d78c19b0e1be3097201a0cc61947a10760bbe`. The squash carries a valid
+  GitHub signature and canonical DCO sign-off; its source branch was removed.
+- Protected-push runs on the squash are Required engineering foundation
+  `36114419541`, Engineering CI `36114419556`, Conformance `36114419521`,
+  Regulatory source observation `36114419555`, and Security `36114419483`;
+  all concluded success. Required engineering emitted all 17 contexts, each
+  successful, including required-check closure. The effective main ruleset
+  remains strict and zero-bypass.
+- Local clean-tree readiness evidence on `84f676289694d4539e9a559b549971c59bb28e05`
+  (tree `b67aa0613629e3a84733c13511cf437c40c3d703`) reports 2/2 subgates,
+  zero failed/skipped, and 16/16 seeded plan faults. Frozen counts are 44
+  production paths, 26 test paths, 43 critical controls/mutants, 57,344
+  property executions, and 32,768 fuzz executions. This is readiness evidence,
+  not evidence that those P4 runtime campaigns have executed.
+- Scheduled Scorecard run `36114759405` at the same protected SHA concluded
+  `startup_failure` with no jobs. It is auxiliary, not a required context; the
+  failure is retained and does not change required closure.
+
+### Current disposition and next action
+
+P1–P3-B and the zero-code P4-readiness gate are evidence-complete. P4-A is
+`ready`; implementation has not begun. Start P4-A only from the current
+protected main SHA with a bounded issue/branch/PR and signed+DCO commits. P4-B
+remains blocked until P4-A's protected closure and final-head read-back. The
+frozen manifest, thresholds, campaigns, tool candidates, edition identity and
+resource limits are unchanged by this correction. `creationAllowed=false`;
+there is no fiscal-compliance, AEAT-acceptance, npm-publication or release
+claim. P4-D/E exact external-artifact admission still remains required before
+those waves.

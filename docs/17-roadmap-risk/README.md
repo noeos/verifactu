@@ -13,10 +13,10 @@ historical-inputs: [REV-001, REV-084]
 # Roadmap and risk
 
 Status: all 21 substantive specifications are approved as design authority under
-`PLAN-L4`; P1–P3-B are evidence-complete. P4 is planned from the protected P3-B
-baseline and has no current implementation. Its ADRs, strict wave order and
-whole-population quality plan are being prepared; P4-A remains blocked until the
-machine manifest and required readiness gate pass on protected `main`.
+`PLAN-L4`; P1–P3-B and the zero-code P4-readiness gate are evidence-complete at
+protected `main` `763b58239d9e589e377b86928ecfc953d72f321b`. P4-A is ready to
+start under the frozen whole-population plan and strict serial wave order; no P4
+implementation is present.
 
 Authority for dependency-driven execution, readiness, completion and visible
 risk. Phases order work; they do not reduce final scope.

@@ -18,14 +18,17 @@ historical-inputs: [REV-010, REV-011, REV-012, REV-015, REV-021, REV-045, REV-04
 This is the human-readable authority for the P4 readiness manifest and its
 fail-closed task. It starts from P3-B protected subject
 `999d78c19b0e1be3097201a0cc61947a10760bbe`; that subject contains no P4
-implementation. This document is a plan, not implementation evidence. P4-A is
-**not ready to start** until a separate protected readiness change adds the
-machine-readable population, validator, seeded plan faults, `p4:quality-plan`
-task and required `gate:p4-readiness`, and proves them green on its final head.
-That readiness change must bind the authoritative edition/generation digests,
-exact Verification Engine package identity and every dependency/tool digest.
-Creation remains disabled; this plan makes no compliance, AEAT, release or
-publication claim.
+implementation. Protected readiness PR `#53` added the machine-readable
+population, validator, seeded plan faults, `p4:quality-plan` task and required
+`gate:p4-readiness`; its exact-head and protected-push checks passed at
+`763b58239d9e589e377b86928ecfc953d72f321b` (tree
+`287a46ba4bfa43143ce6ccecae6d3a3ed56e9e02`). The readiness state is therefore
+**evidence-complete**, and P4-A is **ready to start** from that protected
+subject. This document remains the plan, not product implementation evidence.
+The protected readiness change binds the authoritative edition/generation
+digests, exact Verification Engine package identity and dependency/tool
+digests. Creation remains disabled; this plan makes no compliance, AEAT,
+release or publication claim.
 
 The counts and exact paths below freeze the intended whole-P4 census before
 implementation. The new single authored DSS bridge source is included. Any
