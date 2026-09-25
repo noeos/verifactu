@@ -3053,3 +3053,57 @@ change any frozen P4 control.
   protected main after this documentation read-back PR's own exact-head and
   protected-push closure. Keep the P4 order serial and preserve every frozen
   population, budget and threshold.
+
+## P4-C implementation protected read-back — 2026-09-25
+
+This final read-back records P4-C's exact implementation PR and protected-main
+closure. It supersedes the pre-implementation and pending-closure statements
+above; it changes no frozen P4 control.
+
+- **Work item and implementation PR:** issue #71 was reopened for the
+  implementation/read-back sequence. PR #73 implements P4-C from protected
+  predecessor `a72f8e4f45a0e8ab1652b429e0922ca77a1a1312`. Its exact head was
+  `7810ef6d1cf84be2bebc1569ef67eb4fdfd6a193`, tree
+  `3289cefc041dde8962846982a9708807101987af`; all implementation commits
+  carry valid SSH signatures and canonical DCO trailers.
+- **Exact PR-head evidence:** the head passed 26/26 App 15368 check-runs,
+  including all 17 protected contexts, `Required · required-check closure`,
+  and nine auxiliary checks. The five frozen compatibility cells all passed:
+  Ubuntu 24.04 with Node 22.14.0, 22.23.2 and 24.21.0; Windows 2025 and
+  macOS 15 with Node 24.21.0. P4-C runs with Python 3.13.15 and the exact
+  hash-locked private provider/oracle dependencies in every cell.
+- **Protected identity:** PR #73 merged by squash as
+  `2aae4b0628f98447bd7cd56f21d3e4fdf04f2bcd`, tree
+  `3289cefc041dde8962846982a9708807101987af`, sole parent
+  `a72f8e4f45a0e8ab1652b429e0922ca77a1a1312`. GitHub reports a valid commit
+  signature and canonical DCO trailer. The issue remains open until this
+  separate final read-back is protected.
+- **Protected-push closure:** the exact squash passed all 25/25 App 15368
+  check-runs, including the 17 required contexts and required-check closure.
+  All five push workflows succeeded on this SHA: Required engineering
+  foundation `36184783185`; Engineering CI `36184783090`; Conformance
+  `36184783118`; Regulatory source observation `36184783187`; Security
+  `36184783191`.
+- **Clean local evidence:** on exact PR head `7810ef6`, `test:p4-c` passed
+  15 test cases with zero skips, killed P4-MUT-001–025 (25/25), and detected
+  all 3/3 P4-C seeded faults. `gate:platform` passed 9/9 tasks,
+  `gate:p2` passed 7/7, and `gate:p4-readiness` passed 2/2. On protected
+  squash `2aae4b0`, the same gates passed cleanly: platform 9/9, P2 7/7 and
+  readiness 2/2.
+- **Implementation and boundaries:** P4-C adds the immutable expanded-name
+  XML model and deterministic bounded serializer, exact digest-pinned closure
+  for all eight admitted schema roots, and the offline isolated lxml worker.
+  DTDs, entities, XInclude and undeclared resources are rejected; parsing,
+  worker output, execution time, CPU and memory are bounded. Linux uses POSIX
+  limits, Windows a Job Object, and hosted macOS (whose arm64 runner rejects
+  lower POSIX memory limits) a sampled peak-RSS guard. The signed official
+  AEAT vector is checked against both lxml and independent xmlschema; the
+  provider preserves caller-owned semantic status and adds no public package
+  export. P4's frozen whole-phase populations remain 44 production paths,
+  26 test files, 43 critical controls, 14 properties, 8 fuzz targets,
+  33 seeded faults, five compatibility cells and 13 evidence classes.
+- **Next wave:** once this documentation PR passes its exact-head and
+  protected-push closure and closes issue #71, P4-C is read-back complete and
+  P4-D may start from the latest protected main. `creationAllowed=false`;
+  no semantic/tax/fiscal compliance, AEAT acceptance, publication or release
+  claim follows.

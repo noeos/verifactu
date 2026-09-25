@@ -124,3 +124,25 @@ changelog and makes no compliance, publication or support claim.
   this exact evidence and must pass its own exact-head and protected-push
   closure before P4-C starts. creationAllowed=false; no tax-compliance,
   AEAT-acceptance, publication or release claim is made.
+
+## 2026-09-25 — P4-C implementation protected
+
+- PR #73 implemented the admitted XML/XSD provider and hardened XML model.
+  Its exact head `7810ef6d1cf84be2bebc1569ef67eb4fdfd6a193` passed 26/26 App
+  15368 check-runs, including all 17 required contexts plus closure and all
+  five frozen compatibility cells.
+- Protected squash `2aae4b0628f98447bd7cd56f21d3e4fdf04f2bcd` has tree
+  `3289cefc041dde8962846982a9708807101987af`, sole parent
+  `a72f8e4f45a0e8ab1652b429e0922ca77a1a1312`, a valid GitHub signature and
+  canonical DCO. Its protected push passed all 25 App 15368 check-runs and
+  all five workflows: required foundation `36184783185`, Engineering CI
+  `36184783090`, Conformance `36184783118`, Regulatory observation
+  `36184783187` and Security `36184783191`.
+- Clean exact-head gates passed: test:p4-c (15 cases, zero skips,
+  P4-MUT-001–025 all killed, three seeded P4-C faults detected),
+  gate:platform 9/9, gate:p2 7/7 and gate:p4-readiness 2/2. The exact
+  protected squash also passed platform 9/9, P2 7/7 and readiness 2/2.
+- P4-C remains in serial order; P4-D may start only after separate final
+  read-back PR #74 passes its own protected closure. Frozen P4 populations
+  remain unchanged, `creationAllowed=false`, and no compliance, AEAT
+  acceptance, publication or release claim is made.
