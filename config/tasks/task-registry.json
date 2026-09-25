@@ -340,6 +340,7 @@
         "tests/unit/p4-records-corrections.test.mjs",
         "tests/unit/p4-modes-events-states.test.mjs",
         "tests/unit/p4-sequences-chains.test.mjs",
+        "tests/unit/p4-plans-artifacts.test.mjs",
         "tests/mutation/p4-mutation.test.mjs",
         "tests/property/p4-properties.test.mjs",
         "tests/security/p4-isolation-redaction.test.mjs"

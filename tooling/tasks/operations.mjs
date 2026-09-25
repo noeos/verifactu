@@ -1484,6 +1484,7 @@ async function testP4A(context) {
     "tests/unit/p4-records-corrections.test.mjs",
     "tests/unit/p4-modes-events-states.test.mjs",
     "tests/unit/p4-sequences-chains.test.mjs",
+    "tests/unit/p4-plans-artifacts.test.mjs",
     "tests/property/p4-properties.test.mjs",
     "tests/security/p4-isolation-redaction.test.mjs",
   ];
@@ -1551,12 +1552,12 @@ async function testP4A(context) {
     ["chain-field-swap", "P4-MUT-015"],
   ];
   assert(
-    Number(mutants) === 17 &&
-      Number(killed) === 17 &&
+    Number(mutants) === 23 &&
+      Number(killed) === 23 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
-      criticalMutants.length === 16,
+      criticalMutants.length === 22,
     "P4A_MUTATION_COMPLETENESS",
     `${killed}/${mutants} killed, fail=${mutantFailures}, cancelled=${mutantCancelled}, skipped=${mutantSkipped}`,
   );
@@ -1598,6 +1599,13 @@ async function testP4A(context) {
     "invariants",
     "sequences",
     "chains",
+    "digest",
+    "operation-plan",
+    "record-planner",
+    "official-projection",
+    "official-serialization",
+    "fingerprint",
+    "xml-artifacts",
     "index",
   ];
   for (const module of modules)
@@ -1622,9 +1630,9 @@ async function testP4A(context) {
       `coverage.line=${lines}`,
       `coverage.branch=${branches}`,
       `coverage.function=${functions}`,
-      "criticalMutants=16/16 P4-MUT-001..016",
+      "criticalMutants=22/22 P4-MUT-001..022",
       `seededFaults=${p4AFaults.length}/${p4AFaults.length} ${p4AFaults.map(([fault]) => fault).join(",")}`,
-      "properties=7x4096 seed=1346650369 retries=0 discards=0",
+      "properties=9x4096 seed=1346650369 retries=0 discards=0",
       "fuzz=P4-FUZZ-001x4096 seed=1346651649 retries=0 discards=0",
       `subject=${context.identity.subject}`,
     ],

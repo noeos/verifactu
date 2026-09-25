@@ -62,6 +62,11 @@ async function contextFor(load) {
 
 const date = "2025-01-01";
 const at = "2025-01-01T00:00:00Z";
+const digestPort = {
+  providerId: "test:node-crypto",
+  digest: (algorithm, bytes) =>
+    createHash(algorithm).update(bytes).digest("hex"),
+};
 const digest = (bytes) =>
   `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
 
@@ -553,6 +558,215 @@ test("P4-MUT-016 kills duplicate complete-chain fork acceptance", async () => {
         digest,
       );
       assert.equal(result.code, "DIAG-CHAIN-FORK", "P4-CB-016 fork assertion");
+    },
+  );
+});
+
+test("P4-MUT-017 kills undeclared plan effect acceptance", async () => {
+  await mutation(
+    "P4-MUT-017",
+    "P4-CB-017",
+    "application/operation-plan.js",
+    "input.effects.length !== 0",
+    "false",
+    async ({ load }) => {
+      const { id, context } = await contextFor(load);
+      const { createOperationPlan } = await load(
+        "application/operation-plan.js",
+      );
+      const result = createOperationPlan({
+        operationId: id("operation", "op"),
+        context,
+        editionId: context.editionId,
+        expectedHead: null,
+        expiresAt: at,
+        actions: ["validate"],
+        effects: ["network"],
+      });
+      assert.equal(
+        result.status,
+        "invalid",
+        "P4-CB-017 undeclared effect assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-018 kills mutable plan output", async () => {
+  await mutation(
+    "P4-MUT-018",
+    "P4-CB-018",
+    "application/record-planner.js",
+    "return ok(Object.freeze({",
+    "return ok(({",
+    async ({ load }) => {
+      const { id, context } = await contextFor(load);
+      const { createDecimal } = await load("domain/decimal.js");
+      const { createAltaRecord } = await load("domain/records.js");
+      const { planRecord } = await load("application/record-planner.js");
+      const record = createAltaRecord({
+        kind: "alta",
+        id: id("record", "r"),
+        context,
+        document: {
+          issuer: context.taxpayerId,
+          series: "s",
+          number: "n",
+          issueDate: date,
+        },
+        issueDate: date,
+        generatedAt: at,
+        total: createDecimal("1", { maxIntegerDigits: 3, maxScale: 2 }).value,
+        predecessorId: null,
+        editionId: context.editionId,
+      }).value;
+      const plan = planRecord({
+        record,
+        operationId: id("operation", "op"),
+        expectedHead: null,
+        expiresAt: at,
+        digest: digestPort,
+      }).value;
+      assert.equal(
+        Object.isFrozen(plan),
+        true,
+        "P4-CB-018 immutable plan assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-019 kills undeclared absence in official projection", async () => {
+  await mutation(
+    "P4-MUT-019",
+    "P4-CB-019",
+    "application/official-projection.js",
+    "field.allowAbsent !== true",
+    "false",
+    async ({ load }) => {
+      const { projectOfficialFields } = await load(
+        "application/official-projection.js",
+      );
+      assert.equal(
+        projectOfficialFields([
+          { name: "A", order: 0, value: { presence: "absent" } },
+        ]).status,
+        "invalid",
+        "P4-CB-019 absence assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-020 kills official separator drift", async () => {
+  await mutation(
+    "P4-MUT-020",
+    "P4-CB-020",
+    "application/official-serialization.js",
+    "rule.separator + lexical",
+    '"" + lexical',
+    async ({ load }) => {
+      const { serializeOfficialProjection } = await load(
+        "application/official-serialization.js",
+      );
+      const result = serializeOfficialProjection(
+        [{ name: "A", order: 0, presence: "value", value: "1" }],
+        {
+          editionId: { kind: "edition", value: "e" },
+          label: "FP",
+          separator: "&",
+          encoding: "utf-8",
+          fields: ["A"],
+        },
+      );
+      assert.equal(
+        result.value.text,
+        "FP&1",
+        "P4-CB-020 official separator assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-021 kills a fingerprint edition mismatch", async () => {
+  await mutation(
+    "P4-MUT-021",
+    "P4-CB-021",
+    "application/fingerprint.js",
+    "input.rule.editionId.value !== input.editionId.value",
+    "false",
+    async ({ load }) => {
+      const { id } = await contextFor(load);
+      const { createFingerprint } = await load("application/fingerprint.js");
+      assert.equal(
+        createFingerprint({
+          editionId: id("edition", "e"),
+          expectedEditionId: id("edition", "e"),
+          algorithm: "sha256",
+          fields: [{ name: "A", order: 0, presence: "value", value: "1" }],
+          rule: {
+            editionId: id("edition", "other"),
+            label: "FP",
+            separator: "&",
+            encoding: "utf-8",
+            fields: ["A"],
+          },
+          digest: digestPort,
+        }).status,
+        "invalid",
+        "P4-CB-021 algorithm allowlist assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-022 kills exact artifact byte custody substitution", async () => {
+  await mutation(
+    "P4-MUT-022",
+    "P4-CB-022",
+    "application/xml-artifacts.js",
+    "Boolean(originalBytes) &&\n        originalBytes !== undefined &&\n        bytesEqual(expectedBytes, originalBytes)",
+    "true",
+    async ({ load }) => {
+      const { id, context } = await contextFor(load);
+      const { createHash } = await import("node:crypto");
+      const { createXmlArtifact, transitionXmlArtifact } = await load(
+        "application/xml-artifacts.js",
+      );
+      const original = new TextEncoder().encode("123456789");
+      const artifact = createXmlArtifact(
+        {
+          artifactId: "a",
+          context,
+          editionId: context.editionId,
+          kind: "xml",
+          mediaType: "application/xml",
+          bytes: original,
+          parentIds: [],
+          transform: "serialize",
+          state: "produced",
+        },
+        digestPort,
+      ).value;
+      const replacement = new TextEncoder().encode("987654321");
+      const tampered = {
+        ...artifact,
+        bytes: replacement,
+        sha256:
+          "sha256:" + createHash("sha256").update(replacement).digest("hex"),
+        sha512:
+          "sha512:" + createHash("sha512").update(replacement).digest("hex"),
+      };
+      assert.equal(
+        transitionXmlArtifact(
+          tampered,
+          "bounded-and-digested",
+          replacement,
+          digestPort,
+        ).status,
+        "invalid",
+        "P4-CB-022 byte custody assertion",
+      );
     },
   );
 });

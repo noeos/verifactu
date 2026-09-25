@@ -2939,3 +2939,75 @@ capsule text above and records why it no longer described the protected tree.
   P4-B may branch from the latest protected `main`. No P4 population, threshold,
   or later-wave authorization was changed. `creationAllowed=false`; no
   compliance, AEAT-acceptance, publication or release claim is made.
+
+## P4-B local implementation handoff — 2026-09-25
+
+This append-only amendment supersedes the earlier P4-A capsule correction
+
+after its own protected closure. It records P4-B work before the implementation
+PR is opened; it is not protected-merge evidence.
+
+- **Predecessor closure:** PR #66 closed issue #65 and merged to protected
+  main at 3415fd5540b3b8663fc6aec9b44535b4aac6b0c2 (tree
+  ea058baf138e1b1aec77622c877cbc9beb42ae2a), sole parent
+  5089970fb3407ce464587a3aa5ff1d561e7630a0. The squash has a valid GitHub
+  signature and canonical DCO trailer. Its exact protected-push subject has
+  25/25 successful App 15368 check-runs, all 17 required contexts and
+  Required · required-check closure; all five push workflows succeeded:
+  Required engineering foundation 36153624030, Conformance 36153624080,
+  Engineering CI 36153624053, Security 36153624014, and Regulatory source
+  observation 36153624029.
+- **P4-B work item/base:** issue #67,
+  https://github.com/noeos/verifactu/issues/67; branch
+  build/67-p4b-plans-artifacts, based exactly on the protected predecessor
+  above. No P4-C branch or implementation has started.
+- **Implementation:** the six planned application modules now implement
+  effect-free operation plans; deterministic validated-record planning;
+  ordered official projection with distinct absent/empty/zero/nil states;
+  UTF-8 official serialization with edition identity and explicit nil token;
+  edition-bound SHA-256/SHA-512 fingerprint recomputation; and immutable
+  exact-byte artifact snapshots with length, parents and both digests.
+  ports/digest.ts is the explicit digest dependency already present in the
+  frozen 44-production-path census. Operation identity extends the existing
+  identity type in place. No export was added to the package entrypoint.
+- **Local evidence (dirty worktree, development only):** test:p4-a selected,
+  executed and passed 9/9 registered campaigns; 37 Node test cases passed with
+  zero skip. The accumulated property suite covers P4-PROP-001–009, 4,096
+  executions each, zero retries/discards. P4-MUT-001–022 all killed. Overall
+  coverage was 99.92% lines, 95.28% branches, 100% functions. P4-FUZZ-001
+  remains at 4,096 bounded deterministic inputs, and all 12/12 A seeded
+  faults were detected. gate:p2 passed 6/6 tasks; gate:p4-readiness
+  passed 2/2 subgates. The reports bind the protected base because the tree
+  was dirty; they are not exact-commit proof.
+- **Boundaries:** the artifact byte custody map is process-local; durable
+  custody and rehydration belong to later persistence work. Edition-specific
+  profiles must supply the explicit validated rules and digest provider. This
+  generic implementation does not assert any official acceptance, legal
+  compliance, AEAT result or release readiness.
+- **Next gate:** finish and sign the P4-B implementation commit, rerun
+  gate:p2 and gate:p4-readiness on its clean exact SHA, open the vertical PR
+  against the protected base, and complete exact-head plus protected-push
+  read-back. Follow with a separate final protected read-back before P4-C.
+  Frozen P4 populations, thresholds, budgets, provider admissions and controls
+  remain unchanged; creationAllowed=false.
+
+## P4-B exact clean implementation-commit evidence — 2026-09-25
+
+The preceding local handoff recorded the implementation before a clean signed
+commit existed. This append-only amendment supersedes that limitation.
+
+- Signed implementation commit: 9c0d1ff575707ca42b07e88f7508d5eefa04cc31;
+  tree 84fc6b38e43b933286aa6ed3c4858b07cbb335c8; sole parent
+  3415fd5540b3b8663fc6aec9b44535b4aac6b0c2. Git reports a valid signature
+  and the canonical Signed-off-by trailer.
+- The exact clean commit passed test:p4-a (9/9 selected campaigns, 37 tests,
+  zero skips), gate:p2 (6/6 tasks) and gate:p4-readiness (2/2 subgates).
+  P4-PROP-001–009 ran 4,096 cases each with zero retries/discards; critical
+  mutants P4-MUT-001–022 were all killed; coverage was 99.92% lines, 95.28%
+  branches and 100% functions. P4-FUZZ-001 ran 4,096 bounded deterministic
+  inputs; all 12/12 P4-A seeded faults were detected.
+- Reports bind commit 9c0d1ff and tree 84fc6b3 with no dirty-tree diagnostic.
+  This is local exact-commit evidence only. The vertical P4-B PR and GitHub
+  exact-head/protected-push checks remain outstanding. P4-C stays blocked.
+  The implementation changes no frozen census, thresholds or admission, and
+  creationAllowed remains false.

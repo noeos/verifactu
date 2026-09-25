@@ -18,6 +18,8 @@ import {
 } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/identities.js";
 import { decodeJson } from "../../evidence/runs/artifacts/build/verifactu/dist/contracts/staged-codec.js";
 import { transitionMode } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/mode-tenure.js";
+import { createOperationPlan } from "../../evidence/runs/artifacts/build/verifactu/dist/application/operation-plan.js";
+import { projectOfficialFields } from "../../evidence/runs/artifacts/build/verifactu/dist/application/official-projection.js";
 
 const SEED = 0x50444101;
 function random(seed = SEED) {
@@ -56,6 +58,93 @@ test(`P4-PROP-001 staged decode failures do not advance (seed=${SEED})`, () => {
       "DIAG-JSON-DUPLICATE",
       `seed=${SEED} case=${index}`,
     );
+  }
+});
+
+test("P4-PROP-008 plans are deterministic and deeply immutable", () => {
+  for (let index = 0; index < 4096; index += 1) {
+    const value = "operation-" + index + "-" + Math.floor(next() * 0x7fffffff);
+    const input = {
+      operationId: id("operation", value),
+      context,
+      editionId: context.editionId,
+      expectedHead: index % 2 === 0 ? null : "head-" + index,
+      expiresAt: instant(1),
+      actions: ["validate", "project", "fingerprint"],
+    };
+    const first = createOperationPlan(input);
+    const second = createOperationPlan(input);
+    assert.equal(first.status, "ok", "case=" + index);
+    assert.deepEqual(first.value, second.value, "case=" + index);
+    assert.equal(
+      JSON.stringify(first.value),
+      JSON.stringify(second.value),
+      "case=" + index,
+    );
+    assert.equal(Object.isFrozen(first.value), true, "case=" + index);
+    assert.equal(Object.isFrozen(first.value.context), true, "case=" + index);
+    assert.equal(
+      Object.isFrozen(first.value.context.tenantId),
+      true,
+      "case=" + index,
+    );
+    assert.equal(
+      Object.isFrozen(first.value.operationId),
+      true,
+      "case=" + index,
+    );
+    assert.equal(Object.isFrozen(first.value.actions), true, "case=" + index);
+  }
+});
+
+test("P4-PROP-009 projection preserves presence and order", () => {
+  const presences = ["value", "empty", "zero", "nil", "absent"];
+  for (let index = 0; index < 4096; index += 1) {
+    const presence = presences[Math.floor(next() * presences.length)];
+    const secondPresence = presences[Math.floor(next() * presences.length)];
+    const fields = [
+      {
+        name: "second",
+        order: 2,
+        value:
+          secondPresence === "value"
+            ? { presence: secondPresence, value: "v-" + index }
+            : { presence: secondPresence },
+        allowAbsent: true,
+        allowNil: true,
+      },
+      {
+        name: "first",
+        order: 1,
+        value:
+          presence === "value"
+            ? { presence, value: String(index) }
+            : { presence },
+        allowAbsent: true,
+        allowNil: true,
+      },
+    ];
+    const projected = projectOfficialFields(fields);
+    assert.equal(projected.status, "ok", "case=" + index);
+    assert.deepEqual(
+      projected.value.map((field) => field.name),
+      projected.value
+        .map((field) => field.name)
+        .sort((a, b) => (a === "first" ? -1 : b === "first" ? 1 : 0)),
+      "case=" + index,
+    );
+    assert.equal(
+      projected.value.some((field) => field.name === "first"),
+      presence !== "absent",
+      "case=" + index,
+    );
+    assert.equal(
+      projected.value.some((field) => field.name === "second"),
+      secondPresence !== "absent",
+      "case=" + index,
+    );
+    const first = projected.value.find((field) => field.name === "first");
+    if (first) assert.equal(first.presence, presence, "case=" + index);
   }
 });
 

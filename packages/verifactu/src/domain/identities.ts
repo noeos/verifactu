@@ -10,7 +10,8 @@ export type IdentityKind =
   | "document"
   | "record"
   | "event"
-  | "chain";
+  | "chain"
+  | "operation";
 export interface Identity<K extends IdentityKind> {
   readonly kind: K;
   readonly value: string;
