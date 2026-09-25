@@ -3011,3 +3011,45 @@ commit existed. This append-only amendment supersedes that limitation.
   exact-head/protected-push checks remain outstanding. P4-C stays blocked.
   The implementation changes no frozen census, thresholds or admission, and
   creationAllowed remains false.
+
+## P4-B implementation protected read-back — 2026-09-25
+
+Issue #69 records this final read-back of the P4-B implementation. The entry
+supersedes the earlier local-only and pending-PR statements above; it does not
+change any frozen P4 control.
+
+- **Work item and PR:** issue #67 was closed by implementation PR #68 at
+  https://github.com/noeos/verifactu/pull/68. Its exact PR head was
+  a5a8dde811bd1d386381536bddde15463bde1bb9, tree
+  11f538c42701492fffac151ffd2a3d514a74cd94. It passed 26/26 App 15368
+  exact-head check-runs: all 17 required contexts plus nine auxiliary checks.
+  The exact-head matrix includes Required · required-check closure.
+- **Protected identity:** PR #68 merged by squash at
+  b06b2ffea2a9bf914a131450fc4e84c70d51a50f, tree
+  11f538c42701492fffac151ffd2a3d514a74cd94, sole parent
+  3415fd5540b3b8663fc6aec9b44535b4aac6b0c2. GitHub reports a valid
+  signature and canonical DCO trailer. The source branch was deleted; issue
+  #67 is closed.
+- **Protected-push closure:** the exact squash has 25/25 successful App 15368
+  check-runs, all 17 required contexts and Required · required-check closure.
+  The five workflows all succeeded on this SHA: Required engineering
+  foundation 36163538219; Engineering CI 36163537937; Conformance 36163538438;
+  Regulatory source observation 36163538058; Security 36163537976.
+- **Clean local evidence:** the final PR head had clean-tree gate:p2 6/6 and
+  gate:p4-readiness 2/2. The cumulative campaign passed 9/9 campaigns and 37
+  tests with no skips; P4-PROP-001–009 each ran 4,096 cases with zero
+  retries/discards; P4-MUT-001–022 all were killed; coverage was 99.92% lines,
+  95.28% branches and 100% functions; P4-FUZZ-001 ran 4,096 bounded inputs;
+  all 12/12 P4-A seeded faults were detected.
+- **Scope:** the six application modules and explicit digest port implement
+  P4-B's frozen operation planning, ordered/presence-aware official
+  projection and serialization, edition-bound fingerprinting and exact-byte
+  artifact custody transitions. The digest port path and all tests were
+  already in the frozen readiness census. No package export was added;
+  creationAllowed=false. No tax-compliance, AEAT-acceptance, publication or
+  release claim follows.
+- **Next wave:** P4-B implementation and exact protected read-back are
+  evidence-complete on main b06b2ff. P4-C may branch only from the latest
+  protected main after this documentation read-back PR's own exact-head and
+  protected-push closure. Keep the P4 order serial and preserve every frozen
+  population, budget and threshold.
