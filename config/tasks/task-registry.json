@@ -360,6 +360,42 @@
       "tools": ["node"]
     },
     {
+      "id": "test:p4-c",
+      "version": 1,
+      "owner": "cryptography-owner",
+      "dependencies": ["build:packages"],
+      "inputs": [
+        "packages/verifactu/src/ports/xml-xsd.ts",
+        "internal/xml-provider/**",
+        "tests/unit/p4-xml-model.test.mjs",
+        "tests/contract/p4-xml-xsd-provider.test.mjs",
+        "tests/integration/p4-offline-xsd.test.mjs",
+        "tests/security/p4-xml-attacks.test.mjs",
+        "tests/mutation/p4-mutation.test.mjs",
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/**",
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/standards/xmldsig-core-schema.xsd",
+        "config/python/requirements.lock"
+      ],
+      "outputs": ["evidence/runs/test--p4-c.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "VERIFACTU_PYTHON",
+        "VERIFACTU_SUBJECT_SHA"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 300,
+      "concurrencyLock": "p4-c-xml-tests",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "testP4C",
+      "tools": ["node", "python"]
+    },
+    {
       "id": "package:allowlists",
       "version": 1,
       "owner": "build-owner",
@@ -744,7 +780,8 @@
         "policy:api",
         "policy:packages",
         "test:policy",
-        "build:packages"
+        "build:packages",
+        "test:p4-c"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -771,7 +808,8 @@
         "package:reproducibility",
         "integration:tarball-consumers",
         "provenance:rehearsal",
-        "test:p4-a"
+        "test:p4-a",
+        "test:p4-c"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],
