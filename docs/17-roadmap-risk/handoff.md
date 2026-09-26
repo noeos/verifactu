@@ -3484,3 +3484,43 @@ regulatorily valid; it is not AEAT acceptance, legal approval, compliance,
 publication or release evidence. The next authorized work is only issue `#90`'s
 dedicated main read-back. QR implementation remains barred until that read-back
 PR and its exact protected-push checks pass.
+
+## P4-E implementation final protected read-back — 2026-09-27
+
+This append-only record supersedes the P4-E dependency-admission statement above
+that implementation remained prohibited. P4-E implementation PR #95 is merged
+and its protected-push matrix passed. Issue #96 tracks this separate final
+implementation read-back; P4-F remains unauthorized until #96 closes after its
+dedicated signed+DCO documentation PR and protected-push verification. Issue
+#92 is the implementation work item and closes with this final read-back.
+`creationAllowed=false` remains in force.
+
+### Implementation PR and protected identity
+
+- **Implementation issue and PR:** issue #92 was implemented by PR [#95](https://github.com/noeos/verifactu/pull/95), based on protected `main` `59bbc85e9a37e3a455ceff8d30c94fd0e2212734`. The exact PR head is `75c8cb7a77573f393495c6a0dcbfecb946ea6d20`, tree `bab20113c42484488eeee9e0c3cf7a4f891259e6`, sole parent `59bbc85e9a37e3a455ceff8d30c94fd0e2212734`. Its SSH signature verifies locally and its commit message has a separate canonical `Signed-off-by` trailer.
+- **Exact-head checks:** 26/26 check-runs passed on the exact PR head, including required-check closure, governance signatures/DCO, all required checks, the complete Node/platform matrix, and auxiliary checks.
+- **Protected identity:** PR #95 merged by squash on 2026-09-26 as `f0c83e7b1b692fb6d98584d327c40bd518d9ae89`, tree `bab20113c42484488eeee9e0c3cf7a4f891259e6`, sole parent `59bbc85e9a37e3a455ceff8d30c94fd0e2212734`. GitHub reports a valid commit signature. The squash message contains a real, separately delimited `Signed-off-by: Daniel David <ddcandales@gmail.com>` trailer.
+- **Protected-push closure:** 25/25 check-runs passed on exactly `f0c83e7b1b692fb6d98584d327c40bd518d9ae89`, including `Required · required-check closure`. Successful workflow runs, all with that head SHA: Required engineering foundation `36279678313`, Security `36279678278`, Engineering CI `36279678319`, Conformance `36279678328`, and Regulatory source observation `36279678330`.
+
+### Recovery record
+
+The first implementation squash, `1a7d629154792d6607ca8fb58f93bbe610384068`, had a valid GitHub signature but its message contained literal `\\n` text instead of newline boundaries. Its protected governance/DCO check failed. Recovery PR #94 restored the admitted pre-implementation tree in signed squash `59bbc85e9a37e3a455ceff8d30c94fd0e2212734`; its DCO check passed. Because that temporary tree intentionally omitted P4-E, its protected quality/P2 closure did not pass. PR #95 re-applied the unchanged P4-E tree directly on that protected baseline, with a real DCO trailer. Its complete exact-head and protected-push matrices are green as recorded above. The implementation tree hash remained `bab20113c42484488eeee9e0c3cf7a4f891259e6` throughout recovery.
+
+### Exact-head local evidence
+
+The following canonical task reports bind to PR head `75c8cb7a77573f393495c6a0dcbfecb946ea6d20` and tree `bab20113c42484488eeee9e0c3cf7a4f891259e6`. Report files are local evidence locators; their SHA-256 values bind the report bytes.
+
+| Task | Result | Input digest | Output digest | Local report SHA-256 |
+| --- | --- | --- | --- | --- |
+| `test:p4-e` v4 | 2/2 tasks, 15 test cases, zero skips; critical mutants 4/4; P4-PROP-011/014 and P4-FUZZ-005 each 4,096 cases, zero retries/discards | `c30a8ed636ded39addf6f3be7d7dc5b0797ed1c2082222e36dcebb290d9e0072` | `186547f93401c7e158def2cbf2b4493357869ffc66e5138033ac6f2d2300addc` | `f2492c672b98dc6c36ef4c437383cfeedeeed60a61d61377578e7715df5cc8f9` |
+| `gate:p4-readiness` v1 | 2/2, zero skips or diagnostics | `99f5113878d8bc625dbed92e922b857c50332bdc8ecbe2e5bdfb0f60bc8861d4` | `61afe359ec914a9e90abe4adae81a125bd0a16f3336c445b9e65a62439f72517` | `4432d96a685dd0bbb2a6aaf9b357f2a2db73f9b1ef1d708ca44f15018d04341e` |
+| `gate:platform` v1 | 11/11, zero skips or diagnostics | `5a42d73ad063195a89b329aae13287de01a272d03c1445fc8f897b53c6bab416` | `0a3eb6e45998170eb59174048e2eab204974f0806fed9be6b8ab22e879c02450` | `890ee14ef62f546b96b5a8bdb969b722c553c78cf73224a7ffd585710a93a8a7` |
+| `gate:p2` v1 | 9/9, zero skips or diagnostics | `99f5113878d8bc625dbed92e922b857c50332bdc8ecbe2e5bdfb0f60bc8861d4` | `0e5970e232bc8906276e8aa4a87ed88d2c50f577ffc9cf13a0aca21ea3a4b949` | `77dd50780c767f32f130e110c308a8c6ab00ad23141560901acbbb4996ee1cca` |
+
+### Scope, limits, and next step
+
+P4-E implements private edition/mode/environment-bound QR payload construction and verification, a private admitted encoder, deterministic bounded SVG/PNG rendering, and an independent development-only exact-byte decoder. No product export was added. The selected decoder shares ZXing algorithm lineage with that family, and the encoder's upstream source commit remains unsigned despite the admitted tarball signature/provenance; both limits remain recorded. This implementation establishes no fiscal/legal validity, invoice placement, AEAT acceptance, compliance, publication, or release claim. It does not change `creationAllowed=false`.
+
+After issue #96 closes through its dedicated signed+DCO read-back PR and the exact-head plus protected-push matrices pass, create a separate bounded P4-F work item and branch from the then-current protected `main`. P4-G cumulative closure remains pending. Do not start P4-F from this implementation merge alone.
+
+Refs #92 and #96
