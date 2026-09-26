@@ -3,6 +3,9 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.log
+!config/admission/java-provider-evidence/plugin-resolution.log
+!config/admission/java-provider-evidence/project-offline-build-1.log
+!config/admission/java-provider-evidence/project-offline-build-2.log
 .tmp/
 tmp/
 # P2 deterministic build and task output
