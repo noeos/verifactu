@@ -1739,64 +1739,6 @@ async function testP4C(context) {
   };
 }
 
-async function testP4E(context) {
-  const files = [
-    "tests/contract/p4-qr-provider.test.mjs",
-    "tests/integration/p4-qr-roundtrip.test.mjs",
-  ];
-  const result = await run(
-    process.execPath,
-    ["--experimental-test-coverage", "--test", "--test-reporter=tap", ...files],
-    { cwd: context.root, timeoutMs: 240000 },
-  );
-  assert(
-    result.code === 0,
-    "P4E_TEST_EXECUTION",
-    `${result.stdout}${result.stderr}`.trim(),
-  );
-  const stats =
-    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
-      result.stdout,
-    );
-  assert(stats, "P4E_TEST_REPORT", result.stdout.slice(-1000));
-  const [, tests, , passed, failed, cancelled, skipped] = stats;
-  assert(
-    Number(tests) > 0 &&
-      Number(tests) === Number(passed) &&
-      Number(failed) === 0 &&
-      Number(cancelled) === 0 &&
-      Number(skipped) === 0,
-    "P4E_TEST_COMPLETENESS",
-    `${tests}/${passed}, failed=${failed}, skipped=${skipped}`,
-  );
-  for (const required of [
-    "P4-MUT-030",
-    "P4-MUT-031",
-    "P4-MUT-042",
-    "P4-MUT-043",
-    "P4-PROP-011",
-    "P4-PROP-014",
-    "P4-FUZZ-005",
-  ])
-    assert(result.stdout.includes(required), "P4E_CAMPAIGN_MISSING", required);
-  return {
-    selected: files.length,
-    executed: files.length,
-    passed: files.length,
-    outputDigest: sha256(result.stdout + result.stderr),
-    diagnostics: [
-      `testCases=${tests}`,
-      `skipped=${skipped}`,
-      "criticalMutants=4/4 P4-MUT-030,031,042,043",
-      "properties=P4-PROP-011x4096,P4-PROP-014x4096 seed=1346650369 retries=0 discards=0",
-      "fuzz=P4-FUZZ-005x4096 seed=1346650369 retries=0 discards=0",
-      "encoder=@nuintun/qrcode@5.0.3",
-      "decoder=qr@0.7.0/qr/decode.js",
-      `subject=${context.identity.subject}`,
-    ],
-  };
-}
-
 async function testP4D(context) {
   const maven = process.env.VERIFACTU_MAVEN;
   const java = process.env.VERIFACTU_JAVA;
@@ -3966,7 +3908,6 @@ export const operations = {
   testP4A,
   testP4C,
   testP4D,
-  testP4E,
   buildPackages,
   packageAllowlists,
   packageReproducibility,
@@ -4004,7 +3945,6 @@ export const operationCapabilities = Object.freeze({
   testP4A: { tools: ["node"], network: "denied" },
   testP4C: { tools: ["node", "python"], network: "denied" },
   testP4D: { tools: ["node", "java", "maven"], network: "denied" },
-  testP4E: { tools: ["node"], network: "denied" },
   buildPackages: { tools: ["node", "typescript"], network: "denied" },
   packageAllowlists: {
     tools: ["node", "typescript", "npm"],

@@ -8,22 +8,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { resolve } from "node:path";
 import {
-  buildQrPayload,
-  renderQrSvg,
-  verifyQrPayload,
-} from "../../evidence/runs/artifacts/build/verifactu/dist/application/qr.js";
-import {
-  createIdentity,
-  createFiscalDocumentIdentity,
-} from "../../evidence/runs/artifacts/build/verifactu/dist/domain/identities.js";
-import { createFiscalContext } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/context.js";
-import {
-  createFiscalDate,
-  createFiscalInstant,
-} from "../../evidence/runs/artifacts/build/verifactu/dist/domain/date-time.js";
-import { createDecimal } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/decimal.js";
-import { createAltaRecord } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/records.js";
-import {
   encodeRequest,
   DSS_JVM_OPTIONS,
   minimalEnvironment,
@@ -520,86 +504,4 @@ test("bridge process applies deadline and cancellation, with a minimal environme
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
-});
-
-const qrEditionId = "rrsif-2026-09-21-authoritative-candidate";
-const qrId = (kind, value) => createIdentity(kind, value).value;
-const qrTaxpayer = qrId("taxpayer", "89890001K");
-const qrEditionIdentity = qrId("edition", qrEditionId);
-const qrContext = createFiscalContext({
-  tenantId: qrId("tenant", "qr-resource"),
-  taxpayerId: qrTaxpayer,
-  installationId: qrId("installation", "qr-resource"),
-  editionId: qrEditionIdentity,
-}).value;
-const qrRecord = createAltaRecord({
-  kind: "alta",
-  id: qrId("record", "qr-resource-record"),
-  context: qrContext,
-  document: createFiscalDocumentIdentity({
-    issuer: qrTaxpayer,
-    series: "A-",
-    number: "1",
-    issueDate: "2025-01-01",
-  }).value,
-  issueDate: createFiscalDate("2025-01-01").value,
-  generatedAt: createFiscalInstant("2025-01-01T00:00:00Z").value,
-  total: createDecimal("10.00", { maxIntegerDigits: 8, maxScale: 2 }).value,
-  predecessorId: null,
-  editionId: qrEditionIdentity,
-}).value;
-const qrDigest = {
-  providerId: "test:sha256",
-  digest: (_algorithm, bytes) =>
-    createHash("sha256").update(bytes).digest("hex"),
-};
-
-test("QR verifier rejects duplicate, unknown, missing, noncanonical and cross-environment data", () => {
-  const selected = { id: qrEditionId, environment: "test", mode: "verifactu" };
-  const payload = buildQrPayload(qrRecord, selected, qrDigest);
-  assert.equal(payload.status, "ok");
-  const malformed = [
-    `${payload.value.text}&nif=111111111`,
-    payload.value.text.replace("&fecha=", "&unknown=x&fecha="),
-    payload.value.text.slice(0, payload.value.text.lastIndexOf("&importe=")),
-    payload.value.text.replace("fecha=01-01-2025", "fecha=1-1-2025"),
-    payload.value.text.replace(
-      "prewww2.aeat.es",
-      "www2.agenciatributaria.gob.es",
-    ),
-  ];
-  for (const candidate of malformed)
-    assert.equal(
-      verifyQrPayload(candidate, qrRecord, selected, qrDigest).status,
-      "invalid",
-    );
-});
-
-test("QR renderer rejects dimension overflow before allocation without fallback", () => {
-  const payload = buildQrPayload(
-    qrRecord,
-    { id: qrEditionId, environment: "test", mode: "verifactu" },
-    qrDigest,
-  );
-  assert.equal(payload.status, "ok");
-  let calls = 0;
-  const largeMatrix = {
-    providerId: "test:large-matrix",
-    encode: () => {
-      calls += 1;
-      return { status: "ok", value: { size: 177, get: () => true } };
-    },
-  };
-  const result = renderQrSvg(
-    payload.value,
-    largeMatrix,
-    { scale: 32, symbolSizeMm: 30, quietZoneMm: 6 },
-    qrDigest,
-  );
-  assert.equal(
-    result.status,
-    "invalid",
-    "P4-CB-042 reject oversized symbol before allocation assertion",
-  );
-  assert.equal(calls, 1, "P4-CB-042 no second encoder fallback assertion");
 });

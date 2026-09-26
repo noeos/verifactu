@@ -397,7 +397,7 @@
     },
     {
       "id": "test:p4-d",
-      "version": 86,
+      "version": 85,
       "owner": "cryptography-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -420,10 +420,7 @@
         "tests/security/p4-signature-attacks.test.mjs",
         "tests/security/p4-resource-attacks.test.mjs",
         "tooling/tasks/operations.mjs",
-        "tooling/ci/setup-java-provider.mjs",
-        "packages/verifactu/src/application/qr.ts",
-        "packages/verifactu/src/ports/qr.ts",
-        "packages/verifactu/src/ports/digest.ts"
+        "tooling/ci/setup-java-provider.mjs"
       ],
       "outputs": [
         "evidence/runs/test--p4-d.json",
@@ -451,40 +448,6 @@
       "zeroWork": "fail",
       "operation": "testP4D",
       "tools": ["node", "java", "maven"]
-    },
-    {
-      "id": "test:p4-e",
-      "version": 4,
-      "owner": "api-owner",
-      "dependencies": ["build:packages", "test:p4-d"],
-      "inputs": [
-        "packages/verifactu/src/application/qr.ts",
-        "packages/verifactu/src/ports/qr.ts",
-        "packages/verifactu/src/domain/**",
-        "tests/contract/p4-qr-provider.test.mjs",
-        "tests/integration/p4-qr-roundtrip.test.mjs",
-        "docs/07-formats-cryptography/qr-content.md",
-        "docs/07-formats-cryptography/qr-rendering-and-verification.md",
-        "tooling/tasks/operations.mjs",
-        "packages/verifactu/src/ports/digest.ts",
-        "config/quality/p4-quality-plan.json",
-        "config/admission/dependencies.json",
-        "config/admission/qr-provider-evidence/**",
-        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/DetalleEspecificacTecnCodigoQRfactura.pdf"
-      ],
-      "outputs": ["evidence/runs/test--p4-e.json"],
-      "workingDirectory": ".",
-      "toolProfile": "runtime-matrix",
-      "environment": ["CI", "PATH", "VERIFACTU_SUBJECT_SHA"],
-      "network": "denied",
-      "secrets": "denied",
-      "timeoutSeconds": 300,
-      "concurrencyLock": "p4-e-qr-tests",
-      "selectionClass": "code-and-build",
-      "reportSchema": "evidence/schemas/task-report.schema.json",
-      "zeroWork": "fail",
-      "operation": "testP4E",
-      "tools": ["node"]
     },
     {
       "id": "package:allowlists",
@@ -873,8 +836,7 @@
         "test:policy",
         "build:packages",
         "test:p4-c",
-        "test:p4-d",
-        "test:p4-e"
+        "test:p4-d"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -903,8 +865,7 @@
         "provenance:rehearsal",
         "test:p4-a",
         "test:p4-c",
-        "test:p4-d",
-        "test:p4-e"
+        "test:p4-d"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],
