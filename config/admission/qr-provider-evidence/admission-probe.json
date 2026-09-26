@@ -139,5 +139,10 @@
     "testOnlyDecoder": "qr@0.7.0, qr/decode.js only",
     "independenceBoundary": "separate decoder implementation and package entry from the production encoder; qr documents ZXing inspiration, so no claim of algorithm-family diversity",
     "runtimeInvariant": "qr must remain development-only and absent from runtime dependency graph and packed product; encoder is consumed only through a private port"
+  },
+  "offlinePackedConsumer": {
+    "observation": "The repository verifies packed artifacts with npm offline mode; npm ci from the lockfile caches the package tarball but not the registry packument needed to resolve its dependency from packed consumers.",
+    "prewarm": "The pinned setup-engineering action runs npm cache add @nuintun/qrcode@5.0.3 and npm cache add tslib@2.8.1 before offline consumer checks; these are the exact direct and transitive packages in this encoder dependency closure.",
+    "probe": "A clean npm cache confirmed npm cache add stores registry packument and tarball entries. The first CI retry confirmed the encoder packument was resolved and exposed the previously uncached transitive tslib packument; exact-head CI after both prewarms remains authoritative."
   }
 }
