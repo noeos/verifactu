@@ -3170,11 +3170,29 @@ feasibility dossier remains distinct from product conformance.
   supplied CRL/OCSP parsing/status/time primitives. It also retains valid,
   revoked, stale, wrong-issuer/responder and malformed cases. The Java guard
   observed no network request on tested local-evidence paths.
-- `gate:p2`, `gate:p4-readiness` and `p4:quality-plan` passed on protected
-  admission tree `35a3e30` with 7/7, 2/2 and 84/84 respectively, zero skips,
-  zero diagnostics in the exact clean evidence run. Frozen denominators remain
-  44 production files, 26 test files, 43 critical branches/mutants, 57,344
-  property executions, 32,768 fuzz cases and 16/16 seeded plan faults.
+- On the clean exact handoff source commit `247c0273e80c85aff30da1255b932d83b235d96f`
+  (tree `6b636b43bb139b69c2c04f725beb122bbc9ae156`), `gate:p2` passed 7/7,
+  `gate:p4-readiness` passed 2/2 and `p4:quality-plan` passed 84/84, all with
+  zero skips and zero diagnostics. Their input digests are respectively
+  `14bb8b627ea09451a5b9c9decf4425f35827e90d7de7d24b34be42c2d1d8fc50`,
+  the same `14bb8b...` readiness input, and
+  `41598b7dc956fe5c13cc9e6a0327cde868f8ec7b8192c1ac342ed94cc74bf398`;
+  output digests are `36966eb3e38a3585ba18d5ee53ef2769510fbe77d50aea33bbf1bb5cb9188191`,
+  `27427d0d535a52340a3bbc0061279d4e952f91ed07a875b604449e05868bb123`, and
+  `b3fbe19ad7ea31a859797116978f2619a541d904de5829b9cb080881e95a8a76`.
+  Frozen denominators remain 44 production files, 26 test files, 43 critical
+  branches/mutants, 57,344 property executions, 32,768 fuzz cases and 16/16
+  seeded plan faults. The final amended PR head is independently gated by its
+  own exact-head and protected-push workflows.
+- On that same clean exact source, `sbom:component-graph` passed 410/410
+  (output digest `8d1a125753bc11177094c300e29f8fdbfaf796110715d5e5d414f3c2ea9a0b4b`)
+  and `sbom:documents` passed 820/820 (output digest
+  `164b82ce49dce8aa989fb3d07a2dd73db39e7cb46e346463924afb974b65af56`),
+  zero skips/diagnostics. The CycloneDX input SHA-256 is
+  `a2c85488c79a9aec322dc25b2c4d4a4a5edfb5dcf38f4aa2b84d039495259845`.
+  OSV-Scanner 2.5.1 on those exact bytes found 369 packages and zero
+  vulnerabilities; raw JSON SHA-256 is
+  `ce12ce6b20adc05be3f2fa10a2f54d42c0d6e33445cae1f9291e8d51e1a9d50c`.
 
 ### Residual qualification and next phase
 
