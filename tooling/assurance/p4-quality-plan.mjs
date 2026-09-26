@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
@@ -14,6 +15,7 @@ const generation = await readJson(
 );
 const admission = await readJson("config/admission/dependencies.json");
 const toolchain = await readJson("config/toolchain/toolchain.json");
+const javaProvider = await readJson("config/admission/java-provider.json");
 
 function fail(code, detail) {
   const error = new Error(`${code}: ${detail}`);
@@ -56,7 +58,464 @@ const validProductionPath = (path) =>
     (path.endsWith(".mjs") || path.endsWith(".java"))) ||
   path === "internal/independent-oracles/p4_oracle.py";
 
+function readZipEntry(archivePath, entryName) {
+  const python =
+    process.env.VERIFACTU_PYTHON ??
+    (process.platform === "win32" ? "python" : "python3");
+  const script =
+    "import sys, zipfile\nwith zipfile.ZipFile(sys.argv[1]) as archive:\n sys.stdout.buffer.write(archive.read(sys.argv[2]))\n";
+  const result = spawnSync(
+    python,
+    ["-c", script, resolve(root, archivePath), entryName],
+    { cwd: root, encoding: null, maxBuffer: 8 * 1024 * 1024 },
+  );
+  assert(
+    result.status === 0,
+    "P4_PLAN_ZIP_EVIDENCE_READ",
+    `${entryName}: ${result.stderr?.toString("utf8") ?? "zip read failed"}`,
+  );
+  return result.stdout;
+}
+
 export function validateP4QualityPlan(candidate, discoveredProduction = []) {
+  assert(
+    javaProvider.schemaVersion === 1 &&
+      javaProvider.id === "JAVA-PROVIDER-ADMISSION-0001" &&
+      javaProvider.status === "incomplete-candidate-lock" &&
+      javaProvider.runtimeGraph.componentCount === 42 &&
+      javaProvider.buildPluginGraph.componentCount === 99 &&
+      javaProvider.components.length === 139,
+    "P4_PLAN_JAVA_PROVIDER_ADMISSION",
+    `${javaProvider.runtimeGraph?.componentCount}/${javaProvider.buildPluginGraph?.componentCount}/${javaProvider.components?.length}`,
+  );
+  const admittedPurls = new Set(
+    javaProvider.components.map((item) => item.purl),
+  );
+  const providerPurl =
+    "pkg:maven/eu.noeos.verifactu.internal/verifactu-xades-provider@0.0.0-development";
+  assert(
+    admittedPurls.size === javaProvider.components.length &&
+      javaProvider.components.every(
+        (item) =>
+          item.jarSha256?.length === 64 &&
+          item.pomSha256?.length === 64 &&
+          typeof item.spdxLicenseExpression === "string" &&
+          item.spdxLicenseExpression.length > 0,
+      ),
+    "P4_PLAN_JAVA_PROVIDER_COMPONENTS",
+    "duplicate purl, missing artifact digest, or missing SPDX expression",
+  );
+  assert(
+    javaProvider.runtimeGraph.edges.every(
+      (edge) =>
+        (admittedPurls.has(edge.from) || edge.from === providerPurl) &&
+        admittedPurls.has(edge.to),
+    ) &&
+      javaProvider.runtimeGraph.edges.some(
+        (edge) =>
+          edge.to ===
+          `pkg:maven/${javaProvider.runtimeGraph.directDependencies[0].replaceAll(":", "/").replace(/\/([^/]+)$/u, "@$1")}`,
+      ),
+    "P4_PLAN_JAVA_PROVIDER_RUNTIME_GRAPH",
+    "runtime relationship references an unadmitted purl",
+  );
+  const runtimeRoot = providerPurl;
+  const runtimeReachable = new Set([runtimeRoot]);
+  let runtimeChanged = true;
+  while (runtimeChanged) {
+    runtimeChanged = false;
+    for (const edge of javaProvider.runtimeGraph.edges) {
+      if (runtimeReachable.has(edge.from) && !runtimeReachable.has(edge.to)) {
+        runtimeReachable.add(edge.to);
+        runtimeChanged = true;
+      }
+    }
+  }
+  const runtimePurls = new Set(
+    javaProvider.components
+      .filter((item) => item.scope.includes("runtime"))
+      .map((item) => item.purl),
+  );
+  assert(
+    runtimePurls.size === javaProvider.runtimeGraph.componentCount &&
+      runtimeReachable.size === runtimePurls.size + 1 &&
+      [...runtimePurls].every((purl) => runtimeReachable.has(purl)),
+    "P4_PLAN_JAVA_PROVIDER_RUNTIME_CLOSURE",
+    "runtime graph does not close over exactly the admitted runtime artifacts",
+  );
+  assert(
+    javaProvider.buildPluginGraph.plugins.length === 8 &&
+      javaProvider.buildPluginGraph.plugins.every(
+        (plugin) =>
+          plugin.resolvedComponents.length > 0 &&
+          plugin.resolvedComponents.every((purl) => admittedPurls.has(purl)) &&
+          plugin.edgeEvidence?.closurePurls.length > 0 &&
+          new Set(plugin.resolvedComponents).size ===
+            plugin.edgeEvidence.closurePurls.length &&
+          plugin.edgeEvidence.closurePurls.every((purl) =>
+            plugin.resolvedComponents.includes(purl),
+          ) &&
+          plugin.edgeEvidence.closurePurls.every((purl) =>
+            admittedPurls.has(purl),
+          ),
+      ),
+    "P4_PLAN_JAVA_PROVIDER_PLUGIN_GRAPH",
+    "plugin realm membership is incomplete or references an unadmitted purl",
+  );
+  assert(
+    javaProvider.buildPluginGraph.edges.length ===
+      javaProvider.buildPluginGraph.edgeCount &&
+      javaProvider.buildPluginGraph.edges.every(
+        (edge) =>
+          admittedPurls.has(edge.from) &&
+          admittedPurls.has(edge.to) &&
+          typeof edge.source === "string" &&
+          edge.source.length > 0,
+      ) &&
+      javaProvider.buildPluginGraph.plugins.every((plugin) => {
+        const roots = plugin.edgeEvidence.closurePurls.filter((purl) =>
+          purl.includes(`/${plugin.artifactId}@`),
+        );
+        if (roots.length !== 1) return false;
+        const reachable = new Set([roots[0]]);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const edge of javaProvider.buildPluginGraph.edges) {
+            if (
+              reachable.has(edge.from) &&
+              plugin.edgeEvidence.closurePurls.includes(edge.to) &&
+              !reachable.has(edge.to)
+            ) {
+              reachable.add(edge.to);
+              changed = true;
+            }
+          }
+        }
+        return (
+          reachable.size === plugin.edgeEvidence.closurePurls.length &&
+          plugin.edgeEvidence.closurePurls.every((purl) => reachable.has(purl))
+        );
+      }),
+    "P4_PLAN_JAVA_PROVIDER_PLUGIN_EDGES",
+    "transitive plugin graph is dangling or does not close over exact selected components",
+  );
+  const hashedEvidence = (path, digest, code) => {
+    const bytes = readFileSync(resolve(root, path));
+    assert(
+      createHash("sha256").update(bytes).digest("hex") === digest,
+      code,
+      path,
+    );
+    return bytes;
+  };
+  hashedEvidence(
+    javaProvider.runtimeGraph.evidencePath,
+    javaProvider.runtimeGraph.reportSha256,
+    "P4_PLAN_JAVA_PROVIDER_RUNTIME_EVIDENCE",
+  );
+  hashedEvidence(
+    javaProvider.buildPluginGraph.resolutionProof.reportPath,
+    javaProvider.buildPluginGraph.resolutionProof.reportSha256,
+    "P4_PLAN_JAVA_PROVIDER_PLUGIN_EVIDENCE",
+  );
+  for (const plugin of javaProvider.buildPluginGraph.plugins) {
+    const pom = hashedEvidence(
+      plugin.edgeEvidence.pomEvidencePath,
+      plugin.edgeEvidence.pomSha256,
+      "P4_PLAN_JAVA_PROVIDER_PLUGIN_POM_EVIDENCE",
+    );
+    const treeBytes = hashedEvidence(
+      plugin.edgeEvidence.treeEvidencePath,
+      plugin.edgeEvidence.treeSha256,
+      "P4_PLAN_JAVA_PROVIDER_PLUGIN_TREE_EVIDENCE",
+    );
+    const tree = JSON.parse(treeBytes.toString("utf8"));
+    const exactVersions = new Map(
+      plugin.edgeEvidence.closurePurls.map((purl) => {
+        const item = javaProvider.components.find(
+          (entry) => entry.purl === purl,
+        );
+        return [`${item.groupId}:${item.artifactId}`, purl];
+      }),
+    );
+    const expectedTreeEdges = [];
+    const observedUnmapped = new Set();
+    const visitTree = (node, parent) => {
+      const target = exactVersions.get(`${node.groupId}:${node.artifactId}`);
+      if (!target) {
+        observedUnmapped.add(
+          `${node.groupId}:${node.artifactId}:${node.version}`,
+        );
+        return;
+      }
+      if (parent !== target)
+        expectedTreeEdges.push(
+          `${parent}\0${target}\0${node.scope || "compile"}`,
+        );
+      for (const child of node.children ?? []) visitTree(child, target);
+    };
+    const rootPurl = plugin.edgeEvidence.closurePurls.find((purl) =>
+      purl.includes(`/${plugin.artifactId}@`),
+    );
+    for (const node of tree.children ?? []) visitTree(node, rootPurl);
+    const actualTreeEdges = new Set(
+      javaProvider.buildPluginGraph.edges
+        .filter(
+          (edge) =>
+            edge.source === "maven-dependency-tree-json" &&
+            edge.pluginArtifactId === plugin.artifactId &&
+            plugin.edgeEvidence.closurePurls.includes(edge.from) &&
+            plugin.edgeEvidence.closurePurls.includes(edge.to),
+        )
+        .map((edge) => `${edge.from}\0${edge.to}\0${edge.scope}`),
+    );
+    const expectedTreeEdgeSet = new Set(expectedTreeEdges);
+    assert(
+      canonical([...observedUnmapped].sort()) ===
+        canonical(plugin.edgeEvidence.unmappedTreeCoordinates) &&
+        expectedTreeEdgeSet.size === actualTreeEdges.size &&
+        [...expectedTreeEdgeSet].every((edge) => actualTreeEdges.has(edge)) &&
+        actualTreeEdges.size === expectedTreeEdgeSet.size,
+      "P4_PLAN_JAVA_PROVIDER_PLUGIN_TREE_RECONCILIATION",
+      `${plugin.artifactId} (${pom.length} byte probe POM)`,
+    );
+    assert(
+      javaProvider.buildPluginGraph.edges.filter(
+        (edge) => edge.pluginArtifactId === plugin.artifactId,
+      ).length === plugin.edgeEvidence.edgeCount,
+      "P4_PLAN_JAVA_PROVIDER_PLUGIN_EDGE_COUNT",
+      plugin.artifactId,
+    );
+  }
+  const pluginPurls = new Set(
+    javaProvider.buildPluginGraph.plugins.flatMap(
+      (plugin) => plugin.edgeEvidence.closurePurls,
+    ),
+  );
+  const admittedPluginPurls = new Set(
+    javaProvider.components
+      .filter((item) => item.scope.includes("build-plugin"))
+      .map((item) => item.purl),
+  );
+  assert(
+    pluginPurls.size === javaProvider.buildPluginGraph.componentCount &&
+      pluginPurls.size === admittedPluginPurls.size &&
+      [...pluginPurls].every((purl) => admittedPluginPurls.has(purl)),
+    "P4_PLAN_JAVA_PROVIDER_PLUGIN_CLOSURE",
+    "plugin closures do not reconcile to the exact selected plugin union",
+  );
+  for (const license of javaProvider.licenseClosure.customLicenseTexts) {
+    hashedEvidence(
+      license.path,
+      license.sha256,
+      "P4_PLAN_JAVA_PROVIDER_LICENSE_TEXT",
+    );
+  }
+  const integrityEvidenceBytes = hashedEvidence(
+    javaProvider.artifactIntegrity.evidencePath,
+    javaProvider.artifactIntegrity.evidenceSha256,
+    "P4_PLAN_JAVA_PROVIDER_CENTRAL_INTEGRITY_REPORT",
+  );
+  const integrityEvidence = JSON.parse(integrityEvidenceBytes.toString("utf8"));
+  const verifiedCentralArtifacts = new Map(
+    integrityEvidence.components.map((item) => [
+      `${item.purl}\0${item.kind}`,
+      item,
+    ]),
+  );
+  assert(
+    integrityEvidence.componentCount === javaProvider.components.length &&
+      integrityEvidence.artifactAndPomCount === 278 &&
+      integrityEvidence.artifactAndPomExactCentralByteMatches === 278 &&
+      integrityEvidence.failures.length === 0 &&
+      javaProvider.components.every((item) => {
+        const jar = verifiedCentralArtifacts.get(`${item.purl}\0jar`);
+        const pom = verifiedCentralArtifacts.get(`${item.purl}\0pom`);
+        return (
+          jar?.expectedSha256 === item.jarSha256 &&
+          jar.localSha256 === item.jarSha256 &&
+          jar.remoteSha256 === item.jarSha256 &&
+          pom?.expectedSha256 === item.pomSha256 &&
+          pom.localSha256 === item.pomSha256 &&
+          pom.remoteSha256 === item.pomSha256
+        );
+      }),
+    "P4_PLAN_JAVA_PROVIDER_CENTRAL_INTEGRITY",
+    "the locked artifact/POM digests do not reconcile to exact Maven Central bytes",
+  );
+  const projectLicense = javaProvider.licenseClosure.project;
+  hashedEvidence(
+    projectLicense.licensePath,
+    projectLicense.licenseSha256,
+    "P4_PLAN_JAVA_PROVIDER_PROJECT_LICENSE",
+  );
+  hashedEvidence(
+    projectLicense.noticePath,
+    projectLicense.noticeSha256,
+    "P4_PLAN_JAVA_PROVIDER_PROJECT_NOTICE",
+  );
+  const dssLicense = javaProvider.licenseClosure.dss;
+  hashedEvidence(
+    `internal/xades-provider/dss/src/main/resources/${dssLicense.archivePath}`,
+    dssLicense.sourceSha256,
+    "P4_PLAN_JAVA_PROVIDER_DSS_LICENSE",
+  );
+  const mavenLegal = javaProvider.licenseClosure.selectedMavenDistribution;
+  hashedEvidence(
+    mavenLegal.licenseEvidencePath,
+    mavenLegal.licenseSha256,
+    "P4_PLAN_JAVA_PROVIDER_MAVEN_LICENSE",
+  );
+  hashedEvidence(
+    mavenLegal.noticeEvidencePath,
+    mavenLegal.noticeSha256,
+    "P4_PLAN_JAVA_PROVIDER_MAVEN_NOTICE",
+  );
+  hashedEvidence(
+    javaProvider.toolchain.setupJavaAction.licenseEvidencePath,
+    javaProvider.toolchain.setupJavaAction.runtimeLicenseSha256,
+    "P4_PLAN_JAVA_PROVIDER_SETUP_JAVA_LICENSE",
+  );
+  hashedEvidence(
+    javaProvider.toolchain.spdxLicenseList.evidencePath,
+    javaProvider.toolchain.spdxLicenseList.licenseDataSha256,
+    "P4_PLAN_JAVA_PROVIDER_SPDX_LICENSE_LIST",
+  );
+  const osvReport = hashedEvidence(
+    javaProvider.vulnerabilityObservation.evidencePath,
+    javaProvider.vulnerabilityObservation.osvJsonSha256,
+    "P4_PLAN_JAVA_PROVIDER_OSV_EVIDENCE_HASH",
+  );
+  const osvContent = JSON.parse(osvReport.toString("utf8"));
+  assert(
+    javaProvider.vulnerabilityObservation.result === "No issues found" &&
+      osvContent.results.every(
+        (result) =>
+          !result.packages?.some(
+            (pkg) => (pkg.vulnerabilities ?? []).length > 0,
+          ),
+      ),
+    "P4_PLAN_JAVA_PROVIDER_OSV_EVIDENCE",
+    javaProvider.vulnerabilityObservation.evidencePath,
+  );
+  const projectBuild = javaProvider.buildProbes.projectPomOfflinePackage;
+  const projectBuildLog = hashedEvidence(
+    projectBuild.logEvidencePath,
+    projectBuild.logSha256,
+    "P4_PLAN_JAVA_PROVIDER_BUILD_LOG",
+  );
+  assert(
+    projectBuild.status === "passed-with-empty-bridge-source" &&
+      projectBuild.repeatEvidence.length === 2 &&
+      projectBuild.reproducibleBuildCount === 2 &&
+      projectBuild.repeatedOutputIdentically === true &&
+      projectBuild.outputSha256 ===
+        javaProvider.licenseClosure.shadedArchive.sha256 &&
+      projectBuildLog.toString("utf8").includes("BUILD SUCCESS"),
+    "P4_PLAN_JAVA_PROVIDER_REPRODUCIBLE_BUILD",
+    "offline candidate build evidence is incomplete or does not match the shaded artifact",
+  );
+  for (const run of projectBuild.repeatEvidence) {
+    const buildLog = hashedEvidence(
+      run.path,
+      run.logSha256,
+      "P4_PLAN_JAVA_PROVIDER_REPEAT_BUILD_LOG",
+    );
+    assert(
+      buildLog.toString("utf8").includes("BUILD SUCCESS"),
+      "P4_PLAN_JAVA_PROVIDER_REPEAT_BUILD",
+      run.path,
+    );
+  }
+  const bridgeCoverage = javaProvider.buildProbes.bridgeCoverageFeasibility;
+  const bridgeCoverageCsv = hashedEvidence(
+    bridgeCoverage.reportPath,
+    bridgeCoverage.reportSha256,
+    "P4_PLAN_JAVA_PROVIDER_BRIDGE_COVERAGE_EVIDENCE",
+  );
+  assert(
+    bridgeCoverage.status === "passed-on-scratch-copy; feasibility only" &&
+      bridgeCoverage.classesAnalyzed === 1 &&
+      bridgeCoverage.branchMissed === 0 &&
+      bridgeCoverage.branchCovered === 2 &&
+      bridgeCoverageCsv
+        .toString("utf8")
+        .includes("BridgeProbe,3,13,0,2,1,2,1,3,1,2"),
+    "P4_PLAN_JAVA_PROVIDER_BRIDGE_COVERAGE",
+    "JaCoCo scratch feasibility report does not prove both probe branches",
+  );
+  const officialProbe = javaProvider.buildProbes.officialVectorProbe;
+  for (const item of [
+    officialProbe.source.specificationPdfPath,
+    officialProbe.source.examplesZipPath,
+    officialProbe.signedVector.path,
+    officialProbe.validationReportPath,
+  ]) {
+    const entry =
+      item === officialProbe.source.specificationPdfPath
+        ? officialProbe.source.specificationPdfSha256
+        : item === officialProbe.source.examplesZipPath
+          ? officialProbe.source.examplesZipSha256
+          : item === officialProbe.signedVector.path
+            ? officialProbe.signedVector.sha256
+            : officialProbe.validationReportSha256;
+    hashedEvidence(
+      item,
+      entry,
+      "P4_PLAN_JAVA_PROVIDER_OFFICIAL_VECTOR_EVIDENCE",
+    );
+  }
+  const signedZipVector = readZipEntry(
+    officialProbe.source.examplesZipPath,
+    officialProbe.signedVector.archiveEntry,
+  );
+  const unsignedZipVector = readZipEntry(
+    officialProbe.source.examplesZipPath,
+    officialProbe.unsignedVector.archiveEntry,
+  );
+  const officialValidation = readFileSync(
+    resolve(root, officialProbe.validationReportPath),
+    "utf8",
+  );
+  assert(
+    officialProbe.source.specificationVersion === "0.1.5" &&
+      createHash("sha256").update(signedZipVector).digest("hex") ===
+        officialProbe.signedVector.sha256 &&
+      createHash("sha256").update(unsignedZipVector).digest("hex") ===
+        officialProbe.unsignedVector.sha256 &&
+      officialProbe.signedVector.structuralSignature === true &&
+      officialProbe.signedVector.basicSignature === true &&
+      officialProbe.signedVector.referenceAndSignedPropertiesIntact === true &&
+      officialProbe.signedVector.trustResult ===
+        "INDETERMINATE / NO_CERTIFICATE_CHAIN_FOUND" &&
+      officialValidation.includes("guardNetworkAttempt=denied") &&
+      officialValidation.includes("structural=true basic=true intact=true") &&
+      officialValidation.includes(
+        "INDETERMINATE sub=NO_CERTIFICATE_CHAIN_FOUND",
+      ),
+    "P4_PLAN_JAVA_PROVIDER_OFFICIAL_VECTOR_PROBE",
+    "the official example probe lacks explicit network-denial evidence or overstates trust",
+  );
+  const syntheticProbe = javaProvider.buildProbes.syntheticSigningProbe;
+  hashedEvidence(
+    syntheticProbe.signedArtifactPath,
+    syntheticProbe.signedArtifactSha256,
+    "P4_PLAN_JAVA_PROVIDER_SYNTHETIC_SIGNATURE",
+  );
+  const syntheticReport = hashedEvidence(
+    syntheticProbe.validationReportPath,
+    syntheticProbe.validationReportSha256,
+    "P4_PLAN_JAVA_PROVIDER_SYNTHETIC_SIGNATURE_REPORT",
+  ).toString("utf8");
+  assert(
+    syntheticProbe.trustResult ===
+      "INDETERMINATE / NO_CERTIFICATE_CHAIN_FOUND" &&
+      syntheticReport.includes("structural=true basic=true intact=true") &&
+      syntheticReport.includes("INDETERMINATE sub=NO_CERTIFICATE_CHAIN_FOUND"),
+    "P4_PLAN_JAVA_PROVIDER_SYNTHETIC_SIGNATURE_PROBE",
+    "synthetic signature report does not preserve the trust-indeterminate result",
+  );
   assert(candidate?.schemaVersion === 1, "P4_PLAN_SCHEMA", "schemaVersion");
   assert(
     candidate.id === "P4-QUALITY-PLAN-0001" &&

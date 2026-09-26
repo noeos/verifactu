@@ -1,0 +1,13 @@
+WARNING: A terminally deprecated method in java.lang.System has been called
+WARNING: System::setSecurityManager has been called by Probe (file:<ADMISSION_PROBE>)
+WARNING: Please consider reporting this to the maintainers of Probe
+WARNING: System::setSecurityManager will be removed in a future release
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+aia=null crl=null ocsp=null
+structural=true basic=true intact=true
+digest=r1 uri= intact=true type=REFERENCE
+digest=null uri=#xades-id-ada42f35bdfbdb62873cdfc5a945b271 intact=true type=SIGNED_PROPERTIES
+signatures=[S-A3EC3A7CA4182001064F87F536B3B31DCC8E150643FBB852592669C7755A41B2]
+S-A3EC3A7CA4182001064F87F536B3B31DCC8E150643FBB852592669C7755A41B2 format=XAdES-BASELINE-B indication=INDETERMINATE sub=NO_CERTIFICATE_CHAIN_FOUND

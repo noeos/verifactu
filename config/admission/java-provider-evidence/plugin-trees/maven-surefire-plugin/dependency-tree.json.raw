@@ -1,0 +1,160 @@
+{
+  "groupId": "eu.noeos.probe",
+  "artifactId": "plugin-edge-probe",
+  "version": "1",
+  "type": "jar",
+  "scope": "",
+  "classifier": "",
+  "optional": "false",
+  "children": [
+    {
+      "groupId": "org.apache.maven.plugins",
+      "artifactId": "maven-surefire-plugin",
+      "version": "3.6.0",
+      "type": "jar",
+      "scope": "compile",
+      "classifier": "",
+      "optional": "false",
+      "children": [
+        {
+          "groupId": "org.apache.maven.surefire",
+          "artifactId": "surefire-api",
+          "version": "3.6.0",
+          "type": "jar",
+          "scope": "compile",
+          "classifier": "",
+          "optional": "false",
+          "children": [
+            {
+              "groupId": "org.apache.maven.surefire",
+              "artifactId": "surefire-logger-api",
+              "version": "3.6.0",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false"
+            },
+            {
+              "groupId": "org.apache.maven.surefire",
+              "artifactId": "surefire-shared-utils",
+              "version": "3.6.0",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false"
+            }
+            ]
+        },
+        {
+          "groupId": "org.apache.maven.surefire",
+          "artifactId": "surefire-extensions-api",
+          "version": "3.6.0",
+          "type": "jar",
+          "scope": "compile",
+          "classifier": "",
+          "optional": "false"
+        },
+        {
+          "groupId": "org.apache.maven.surefire",
+          "artifactId": "maven-surefire-common",
+          "version": "3.6.0",
+          "type": "jar",
+          "scope": "compile",
+          "classifier": "",
+          "optional": "false",
+          "children": [
+            {
+              "groupId": "org.apache.maven.surefire",
+              "artifactId": "surefire-booter",
+              "version": "3.6.0",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false",
+              "children": [
+                {
+                  "groupId": "org.apache.maven.surefire",
+                  "artifactId": "surefire-extensions-spi",
+                  "version": "3.6.0",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                }
+                ]
+            },
+            {
+              "groupId": "org.apache.maven.resolver",
+              "artifactId": "maven-resolver-util",
+              "version": "1.9.27",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false",
+              "children": [
+                {
+                  "groupId": "org.apache.maven.resolver",
+                  "artifactId": "maven-resolver-api",
+                  "version": "1.9.27",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                }
+                ]
+            },
+            {
+              "groupId": "org.apache.maven.shared",
+              "artifactId": "maven-common-artifact-filters",
+              "version": "3.4.0",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false",
+              "children": [
+                {
+                  "groupId": "org.slf4j",
+                  "artifactId": "slf4j-api",
+                  "version": "1.7.36",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                }
+                ]
+            },
+            {
+              "groupId": "org.codehaus.plexus",
+              "artifactId": "plexus-java",
+              "version": "1.6.0",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false",
+              "children": [
+                {
+                  "groupId": "org.ow2.asm",
+                  "artifactId": "asm",
+                  "version": "9.10.1",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                },
+                {
+                  "groupId": "com.github.javaparser",
+                  "artifactId": "javaparser-core",
+                  "version": "3.28.2",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                }
+                ]
+            }
+            ]
+        }
+        ]
+    }
+    ]
+}

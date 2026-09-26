@@ -1,0 +1,2594 @@
+{
+  "results": [
+    {
+      "source": {
+        "path": "evidence/runs/artifacts/sbom/cyclonedx-1.7.json",
+        "type": "sbom"
+      },
+      "packages": [
+        {
+          "package": {
+            "name": "@cacheable/memory",
+            "version": "2.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@cacheable/utils",
+            "version": "2.5.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint-community/eslint-utils",
+            "version": "4.10.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint-community/regexpp",
+            "version": "4.12.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint/config-array",
+            "version": "0.23.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint/config-helpers",
+            "version": "0.7.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint/core",
+            "version": "1.2.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint/object-schema",
+            "version": "3.0.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@eslint/plugin-kit",
+            "version": "0.7.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@gar/promise-retry",
+            "version": "1.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@humanfs/core",
+            "version": "0.19.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@humanfs/node",
+            "version": "0.16.8",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@humanfs/types",
+            "version": "0.15.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@humanwhocodes/module-importer",
+            "version": "1.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@humanwhocodes/retry",
+            "version": "0.4.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@isaacs/fs-minipass",
+            "version": "4.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@isaacs/string-locale-compare",
+            "version": "1.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@keyv/bigmap",
+            "version": "1.3.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@keyv/serialize",
+            "version": "1.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@noeos/verification-engine",
+            "version": "1.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/agent",
+            "version": "4.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/arborist",
+            "version": "9.9.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/config",
+            "version": "10.12.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/fs",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/git",
+            "version": "7.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/installed-package-contents",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/map-workspaces",
+            "version": "5.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/metavuln-calculator",
+            "version": "9.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/name-from-folder",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/node-gyp",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/package-json",
+            "version": "7.0.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/promise-spawn",
+            "version": "9.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/query",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/redact",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@npmcli/run-script",
+            "version": "10.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@sigstore/bundle",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@sigstore/core",
+            "version": "3.2.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@sigstore/protobuf-specs",
+            "version": "0.5.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@sigstore/sign",
+            "version": "4.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@sigstore/tuf",
+            "version": "4.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@sigstore/verify",
+            "version": "3.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@tufjs/canonical-json",
+            "version": "2.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@tufjs/models",
+            "version": "4.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@types/esrecurse",
+            "version": "4.3.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@types/estree",
+            "version": "1.0.9",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@types/json-schema",
+            "version": "7.0.15",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "@types/node",
+            "version": "24.13.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "abbrev",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "acorn",
+            "version": "8.18.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "acorn-jsx",
+            "version": "5.3.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "agent-base",
+            "version": "7.1.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ajv",
+            "version": "6.15.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ajv",
+            "version": "8.20.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ajv-formats",
+            "version": "3.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "aproba",
+            "version": "2.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "archy",
+            "version": "1.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "balanced-match",
+            "version": "4.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "bin-links",
+            "version": "6.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "binary-extensions",
+            "version": "3.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "brace-expansion",
+            "version": "5.0.12",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "brace-expansion",
+            "version": "5.0.9",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "cacache",
+            "version": "20.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "cacheable",
+            "version": "2.5.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "chalk",
+            "version": "5.6.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "chownr",
+            "version": "3.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ci-info",
+            "version": "4.4.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "cidr-regex",
+            "version": "5.0.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "cmd-shim",
+            "version": "8.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.woodstox:woodstox-core",
+            "version": "6.5.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "com.github.cliftonlabs:json-simple",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "com.github.javaparser:javaparser-core",
+            "version": "3.28.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "com.github.luben:zstd-jni",
+            "version": "1.5.7-6",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "com.github.luben:zstd-jni",
+            "version": "1.5.7-9",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "com.sun.activation:jakarta.activation",
+            "version": "2.0.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "com.sun.istack:istack-commons-runtime",
+            "version": "4.0.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "common-ancestor-path",
+            "version": "2.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-beanutils:commons-beanutils",
+            "version": "1.11.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-codec:commons-codec",
+            "version": "1.18.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-codec:commons-codec",
+            "version": "1.19.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-collections:commons-collections",
+            "version": "3.2.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-io:commons-io",
+            "version": "2.19.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-io:commons-io",
+            "version": "2.21.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-io:commons-io",
+            "version": "2.22.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "commons-logging:commons-logging",
+            "version": "1.3.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "cross-spawn",
+            "version": "7.0.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "cssesc",
+            "version": "3.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "debug",
+            "version": "4.4.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "deep-is",
+            "version": "0.1.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "diff",
+            "version": "8.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "env-paths",
+            "version": "2.2.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "escape-string-regexp",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "eslint",
+            "version": "10.10.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "eslint-scope",
+            "version": "9.1.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "eslint-visitor-keys",
+            "version": "3.4.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "eslint-visitor-keys",
+            "version": "5.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "espree",
+            "version": "11.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "esquery",
+            "version": "1.7.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "esrecurse",
+            "version": "4.3.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "estraverse",
+            "version": "5.3.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "esutils",
+            "version": "2.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-alert",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-crl-parser",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-detailed-report-jaxb",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-diagnostic-jaxb",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-document",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-enumerations",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-i18n",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-jaxb-common",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-jaxb-parsers",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-model",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-policy-jaxb",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-simple-certificate-report-jaxb",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-simple-report-jaxb",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-spi",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-utils",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-utils-apache-commons",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-validation",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-xades",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-xml-common",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-xml-utils",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:specs-trusted-list",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:specs-trusted-list-v211",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:specs-validation-report",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:specs-xades",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:specs-xmldsig",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.maveniverse.maven.domtrip:domtrip-core",
+            "version": "1.5.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "eu.maveniverse.maven.domtrip:domtrip-maven",
+            "version": "1.5.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "exponential-backoff",
+            "version": "3.1.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fast-deep-equal",
+            "version": "3.1.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fast-json-stable-stringify",
+            "version": "2.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fast-levenshtein",
+            "version": "2.0.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fast-uri",
+            "version": "3.1.8",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fastest-levenshtein",
+            "version": "1.0.16",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fdir",
+            "version": "6.5.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "file-entry-cache",
+            "version": "11.1.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "find-up",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "flat-cache",
+            "version": "6.1.23",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "flatted",
+            "version": "3.4.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "fs-minipass",
+            "version": "3.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "glob",
+            "version": "13.0.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "glob-parent",
+            "version": "6.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "graceful-fs",
+            "version": "4.2.11",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "hashery",
+            "version": "1.5.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "hookified",
+            "version": "1.15.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "hookified",
+            "version": "2.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "hosted-git-info",
+            "version": "9.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "http-cache-semantics",
+            "version": "4.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "http-proxy-agent",
+            "version": "7.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "https-proxy-agent",
+            "version": "7.0.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "iconv-lite",
+            "version": "0.7.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ignore",
+            "version": "5.3.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ignore-walk",
+            "version": "8.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "imurmurhash",
+            "version": "0.1.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ini",
+            "version": "6.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "init-package-json",
+            "version": "8.2.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ip-address",
+            "version": "10.5.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "is-cidr",
+            "version": "6.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "is-extglob",
+            "version": "2.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "is-glob",
+            "version": "4.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "isexe",
+            "version": "2.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "isexe",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+            "version": "3.0.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "javax.inject:javax.inject",
+            "version": "1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "json-parse-even-better-errors",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "json-schema-traverse",
+            "version": "0.4.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "json-schema-traverse",
+            "version": "1.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "json-stable-stringify-without-jsonify",
+            "version": "1.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "json-stringify-nice",
+            "version": "1.1.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "jsonparse",
+            "version": "1.3.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "just-diff",
+            "version": "6.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "just-diff-apply",
+            "version": "5.5.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "keyv",
+            "version": "5.6.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "levn",
+            "version": "0.4.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmaccess",
+            "version": "10.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmdiff",
+            "version": "8.1.12",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmexec",
+            "version": "10.3.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmfund",
+            "version": "7.0.26",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmorg",
+            "version": "8.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmpack",
+            "version": "9.1.13",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmpublish",
+            "version": "11.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmsearch",
+            "version": "9.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmteam",
+            "version": "8.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "libnpmversion",
+            "version": "8.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "locate-path",
+            "version": "6.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "lru-cache",
+            "version": "11.5.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "make-fetch-happen",
+            "version": "15.0.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minimatch",
+            "version": "10.2.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minimatch",
+            "version": "10.2.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass",
+            "version": "3.3.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass",
+            "version": "7.1.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass-collect",
+            "version": "2.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass-fetch",
+            "version": "5.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass-flush",
+            "version": "1.0.6",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass-pipeline",
+            "version": "1.2.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minipass-sized",
+            "version": "2.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "minizlib",
+            "version": "3.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ms",
+            "version": "2.1.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "mute-stream",
+            "version": "3.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "natural-compare",
+            "version": "1.4.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "negotiator",
+            "version": "1.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "node-gyp",
+            "version": "12.4.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "nopt",
+            "version": "9.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm",
+            "version": "11.19.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-audit-report",
+            "version": "7.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-bundled",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-install-checks",
+            "version": "8.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-normalize-package-bin",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-package-arg",
+            "version": "13.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-packlist",
+            "version": "10.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-pick-manifest",
+            "version": "11.0.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-profile",
+            "version": "12.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-registry-fetch",
+            "version": "19.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "npm-user-validate",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "optionator",
+            "version": "0.9.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-collections4",
+            "version": "4.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-compress",
+            "version": "1.28.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-digester3",
+            "version": "3.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-lang3",
+            "version": "3.18.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-lang3",
+            "version": "3.20.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-text",
+            "version": "1.12.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-core",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-integration-tools",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-module-apt",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-module-xdoc",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-module-xhtml5",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-sink-api",
+            "version": "1.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-sink-api",
+            "version": "2.1.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-site-model",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-site-renderer",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.doxia:doxia-skin-model",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-clean-plugin",
+            "version": "3.5.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-compiler-plugin",
+            "version": "3.16.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-dependency-plugin",
+            "version": "3.11.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-jar-plugin",
+            "version": "3.5.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-resources-plugin",
+            "version": "3.5.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-shade-plugin",
+            "version": "3.6.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.plugins:maven-surefire-plugin",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.reporting:maven-reporting-api",
+            "version": "3.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.reporting:maven-reporting-api",
+            "version": "4.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.reporting:maven-reporting-impl",
+            "version": "4.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.resolver:maven-resolver-api",
+            "version": "1.4.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.resolver:maven-resolver-api",
+            "version": "1.9.27",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.resolver:maven-resolver-util",
+            "version": "1.9.25",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.resolver:maven-resolver-util",
+            "version": "1.9.27",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:file-management",
+            "version": "3.2.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-artifact-transfer",
+            "version": "0.13.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-common-artifact-filters",
+            "version": "3.4.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-dependency-analyzer",
+            "version": "1.17.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-dependency-tree",
+            "version": "3.3.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-filtering",
+            "version": "3.5.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-shared-incremental",
+            "version": "1.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.shared:maven-shared-utils",
+            "version": "3.4.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:maven-surefire-common",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:surefire-api",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:surefire-booter",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:surefire-extensions-api",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:surefire-extensions-spi",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:surefire-logger-api",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven.surefire:surefire-shared-utils",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven:maven-archiver",
+            "version": "3.6.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.maven:maven-archiver",
+            "version": "3.6.6",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.santuario:xmlsec",
+            "version": "3.0.6",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.velocity.tools:velocity-tools-generic",
+            "version": "3.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.velocity:velocity-engine-core",
+            "version": "2.4.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.bouncycastle:bcpkix-jdk18on",
+            "version": "1.85",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.bouncycastle:bcprov-jdk18on",
+            "version": "1.85",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.bouncycastle:bcutil-jdk18on",
+            "version": "1.85",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-archiver",
+            "version": "4.11.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-archiver",
+            "version": "4.12.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-build-api",
+            "version": "1.2.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-classworlds",
+            "version": "2.9.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-compiler-api",
+            "version": "2.17.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-compiler-javac",
+            "version": "2.17.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-compiler-manager",
+            "version": "2.17.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-component-annotations",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-i18n",
+            "version": "1.1.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-interpolation",
+            "version": "1.27",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-interpolation",
+            "version": "1.29",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-io",
+            "version": "3.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-java",
+            "version": "1.6.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-utils",
+            "version": "3.6.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-utils",
+            "version": "4.0.3",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-velocity",
+            "version": "2.2.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.plexus:plexus-xml",
+            "version": "3.0.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.codehaus.woodstox:stax2-api",
+            "version": "4.2.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.eclipse.sisu:org.eclipse.sisu.inject",
+            "version": "1.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.eclipse.sisu:org.eclipse.sisu.plexus",
+            "version": "0.9.0.M4",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.eclipse.sisu:org.eclipse.sisu.plexus",
+            "version": "1.0.0",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.glassfish.jaxb:jaxb-core",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.glassfish.jaxb:jaxb-runtime",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.glassfish.jaxb:txw2",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.jacoco:jacoco-maven-plugin",
+            "version": "0.8.15",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.jacoco:org.jacoco.agent",
+            "version": "0.8.15",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.jacoco:org.jacoco.core",
+            "version": "0.8.15",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.jacoco:org.jacoco.report",
+            "version": "0.8.15",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.jdom:jdom2",
+            "version": "2.0.6.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm",
+            "version": "9.10",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm",
+            "version": "9.10.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm",
+            "version": "9.9.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm-commons",
+            "version": "9.10.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm-commons",
+            "version": "9.9.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm-tree",
+            "version": "9.10.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.ow2.asm:asm-tree",
+            "version": "9.9.1",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.slf4j:slf4j-api",
+            "version": "1.7.36",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.slf4j:slf4j-api",
+            "version": "2.0.18",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.sonatype.plexus:plexus-build-api",
+            "version": "0.0.7",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.tukaani:xz",
+            "version": "1.11",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.tukaani:xz",
+            "version": "1.12",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "org.vafer:jdependency",
+            "version": "2.15",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "p-limit",
+            "version": "3.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "p-locate",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "p-map",
+            "version": "7.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "pacote",
+            "version": "21.5.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "parse-conflict-json",
+            "version": "5.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "path-exists",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "path-key",
+            "version": "3.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "path-scurry",
+            "version": "2.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "picomatch",
+            "version": "4.0.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "postcss-selector-parser",
+            "version": "7.1.4",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "prelude-ls",
+            "version": "1.2.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "prettier",
+            "version": "3.6.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "proc-log",
+            "version": "6.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "proggy",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "promise-all-reject-late",
+            "version": "1.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "promise-call-limit",
+            "version": "3.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "promzard",
+            "version": "3.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "punycode",
+            "version": "2.3.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "qified",
+            "version": "0.10.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "qrcode-terminal",
+            "version": "0.12.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "read",
+            "version": "5.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "read-cmd-shim",
+            "version": "6.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "require-from-string",
+            "version": "2.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "safer-buffer",
+            "version": "2.1.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "semver",
+            "version": "7.8.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "shebang-command",
+            "version": "2.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "shebang-regex",
+            "version": "3.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "signal-exit",
+            "version": "4.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "sigstore",
+            "version": "4.1.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "smart-buffer",
+            "version": "4.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "socks",
+            "version": "2.8.9",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "socks-proxy-agent",
+            "version": "8.0.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "spdx-exceptions",
+            "version": "2.5.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "spdx-expression-parse",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "spdx-license-ids",
+            "version": "3.0.23",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "ssri",
+            "version": "13.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "supports-color",
+            "version": "10.2.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "tar",
+            "version": "7.5.22",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "text-table",
+            "version": "0.2.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "tiny-relative-date",
+            "version": "2.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "tinyglobby",
+            "version": "0.2.17",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "treeverse",
+            "version": "3.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "tuf-js",
+            "version": "4.1.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "type-check",
+            "version": "0.4.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "typescript",
+            "version": "5.9.3",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "undici",
+            "version": "6.28.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "undici-types",
+            "version": "7.18.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "uri-js",
+            "version": "4.4.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "util-deprecate",
+            "version": "1.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "validate-npm-package-name",
+            "version": "7.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "verifactu-xades-provider",
+            "version": "0.0.0-development",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
+            "name": "walk-up-path",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "which",
+            "version": "2.0.2",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "which",
+            "version": "6.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "word-wrap",
+            "version": "1.2.5",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "write-file-atomic",
+            "version": "7.0.1",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "yallist",
+            "version": "4.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "yallist",
+            "version": "5.0.0",
+            "ecosystem": "npm"
+          }
+        },
+        {
+          "package": {
+            "name": "yocto-queue",
+            "version": "0.1.0",
+            "ecosystem": "npm"
+          }
+        }
+      ]
+    }
+  ],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}

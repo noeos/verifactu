@@ -1,0 +1,29 @@
+{
+  "groupId": "eu.noeos.probe",
+  "artifactId": "plugin-edge-probe",
+  "version": "1",
+  "type": "jar",
+  "scope": "",
+  "classifier": "",
+  "optional": "false",
+  "children": [
+    {
+      "groupId": "org.apache.maven.plugins",
+      "artifactId": "maven-clean-plugin",
+      "version": "3.5.0",
+      "type": "jar",
+      "scope": "compile",
+      "classifier": "",
+      "optional": "false"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-utils",
+      "version": "4.0.3",
+      "type": "jar",
+      "scope": "compile",
+      "classifier": "",
+      "optional": "false"
+    }
+    ]
+}

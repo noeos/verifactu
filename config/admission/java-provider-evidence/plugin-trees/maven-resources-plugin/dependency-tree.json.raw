@@ -1,0 +1,98 @@
+{
+  "groupId": "eu.noeos.probe",
+  "artifactId": "plugin-edge-probe",
+  "version": "1",
+  "type": "jar",
+  "scope": "",
+  "classifier": "",
+  "optional": "false",
+  "children": [
+    {
+      "groupId": "org.apache.maven.plugins",
+      "artifactId": "maven-resources-plugin",
+      "version": "3.5.0",
+      "type": "jar",
+      "scope": "compile",
+      "classifier": "",
+      "optional": "false",
+      "children": [
+        {
+          "groupId": "org.apache.maven.shared",
+          "artifactId": "maven-filtering",
+          "version": "3.5.0",
+          "type": "jar",
+          "scope": "compile",
+          "classifier": "",
+          "optional": "false",
+          "children": [
+            {
+              "groupId": "org.slf4j",
+              "artifactId": "slf4j-api",
+              "version": "1.7.36",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false"
+            },
+            {
+              "groupId": "org.codehaus.plexus",
+              "artifactId": "plexus-build-api",
+              "version": "1.2.0",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false",
+              "children": [
+                {
+                  "groupId": "javax.inject",
+                  "artifactId": "javax.inject",
+                  "version": "1",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                },
+                {
+                  "groupId": "org.sonatype.plexus",
+                  "artifactId": "plexus-build-api",
+                  "version": "0.0.7",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                },
+                {
+                  "groupId": "org.eclipse.sisu",
+                  "artifactId": "org.eclipse.sisu.plexus",
+                  "version": "0.9.0.M2",
+                  "type": "jar",
+                  "scope": "compile",
+                  "classifier": "",
+                  "optional": "false"
+                }
+                ]
+            },
+            {
+              "groupId": "org.codehaus.plexus",
+              "artifactId": "plexus-interpolation",
+              "version": "1.29",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false"
+            }
+            ]
+        }
+        ]
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-utils",
+      "version": "3.6.1",
+      "type": "jar",
+      "scope": "compile",
+      "classifier": "",
+      "optional": "false"
+    }
+    ]
+}
