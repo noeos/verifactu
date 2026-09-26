@@ -3164,6 +3164,14 @@ feasibility dossier remains distinct from product conformance.
   The signed official PDF requires a contextual SHA-1 policy digest; record
   signature and reference digests remain restricted to the approved SHA-256
   profile. No trust or AEAT acceptance is inferred.
+- On 2026-09-26, the live AEAT developer page for the signature
+  specifications was re-observed; it still links edition v0.1.5 and the
+  examples ZIP. This page observation is not a byte re-download. The locally
+  retained PDF and ZIP remain pinned at SHA-256
+  `60953acd5d437a745db9076377739d8ef3f05c31967c1424cd4f6a8ac04af481` and
+  `66fac533bef6c93c041b08704bf538843fe552052a2994899aba0875c2c4b24e`,
+  respectively. Source page:
+  [AEAT technical specification](https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion.html).
 - Synthetic profile-feasibility report SHA-256 is
   `70d153f5a85cddf6966e2c155590655a353c8d72dd78116628b33ed56032bdba`.
   It demonstrates DSS signing through an opaque SoftHSM PKCS#11 key and local
