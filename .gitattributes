@@ -9,3 +9,4 @@ editions/source-snapshots/** binary
 config/admission/java-provider-licenses/*.txt -whitespace
 config/admission/java-provider-evidence/MAVEN-LICENSE.txt -whitespace
 config/admission/java-provider-evidence/MAVEN-NOTICE.txt -whitespace
+config/admission/java-provider-evidence/*.log -whitespace
