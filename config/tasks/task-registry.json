@@ -331,7 +331,7 @@
     },
     {
       "id": "test:p4-a",
-      "version": 1,
+      "version": 10,
       "owner": "quality-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -361,7 +361,7 @@
     },
     {
       "id": "test:p4-c",
-      "version": 1,
+      "version": 10,
       "owner": "cryptography-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -394,6 +394,60 @@
       "zeroWork": "fail",
       "operation": "testP4C",
       "tools": ["node", "python"]
+    },
+    {
+      "id": "test:p4-d",
+      "version": 85,
+      "owner": "cryptography-owner",
+      "dependencies": ["build:packages"],
+      "inputs": [
+        ".gitignore",
+        "packages/verifactu/src/application/xades.ts",
+        "packages/verifactu/src/ports/signature.ts",
+        "packages/verifactu/src/ports/certificate.ts",
+        "internal/xades-provider/provider.mjs",
+        "internal/xades-provider/pki.mjs",
+        "internal/xades-provider/worker.mjs",
+        "internal/xades-provider/dss/pom.xml",
+        "internal/xades-provider/dss/src/**",
+        "config/admission/java-provider.json",
+        "config/admission/java-provider-evidence/**",
+        "config/admission/java-provider-licenses/**",
+        "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/**",
+        "tests/contract/p4-xades-provider.test.mjs",
+        "tests/integration/p4-xades-pki.test.mjs",
+        "tests/mutation/p4-mutation.test.mjs",
+        "tests/security/p4-signature-attacks.test.mjs",
+        "tests/security/p4-resource-attacks.test.mjs",
+        "tooling/tasks/operations.mjs",
+        "tooling/ci/setup-java-provider.mjs"
+      ],
+      "outputs": [
+        "evidence/runs/test--p4-d.json",
+        "internal/xades-provider/dss/target/**"
+      ],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "JAVA_HOME",
+        "PATH",
+        "VERIFACTU_JAVA",
+        "VERIFACTU_JAVA_MUTATION",
+        "VERIFACTU_DSS_JAR",
+        "VERIFACTU_MAVEN",
+        "VERIFACTU_MAVEN_REPOSITORY",
+        "VERIFACTU_SUBJECT_SHA"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 600,
+      "concurrencyLock": "p4-d-xades-tests",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "testP4D",
+      "tools": ["node", "java", "maven"]
     },
     {
       "id": "package:allowlists",
@@ -781,7 +835,8 @@
         "policy:packages",
         "test:policy",
         "build:packages",
-        "test:p4-c"
+        "test:p4-c",
+        "test:p4-d"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -809,7 +864,8 @@
         "integration:tarball-consumers",
         "provenance:rehearsal",
         "test:p4-a",
-        "test:p4-c"
+        "test:p4-c",
+        "test:p4-d"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],

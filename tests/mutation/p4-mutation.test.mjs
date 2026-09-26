@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { inflateRawSync } from "node:zlib";
+import { promisify } from "node:util";
+import { spawnDssBridge } from "../../internal/xades-provider/worker.mjs";
 import test from "node:test";
 
 const built = resolve("evidence/runs/artifacts/build/verifactu/dist");
@@ -18,16 +23,59 @@ async function mutation(id, control, module, before, after, observe) {
     await cp(resolve("internal/xml-provider"), join(internal, "xml-provider"), {
       recursive: true,
     });
+    const xades = join(internal, "xades-provider");
+    await mkdir(xades, { recursive: true });
+    for (const name of ["provider.mjs", "pki.mjs", "worker.mjs"])
+      await cp(resolve("internal/xades-provider", name), join(xades, name));
     await writeFile(join(temporary, "package.json"), '{"type":"module"}\n');
-    const target = module.startsWith("internal/")
-      ? join(temporary, module)
-      : join(dist, module);
-    const original = await readFile(target, "utf8");
-    assert(
-      original.includes(before),
-      `mutation source span missing: ${module}`,
+    const javaSource = module.endsWith(".java");
+    const target = javaSource
+      ? join(temporary, "mutated", module)
+      : module.startsWith("internal/")
+        ? join(temporary, module)
+        : join(dist, module);
+    const original = await readFile(
+      javaSource ? resolve(module) : target,
+      "utf8",
     );
-    await writeFile(target, original.replace(before, after));
+    const edits = Array.isArray(before) ? before : [{ before, after }];
+    let mutated = original;
+    for (const edit of edits) {
+      assert(
+        mutated.includes(edit.before),
+        `mutation source span missing: ${module}`,
+      );
+      mutated = mutated.replace(edit.before, edit.after);
+    }
+    await mkdir(join(target, ".."), { recursive: true });
+    await writeFile(target, mutated);
+    let jarPath;
+    if (javaSource) {
+      const javaHome = process.env.JAVA_HOME;
+      const jar =
+        process.env.VERIFACTU_DSS_JAR ??
+        resolve(
+          "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
+        );
+      assert.ok(javaHome, "P4-D mutation requires the admitted JAVA_HOME");
+      const classes = join(temporary, "mutated-classes");
+      await mkdir(classes);
+      const javac = join(
+        javaHome,
+        "bin",
+        process.platform === "win32" ? "javac.exe" : "javac",
+      );
+      await promisify(execFile)(javac, [
+        "--release",
+        "21",
+        "-cp",
+        jar,
+        "-d",
+        classes,
+        target,
+      ]);
+      jarPath = `${classes}${process.platform === "win32" ? ";" : ":"}${jar}`;
+    }
     const load = async (path) => {
       const base = path.startsWith("internal/") ? temporary : dist;
       return import(
@@ -35,7 +83,7 @@ async function mutation(id, control, module, before, after, observe) {
       );
     };
     try {
-      await observe({ dist, load });
+      await observe({ dist, load, temporary, jarPath });
     } catch (error) {
       assert.equal(
         error?.code,
@@ -72,6 +120,74 @@ async function contextFor(load) {
 
 const date = "2025-01-01";
 const at = "2025-01-01T00:00:00Z";
+const xadesBytes = new TextEncoder().encode("<RegistroAlta/>");
+const xadesValid = {
+  editionId: "rrsif-2026-09-21-authoritative-candidate",
+  profileId: "AEAT-XADES-EPES-v0.1.5",
+  targetName: "RegistroAlta",
+  artifactBytes: xadesBytes,
+  artifactDigestSha256: createHash("sha256").update(xadesBytes).digest("hex"),
+  signingTime: "2026-09-26T12:00:00Z",
+  validationTime: "2026-09-26T12:00:00Z",
+  maximumRevocationAgeSeconds: 3_600,
+  trustAnchorsDer: [new Uint8Array([1])],
+  crlEvidence: [new Uint8Array([2])],
+  ocspEvidence: [],
+};
+
+function officialSignedVector() {
+  const archive = readFileSync(
+    "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/AnexosEjemplosFirmaRegFact.zip",
+  );
+  const end = archive.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  assert.notEqual(end, -1);
+  let offset = archive.readUInt32LE(end + 16);
+  const entries = archive.readUInt16LE(end + 10);
+  for (let index = 0; index < entries; index += 1) {
+    assert.equal(archive.readUInt32LE(offset), 0x02014b50);
+    const compressedBytes = archive.readUInt32LE(offset + 20);
+    const nameBytes = archive.readUInt16LE(offset + 28);
+    const extraBytes = archive.readUInt16LE(offset + 30);
+    const commentBytes = archive.readUInt16LE(offset + 32);
+    const localOffset = archive.readUInt32LE(offset + 42);
+    const name = archive.toString("utf8", offset + 46, offset + 46 + nameBytes);
+    if (name === "ejemploRegistro-firmado-epes-xades4j.xml") {
+      const body =
+        localOffset +
+        30 +
+        archive.readUInt16LE(localOffset + 26) +
+        archive.readUInt16LE(localOffset + 28);
+      return new Uint8Array(
+        inflateRawSync(archive.subarray(body, body + compressedBytes)),
+      );
+    }
+    offset += 46 + nameBytes + extraBytes + commentBytes;
+  }
+  assert.fail("official XAdES vector missing");
+}
+
+async function verifyWithBridge(artifactBytes, jarPath) {
+  const { createXadesProvider, XADES_EDITION_ID, XADES_PROFILE_ID } =
+    await import("../../internal/xades-provider/provider.mjs");
+  const provider = createXadesProvider({
+    execute: (request, options) =>
+      spawnDssBridge(request, { ...options, jarPath }),
+  });
+  return provider.verify({
+    editionId: XADES_EDITION_ID,
+    profileId: XADES_PROFILE_ID,
+    targetName: "RegistroAlta",
+    artifactBytes,
+    artifactDigestSha256: createHash("sha256")
+      .update(artifactBytes)
+      .digest("hex"),
+    trustAnchorsDer: [],
+    crlEvidence: [],
+    ocspEvidence: [],
+    validationTime: "2025-02-04T00:00:00Z",
+    maximumRevocationAgeSeconds: 86_400,
+  });
+}
 const digestPort = {
   providerId: "test:node-crypto",
   digest: (algorithm, bytes) =>
@@ -907,6 +1023,284 @@ test("P4-MUT-025 kills semantic-validity promotion by the XSD provider", async (
         result.semantic,
         "invalid",
         "P4-CB-025 semantic separation assertion",
+      );
+    },
+  );
+});
+
+if (process.env.VERIFACTU_JAVA_MUTATION === "1") {
+  test("P4-MUT-026 detects duplicate IDs in the signed XAdES target", async () => {
+    await mutation(
+      "P4-MUT-026",
+      "P4-CB-026",
+      "internal/xades-provider/dss/src/main/java/eu/noeos/verifactu/bridge/DssBridge.java",
+      "if (e.hasAttribute(attr) && !ids.add(e.getAttribute(attr))) return false;",
+      "if (false) return false;",
+      async ({ jarPath }) => {
+        const source = officialSignedVector();
+        const text = new TextDecoder()
+          .decode(source)
+          .replace("<sum1:IDVersion>", '<sum1:IDVersion Id="duplicate">')
+          .replace("<sum1:IDFactura>", '<sum1:IDFactura Id="duplicate">');
+        const result = await verifyWithBridge(
+          new TextEncoder().encode(text),
+          jarPath,
+        );
+        assert.equal(
+          result.profile,
+          "invalid",
+          "P4-CB-026 duplicate ID profile assertion",
+        );
+      },
+    );
+  });
+
+  test("P4-MUT-027 detects extra references in the signed XAdES profile", async () => {
+    await mutation(
+      "P4-MUT-027",
+      "P4-CB-027",
+      "internal/xades-provider/dss/src/main/java/eu/noeos/verifactu/bridge/DssBridge.java",
+      [
+        {
+          before: "signedInfoChildren.size() != 4",
+          after: "signedInfoChildren.size() < 4",
+        },
+        { before: "refs.size() != 2", after: "refs.size() < 2" },
+      ],
+      undefined,
+      async ({ jarPath }) => {
+        const source = officialSignedVector();
+        const text = new TextDecoder()
+          .decode(source)
+          .replace(
+            "</ds:SignedInfo>",
+            '<ds:Reference URI="https://example.invalid/attacker"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</ds:DigestValue></ds:Reference></ds:SignedInfo>',
+          );
+        const result = await verifyWithBridge(
+          new TextEncoder().encode(text),
+          jarPath,
+        );
+        assert.equal(
+          result.profile,
+          "invalid",
+          "P4-CB-027 exact reference profile assertion",
+        );
+      },
+    );
+  });
+}
+
+test("P4-MUT-028 preserves separate chain and trust outcomes", async () => {
+  await mutation(
+    "P4-MUT-028",
+    "P4-CB-028",
+    "internal/xades-provider/pki.mjs",
+    '    "trust",\n    "time",',
+    '    "time",',
+    async ({ load }) => {
+      const { normalizeCertificateAssessment } = await load(
+        "internal/xades-provider/pki.mjs",
+      );
+      const result = normalizeCertificateAssessment({
+        chain: "valid",
+        trust: "indeterminate",
+        time: "valid",
+        usage: "valid",
+        identity: "valid",
+        authorization: "indeterminate",
+        algorithm: "valid",
+      });
+      assert.equal(
+        result.outcomes.trust,
+        "indeterminate",
+        "P4-CB-028 separated trust outcome assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-037 rejects substitution of the permitted XAdES profile", async () => {
+  await mutation(
+    "P4-MUT-037",
+    "P4-CB-037",
+    "internal/xades-provider/provider.mjs",
+    "if (\n    request.editionId !== XADES_EDITION_ID ||\n    request.profileId !== XADES_PROFILE_ID\n  )",
+    "if (false)",
+    async ({ load }) => {
+      const { createXadesProvider } = await load(
+        "internal/xades-provider/provider.mjs",
+      );
+      const result = await createXadesProvider({
+        execute: async () => {
+          throw new Error("must not execute");
+        },
+      }).verify({ ...xadesValid, profileId: "attacker-profile" });
+      assert.equal(
+        result.diagnostics[0],
+        "DIAG-XADES-EDITION",
+        "P4-CB-037 pinned profile assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-038 rejects signed bytes whose independent verification is invalid", async () => {
+  await mutation(
+    "P4-MUT-038",
+    "P4-CB-038",
+    "internal/xades-provider/provider.mjs",
+    'if (\n    verification.profile !== "valid" ||\n    verification.cryptographic !== "valid"\n  )',
+    "if (false)",
+    async ({ load }) => {
+      const { createXadesProvider } = await load(
+        "internal/xades-provider/provider.mjs",
+      );
+      const execute = async (request) => {
+        if (request.command === "SIGN_PREPARE")
+          return {
+            kind: "TBS",
+            diagnostic: "NONE",
+            payload: new Uint8Array(256),
+          };
+        if (request.command === "SIGN_COMPLETE")
+          return {
+            kind: "SIGNED",
+            diagnostic: "NONE",
+            payload: new TextEncoder().encode("<RegistroAlta/> "),
+          };
+        return {
+          kind: "INDETERMINATE",
+          diagnostic: "NONE",
+          payload: new TextEncoder().encode(
+            "VALID\tINVALID\tVALID\tUNKNOWN\tNONE\t0\t0",
+          ),
+        };
+      };
+      const provider = createXadesProvider({ execute });
+      const result = await provider.sign({
+        ...xadesValid,
+        signer: {
+          keyHandle: "test:opaque-key",
+          certificateDer: new Uint8Array([3]),
+          certificateChainDer: [],
+          sign: async (data) => new Uint8Array(data.byteLength).fill(9),
+        },
+      });
+      assert.equal(
+        result.status,
+        "invalid",
+        "P4-CB-038 output signature verification assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-039 rejects revocation evidence outside its caller-time interval", async () => {
+  await mutation(
+    "P4-MUT-039",
+    "P4-CB-039",
+    "internal/xades-provider/pki.mjs",
+    "thisUpdate > instant ||",
+    "false ||",
+    async ({ load }) => {
+      const { normalizePkiObservation } = await load(
+        "internal/xades-provider/pki.mjs",
+      );
+      const instant = Date.parse("2026-09-26T12:00:00Z");
+      const result = normalizePkiObservation(
+        {
+          status: "valid",
+          thisUpdateMs: instant + 1_000,
+          nextUpdateMs: instant + 60_000,
+        },
+        {
+          validationTimeMs: instant,
+          maximumRevocationAgeSeconds: 3_600,
+          crlEvidence: [new Uint8Array([1])],
+          ocspEvidence: [],
+        },
+      );
+      assert.equal(
+        result.status,
+        "stale",
+        "P4-CB-039 caller-time evidence interval assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-029 keeps stale revocation evidence indeterminate", async () => {
+  await mutation(
+    "P4-MUT-029",
+    "P4-CB-029",
+    "internal/xades-provider/pki.mjs",
+    'if (observation.status === "stale")\n    return Object.freeze({\n      status: "stale",\n      thisUpdateMs: observation.thisUpdateMs,\n      nextUpdateMs: observation.nextUpdateMs,\n    });',
+    'if (observation.status === "stale")\n    return Object.freeze({\n      status: "valid",\n      thisUpdateMs: observation.thisUpdateMs,\n      nextUpdateMs: observation.nextUpdateMs,\n    });',
+    async ({ load }) => {
+      const { normalizePkiObservation } = await load(
+        "internal/xades-provider/pki.mjs",
+      );
+      const result = normalizePkiObservation(
+        { status: "stale", thisUpdateMs: 10, nextUpdateMs: 20 },
+        {
+          validationTimeMs: 15,
+          maximumRevocationAgeSeconds: 60,
+          crlEvidence: [new Uint8Array([1])],
+          ocspEvidence: [],
+        },
+      );
+      assert.equal(
+        result.status,
+        "stale",
+        "P4-CB-029 stale evidence fail-closed assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-040 keeps unknown revocation evidence indeterminate", async () => {
+  await mutation(
+    "P4-MUT-040",
+    "P4-CB-040",
+    "internal/xades-provider/pki.mjs",
+    'if (observation.status === "unknown")\n    return Object.freeze({\n      status: "unknown",\n      thisUpdateMs: null,\n      nextUpdateMs: null,\n    });',
+    'if (observation.status === "unknown")\n    return Object.freeze({\n      status: "valid",\n      thisUpdateMs: null,\n      nextUpdateMs: null,\n    });',
+    async ({ load }) => {
+      const { normalizePkiObservation } = await load(
+        "internal/xades-provider/pki.mjs",
+      );
+      const result = normalizePkiObservation(
+        { status: "unknown" },
+        {
+          validationTimeMs: Date.parse("2026-09-26T12:00:00Z"),
+          maximumRevocationAgeSeconds: 3_600,
+          crlEvidence: [new Uint8Array([1])],
+          ocspEvidence: [],
+        },
+      );
+      assert.equal(
+        result.status,
+        "unknown",
+        "P4-CB-040 unknown evidence fail-closed assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-041 prevents network-enabled Java policy in the DSS worker", async () => {
+  await mutation(
+    "P4-MUT-041",
+    "P4-CB-041",
+    "internal/xades-provider/worker.mjs",
+    '"-Djava.security.manager=allow",',
+    '"-Djava.security.manager=disallow",',
+    async ({ load }) => {
+      const { DSS_JVM_OPTIONS } = await load(
+        "internal/xades-provider/worker.mjs",
+      );
+      assert.ok(
+        DSS_JVM_OPTIONS.includes("-Djava.security.manager=allow"),
+        "P4-CB-041 process network-deny assertion",
       );
     },
   );

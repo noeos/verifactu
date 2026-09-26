@@ -5542,5 +5542,607 @@
       ],
       "buildToolsNotShaded": true
     }
-  }
+  },
+  "buildMetadataPoms": [
+    {
+      "groupId": "com.fasterxml",
+      "artifactId": "oss-parent",
+      "version": "38",
+      "pomSha256": "c83f8f45dfdca8d0b6b3661c60b3f84780f671b12e06f91ad5d1c1a1d1f966e8"
+    },
+    {
+      "groupId": "com.fasterxml",
+      "artifactId": "oss-parent",
+      "version": "50",
+      "pomSha256": "f5da55dd7b88fb170c46801d17774a652fb2f4581fb5b1d0a5fc86aa182b8577"
+    },
+    {
+      "groupId": "com.github.javaparser",
+      "artifactId": "javaparser-parent",
+      "version": "3.28.2",
+      "pomSha256": "0358ce75bca1a54c141e16b7f1621e973fa177ddf64fe02b0f38df23ad400543"
+    },
+    {
+      "groupId": "com.sun.activation",
+      "artifactId": "all",
+      "version": "2.0.1",
+      "pomSha256": "648d5d62b6153f42f190ced2d6e70c1e6442550c9cfeb66fbee0961c6616b2cc"
+    },
+    {
+      "groupId": "com.sun.istack",
+      "artifactId": "istack-commons",
+      "version": "4.0.1",
+      "pomSha256": "cc3bcf26d42c2e023a4a90e47f331793e0d9476baf2727ad9ddc8bbe735216c2"
+    },
+    {
+      "groupId": "com.sun.xml.bind",
+      "artifactId": "jaxb-bom-ext",
+      "version": "3.0.2",
+      "pomSha256": "8d448852996c758311a5bb3da1e7234c6a8679f4d13b52275b14a9f517af8c10"
+    },
+    {
+      "groupId": "com.sun.xml.bind.mvn",
+      "artifactId": "jaxb-parent",
+      "version": "3.0.2",
+      "pomSha256": "1df0217784257f7fc3ab45c8cee214ec2058ae76c41fbcd9cf8394d5e98c9673"
+    },
+    {
+      "groupId": "com.sun.xml.bind.mvn",
+      "artifactId": "jaxb-runtime-parent",
+      "version": "3.0.2",
+      "pomSha256": "985009de59b42555e88fee17f2d4467d84f6c227646f83e6fc1b31f346b8ebdd"
+    },
+    {
+      "groupId": "com.sun.xml.bind.mvn",
+      "artifactId": "jaxb-txw-parent",
+      "version": "3.0.2",
+      "pomSha256": "0d5abccc805a2ebbf25c3f2ec1b3e42dcdeb16ea9c905b985674620168c1a0ab"
+    },
+    {
+      "groupId": "commons-io",
+      "artifactId": "commons-io",
+      "version": "2.11.0",
+      "pomSha256": "2e016fd7e3244b5f2c20acad834d93aa4790486ee1e4564641361a3e831eef59"
+    },
+    {
+      "groupId": "commons-io",
+      "artifactId": "commons-io",
+      "version": "2.20.0",
+      "pomSha256": "bdbdf81072c190ee9a8b181a5c58f5bd917a750fb13a256debbf53f5dbd33a2a"
+    },
+    {
+      "groupId": "eu.europa.ec.joinup.sd-dss",
+      "artifactId": "dss-bom",
+      "version": "6.5",
+      "pomSha256": "f68ecfe663ebf75a3c6ea76b2daf146ea6e0a47558a771cca82b00e6fdf57689"
+    },
+    {
+      "groupId": "eu.europa.ec.joinup.sd-dss",
+      "artifactId": "sd-dss",
+      "version": "6.5",
+      "pomSha256": "078e6c0405f49ebbfd4a48c6e4406d800cc3f887254e992429189e0de700808e"
+    },
+    {
+      "groupId": "io.airlift",
+      "artifactId": "airbase",
+      "version": "112",
+      "pomSha256": "18ccd104cbd97eb44bd57b68c047ab7ff81fbc800987f82d815c68ac4c2304ce"
+    },
+    {
+      "groupId": "io.airlift",
+      "artifactId": "aircompressor",
+      "version": "0.27",
+      "pomSha256": "5aacda89be38563bdf3bfac79333616c0802ca617070dea66ba649507c994441"
+    },
+    {
+      "groupId": "jakarta.xml.bind",
+      "artifactId": "jakarta.xml.bind-api-parent",
+      "version": "3.0.1",
+      "pomSha256": "9f1fb5d4a02e9f8fdd62ef3beab94b8fea7b81643748c86f68a31f40f774ad56"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "13",
+      "pomSha256": "ff513db0361fd41237bef4784968bc15aae478d4ec0a9496f811072ccaf3841d"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "21",
+      "pomSha256": "af10c108da014f17cafac7b52b2b4b5a3a1c18265fa2af97a325d9143537b380"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "23",
+      "pomSha256": "bc10624e0623f36577fac5639ca2936d3240ed152fb6d8d533ab4d270543491c"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "29",
+      "pomSha256": "3e49037174820bbd0df63420a977255886398954c2a06291fa61f727ac35b377"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "32",
+      "pomSha256": "cfd872c0ec27f53ae68f43dbc0fecded8add773079a53afbd390e407b42ce72f"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "33",
+      "pomSha256": "d78bd8524c5f8380a190a6525686629a95dfe512df21111383a6d8c0923a4415"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "34",
+      "pomSha256": "3671ae9d4d062ae3bb985731c76088bb2f6f7d7254e2d304ee9f690b97651328"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "35",
+      "pomSha256": "ea297dcd114136e8b8e8b630230d52a76c2fc69f6c5db25d672b1857000728b8"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "37",
+      "pomSha256": "524ec4787aff73af6b3a9fafa154c7f1881b648299b663fdbfcadda1286f2353"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "39",
+      "pomSha256": "71752ed4c2435a1d8385fe0a4d330f39d04efec89f0d1ba5d1598d39f7397a44"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "4",
+      "pomSha256": "9e9323a26ba8eb2394efef0c96d31b70df570808630dc147cab1e73541cc5194"
+    },
+    {
+      "groupId": "org.apache",
+      "artifactId": "apache",
+      "version": "7",
+      "pomSha256": "1397ce1db433adc9f223dbf07496d133681448751f4ae29e58f68e78fb4b6c25"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "103",
+      "pomSha256": "07407815f3c1441a078e16e5dde2deaf652a3dbdfbf2eba3b563d561210794bf"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "52",
+      "pomSha256": "75dbe8f34e98e4c3ff42daae4a2f9eb4cbcd3b5f1047d54460ace906dbb4502e"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "79",
+      "pomSha256": "628df30148acd3c491cfcb6b73c7ae4b5989e5526ab13a2f428dea5d4ad10d7a"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "81",
+      "pomSha256": "348d4e7c131be6114c854a719ce7a44307a7c39bd366084977b24fd29ad0edb4"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "85",
+      "pomSha256": "d189ff2c0027e96bb65d31e6f227ed2af966169b36af1e973dd5ba08926dc7b5"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "92",
+      "pomSha256": "94f6c027b15f6402995dd1b2c7ea35bfe1ebc88b6832b3134368b41998721953"
+    },
+    {
+      "groupId": "org.apache.commons",
+      "artifactId": "commons-parent",
+      "version": "98",
+      "pomSha256": "d40318527f56033e0ff0789971cc38c856aa99a685eea11270814e7f1eda9fba"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "10",
+      "pomSha256": "81fe14cb9779d36e0c610e1049e5b32a6b9974957f257921acf628b31c5486c8"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "16",
+      "pomSha256": "70cef83d246309a2aa355c38f2004edda3621ae0bc5c55a7a139eaeef4d1231a"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "23",
+      "pomSha256": "5425501edd9e0bd7b01eca53cc92e06836d24851151304f9c6759e1713541685"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "33",
+      "pomSha256": "3856e3fcd169502d5f12fe2452604ebf6c7c025f15656bfa558ea99ed29d73ea"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "39",
+      "pomSha256": "cfe4820aa1d96ae51d1dc5b0e2a9dc582c42478c24c95ca8238f547e60bef721"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "42",
+      "pomSha256": "04534dea350a2187970a5b74444338bcf78ba8e537d44f262acfba16ebb33056"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "44",
+      "pomSha256": "1c0a088d7352d52ea8f3581d05778c0c4a679613fff2c58737fba55f1007fe24"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "45",
+      "pomSha256": "94fe869eb9b4ce9fce3995d05ea86b168c85d927f9d17beb814a1960c76d7e6f"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "47",
+      "pomSha256": "82d0112ba1907ff5fd13a2485829c97df66c6a81e075359a561a422f7d1582d3"
+    },
+    {
+      "groupId": "org.apache.maven",
+      "artifactId": "maven-parent",
+      "version": "49",
+      "pomSha256": "ca906201ee34de09e76632c5dec04a9b868ee38ce68c134b765fd1871d1d3eed"
+    },
+    {
+      "groupId": "org.apache.maven.doxia",
+      "artifactId": "doxia",
+      "version": "1.0",
+      "pomSha256": "38246291439393fd08f54c6d7fedde2db0fd5c94d0910f17b99e8d59a2858e98"
+    },
+    {
+      "groupId": "org.apache.maven.plugins",
+      "artifactId": "maven-plugins",
+      "version": "44",
+      "pomSha256": "d7801d725de2abb706efb931e22eac5df4d0c7fc8c9ea9a4d9986782407aaff7"
+    },
+    {
+      "groupId": "org.apache.maven.plugins",
+      "artifactId": "maven-plugins",
+      "version": "47",
+      "pomSha256": "58ddbb8e429cb5e9054c2f5f7b7cdfeb7adbcdfda21d92b67f67fa2b94edf982"
+    },
+    {
+      "groupId": "org.apache.maven.plugins",
+      "artifactId": "maven-plugins",
+      "version": "49",
+      "pomSha256": "4225f860bccdcb48a315de478e70ab817b411077974de5c9d1b8e2761be5f515"
+    },
+    {
+      "groupId": "org.apache.maven.resolver",
+      "artifactId": "maven-resolver-util",
+      "version": "1.4.1",
+      "pomSha256": "a58c932e967e85e7bcb8d4adaedd14a5221a1750a1d089c5086c4d73df505155"
+    },
+    {
+      "groupId": "org.apache.maven.resolver",
+      "artifactId": "maven-resolver",
+      "version": "1.4.1",
+      "pomSha256": "831c3849751101226495acfe9119582feb734a4539b070e0fbd9e85b03b501ce"
+    },
+    {
+      "groupId": "org.apache.maven.resolver",
+      "artifactId": "maven-resolver",
+      "version": "1.9.27",
+      "pomSha256": "8924b41711cce058f83c46d79ad83d6e04edcf13ed5631ec11135656e0b87f56"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "15",
+      "pomSha256": "6a58eb24291600f75ce0fe369b73fe6700f575ace4b664724d3cd0a6b85b63ee"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "19",
+      "pomSha256": "d82408269aada2eb1521ee8ff17f7c67333684f8ed2a09a9e35badd2e7575957"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "39",
+      "pomSha256": "17e81388d88ba61c4055450ec90a32ee30acd07f46dc6e31e096b8e53735f4b2"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "42",
+      "pomSha256": "aa66faa11c11b900d099bfef0ee9fe8485d7e7fc74e87193e1f74572ed9587c5"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "44",
+      "pomSha256": "41fbab97912beb3a061b1e3845d2e06d2bb214cc71f92fa7f396480dc765a14e"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "45",
+      "pomSha256": "5879e023d9bcafda006d28b42b2495c6f3db587d3e71eefa0a3cedeeea36d987"
+    },
+    {
+      "groupId": "org.apache.maven.shared",
+      "artifactId": "maven-shared-components",
+      "version": "47",
+      "pomSha256": "3bd3d07c910477091bb9602f931f696c4aa115c86a322bff6a604ec7543afc07"
+    },
+    {
+      "groupId": "org.apache.maven.surefire",
+      "artifactId": "surefire",
+      "version": "3.6.0",
+      "pomSha256": "172f76e8ad94a07a700ed7d5afc775c91f80cbd131eb60378b0d83d57d8131d9"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-archiver",
+      "version": "4.10.4",
+      "pomSha256": "53a2103d9257c801a8fc9c211d9fedea7e3ee1bf516bbbc28021ef45c1a219c5"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-compiler",
+      "version": "2.17.0",
+      "pomSha256": "62eae3b1bb053060b4375c393664a9559afdfafd6de133924f81794aa20caf68"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-compilers",
+      "version": "2.17.0",
+      "pomSha256": "a7bd62ce59cd3822b8202228471eb363af269128af71db9c3b24ec56c2b1a850"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-languages",
+      "version": "1.6.0",
+      "pomSha256": "57b98b5fd9c81bf78bd34cbe0faf11d9613b2f472ffad0194c0395677ccfcb0a"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-utils",
+      "version": "3.6.0",
+      "pomSha256": "6138300481471c7fe6aeb115f912961f886e1a46ee9c2bd2841b65184824da28"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus-utils",
+      "version": "4.0.2",
+      "pomSha256": "5151c13bdd7cc3a5569583a7f4267392f013ffd3115eab8db5f86de420a366af"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus",
+      "version": "13",
+      "pomSha256": "575945dc08966c66eb03d5bae9135bd22ca3920a1865bb99d3ecd93bef55abd3"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus",
+      "version": "18",
+      "pomSha256": "b43ee89c8890b9e5bc48d079fcb4c44f082b5139253356dc455806a33c3dd8fd"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus",
+      "version": "19",
+      "pomSha256": "8d3e51c3902fd7596e548eab121ebf6b0d4aa73857077f26a24fc86f9b8455b4"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus",
+      "version": "24",
+      "pomSha256": "89a1bc79e46c35ab108b7e215bb2c5c215ff8f3af1ae3cfef82d9a2b33b06c51"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus",
+      "version": "25",
+      "pomSha256": "faa7947c2020967ad0c92b259ee9fa361d05e90cd036d17c37098bb1edaea3a3"
+    },
+    {
+      "groupId": "org.codehaus.plexus",
+      "artifactId": "plexus",
+      "version": "27",
+      "pomSha256": "dbc7d80d79d3760fed777bea9e41b1c0a370442ea8ecf930d04a6a5620d36b6e"
+    },
+    {
+      "groupId": "org.eclipse.ee4j",
+      "artifactId": "project",
+      "version": "1.0.6",
+      "pomSha256": "4e7d8329d8da7dcf30779d824241be145f27108932f5a5a24eb907677bc8d72d"
+    },
+    {
+      "groupId": "org.eclipse.ee4j",
+      "artifactId": "project",
+      "version": "1.0.7",
+      "pomSha256": "205c039a42cbae3556efbeb04a483eb3a3cf9550bd75bf84260dc8f28218f105"
+    },
+    {
+      "groupId": "org.eclipse.sisu",
+      "artifactId": "sisu-inject",
+      "version": "0.9.0.M4",
+      "pomSha256": "0c829c9641ccac870d7d7ff012cbbad8447e912eb9a26d0d7283f09cba44c0d9"
+    },
+    {
+      "groupId": "org.glassfish.jaxb",
+      "artifactId": "jaxb-bom",
+      "version": "3.0.2",
+      "pomSha256": "062a1332f8cb4bed0dd9cd58bb4cc07501fa44c90daa17fec1079f450b9d5703"
+    },
+    {
+      "groupId": "org.jacoco",
+      "artifactId": "org.jacoco.build",
+      "version": "0.8.15",
+      "pomSha256": "3a2c89f80c2ab9caf1b403a62da4bcbd909ee52ea53747391267a5cdc968c123"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.10.2",
+      "pomSha256": "169dd904a4b0f6520cffe658cc62292bfe9f3c14a989fa92120724cde43a9968"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.11.1",
+      "pomSha256": "c72124a9c9a79910c1858766b72c350e1a39244cbfb4b076348fbfe078281965"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.11.4",
+      "pomSha256": "19d4b747b204805325b6334553296f986562277a4ac1cb5e593a5e4c4f5e4115"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.12.1",
+      "pomSha256": "7c826bc72beddc817dad9263027f9012a0f55a377d38df89c42932a2501c2bf0"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.12.2",
+      "pomSha256": "cef80fec86454f6806bfb0df24669b5c6f32e2cb728539ea859f47dfdc9bbc17"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.13.1",
+      "pomSha256": "fa68451ea830572ed43ffe51d75b6a05f7a5e665a602a51f49d6be02063a65f3"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.13.4",
+      "pomSha256": "d7a08a99b2502f0bb68cd4e1f984f0bf69324aaa208bd0f73366c03fc3548a42"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.14.1",
+      "pomSha256": "01b01dfa366550b40ac5760548a7d728b6109d17c451e83864d1e5e0ce862c94"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.14.2",
+      "pomSha256": "ed2dcc7855bd460bccc93a1bf0c962e63b566ff7d8f1ded0f1f2593ba8183aaf"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.14.3",
+      "pomSha256": "08a02856e487c9357f9b29e38745f8ae805848111e72d15aad0352338f1632e1"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.14.4",
+      "pomSha256": "5706e8f29a0a07f56efbbea4a0670793414194bb8d24d8143ba1e787a2f32856"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.7.2",
+      "pomSha256": "cd14aaa869991f82021c585d570d31ff342bcba58bb44233b70193771b96487b"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.8.0-M1",
+      "pomSha256": "77144432ffc68bd98a790ab1069619d91032cfc0e4e13c08163aa03da36fd6e2"
+    },
+    {
+      "groupId": "org.junit",
+      "artifactId": "junit-bom",
+      "version": "5.9.3",
+      "pomSha256": "4d0329cd9e72f2420e5ca15724cbfe6ffa6e5fd2888361516271190fdc342ed7"
+    },
+    {
+      "groupId": "org.mockito",
+      "artifactId": "mockito-bom",
+      "version": "4.11.0",
+      "pomSha256": "d8531a746c988f7f68ed5f188cdea945006aea993ec5df9e524e0d27d61491da"
+    },
+    {
+      "groupId": "org.ow2",
+      "artifactId": "ow2",
+      "version": "1.5.1",
+      "pomSha256": "321ddbb7ee6fe4f53dea6b4cd6db74154d6bfa42391c1f763b361b9f485acf05"
+    },
+    {
+      "groupId": "org.ow2.asm",
+      "artifactId": "asm-bom",
+      "version": "9.10.1",
+      "pomSha256": "709472d69cf785d4b679eee0e6e0575d4b104476ddf35265ef1117e73c129cd4"
+    },
+    {
+      "groupId": "org.slf4j",
+      "artifactId": "slf4j-bom",
+      "version": "2.0.18",
+      "pomSha256": "9219aab601575126c4e66e1331eb2b0c6c17a330ac4d5a07e3cd11d580a0c12d"
+    },
+    {
+      "groupId": "org.slf4j",
+      "artifactId": "slf4j-parent",
+      "version": "1.7.36",
+      "pomSha256": "bb388d37fbcdd3cde64c3cede21838693218dc451f04040c5df360a78ed7e812"
+    },
+    {
+      "groupId": "org.slf4j",
+      "artifactId": "slf4j-parent",
+      "version": "2.0.18",
+      "pomSha256": "0b3896bedad2c9ed9697edcbea1da0c54cd238a723583a81358a83bfb782e9fa"
+    },
+    {
+      "groupId": "org.sonatype.forge",
+      "artifactId": "forge-parent",
+      "version": "5",
+      "pomSha256": "e56188aa8ce51278006aa90bc7e0f304a81e2f1219f462e7d21f262535cd2795"
+    },
+    {
+      "groupId": "org.sonatype.spice",
+      "artifactId": "spice-parent",
+      "version": "15",
+      "pomSha256": "13d15ddfe9946b8427bb7b4b081ab63962285eed0bf6fa5142aea25a46e15814"
+    },
+    {
+      "groupId": "org.tukaani",
+      "artifactId": "xz",
+      "version": "1.10",
+      "pomSha256": "ef608b83c3bb6c8e3e6b3beaa38842ba15963b46495e4af91b0746c8b750f3b9"
+    }
+  ]
 }

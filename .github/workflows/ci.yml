@@ -43,6 +43,8 @@ jobs:
         with:
           python-version: 3.13.15
           check-latest: false
+      - name: Admit exact Maven provider inputs
+        run: node tooling/ci/setup-java-provider.mjs
       - name: Install hash-locked SPDX runtime
         shell: bash
         run: python -m pip install --require-hashes --no-deps --disable-pip-version-check -r config/python/requirements.lock

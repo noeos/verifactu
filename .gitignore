@@ -15,3 +15,6 @@ dist/
 evidence/runs/
 node_modules/
 *.tgz
+
+# Private XAdES provider build output
+/internal/xades-provider/dss/target/
