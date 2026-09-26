@@ -3370,9 +3370,9 @@ on its own line; issue `#87` is closed. The first protected-push attempt had
 23/25 checks pass. The source gate received HTTP 403 from the GitHub API while
 downloading the pinned SPDX model asset; required-check closure failed as a
 consequence. Governance/DCO passed with the correctly formatted trailer.
-GitHub attempt 2 is rerunning the failed source and closure jobs. Issue `#85`
-and this PR remain open until the protected checks and refreshed read-back
-checks pass.
+GitHub reran the failed jobs as attempt 2; all 25/25 check-runs then passed on
+the same protected commit, including source/generation closure and DCO. Issue
+`#85` and this PR remain open until the refreshed read-back checks pass.
 
 ### Decision evidence and limits
 
