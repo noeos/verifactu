@@ -900,7 +900,7 @@
     },
     {
       "id": "p4:quality-plan",
-      "version": 1,
+      "version": 5,
       "owner": "assurance-owner",
       "dependencies": [],
       "inputs": [
@@ -909,6 +909,9 @@
         "config/ci/required-checks.json",
         "config/toolchain/toolchain.json",
         "config/admission/dependencies.json",
+        "config/admission/java-provider.json",
+        "config/admission/java-provider-evidence/**",
+        "config/admission/java-provider-licenses/**",
         "docs/17-roadmap-risk/p4-quality-plan.md",
         "docs/17-roadmap-risk/prompts.md",
         "docs/11-quality-testing/coverage-policy.md",
@@ -932,7 +935,7 @@
       "reportSchema": "evidence/schemas/task-report.schema.json",
       "zeroWork": "fail",
       "operation": "p4QualityPlan",
-      "tools": ["git", "node"]
+      "tools": ["git", "node", "python"]
     },
     {
       "id": "gate:p4-readiness",

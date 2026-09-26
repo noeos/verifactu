@@ -2107,6 +2107,9 @@ async function componentGraph(context) {
   const python = await readJson(
     resolve(context.root, "config/admission/python-dependencies.json"),
   );
+  const javaProvider = await readJson(
+    resolve(context.root, "config/admission/java-provider.json"),
+  );
   const actions = (
     await readJson(resolve(context.root, "config/admission/actions.json"))
   ).actions;
@@ -2257,6 +2260,33 @@ async function componentGraph(context) {
       scope: "build",
     });
   }
+  const javaProviderId =
+    "pkg:maven/eu.noeos.verifactu.internal/verifactu-xades-provider@0.0.0-development";
+  const pluginRootPurl = (plugin) =>
+    `pkg:maven/${plugin.groupId}/${plugin.artifactId}@${plugin.version}`;
+  components.push({
+    id: javaProviderId,
+    type: "maven-provider",
+    name: "verifactu-xades-provider",
+    version: "0.0.0-development",
+    purl: javaProviderId,
+    digest: javaProvider.licenseClosure.shadedArchive.sha256,
+    license: "Apache-2.0",
+    scope: "subject",
+  });
+  for (const item of javaProvider.components) {
+    components.push({
+      id: item.purl,
+      type: "maven",
+      name: `${item.groupId}:${item.artifactId}`,
+      version: item.version,
+      purl: item.purl,
+      digest: item.jarSha256,
+      license: item.spdxLicenseExpression,
+      scope: item.scope.includes("runtime") ? "runtime" : "build",
+      source: "config/admission/java-provider.json",
+    });
+  }
   for (const item of packageManifest.subjects)
     components.push({
       id: `package:${item.name}@0.0.0-development`,
@@ -2350,6 +2380,14 @@ async function componentGraph(context) {
       );
     }
   }
+  for (const edge of javaProvider.runtimeGraph.edges)
+    addRelationship(edge.from, edge.to, "dependsOn");
+  for (const edge of javaProvider.buildPluginGraph.edges)
+    addRelationship(edge.from, edge.to, "buildDependency");
+  for (const plugin of javaProvider.buildPluginGraph.plugins)
+    for (const purl of new Set(plugin.resolvedComponents))
+      if (pluginRootPurl(plugin) !== purl)
+        addRelationship(pluginRootPurl(plugin), purl, "buildDependency");
   const uniqueRelationships = [
     ...new Map(
       relationships.map((entry) => [
@@ -2358,6 +2396,49 @@ async function componentGraph(context) {
       ]),
     ).values(),
   ].sort((a, b) => canonicalJson(a).localeCompare(canonicalJson(b), "en"));
+  const componentById = new Map(
+    components.map((component) => [component.id, component]),
+  );
+  for (const admitted of javaProvider.components) {
+    const actual = componentById.get(admitted.purl);
+    assert(
+      actual?.digest === admitted.jarSha256 &&
+        actual.license === admitted.spdxLicenseExpression,
+      "JAVA_PROVIDER_SBOM_COMPONENT",
+      admitted.purl,
+    );
+  }
+  assert(
+    componentById.get(javaProviderId)?.digest ===
+      javaProvider.licenseClosure.shadedArchive.sha256,
+    "JAVA_PROVIDER_SBOM_SHADED_ARCHIVE",
+    javaProviderId,
+  );
+  const relationshipIds = new Set(
+    uniqueRelationships.map((edge) => `${edge.from}\0${edge.to}\0${edge.type}`),
+  );
+  for (const edge of javaProvider.runtimeGraph.edges)
+    assert(
+      relationshipIds.has(`${edge.from}\0${edge.to}\0dependsOn`),
+      "JAVA_PROVIDER_SBOM_RUNTIME_EDGE",
+      `${edge.from} -> ${edge.to}`,
+    );
+  for (const edge of javaProvider.buildPluginGraph.edges)
+    assert(
+      relationshipIds.has(`${edge.from}\0${edge.to}\0buildDependency`),
+      "JAVA_PROVIDER_SBOM_PLUGIN_EDGE",
+      `${edge.from} -> ${edge.to}`,
+    );
+  for (const plugin of javaProvider.buildPluginGraph.plugins)
+    for (const purl of new Set(plugin.resolvedComponents))
+      if (pluginRootPurl(plugin) !== purl)
+        assert(
+          relationshipIds.has(
+            `${pluginRootPurl(plugin)}\0${purl}\0buildDependency`,
+          ),
+          "JAVA_PROVIDER_SBOM_PLUGIN_MEMBERSHIP",
+          `${plugin.artifactId} -> ${purl}`,
+        );
   for (const relationship of uniqueRelationships) {
     assert(
       ids.has(relationship.from),
@@ -2412,7 +2493,9 @@ function cyclonedxFromGraph(graph) {
   };
   const components = graph.components.map((component) => ({
     type:
-      component.type === "package" || component.type === "npm"
+      component.type === "package" ||
+      component.type === "npm" ||
+      component.type === "maven"
         ? "library"
         : "application",
     "bom-ref": component.id,
@@ -2421,7 +2504,8 @@ function cyclonedxFromGraph(graph) {
     purl: component.purl,
     hashes: digestRecords(component.digest),
     licenses: [
-      /\s(?:AND|OR|WITH)\s/u.test(component.license)
+      /\s(?:AND|OR|WITH)\s/u.test(component.license) ||
+      component.license.startsWith("LicenseRef-")
         ? { expression: component.license }
         : { license: { id: component.license } },
     ],
@@ -3414,6 +3498,6 @@ export const operationCapabilities = Object.freeze({
   regulatoryDrift: { tools: ["node"], network: "denied" },
   gateP3: { tools: [], network: "denied" },
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
-  p4QualityPlan: { tools: ["git", "node"], network: "denied" },
+  p4QualityPlan: { tools: ["git", "node", "python"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });
