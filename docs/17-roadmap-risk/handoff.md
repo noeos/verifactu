@@ -3318,3 +3318,88 @@ separate bounded P4-E work item and branch start from the latest protected
 
 Closes #81 after this handoff PR passes its exact-head and protected-push
 checks and the final protected-main read-back is recorded.
+
+## P4-E decoder decision protected read-back — 2026-09-26
+
+This append-only record captures the separate decision update required before
+P4-E dependency admission. It does not admit dependencies or authorize
+implementation. Issue `#83` remains open for exact package admission; issue
+`#85` tracks this protected-main read-back and correction of the squash DCO
+trailer.
+
+### Decision PR and exact protected identity
+
+- PR `#84` selected `qr@0.7.0` through `qr/decode.js` as the development-only
+  independent decoder; `@nuintun/qrcode@5.0.3` remains the private encoder
+  candidate. `@zxing/library@0.23.0` was rejected because it is maintenance-only
+  and declares Node `>=24`, beyond the project's Node `22.14.0` minimum.
+- PR head `bc99596f1f92abc63f149f062282eb6ae5ff6a87` has tree
+  `65cd6e6d1a705d88504ada3772ad433329e51f96`, is based on protected
+  `5d6893617812f8ecd755807d0206aa07d94f0ac8`, and has a valid SSH signature and
+  canonical DCO trailer. Its exact-head checks were 26/26 successful, including
+  required-check closure, OSV, dependency review, package/SBOM, and all
+  configured Node/platform cells.
+- PR `#84` merged as protected commit
+  `672fc3b7dbc39db7a15451e7ece894e479d95af1`, tree
+  `65cd6e6d1a705d88504ada3772ad433329e51f96`, sole parent
+  `5d6893617812f8ecd755807d0206aa07d94f0ac8`. GitHub reports a valid protected
+  commit signature. The protected-push governance/DCO check failed because the
+  squash message contained literal `\\n` text before its `Signed-off-by` line;
+  this was a handoff-command formatting error, not a failed PR-head DCO check.
+  Issue `#85` tracks the corrective protected read-back; the decision remains
+  open until a later protected tip and its required checks are verified.
+
+### P4-D Windows fixture timeout correction
+
+PR `#86`'s first exact head, `4fa8c275d2771c069b5e90e617e8ad40bcb37ddb`,
+passed all Linux/macOS jobs but failed the Windows/Node 24 platform gate because
+the Java PKI fixture generator reached its 15-second test timeout. The JAXP
+depth-65 message was emitted while that subprocess was being terminated. Issue
+`#87` tracked a test-only increase of that bounded timeout to 60 seconds; it
+changed no production code, behavior, or resource limits.
+
+PR `#88` made this correction from protected base
+`672fc3b7dbc39db7a15451e7ece894e479d95af1`. Its exact head
+`23281f2e9330c49c4092aef632d2b52d7230ac81` had 26/26 successful check-runs,
+including Windows/Node 24 platform coverage, gate P2 and required-check closure.
+The protected squash is `1cc5fdd0c571960b745e595de0b1441873bb05d2`, tree
+`485026098d545962d8f42766eb1bf9af75bd8a45`, sole parent
+`672fc3b7dbc39db7a15451e7ece894e479d95af1`. Its GitHub commit signature is
+valid and its `Signed-off-by: Daniel David <ddcandales@gmail.com>` trailer is
+on its own line; issue `#87` is closed. The first protected-push attempt had
+23/25 checks pass. The source gate received HTTP 403 from the GitHub API while
+downloading the pinned SPDX model asset; required-check closure failed as a
+consequence. Governance/DCO passed with the correctly formatted trailer.
+GitHub attempt 2 is rerunning the failed source and closure jobs. Issue `#85`
+and this PR remain open until the protected checks and refreshed read-back
+checks pass.
+
+### Decision evidence and limits
+
+The frozen P4 quality populations and thresholds remain unchanged: 44
+production modules, 26 P4 test files, 43 critical branches/mutants, 57,344
+property executions, 32,768 fuzz executions, and 16 readiness faults. The
+quality-plan decision, implementation validator, and ADR-0056 were updated in
+PR `#84` only. The exact QR image in page 25 of the edition's digest-pinned AEAT
+PDF annex decoded to its printed official URL with `qr/decode.js` and ZXing.
+Both readers also returned the exact URL for 90-degree rotation, 2x scaling and
+JPEG compression variants. A separate two-payload synthetic cross-decode
+checked interoperability only; the official annex image was the independent
+oracle. Runtime smoke checks passed on Node `22.14.0`, `22.23.2` and `24.21.0`.
+
+`qr` has no runtime dependencies; only `qr/decode.js` is selected, and the
+package stays development-only and out of the product package. It documents
+ZXing inspiration, so independence is from the selected `@nuintun` encoder at
+the implementation/package boundary, not algorithm-family diversity. The
+encoder's verified npm signature and SLSA provenance bind its tarball to source
+commit `50c35297fdae64b044e57b07dd06329cd1cb7319`; that source commit is
+unsigned and remains a recorded residual supply-chain risk. Exact package
+integrity, provenance, dependency closure, licences and audit findings are
+recorded in the P4-E admission evidence.
+
+`creationAllowed=false` remains in force. No QR production/test implementation,
+regulatory-validity, invoice-placement, AEAT-acceptance, compliance, publication
+or release claim is made by this decision read-back.
+
+Closes #85 after this read-back PR and its exact-head and protected-push checks
+pass and the new protected-main identity is verified.
