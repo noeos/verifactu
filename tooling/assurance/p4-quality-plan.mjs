@@ -388,6 +388,19 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
     "P4_PLAN_JAVA_PROVIDER_OSV_EVIDENCE_HASH",
   );
   const osvContent = JSON.parse(osvReport.toString("utf8"));
+  const osvPackages = osvContent.results.flatMap(
+    (result) => result.packages ?? [],
+  );
+  const osvMavenPackages = osvPackages
+    .map((entry) => entry.package)
+    .filter((entry) => entry.ecosystem === "Maven");
+  const osvMavenCoordinates = new Set(
+    osvMavenPackages.map((entry) => `${entry.name}@${entry.version}`),
+  );
+  const expectedJavaCoordinates = javaProvider.components.map(
+    (item) => `${item.groupId}:${item.artifactId}@${item.version}`,
+  );
+  const shadedCoordinate = "verifactu-xades-provider@0.0.0-development";
   assert(
     javaProvider.vulnerabilityObservation.result === "No issues found" &&
       osvContent.results.every(
@@ -395,9 +408,19 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
           !result.packages?.some(
             (pkg) => (pkg.vulnerabilities ?? []).length > 0,
           ),
-      ),
+      ) &&
+      osvPackages.length ===
+        javaProvider.vulnerabilityObservation.uniqueResolvedPackageCount &&
+      osvMavenPackages.length ===
+        javaProvider.vulnerabilityObservation.mavenPackageCount &&
+      osvMavenCoordinates.size === osvMavenPackages.length &&
+      expectedJavaCoordinates.every((coordinate) =>
+        osvMavenCoordinates.has(coordinate),
+      ) &&
+      osvMavenCoordinates.has(shadedCoordinate) &&
+      osvMavenCoordinates.size === expectedJavaCoordinates.length + 1,
     "P4_PLAN_JAVA_PROVIDER_OSV_EVIDENCE",
-    javaProvider.vulnerabilityObservation.evidencePath,
+    `${javaProvider.vulnerabilityObservation.evidencePath}: Maven coordinates do not reconcile to the locked runtime/plugin graph`,
   );
   const projectBuild = javaProvider.buildProbes.projectPomOfflinePackage;
   const projectBuildLog = hashedEvidence(

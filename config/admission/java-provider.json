@@ -5262,7 +5262,6 @@
     "osvJsonSha256": "902b6fb03782895f3e778df5068d3f85288310b4d166cf513d5946a6c89ac5a3",
     "scanDate": "2026-09-26",
     "report": "temporary report, before protected PR; final report must be retained and bound to exact PR head",
-    "fullGraphCycloneDxSha256": "2807b3ca8b445a98959ba84d8d1475d9474075689759a700efd110e49913072a",
     "fullGraphPackageCount": 371,
     "uniqueResolvedPackageCount": 368,
     "mavenPackageCount": 140,
