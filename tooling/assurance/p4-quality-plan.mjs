@@ -82,9 +82,9 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
     javaProvider.schemaVersion === 1 &&
       javaProvider.id === "JAVA-PROVIDER-ADMISSION-0001" &&
       javaProvider.status === "incomplete-candidate-lock" &&
-      javaProvider.runtimeGraph.componentCount === 42 &&
+      javaProvider.runtimeGraph.componentCount === 43 &&
       javaProvider.buildPluginGraph.componentCount === 99 &&
-      javaProvider.components.length === 139,
+      javaProvider.components.length === 140,
     "P4_PLAN_JAVA_PROVIDER_ADMISSION",
     `${javaProvider.runtimeGraph?.componentCount}/${javaProvider.buildPluginGraph?.componentCount}/${javaProvider.components?.length}`,
   );
@@ -326,8 +326,8 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
   );
   assert(
     integrityEvidence.componentCount === javaProvider.components.length &&
-      integrityEvidence.artifactAndPomCount === 278 &&
-      integrityEvidence.artifactAndPomExactCentralByteMatches === 278 &&
+      integrityEvidence.artifactAndPomCount === 280 &&
+      integrityEvidence.artifactAndPomExactCentralByteMatches === 280 &&
       integrityEvidence.failures.length === 0 &&
       javaProvider.components.every((item) => {
         const jar = verifiedCentralArtifacts.get(`${item.purl}\0jar`);

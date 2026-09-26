@@ -135,26 +135,6 @@
               "optional": "false"
             },
             {
-              "groupId": "eu.europa.ec.joinup.sd-dss",
-              "artifactId": "dss-crl-parser",
-              "version": "6.5",
-              "type": "jar",
-              "scope": "compile",
-              "classifier": "",
-              "optional": "false",
-              "children": [
-                {
-                  "groupId": "org.bouncycastle",
-                  "artifactId": "bcprov-jdk18on",
-                  "version": "1.85",
-                  "type": "jar",
-                  "scope": "compile",
-                  "classifier": "",
-                  "optional": "false"
-                }
-                ]
-            },
-            {
               "groupId": "org.bouncycastle",
               "artifactId": "bcpkix-jdk18on",
               "version": "1.85",
@@ -249,6 +229,37 @@
           "scope": "compile",
           "classifier": "",
           "optional": "false"
+        }
+        ]
+    },
+    {
+      "groupId": "eu.europa.ec.joinup.sd-dss",
+      "artifactId": "dss-crl-parser-x509crl",
+      "version": "6.5",
+      "type": "jar",
+      "scope": "compile",
+      "classifier": "",
+      "optional": "false",
+      "children": [
+        {
+          "groupId": "eu.europa.ec.joinup.sd-dss",
+          "artifactId": "dss-crl-parser",
+          "version": "6.5",
+          "type": "jar",
+          "scope": "compile",
+          "classifier": "",
+          "optional": "false",
+          "children": [
+            {
+              "groupId": "org.bouncycastle",
+              "artifactId": "bcprov-jdk18on",
+              "version": "1.85",
+              "type": "jar",
+              "scope": "compile",
+              "classifier": "",
+              "optional": "false"
+            }
+            ]
         }
         ]
     },

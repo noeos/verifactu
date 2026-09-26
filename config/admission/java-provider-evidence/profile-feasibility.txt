@@ -1,0 +1,97 @@
+EU DSS 6.5 profile feasibility — synthetic, non-product evidence
+Observed: 2026-09-26
+
+Subject and limits
+------------------
+The subject is the offline dependency-only shaded archive built from the
+admitted POM: SHA-256 44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6.
+This archive contains no authored DssBridge and is not P4-D product behavior.
+All PKI material, test keys, tokens, and probe source remained in
+/tmp/verifactu-p4d-admission-probe; no private key or local PIN is retained.
+
+Signing key feasibility
+-----------------------
+SoftHSM 2.6.1 was extracted from Ubuntu 24.04 packages in the temporary probe
+directory; it was not installed system-wide. Package SHA-256 values:
+  softhsm2_2.6.1-3_amd64.deb       c9b76ced40eab91f7f6c106af45ebddc7f50c734d31639c57ceca26050d3665b
+  libsofthsm2_2.6.1-3_amd64.deb    6117da60dfc0ca0f28928af10a52ffa338bf9c99fa06669374d1aad53ad6a783
+  softhsm2-common_2.6.1-3_amd64.deb 6423761a46799e1bc2e68399c53958b202f24af01d0293f09263471cdef1f68c
+
+A temporary PKCS#12 test key was imported into a new SoftHSM token for this
+feasibility probe. SunPKCS11 returned
+sun.security.pkcs11.P11Key$P11RSAPrivateKeyInternal with getEncoded() == null.
+EU DSS XAdESService produced an enveloped XAdES-B signature using
+SunPKCS11-SoftHSMProbe; SHA-256 of the synthetic signed XML is
+9a3d4e22247bd5b0a577f003a9acd5e504b1b4f581f05441b0511cbac013294c.
+This demonstrates a usable opaque-key signature handle at this provider API
+boundary. The key was imported for the lab; production in-token provisioning,
+hardware modules, platform coverage, concurrency, and key lifecycle are not
+demonstrated.
+
+Offline validation and revocation feasibility
+----------------------------------------------
+The synthetic signer is RSA-2048 with digitalSignature, nonRepudiation,
+keyEncipherment, emailProtection, and clientAuth extensions. DSS received only
+an explicit local trust anchor and caller-supplied CRL or OCSP bytes. The
+network-guard probes used JDK 21's deprecated SecurityManager with
+-Djava.security.manager=allow; no socket/DNS attempt was observed for either
+explicit CRL or explicit OCSP validation. DSS reported its AIA source null,
+and only the supplied revocation source was configured. This guard is a
+temporary feasibility probe, not the future process isolation control.
+
+CRL probe corpus SHA-256 and observed outcomes:
+  valid supplied CRL             ff9dd2d71142c11356da98a6b39251bc82a80518b911d3180725ca1ad322ca2e -> TOTAL_PASSED
+  revoked supplied CRL           e65f63fc32735c739b60e70e0b45a124572be69dc36001a41c9b5c1718b6c70d -> INDETERMINATE / REVOKED_NO_POE; diagnostic says revoked
+  stale trusted-issuer CRL       34cf478cecfdd9e97f11247d6d16b6f048a1b2022342f5e42b4c12599a6af111 -> INDETERMINATE / CERTIFICATE_CHAIN_GENERAL_FAILURE
+  unrelated-issuer CRL           326f435e219ad73ba6e489051589da4277172c6868447c72165c2f4fa9e85399 -> INDETERMINATE / CERTIFICATE_CHAIN_GENERAL_FAILURE
+  malformed CRL                  1ac6b35508fafb34805b2b9d5342a161f203bda22603ac2e2a7d5f275896187e -> parser throws DSSException; caller must map to non-valid
+
+OCSP responses were generated for the exact synthetic signer/issuer pair and
+their token status, thisUpdate, and nextUpdate were read through DSS 6.5's
+ExternalResourcesOCSPSource and RevocationDataVerifier. The temporary explicit
+policy used a 48-hour maximum age and also required the caller validation
+instant to be within thisUpdate..nextUpdate:
+  good response   bfa9371c0717d06f3fe35815c2f811debff6925c1ff78985c714ce79921ada32 -> GOOD, withinPeriod=true, maxAge=true
+  revoked response 5e48298d13bd598a4735b33eedc8f7a34bfabd3fff0726b969e357acf0df9d22 -> REVOKED, withinPeriod=true, maxAge=true; full signature report INDETERMINATE / REVOKED_NO_POE
+  stale response  47a6baafac247ecaecf70160a910feb28670d8286ba26ada34993b1d49f0c889 -> GOOD, withinPeriod=false, maxAge=true
+  wrong-responder response 947f2501d403b361b1f675745b23d9114484827279521d8e5ccbb5ed8a7c4e84 -> UNKNOWN; full signature report INDETERMINATE / CERTIFICATE_CHAIN_GENERAL_FAILURE
+
+The probe establishes that DSS exposes offline evidence parsing, cryptographic
+status, and explicit time-policy primitives. DSS's default basic-signature
+result alone did not reject the stale response relative to an independently
+supplied later validation instant; the bridge must enforce the exact caller
+instant, nextUpdate, policy maximum age, authority/signature, certificate
+binding, and unknown/missing/malformed outcomes before any result can become
+valid. Wrong OCSP responder, bad response signature, unsupported status, and
+all policy boundary cases remain P4-D implementation tests.
+
+Official-vector check
+---------------------
+The official PDF version 0.1.5 explicitly fixes the signature-policy digest to
+SHA-1 and confines that use to policy verification; it separately directs that
+the invoice/event record signature use SHA-256. The signed official vector uses
+RSA-SHA256 and SHA-256 document/reference digests while its signature-policy
+digest and certificate-reference digests use SHA-1. The profile must preserve
+that exact contextual distinction, never broadly enable SHA-1 for record
+signatures or document/reference digests.
+
+The exact dependency-only archive was rerun against the hash-pinned signed
+AEAT example in
+config/admission/java-provider-evidence/aeat-official/ejemploRegistro-firmado-epes-xades4j.xml.
+DSS reports structural=true, basic=true, intact=true, both document and signed
+properties references intact, and INDETERMINATE / NO_CERTIFICATE_CHAIN_FOUND.
+The local loopback network attempt was denied before connection; configured
+AIA/CRL/OCSP sources were null. The vector is not evidence of trust, policy
+acceptance, AEAT acceptance, or legal approval. DSS emits default-policy SHA-1
+certificate-reference warnings for the official legacy vector; P4-D must
+narrowly implement the source-bound algorithm contexts above and verify them
+independently.
+
+Scope boundary
+--------------
+These are synthetic feasibility observations on Linux x64 and do not prove a
+real HSM, multi-platform provider compatibility, P4-D behavior, legal review,
+AEAT acceptance, fiscal compliance, publication, or release readiness.
+P4-D must independently implement and test profile topology, certificate
+trust/time/usage/algorithm policy, opaque-key isolation, bounded cancellation,
+network denial, and fail-closed CRL/OCSP processing against exact artifacts.

@@ -722,6 +722,13 @@
         },
         {
           "package": {
+            "name": "eu.europa.ec.joinup.sd-dss:dss-crl-parser-x509crl",
+            "version": "6.5",
+            "ecosystem": "Maven"
+          }
+        },
+        {
+          "package": {
             "name": "eu.europa.ec.joinup.sd-dss:dss-detailed-report-jaxb",
             "version": "6.5",
             "ecosystem": "Maven"

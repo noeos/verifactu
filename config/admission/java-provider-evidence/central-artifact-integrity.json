@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "source": "Maven Central HTTPS artifact and POM bytes; compared independently with Maven local cache and locked SHA-256",
   "verifiedAt": "2026-09-26",
-  "componentCount": 139,
-  "artifactAndPomCount": 278,
-  "artifactAndPomExactCentralByteMatches": 278,
-  "aggregateSha256": "0c632e84afe720e110167e113be807a6ce5632804a1711922d6945cae2f7fb0f",
+  "componentCount": 140,
+  "artifactAndPomCount": 280,
+  "artifactAndPomExactCentralByteMatches": 280,
+  "aggregateSha256": "6d09274732d635a6c665045365ce3bfa233266a76aee93f63f1e79ad2db76cc8",
   "failures": [],
   "components": [
     {
@@ -359,6 +359,28 @@
       "localMatches": true,
       "remoteMatches": true,
       "bytes": 1249
+    },
+    {
+      "purl": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser-x509crl@6.5",
+      "kind": "jar",
+      "url": "https://repo.maven.apache.org/maven2/eu/europa/ec/joinup/sd-dss/dss-crl-parser-x509crl/6.5/dss-crl-parser-x509crl-6.5.jar",
+      "expectedSha256": "8b73565d5a1c1b5f0044ec7d018f7dc6eb5a636ad714611e7c3cdf343daaa6e4",
+      "localSha256": "8b73565d5a1c1b5f0044ec7d018f7dc6eb5a636ad714611e7c3cdf343daaa6e4",
+      "remoteSha256": "8b73565d5a1c1b5f0044ec7d018f7dc6eb5a636ad714611e7c3cdf343daaa6e4",
+      "localMatches": true,
+      "remoteMatches": true,
+      "bytes": 7468
+    },
+    {
+      "purl": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser-x509crl@6.5",
+      "kind": "pom",
+      "url": "https://repo.maven.apache.org/maven2/eu/europa/ec/joinup/sd-dss/dss-crl-parser-x509crl/6.5/dss-crl-parser-x509crl-6.5.pom",
+      "expectedSha256": "08375ffa63cf7953066c68da3ec9dde34d84ffb60251a3a767d226c24afc912b",
+      "localSha256": "08375ffa63cf7953066c68da3ec9dde34d84ffb60251a3a767d226c24afc912b",
+      "remoteSha256": "08375ffa63cf7953066c68da3ec9dde34d84ffb60251a3a767d226c24afc912b",
+      "localMatches": true,
+      "remoteMatches": true,
+      "bytes": 1581
     },
     {
       "purl": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser@6.5",
@@ -3066,5 +3088,6 @@
       "remoteMatches": true,
       "bytes": 13716
     }
-  ]
+  ],
+  "aggregateMethod": "SHA-256 over UTF-8 lines sorted by purl and kind: purl|kind|remoteSha256, with a trailing LF per line."
 }

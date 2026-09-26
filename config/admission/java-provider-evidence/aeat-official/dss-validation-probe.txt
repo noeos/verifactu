@@ -1,5 +1,9 @@
+P4-D readiness only — DSS 6.5 dependency-only archive probe.
+Subject jar SHA-256: 44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6
+Source vector: official AEAT signed example; source hash is pinned in java-provider.json.
+The loopback guard is a temporary JDK 21 SecurityManager probe, not a process-isolation control.
 WARNING: A terminally deprecated method in java.lang.System has been called
-WARNING: System::setSecurityManager has been called by Probe (file:<ADMISSION_PROBE>)
+WARNING: System::setSecurityManager has been called by Probe (file:<ADMISSION_PROBE>/)
 WARNING: Please consider reporting this to the maintainers of Probe
 WARNING: System::setSecurityManager will be removed in a future release
 guardNetworkAttempt=denied

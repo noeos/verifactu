@@ -88,10 +88,11 @@
   },
   "runtimeGraph": {
     "source": "Maven dependency:tree JSON from internal/xades-provider/dss/pom.xml",
-    "componentCount": 42,
+    "componentCount": 43,
     "directDependencies": [
       "eu.europa.ec.joinup.sd-dss:dss-xades:6.5",
       "eu.europa.ec.joinup.sd-dss:dss-validation:6.5",
+      "eu.europa.ec.joinup.sd-dss:dss-crl-parser-x509crl:6.5",
       "eu.europa.ec.joinup.sd-dss:dss-policy-jaxb:6.5",
       "eu.europa.ec.joinup.sd-dss:dss-utils-apache-commons:6.5"
     ],
@@ -102,6 +103,7 @@
       "pkg:maven/commons-codec/commons-codec@1.18.0",
       "pkg:maven/commons-io/commons-io@2.22.0",
       "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-alert@6.5",
+      "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser-x509crl@6.5",
       "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser@6.5",
       "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-detailed-report-jaxb@6.5",
       "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-diagnostic-jaxb@6.5",
@@ -207,16 +209,6 @@
       },
       {
         "from": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-spi@6.5",
-        "to": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser@6.5",
-        "scope": "compile"
-      },
-      {
-        "from": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser@6.5",
-        "to": "pkg:maven/org.bouncycastle/bcprov-jdk18on@1.85",
-        "scope": "compile"
-      },
-      {
-        "from": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-spi@6.5",
         "to": "pkg:maven/org.bouncycastle/bcpkix-jdk18on@1.85",
         "scope": "compile"
       },
@@ -263,6 +255,21 @@
       {
         "from": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-validation@6.5",
         "to": "pkg:maven/org.slf4j/slf4j-api@2.0.18",
+        "scope": "compile"
+      },
+      {
+        "from": "pkg:maven/eu.noeos.verifactu.internal/verifactu-xades-provider@0.0.0-development",
+        "to": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser-x509crl@6.5",
+        "scope": "compile"
+      },
+      {
+        "from": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser-x509crl@6.5",
+        "to": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser@6.5",
+        "scope": "compile"
+      },
+      {
+        "from": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser@6.5",
+        "to": "pkg:maven/org.bouncycastle/bcprov-jdk18on@1.85",
         "scope": "compile"
       },
       {
@@ -352,7 +359,7 @@
       }
     ],
     "evidencePath": "config/admission/java-provider-evidence/runtime-tree.json.raw",
-    "reportSha256": "5f9688286d1fe6361ed659a4c5e8093a49615f2097584a50f19d90219e85a24c"
+    "reportSha256": "e96f5fd00c60b1aeff45f9801c3129ca14b6554dad019fcaab3c0d88ba42a1dc"
   },
   "buildPluginGraph": {
     "source": "Maven resolve-plugins output from internal/xades-provider/dss/pom.xml, filtered to its eight exactly pinned plugins; each plugin retains its own resolved versions.",
@@ -2036,6 +2043,26 @@
       "centralBaseUrl": "https://repo.maven.apache.org/maven2/eu/europa/ec/joinup/sd-dss/dss-alert/6.5/",
       "jarSha256": "4e2e321a2d2e439867cf80156a3fa7ea76217d4d2666f13109e257f22fc42487",
       "pomSha256": "b81038716903486f8ad966d30c1b9553a8839baf8ca81557a1beebe8db6c1fe4",
+      "licenseDeclarations": [
+        {
+          "declaredName": "GNU Lesser General Public License",
+          "url": "https://www.gnu.org/licenses/lgpl-2.1.html"
+        }
+      ],
+      "embeddedLicenseNoticeResources": [],
+      "spdxLicenseExpression": "LGPL-2.1-only"
+    },
+    {
+      "purl": "pkg:maven/eu.europa.ec.joinup.sd-dss/dss-crl-parser-x509crl@6.5",
+      "groupId": "eu.europa.ec.joinup.sd-dss",
+      "artifactId": "dss-crl-parser-x509crl",
+      "version": "6.5",
+      "type": "jar",
+      "classifier": null,
+      "scope": ["runtime"],
+      "centralBaseUrl": "https://repo.maven.apache.org/maven2/eu/europa/ec/joinup/sd-dss/dss-crl-parser-x509crl/6.5/",
+      "jarSha256": "8b73565d5a1c1b5f0044ec7d018f7dc6eb5a636ad714611e7c3cdf343daaa6e4",
+      "pomSha256": "08375ffa63cf7953066c68da3ec9dde34d84ffb60251a3a767d226c24afc912b",
       "licenseDeclarations": [
         {
           "declaredName": "GNU Lesser General Public License",
@@ -5059,13 +5086,13 @@
     }
   ],
   "sourceArchives": {
-    "count": 25,
+    "count": 26,
     "matchReport": {
-      "javaSourceFiles": 2225,
-      "trackedSourcesByteIdenticalAfterNewlineNormalization": 1492,
+      "javaSourceFiles": 2227,
+      "trackedSourcesByteIdenticalAfterNewlineNormalization": 1494,
       "generatedSourcesFromCommittedSchemas": 733,
       "mismatches": 0,
-      "reportSha256": "64474dc9e3834fa60f20f0bedb3a23a8f075ed3ab73a0dcf94b0d56d1641dc53"
+      "reportSha256": "9c2c41070017069ecc7e906da36e6e55543f22295db22967535e5b3f573d0f14"
     },
     "archives": [
       {
@@ -5081,6 +5108,13 @@
         "version": "6.5",
         "url": "https://repo.maven.apache.org/maven2/eu/europa/ec/joinup/sd-dss/dss-crl-parser/6.5/dss-crl-parser-6.5-sources.jar",
         "sha256": "3fc8297741fdce3db2066d18d584a86eb19993b2dda6617caf6b6e1252364c8f"
+      },
+      {
+        "groupId": "eu.europa.ec.joinup.sd-dss",
+        "artifactId": "dss-crl-parser-x509crl",
+        "version": "6.5",
+        "url": "https://repo.maven.apache.org/maven2/eu/europa/ec/joinup/sd-dss/dss-crl-parser-x509crl/6.5/dss-crl-parser-x509crl-6.5-sources.jar",
+        "sha256": "6ddb9363ed38aacc6e74c451f496865e2cfb7cbffcc33abf72bf160ce3acd59d"
       },
       {
         "groupId": "eu.europa.ec.joinup.sd-dss",
@@ -5247,32 +5281,32 @@
   },
   "artifactIntegrity": {
     "repository": "https://repo.maven.apache.org/maven2/",
-    "artifactAndPomExactCentralByteMatches": 278,
-    "aggregateSha256": "0c632e84afe720e110167e113be807a6ce5632804a1711922d6945cae2f7fb0f",
+    "artifactAndPomExactCentralByteMatches": 280,
+    "aggregateSha256": "6d09274732d635a6c665045365ce3bfa233266a76aee93f63f1e79ad2db76cc8",
     "sha1SidecarsVerifiedLocally": true,
     "evidencePath": "config/admission/java-provider-evidence/central-artifact-integrity.json",
-    "evidenceSha256": "b9cdc842a6cfa488c65b9263750269f141082c2bcf969b9996a0f55fe3d1c7bd",
+    "evidenceSha256": "2c189bc150dce13d11d2fca631f73b677d3f91cddc9c797e75e6d5f27cf82ef6",
     "verifiedAt": "2026-09-26"
   },
   "vulnerabilityObservation": {
     "scanner": "OSV-Scanner 2.5.1",
-    "runtimeComponents": 42,
+    "runtimeComponents": 43,
     "pluginComponents": 99,
     "result": "No issues found",
-    "osvJsonSha256": "902b6fb03782895f3e778df5068d3f85288310b4d166cf513d5946a6c89ac5a3",
+    "osvJsonSha256": "c6a633d7b69c7f38193780c6c0193431768e84e91927a41402e8dd29a6169db8",
     "scanDate": "2026-09-26",
     "report": "temporary report, before protected PR; final report must be retained and bound to exact PR head",
-    "fullGraphPackageCount": 371,
-    "uniqueResolvedPackageCount": 368,
-    "mavenPackageCount": 140,
-    "mavenAdmissionMatchCount": 139,
+    "fullGraphPackageCount": 372,
+    "uniqueResolvedPackageCount": 369,
+    "mavenPackageCount": 141,
+    "mavenAdmissionMatchCount": 140,
     "additionalLocalShadedSubject": {
       "purl": "pkg:maven/eu.noeos.verifactu.internal/verifactu-xades-provider@0.0.0-development",
-      "sha256": "c53e8174e31e256dedecd3d9bd7ae73ba516e0e470a2216b1ab90728f8a41d6a"
+      "sha256": "44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6"
     },
     "evidencePath": "config/admission/java-provider-evidence/osv-full-graph.json",
-    "scanMethod": "OSV-Scanner 2.5.1 scan source --sbom against the 409-component CycloneDX 1.7 graph; all 139 admitted Maven runtime/plugin coordinates and the local shaded subject were observed; no OSV vulnerability results.",
-    "reportPathNormalization": "Only scanner input path normalized from temporary probe path to the admitted SBOM path; package and vulnerability observations retained."
+    "scanMethod": "OSV-Scanner 2.5.1 scan source --sbom against the generated 410-component CycloneDX 1.7 graph; all 140 admitted Maven runtime/plugin coordinates plus the local shaded subject were observed; no OSV vulnerability results.",
+    "reportPathNormalization": "Scanner SBOM source path normalized to the canonical task output path; package and vulnerability observations retained."
   },
   "buildProbes": {
     "upstreamSourceReactor": {
@@ -5289,34 +5323,34 @@
     },
     "projectPomRuntimeGraph": {
       "status": "passed",
-      "componentCount": 42,
-      "edgeCount": 42,
+      "componentCount": 43,
+      "edgeCount": 43,
       "source": "actual internal/xades-provider/dss/pom.xml with Maven dependency:tree JSON",
-      "reportSha256": "5f9688286d1fe6361ed659a4c5e8093a49615f2097584a50f19d90219e85a24c"
+      "reportSha256": "e96f5fd00c60b1aeff45f9801c3129ca14b6554dad019fcaab3c0d88ba42a1dc"
     },
     "projectPomOfflinePackage": {
       "status": "passed-with-empty-bridge-source",
-      "command": "mvn -o -B -f internal/xades-provider/dss/pom.xml clean package -DskipTests",
+      "command": "mvn -o -B -Dmaven.repo.local=<admitted-cache> -f internal/xades-provider/dss/pom.xml clean package -DskipTests",
       "testsSkipped": true,
-      "limitations": "Validated only the pinned Maven/plugin/dependency/shade configuration; no Java bridge source exists yet, so the output is not the provider artifact.",
-      "outputSha256": "c53e8174e31e256dedecd3d9bd7ae73ba516e0e470a2216b1ab90728f8a41d6a",
+      "limitations": "Validates the exact pinned Maven/plugin/dependency/shade configuration offline; P4-D bridge source is not yet admitted or present, so this output is a dependency-only candidate jar.",
+      "outputSha256": "44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6",
       "repeatedOutputIdentically": true,
       "legalResourceMatches": 29,
       "dssLicenseAndProjectNoticesIncluded": true,
       "logEvidencePath": "config/admission/java-provider-evidence/project-offline-build-2.log",
-      "logSha256": "5ea438d42db80559c6028c9f58e98eee03a31dacac2d7ed74d273bb76de1d82d",
-      "rawCommandLogSha256": "ddac96614544e6199fa674d6fec10043f189aa34f7b2931b6cc734396d4ffd39",
-      "logNormalization": "Absolute workstation and temporary-directory paths replaced with stable placeholders; Maven output and build result lines retained.",
+      "logSha256": "dd22b2d458c57f1bf3d9f8f46eb2ffe613af2be60e2f9d0e304732321678e464",
+      "rawCommandLogSha256": "2a2cea7e796f033b0272dfbc552c47f1568c814bb9a4335cef1314086d495f2a",
+      "logNormalization": "Workstation and temporary cache paths replaced by stable placeholders; duration and wall-clock finish lines removed; all Maven build result and warning lines retained.",
       "repeatEvidence": [
         {
           "path": "config/admission/java-provider-evidence/project-offline-build-1.log",
-          "rawLogSha256": "30a138d01b4a7aaa94497e18570aeb8d03d848a34862708f4aca6a3422343af7",
-          "logSha256": "ef82c41a17432cb492e452e015c154f92053f40fc39be9ae2cae0fb7a7589e96"
+          "rawLogSha256": "6e7d6633c2d7f674b7737ffa142f9d969fe3f508ffc1363284875df752f7c42c",
+          "logSha256": "dd22b2d458c57f1bf3d9f8f46eb2ffe613af2be60e2f9d0e304732321678e464"
         },
         {
           "path": "config/admission/java-provider-evidence/project-offline-build-2.log",
-          "rawLogSha256": "c5249febbe7ddd4dce735e9f45df7407927c0f5ca3fbbf9acf29425f521ef4df",
-          "logSha256": "5ea438d42db80559c6028c9f58e98eee03a31dacac2d7ed74d273bb76de1d82d"
+          "rawLogSha256": "2a2cea7e796f033b0272dfbc552c47f1568c814bb9a4335cef1314086d495f2a",
+          "logSha256": "dd22b2d458c57f1bf3d9f8f46eb2ffe613af2be60e2f9d0e304732321678e464"
         }
       ],
       "reproducibleBuildCount": 2
@@ -5337,7 +5371,7 @@
     "officialVectorProbe": {
       "status": "passed-for-structure-basic-integrity-and-offline-configuration; trust-indeterminate",
       "source": {
-        "publisher": "Agencia Estatal de Administraci\u00f3n Tributaria (AEAT)",
+        "publisher": "Agencia Estatal de Administración Tributaria (AEAT)",
         "officialFaqUrl": "https://www3.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/preguntas-frecuentes/firma.html",
         "developerDocumentUrl": "https://www.agenciatributaria.es/AEAT.desarrolladores/Desarrolladores/_menu_/Documentacion/Sistemas_Informaticos_de_Facturacion_y_Sistemas_VERI_FACTU/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion/Especificaciones_tecnicas_para_generacion_de_la_firma_electronica_de_los_registros_de_facturacion.html",
         "specificationVersion": "0.1.5",
@@ -5346,7 +5380,7 @@
         "examplesZipPath": "config/admission/java-provider-evidence/aeat-official/AnexosEjemplosFirmaRegFact.zip",
         "examplesZipSha256": "66fac533bef6c93c041b08704bf538843fe552052a2994899aba0875c2c4b24e",
         "retrievedAt": "2026-09-26",
-        "signatureVerification": "Archive entry SHA-256 matches exactly the member extracted from the AEAT-linked official ZIP; developer host presented a legacy CA signature rejected by default curl validation, so content hashes and the official FAQ\u2192developer-page link are recorded."
+        "signatureVerification": "Archive entry SHA-256 matches exactly the member extracted from the AEAT-linked official ZIP; developer host presented a legacy CA signature rejected by default curl validation, so content hashes and the official FAQ→developer-page link are recorded."
       },
       "signedVector": {
         "path": "config/admission/java-provider-evidence/aeat-official/ejemploRegistro-firmado-epes-xades4j.xml",
@@ -5363,9 +5397,9 @@
         "archiveEntry": "ejemploRegistro.xml"
       },
       "validationReportPath": "config/admission/java-provider-evidence/aeat-official/dss-validation-probe.txt",
-      "validationReportSha256": "c412c1f9cfc1c1796a6849a57cfad130fb5db40bcd3b1ffa2ca3c14e5d6b6602",
+      "validationReportSha256": "210bb69f8cb660c3e268c133c9b047c5360e0dd7dffd2f53cebbf1b42623cf6d",
       "networkGuardAttempt": "Explicit loopback socket attempt rejected by the Java network SecurityManager before connection; DSS AIA, CRL and OCSP sources report null during vector validation.",
-      "runtimeJarSha256": "c53e8174e31e256dedecd3d9bd7ae73ba516e0e470a2216b1ab90728f8a41d6a",
+      "runtimeJarSha256": "44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6",
       "limitations": "Temporary probe harness against the exact dependency-only shaded DSS artifact, outside the repository source census. It is not DssBridge, does not prove trust/revocation/key-isolation policy or AEAT acceptance."
     },
     "syntheticSigningProbe": {
@@ -5376,6 +5410,27 @@
       "validationReportSha256": "9b14f4f1ddad657d2140246444dd307195389345853ac1ff559c47c3287e3837",
       "trustResult": "INDETERMINATE / NO_CERTIFICATE_CHAIN_FOUND",
       "limitations": "Temporary software-generated self-signed test key; not opaque-key isolation evidence and not an AEAT official vector."
+    },
+    "profileFeasibility": {
+      "status": "passed-with-explicit-bridge-limitations; synthetic feasibility only",
+      "evidencePath": "config/admission/java-provider-evidence/profile-feasibility.txt",
+      "artifactSha256": "44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6",
+      "environment": "Ubuntu 24.04 x64, Eclipse Temurin 21.0.12.1+1, EU DSS 6.5, SoftHSM 2.6.1",
+      "demonstrated": [
+        "PKCS#11 private key handle is opaque (getEncoded() == null) and DSS creates a synthetic XAdES signature through SunPKCS11-SoftHSMProbe",
+        "explicit local trust anchor and caller-supplied CRL/OCSP sources validate offline; temporary network guard observed no socket attempt",
+        "valid and revoked CRL/OCSP outcomes distinguished; stale CRL is indeterminate; malformed/wrong-issuer CRL never returns valid",
+        "DSS OCSP token exposes status and update times; an explicit caller-time within-period and maximum-age precheck distinguishes fresh from stale evidence",
+        "wrong-responder OCSP evidence maps to UNKNOWN and the signature report remains INDETERMINATE/CERTIFICATE_CHAIN_GENERAL_FAILURE"
+      ],
+      "limitations": [
+        "probe key was imported for laboratory use; production non-exportable in-token provisioning and real hardware are unproved",
+        "SecurityManager network guard is deprecated and is only a feasibility probe; P4-D needs durable isolation/network-denial control",
+        "default DSS basic-signature outcome alone did not fail stale OCSP relative to an independently supplied later validation instant; P4-D bridge must enforce caller-time, nextUpdate, maximum age, authority/signature and certificate binding before valid",
+        "bad response signature, unsupported status, and complete policy-boundary behavior remain P4-D implementation tests",
+        "synthetic Linux x64 evidence does not prove provider platform compatibility, AEAT acceptance, legal approval, compliance, publication or release readiness"
+      ],
+      "reportSha256": "70d153f5a85cddf6966e2c155590655a353c8d72dd78116628b33ed56032bdba"
     }
   },
   "notYetAdmitted": [
@@ -5384,7 +5439,9 @@
     "The synthetic signing probe uses a temporary PKCS#12 key and is not an opaque-key isolation test. The bridge key-handle boundary, private-material non-disclosure and concurrent cancellation behavior remain to be implemented and verified in P4-D.",
     "The DSS 6.5 release tag is unsigned. Source identity is separately pinned to the canonical European Commission Git remote, exact commit/tree and source archive hashes; no signed-source-tag claim is made.",
     "The offline build and JaCoCo feasibility probe ran on Ubuntu 24.04 x64. Other declared platform artifacts are hash/signature admitted, but Windows/macOS/arm64 Maven builds are not yet executed.",
-    "Competent legal review remains a separate distribution prerequisite; this artifact inventory is not legal approval."
+    "Competent legal review remains a separate distribution prerequisite; this artifact inventory is not legal approval.",
+    "CRL/OCSP probe evidence is synthetic and readiness-only. The bridge must enforce caller validation time and freshness itself; wrong OCSP responder/signature, unknown response, key lifecycle, robust network isolation, non-Linux builds, and full profile conformance remain unproved until P4-D.",
+    "The official AEAT 0.1.5 text requires SHA-1 for the signature-policy digest only and separately requires SHA-256 for the record signature. The exact vector also has SHA-1 certificate-reference digests; P4-D must retain these contextual semantics without enabling SHA-1 for record signatures or document/reference digests."
   ],
   "licenseClosure": {
     "status": "runtime-texts-present-and-resource-matches-verified",
@@ -5460,8 +5517,8 @@
       }
     ],
     "runtimeResourceReconciliation": {
-      "runtimeComponents": 42,
-      "declaredLicenseComponents": 42,
+      "runtimeComponents": 43,
+      "declaredLicenseComponents": 43,
       "embeddedResourcesChecked": 29,
       "unmatchedEmbeddedResources": 0,
       "exactSource": "SHA-256 matched embedded resources read from each selected runtime JAR against the shaded archive; common META-INF license/notice resources are verified as exact byte substrings in their merged output resource.",
@@ -5470,7 +5527,7 @@
     },
     "shadedArchive": {
       "path": "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
-      "sha256": "c53e8174e31e256dedecd3d9bd7ae73ba516e0e470a2216b1ab90728f8a41d6a",
+      "sha256": "44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6",
       "reproducibleBuildCount": 2,
       "identicalOutputs": true,
       "containsBridgeSource": false
