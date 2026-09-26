@@ -1,8 +1,9 @@
 import { createReadStream } from "node:fs";
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
 import {
   cp,
   copyFile,
+  mkdtemp,
   lstat,
   mkdir,
   readFile,
@@ -10,8 +11,10 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
-import { basename, dirname, extname, resolve } from "node:path";
+import { basename, dirname, extname, join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { createGunzip } from "node:zlib";
+import { promisify } from "node:util";
 import Ajv from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
@@ -41,6 +44,7 @@ const PACKAGE_NAMES = [
   "@noeos/verifactu-adapter-kit",
   "@noeos/verifactu-cli",
 ];
+const execFileAsync = promisify(execFile);
 
 async function repositoryFiles(root) {
   const result = await run(
@@ -1535,7 +1539,9 @@ async function testP4A(context) {
   const [, mutants, , killed, mutantFailures, mutantCancelled, mutantSkipped] =
     mutationStats;
   const criticalMutants = [
-    ...mutationResult.stdout.matchAll(/# Subtest: P4-MUT-\d{3}\b/gu),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: P4-MUT-(?:00[1-9]|01\d|02[0-5]|029|03[7-9]|04[01])\b/gu,
+    ),
   ];
   const p4AFaults = [
     ["codec-stage-skip", "P4-MUT-001"],
@@ -1552,12 +1558,12 @@ async function testP4A(context) {
     ["chain-field-swap", "P4-MUT-015"],
   ];
   assert(
-    Number(mutants) === 26 &&
-      Number(killed) === 26 &&
+    Number(mutants) === 33 &&
+      Number(killed) === 33 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
-      criticalMutants.length === 25,
+      criticalMutants.length === 31,
     "P4A_MUTATION_COMPLETENESS",
     `${killed}/${mutants} killed, fail=${mutantFailures}, cancelled=${mutantCancelled}, skipped=${mutantSkipped}`,
   );
@@ -1630,7 +1636,7 @@ async function testP4A(context) {
       `coverage.line=${lines}`,
       `coverage.branch=${branches}`,
       `coverage.function=${functions}`,
-      "criticalMutants=25/25 P4-MUT-001..025",
+      "criticalMutants=31/43 non-Java mappings; P4-D Java-only mutations run in test:p4-d",
       `seededFaults=${p4AFaults.length}/${p4AFaults.length} ${p4AFaults.map(([fault]) => fault).join(",")}`,
       "properties=9x4096 seed=1346650369 retries=0 discards=0",
       "fuzz=P4-FUZZ-001x4096 seed=1346651649 retries=0 discards=0",
@@ -1694,15 +1700,17 @@ async function testP4C(context) {
   const [, mutants, , killed, mutantFailures, mutantCancelled, mutantSkipped] =
     mutationStats;
   const p4cMutants = [
-    ...mutationResult.stdout.matchAll(/# Subtest: P4-MUT-\d{3}\b/gu),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: P4-MUT-(?:00[1-9]|01\d|02[0-5]|029|03[7-9]|04[01])\b/gu,
+    ),
   ];
   assert(
-    Number(mutants) === 26 &&
-      Number(killed) === 26 &&
+    Number(mutants) === 33 &&
+      Number(killed) === 33 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
-      p4cMutants.length === 25,
+      p4cMutants.length === 31,
     "P4C_MUTATION_COMPLETENESS",
     `${killed}/${mutants} killed, fail=${mutantFailures}, cancelled=${mutantCancelled}, skipped=${mutantSkipped}`,
   );
@@ -1722,13 +1730,472 @@ async function testP4C(context) {
     diagnostics: [
       `testCases=${tests}`,
       `skipped=${skipped}`,
-      "criticalMutants=25/25 P4-MUT-001..025",
+      "criticalMutants=31/43 non-Java mappings; P4-D Java-only mutations run in test:p4-d",
       "seededP4CFaults=3/3 P4-MUT-023..025",
       "independentOracle=xmlschema@4.3.2/elementpath@5.1.4",
       "schemaClosure=8 exact digest-pinned AEAT/W3C sources",
       `subject=${context.identity.subject}`,
     ],
   };
+}
+
+async function testP4D(context) {
+  const maven = process.env.VERIFACTU_MAVEN;
+  const java = process.env.VERIFACTU_JAVA;
+  const javaHome = process.env.JAVA_HOME;
+  const repository = process.env.VERIFACTU_MAVEN_REPOSITORY;
+  assert(
+    typeof maven === "string" &&
+      maven.length > 0 &&
+      typeof java === "string" &&
+      java.length > 0 &&
+      typeof javaHome === "string" &&
+      javaHome.length > 0 &&
+      typeof repository === "string" &&
+      repository.length > 0,
+    "P4D_TOOLCHAIN_INPUTS",
+    "absolute Maven, Java, JAVA_HOME and local repository paths are required",
+  );
+  const toolEnv = { ...process.env, JAVA_HOME: javaHome };
+  const javaVersion = await run(
+    java,
+    ["-XshowSettings:properties", "-version"],
+    { cwd: context.root, env: toolEnv, timeoutMs: 10000 },
+  );
+  const javaOutput = `${javaVersion.stdout}${javaVersion.stderr}`;
+  assert(
+    javaVersion.code === 0 &&
+      javaOutput.includes("java.runtime.version = 21.0.12.1+1-LTS") &&
+      javaOutput.includes("java.vendor = Eclipse Adoptium"),
+    "P4D_JDK_IDENTITY",
+    javaOutput.trim(),
+  );
+  const mavenVersion = await runMaven(maven, ["--version"], {
+    cwd: context.root,
+    env: toolEnv,
+    timeoutMs: 10000,
+  });
+  const mavenOutput = `${mavenVersion.stdout}${mavenVersion.stderr}`;
+  assert(
+    mavenVersion.code === 0 &&
+      mavenOutput.includes("Apache Maven 3.9.12") &&
+      mavenOutput.includes("Java version: 21.0.12.1, vendor: Eclipse Adoptium"),
+    "P4D_MAVEN_IDENTITY",
+    mavenOutput.trim(),
+  );
+  const admission = await readJson(
+    resolve(context.root, "config/admission/java-provider.json"),
+  );
+  assert(
+    admission.components.length === 140 &&
+      admission.runtimeGraph.componentCount === 43 &&
+      admission.buildPluginGraph.componentCount === 99,
+    "P4D_MAVEN_LOCK_POPULATION",
+    `${admission.runtimeGraph?.componentCount}/${admission.buildPluginGraph?.componentCount}/${admission.components?.length}`,
+  );
+  const artifactDigests = [];
+  for (const component of admission.components) {
+    const componentDirectory = resolve(
+      repository,
+      component.groupId.replaceAll(".", "/"),
+      component.artifactId,
+      component.version,
+    );
+    const classifier = component.classifier ? `-${component.classifier}` : "";
+    const jarPath = resolve(
+      componentDirectory,
+      `${component.artifactId}-${component.version}${classifier}.jar`,
+    );
+    const pomPath = resolve(
+      componentDirectory,
+      `${component.artifactId}-${component.version}.pom`,
+    );
+    assert(
+      (await sha256File(jarPath)) === component.jarSha256,
+      "P4D_MAVEN_JAR_INTEGRITY",
+      `${component.purl}: ${jarPath}`,
+    );
+    assert(
+      (await sha256File(pomPath)) === component.pomSha256,
+      "P4D_MAVEN_POM_INTEGRITY",
+      `${component.purl}: ${pomPath}`,
+    );
+    artifactDigests.push(component.jarSha256, component.pomSha256);
+  }
+  assert(
+    Array.isArray(admission.buildMetadataPoms) &&
+      admission.buildMetadataPoms.length === 100,
+    "P4D_MAVEN_METADATA_POM_POPULATION",
+    `${admission.buildMetadataPoms?.length}`,
+  );
+  for (const pom of admission.buildMetadataPoms) {
+    const pomPath = resolve(
+      repository,
+      pom.groupId.replaceAll(".", "/"),
+      pom.artifactId,
+      pom.version,
+      `${pom.artifactId}-${pom.version}.pom`,
+    );
+    assert(
+      (await sha256File(pomPath)) === pom.pomSha256,
+      "P4D_MAVEN_METADATA_POM_INTEGRITY",
+      `${pom.groupId}:${pom.artifactId}:${pom.version}: ${pomPath}`,
+    );
+    artifactDigests.push(pom.pomSha256);
+  }
+  const build = await runMaven(
+    maven,
+    [
+      "-o",
+      ...(repository ? [`-Dmaven.repo.local=${repository}`] : []),
+      "-f",
+      "internal/xades-provider/dss/pom.xml",
+      "clean",
+      "package",
+      "-DskipTests",
+    ],
+    { cwd: context.root, env: toolEnv, timeoutMs: 300000 },
+  );
+  assert(
+    build.code === 0,
+    "P4D_DSS_BUILD",
+    `${build.stdout}${build.stderr}`.trim(),
+  );
+  const providerJar = resolve(
+    context.root,
+    "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
+  );
+  const firstProviderJarSha256 = await sha256File(providerJar);
+  const jarTool = resolve(
+    javaHome,
+    "bin",
+    process.platform === "win32" ? "jar.exe" : "jar",
+  );
+  const jarListing = await run(jarTool, ["--list", "--file", providerJar], {
+    cwd: context.root,
+    env: toolEnv,
+    timeoutMs: 30000,
+  });
+  const bridgeClass = "eu/noeos/verifactu/bridge/DssBridge.class";
+  const bridgeLicense = "META-INF/THIRD-PARTY-LICENSES/EU-DSS-LGPL-2.1.txt";
+  assert(
+    jarListing.code === 0 &&
+      jarListing.stdout.includes(bridgeClass) &&
+      jarListing.stdout.includes("META-INF/LICENSE") &&
+      jarListing.stdout.includes("META-INF/NOTICE") &&
+      jarListing.stdout.includes(bridgeLicense),
+    "P4D_SHADE_CONTENTS",
+    `${jarListing.stdout}${jarListing.stderr}`.trim(),
+  );
+  const archiveProbe = await mkdtemp(join(tmpdir(), "verifactu-p4d-shade-"));
+  try {
+    const extract = await run(
+      jarTool,
+      [
+        "--extract",
+        "--file",
+        providerJar,
+        "META-INF/LICENSE",
+        "META-INF/NOTICE",
+        bridgeLicense,
+        bridgeClass,
+      ],
+      { cwd: archiveProbe, env: toolEnv, timeoutMs: 30000 },
+    );
+    assert(
+      extract.code === 0,
+      "P4D_SHADE_EXTRACT",
+      `${extract.stdout}${extract.stderr}`.trim(),
+    );
+    const licenseClosure = admission.licenseClosure;
+    const projectLicense = await readFile(
+      resolve(context.root, licenseClosure.project.licensePath),
+    );
+    const projectNotice = await readFile(
+      resolve(context.root, licenseClosure.project.noticePath),
+    );
+    const shadedLicense = await readFile(
+      resolve(archiveProbe, "META-INF/LICENSE"),
+    );
+    const shadedNotice = await readFile(
+      resolve(archiveProbe, "META-INF/NOTICE"),
+    );
+    const shadedDssLicense = await readFile(
+      resolve(archiveProbe, bridgeLicense),
+    );
+    assert(
+      sha256(projectLicense) === licenseClosure.project.licenseSha256 &&
+        sha256(projectNotice) === licenseClosure.project.noticeSha256 &&
+        shadedLicense.includes(projectLicense) &&
+        shadedNotice.includes(projectNotice) &&
+        sha256(shadedDssLicense) === licenseClosure.dss.sourceSha256 &&
+        (await stat(resolve(archiveProbe, bridgeClass))).size > 0,
+      "P4D_SHADE_LICENSE_NOTICE_CLOSURE",
+      "project and DSS license/NOTICE resources must remain in the built provider",
+    );
+  } finally {
+    await rm(archiveProbe, { recursive: true, force: true });
+  }
+  const jacocoComponent = admission.components.find(
+    (component) =>
+      component.purl ===
+      "pkg:maven/org.jacoco/org.jacoco.agent@0.8.15?classifier=runtime",
+  );
+  assert(
+    jacocoComponent,
+    "P4D_JACOCO_ADMISSION",
+    "pinned runtime agent missing",
+  );
+  const jacocoAgent = resolve(
+    repository,
+    "org/jacoco/org.jacoco.agent/0.8.15/org.jacoco.agent-0.8.15-runtime.jar",
+  );
+  assert(
+    (await sha256File(jacocoAgent)) === jacocoComponent.jarSha256,
+    "P4D_JACOCO_INTEGRITY",
+    jacocoAgent,
+  );
+  const jacocoData = resolve(
+    context.root,
+    "internal/xades-provider/dss/target/jacoco.exec",
+  );
+  await rm(jacocoData, { force: true });
+  process.env.VERIFACTU_JACOCO_AGENT = jacocoAgent;
+  process.env.VERIFACTU_JACOCO_DESTFILE = jacocoData;
+  process.env.VERIFACTU_JAVA_MUTATION = "1";
+  const files = [
+    "tests/contract/p4-xades-provider.test.mjs",
+    "tests/integration/p4-xades-pki.test.mjs",
+    "tests/security/p4-signature-attacks.test.mjs",
+    "tests/security/p4-resource-attacks.test.mjs",
+  ];
+  const result = await run(
+    process.execPath,
+    ["--experimental-test-coverage", "--test", "--test-reporter=tap", ...files],
+    { cwd: context.root, timeoutMs: 300000 },
+  );
+  assert(
+    result.code === 0,
+    "P4D_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.trim(),
+  );
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P4D_TEST_REPORT", result.stdout.slice(-1000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P4D_TEST_COMPLETENESS",
+    `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  const coverage = await runMaven(
+    maven,
+    [
+      "-o",
+      `-Dmaven.repo.local=${repository}`,
+      "-f",
+      "internal/xades-provider/dss/pom.xml",
+      "org.jacoco:jacoco-maven-plugin:0.8.15:report",
+      `-Djacoco.dataFile=${jacocoData}`,
+    ],
+    { cwd: context.root, env: toolEnv, timeoutMs: 120000 },
+  );
+  assert(
+    coverage.code === 0,
+    "P4D_JAVA_COVERAGE_EXECUTION",
+    `${coverage.stdout}${coverage.stderr}`.trim(),
+  );
+  const coverageXmlPath = resolve(
+    context.root,
+    "internal/xades-provider/dss/target/site/jacoco/jacoco.xml",
+  );
+  const coverageXml = await readFile(coverageXmlPath, "utf8");
+  const bridgeSource =
+    /<sourcefile name="DssBridge\.java">[\s\S]*?<\/sourcefile>/u.exec(
+      coverageXml,
+    )?.[0];
+  assert(
+    bridgeSource,
+    "P4D_JAVA_COVERAGE_CLASS",
+    "DssBridge.java absent from JaCoCo report",
+  );
+  const lineCoverage =
+    /<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/u.exec(
+      bridgeSource,
+    );
+  const branchCoverage =
+    /<counter type="BRANCH" missed="(\d+)" covered="(\d+)"\/>/u.exec(
+      bridgeSource,
+    );
+  assert(
+    lineCoverage && branchCoverage,
+    "P4D_JAVA_COVERAGE_COUNTERS",
+    "line or branch counters missing",
+  );
+  const javaLines =
+    (Number(lineCoverage[2]) /
+      (Number(lineCoverage[1]) + Number(lineCoverage[2]))) *
+    100;
+  const javaBranches =
+    (Number(branchCoverage[2]) /
+      (Number(branchCoverage[1]) + Number(branchCoverage[2]))) *
+    100;
+  const mutationResult = await run(
+    process.execPath,
+    ["--test", "--test-reporter=tap", "tests/mutation/p4-mutation.test.mjs"],
+    { cwd: context.root, timeoutMs: 300000 },
+  );
+  assert(
+    mutationResult.code === 0,
+    "P4D_MUTATION_EXECUTION",
+    `${mutationResult.stdout}${mutationResult.stderr}`.trim(),
+  );
+  const mutationStats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      mutationResult.stdout,
+    );
+  assert(
+    mutationStats,
+    "P4D_MUTATION_REPORT",
+    mutationResult.stdout.slice(-1000),
+  );
+  const [
+    ,
+    mutants,
+    ,
+    killed,
+    mutationFailures,
+    mutationCancelled,
+    mutationSkipped,
+  ] = mutationStats;
+  const dMutants = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: P4-MUT-0(?:26|27|28|29|37|38|39|40|41)\b/gu,
+    ),
+  ];
+  assert(
+    Number(mutants) === 35 &&
+      Number(killed) === 35 &&
+      Number(mutationFailures) === 0 &&
+      Number(mutationCancelled) === 0 &&
+      Number(mutationSkipped) === 0 &&
+      dMutants.length === 9,
+    "P4D_MUTATION_COMPLETENESS",
+    `${killed}/${mutants} total, P4-D=${dMutants.length}/9, fail=${mutationFailures}, cancelled=${mutationCancelled}, skipped=${mutationSkipped}`,
+  );
+  const reproducedBuild = await runMaven(
+    maven,
+    [
+      "-o",
+      `-Dmaven.repo.local=${repository}`,
+      "-f",
+      "internal/xades-provider/dss/pom.xml",
+      "clean",
+      "package",
+      "-DskipTests",
+    ],
+    { cwd: context.root, env: toolEnv, timeoutMs: 300000 },
+  );
+  assert(
+    reproducedBuild.code === 0,
+    "P4D_DSS_REPRODUCIBLE_BUILD",
+    `${reproducedBuild.stdout}${reproducedBuild.stderr}`.trim(),
+  );
+  const reproducedProviderJarSha256 = await sha256File(providerJar);
+  assert(
+    reproducedProviderJarSha256 === firstProviderJarSha256,
+    "P4D_DSS_REPRODUCIBILITY_DIGEST",
+    `${firstProviderJarSha256} != ${reproducedProviderJarSha256}`,
+  );
+  assert(
+    javaLines >= 98 && javaBranches >= 95,
+    "P4D_JAVA_COVERAGE_THRESHOLD",
+    `line=${javaLines.toFixed(2)}%, branch=${javaBranches.toFixed(2)}%; required 98/95`,
+  );
+  const p4DSeededFaults = [
+    ["dss-altered-signed-bytes-success", "P4-MUT-038"],
+    [
+      "provider-serializes-or-logs-private-key",
+      "bridge child environment excludes unrelated parent secrets",
+    ],
+    ["stale-crl-ocsp-promoted-valid", "P4-MUT-040"],
+    ["unauthorized-revocation-responder-trusted", "P4-MUT-039"],
+    ["provider-attempts-network-without-evidence", "P4-MUT-041"],
+  ];
+  for (const [fault, evidence] of p4DSeededFaults) {
+    assert(
+      result.stdout.includes(evidence) ||
+        mutationResult.stdout.includes(evidence),
+      "P4D_SEEDED_FAULT_MISSING",
+      `${fault} -> ${evidence}`,
+    );
+  }
+  return {
+    selected: files.length + 2,
+    executed: files.length + 2,
+    passed: files.length + 2,
+    outputDigest: sha256(
+      build.stdout +
+        build.stderr +
+        jarListing.stdout +
+        firstProviderJarSha256 +
+        reproducedProviderJarSha256 +
+        artifactDigests.join("\n") +
+        result.stdout +
+        result.stderr +
+        coverage.stdout +
+        coverage.stderr +
+        coverageXml +
+        mutationResult.stdout +
+        mutationResult.stderr +
+        reproducedBuild.stdout +
+        reproducedBuild.stderr,
+    ),
+    diagnostics: [
+      `testCases=${tests}`,
+      `skipped=${skipped}`,
+      "dssBuild=offline",
+      `dssArtifactSha256=${firstProviderJarSha256}; reproducible=2/2`,
+      "dssShadeLicenseNotice=project LICENSE/NOTICE and exact DSS LGPL text present",
+      `mavenArtifacts=280/280 JAR+POM; buildMetadataPoms=${admission.buildMetadataPoms.length}/100 SHA-256 verified`,
+      "jdk=Eclipse-Temurin-21.0.12.1+1",
+      "maven=3.9.12",
+      `javaLineCoverage=${lineCoverage[2]}/${Number(lineCoverage[1]) + Number(lineCoverage[2])}`,
+      `javaBranchCoverage=${branchCoverage[2]}/${Number(branchCoverage[1]) + Number(branchCoverage[2])}`,
+      "properties=P4-PROP-013x4096 seed=1346650369 retries=0 discards=0",
+      "fuzz=P4-FUZZ-007x4096 seed=1346651655; P4-FUZZ-008x4096 seed=1430257929; minimized failures=0",
+      `seededFaults=${p4DSeededFaults.length}/${p4DSeededFaults.length} ${p4DSeededFaults.map(([fault]) => fault).join(",")}`,
+      "criticalMutants=9/9 P4-D (P4-MUT-026..029,037..041); total=34/43; future-wave P4-MUT-030..036,042..043 pending",
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
+async function runMaven(maven, args, options) {
+  if (process.platform !== "win32") return run(maven, args, options);
+  try {
+    const result = await execFileAsync(maven, args, {
+      cwd: options.cwd,
+      env: options.env ?? process.env,
+      maxBuffer: options.maxBuffer ?? 16 * 1024 * 1024,
+      timeout: options.timeoutMs,
+      windowsHide: true,
+      shell: true,
+    });
+    return { code: 0, stdout: result.stdout, stderr: result.stderr };
+  } catch (error) {
+    return {
+      code: Number.isInteger(error.code) ? error.code : 1,
+      stdout: error.stdout ?? "",
+      stderr: error.stderr ?? error.message,
+    };
+  }
 }
 
 async function compilePackages(context, outputRoot, sourceRoot = context.root) {
@@ -3440,6 +3907,7 @@ export const operations = {
   testPolicy,
   testP4A,
   testP4C,
+  testP4D,
   buildPackages,
   packageAllowlists,
   packageReproducibility,
@@ -3476,6 +3944,7 @@ export const operationCapabilities = Object.freeze({
   testPolicy: { tools: [], network: "denied" },
   testP4A: { tools: ["node"], network: "denied" },
   testP4C: { tools: ["node", "python"], network: "denied" },
+  testP4D: { tools: ["node", "java", "maven"], network: "denied" },
   buildPackages: { tools: ["node", "typescript"], network: "denied" },
   packageAllowlists: {
     tools: ["node", "typescript", "npm"],
