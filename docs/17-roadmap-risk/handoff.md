@@ -37,13 +37,15 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The append-only P4-readiness read-back below supersedes the stale restart
-capsule and P3-B-era status statements where they conflict. The latest
-protected `main` is `e7df2649e9ee148a61ccda0d8d4af6b8d3e0fe0f`; the zero-code
-P4-readiness gate is evidence-complete at PR `#53` (`763b582…`). P4-A is ready
-to begin from current protected `main`, but no P4 implementation is present.
-Later P4–P7 sections below remain historical records and do not establish
-current implementation or evidence.
+The append-only P4 protected read-backs below supersede the stale restart
+capsule and earlier current-state statements where they conflict. P4-A, P4-B,
+and P4-C are implemented and have protected final read-backs. The exact EU DSS
+6.5/JDK/Maven candidate admission is merged at PR `#76` squash
+`31cfe1a72bd6a1c75faf87bac87a1d1ccb431608`; P4-D product implementation is
+not yet authorized because issue `#77`'s dedicated admission read-back and
+protected-push closure remain pending. Later P4-D–P7 sections below remain
+historical or forward requirements unless a newer protected read-back says
+otherwise. `creationAllowed=false`.
 
 ## Historical initial baseline control — retained
 
@@ -91,21 +93,21 @@ unknown evidence is `blocked`, never `passed`.
 This capsule is intentionally short and MUST be refreshed by the active phase.
 Historical detail belongs in phase records below.
 
-| Field                        | Current value                                                                                                                                                                           |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                              |
-| Current phase                | P4-A is evidence-complete; P4-B entry is blocked until the current-capsule correction has its own exact-head and protected-push closure.                                                |
-| Phase status                 | P1–P4-A are evidence-complete. P4 readiness is recorded at PR `#53`; P4-A implementation and final protected read-back are recorded at PRs `#62` and `#64`. `creationAllowed=false`.    |
-| Last evidence-complete phase | P4-A: implementation squash `8b0724350b9e30ec6616e837d7605bd7ab839e17`; final read-back squash `5089970fb3407ce464587a3aa5ff1d561e7630a0`; both exact protected-push matrices passed.   |
-| Local repository             | P4-A contracts/domain core, codec, unit/property/security/mutation tests and task-enforced coverage/fuzz/fault evidence. P4-B application modules are not started.                      |
-| Protected `main` SHA         | `5089970fb3407ce464587a3aa5ff1d561e7630a0`, tree `55cc0d758640e42dadfb583e5c0f5c0fb8db935f`; PR `#64` carries the P4-A final protected read-back.                                       |
-| GitHub effective state       | Active zero-bypass protected-main ruleset. PR `#62` and final read-back PR `#64` passed all 17 required contexts and auxiliary checks; both protected-push closures passed.             |
-| Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; informational `26.8.2`; npm `10.9.2`/`11.19.1`; TypeScript `5.9.3`; Python `3.13.15`; exact lock and admissions below.                            |
-| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; `creationAllowed=false`.                          |
-| Verification Engine          | Public `@noeos/verification-engine@1.0.1` is exactly admitted and exercised only as a package dependency; fiscal integration remains downstream.                                        |
-| Public packages              | Three private `0.0.0-development` package shells build reproducibly and clean-consume from tarballs; they are not published and export no capability.                                   |
-| External gates               | Legal, AEAT, provider, stable-performance, independent-assurance and publication gates remain explicitly downstream and make no P2 claim.                                               |
-| Immediate instruction        | Start only P4-A from current protected `main`, with its own issue and vertical signed+DCO PR. Preserve `creationAllowed=false`; do not begin P4-B before protected A closure/read-back. |
+| Field                        | Current value                                                                                                                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                     |
+| Current phase                | P4-D provider admission final protected read-back, issue `#77`; implementation remains gated until that closure.                                                                |
+| Phase status                 | P1–P4-C are evidence-complete. P4-D exact provider graph/build admission merged at PR `#76`; synthetic feasibility is not product conformance. `creationAllowed=false`.         |
+| Last evidence-complete wave  | P4-C final protected read-back PR `#74`; protected main at its closure was `02d0a6781519dc30aacb70ffa3c98ff31f078c9f`.                                                        |
+| Local repository             | P4-A domain, P4-B planning/artifacts, P4-C bounded XML/XSD, plus exact local DSS 6.5/JDK/Maven admission. No DssBridge or P4-D product tests exist.                           |
+| Protected `main` SHA         | Admission squash `31cfe1a72bd6a1c75faf87bac87a1d1ccb431608`, tree `35a3e30ab8caca3ec5ebcb9b23a95ecb1742fb80`, parent `02d0a6781519dc30aacb70ffa3c98ff31f078c9f`.      |
+| GitHub effective state       | Active zero-bypass protected-main ruleset; squash-only PRs, signed commits, strict required contexts. PR #76 head passed 26/26 checks; exact protected-push matrix pending.    |
+| Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
+| Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
+| Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted; fiscal integration is P4-F scope.                                                                                   |
+| Public packages              | Three private `0.0.0-development` package shells; not published and no P4-D provider export.                                                                                    |
+| External gates               | Legal, AEAT, stable-performance, independent-assurance and publication gates remain downstream; none is claimed.                                                                |
+| Immediate instruction        | Complete issue `#77` protected read-back. Only then start a new bounded P4-D implementation issue/branch from resulting protected `main`; preserve serial wave order.             |
 
 ## Phase ledger
 
@@ -115,7 +117,7 @@ Historical detail belongs in phase records below.
 | P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa`                       | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`              | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
-| P4    | planned           | P3-B restart baseline `999d78c19b0e1be3097201a0cc61947a10760bbe` | —                                          | readiness + A–G    | Readiness decisions and plan are prepared; machine gate must pass before any wave starts.                                |
+| P4    | active            | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | —                                          | readiness + A–G    | P4-A–C are protected and read back; exact P4-D provider/toolchain admission is protected, with its final handoff closure in progress. |
 | P5    | planned           | P4 closure required                                              | —                                          | —                  | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
@@ -3107,3 +3109,89 @@ above; it changes no frozen P4 control.
   P4-D may start from the latest protected main. `creationAllowed=false`;
   no semantic/tax/fiscal compliance, AEAT acceptance, publication or release
   claim follows.
+
+
+## P4-D provider admission final protected read-back — 2026-09-26
+
+This admission closure supersedes the earlier current-state capsule that said
+DSS admission remained outstanding. It authorizes only P4-D implementation
+after this dedicated handoff PR and its protected-push closure. The synthetic
+feasibility dossier remains distinct from product conformance.
+
+### Identity and status
+
+- Admission item: issue `#75`, https://github.com/noeos/verifactu/issues/75.
+  Dedicated final read-back: issue `#77`,
+  https://github.com/noeos/verifactu/issues/77.
+- Admission PR `#76`, https://github.com/noeos/verifactu/pull/76, was based on
+  protected main `02d0a6781519dc30aacb70ffa3c98ff31f078c9f` and merged by
+  squash at `31cfe1a72bd6a1c75faf87bac87a1d1ccb431608`, tree
+  `35a3e30ab8caca3ec5ebcb9b23a95ecb1742fb80`, with that protected commit as
+  its sole parent. GitHub verified the squash signature and canonical DCO
+  trailer; the source branch was deleted.
+- PR `#76` final head was `b07a3f9b8720c27140237b57ba038c9ab2746485`, tree
+  `35a3e30ab8caca3ec5ebcb9b23a95ecb1742fb80`. Its five implementation
+  commits (`f4dfdbb`, `1deeb64`, `7be8186`, `d996d62`, `b07a3f9`) all have
+  GitHub-verified SSH signatures and canonical DCO trailers.
+- Exact-head matrix: 26/26 checks passed, including all 17 required contexts,
+  required-check closure and nine auxiliary checks. Protected-push matrix on
+  squash `31cfe1a` passed 25/25 check-runs, including all 17 required contexts
+  and `Required · required-check closure`. All five push workflows succeeded:
+  Required engineering foundation `36218184461`, Regulatory source
+  observation `36218184459`, Security `36218184523`, Conformance
+  `36218184539`, Engineering CI `36218184551`.
+- This documentation PR is the dedicated admission read-back. Its closure
+  `main` SHA/tree are derived by the P4-D implementation intake because this
+  record cannot identify its own future squash commit.
+
+### Readiness and admitted inputs
+
+- The admitted DSS 6.5 candidate has 43 exact runtime artifacts, 99 selected
+  Maven plugin components, and 140 locked Maven components total. Central
+  byte-integrity evidence covers 280 JAR/POM files. The CycloneDX graph has
+  410 components; CycloneDX and SPDX validation passed 410/410 and 820/820
+  cases respectively. OSV-Scanner 2.5.1 scanned the exact graph: 369 unique
+  packages and zero vulnerability findings. The normalized retained OSV
+  report equals the exact-head scan.
+- Java 21.0.12.1+1 and Maven 3.9.12 offline dependency-only shaded builds
+  repeated with SHA-256
+  `44ebd04a07dd6e4c8155ec21dd1f034d67f229c3f1f3b6f7a1cd684382c055b6`.
+  Artifact, upstream source, plugin, license and NOTICE identities are bound
+  in `config/admission/java-provider.json` (SHA-256
+  `55f7b3919c5516a90ae29a9176de52cc719df5f49d69c3c723099d824e041b35`).
+- Official AEAT example evidence records structural/basic/reference integrity
+  with network denied, while trust is `INDETERMINATE / NO_CERTIFICATE_CHAIN_FOUND`.
+  The signed official PDF requires a contextual SHA-1 policy digest; record
+  signature and reference digests remain restricted to the approved SHA-256
+  profile. No trust or AEAT acceptance is inferred.
+- Synthetic profile-feasibility report SHA-256 is
+  `70d153f5a85cddf6966e2c155590655a353c8d72dd78116628b33ed56032bdba`.
+  It demonstrates DSS signing through an opaque SoftHSM PKCS#11 key and local
+  supplied CRL/OCSP parsing/status/time primitives. It also retains valid,
+  revoked, stale, wrong-issuer/responder and malformed cases. The Java guard
+  observed no network request on tested local-evidence paths.
+- `gate:p2`, `gate:p4-readiness` and `p4:quality-plan` passed on protected
+  admission tree `35a3e30` with 7/7, 2/2 and 84/84 respectively, zero skips,
+  zero diagnostics in the exact clean evidence run. Frozen denominators remain
+  44 production files, 26 test files, 43 critical branches/mutants, 57,344
+  property executions, 32,768 fuzz cases and 16/16 seeded plan faults.
+
+### Residual qualification and next phase
+
+The admitted archive has no authored `DssBridge`; these results prove neither
+P4-D product behavior nor independent trust, certificate/time/usage/algorithm
+policy, caller-time/nextUpdate/max-age OCSP enforcement, production HSM
+provisioning, cross-platform Java behavior, cancellation/resource bounds,
+legal review, fiscal compliance, AEAT acceptance, publication or release.
+DSS's default basic-signature result accepted a stale OCSP status relative to a
+later caller validation instant in the probe, so P4-D must enforce that policy
+in the bridge and test it fail-closed. The bridge, its exact coverage/mutation
+mapping, all negative cases, independent vectors and end-to-end isolation stay
+mandatory implementation work under ADR-0057, ADR-0058 and the P4 quality plan.
+
+After issue `#77` closes through this protected handoff and its exact-head and
+protected-push checks pass, start a separate bounded P4-D implementation issue
+and branch from the resulting protected `main`. Do not start P4-E until P4-D's
+own implementation and final protected read-back are complete. `creationAllowed`
+remains false; no compliance, AEAT-acceptance, legal-approval, publication or
+release claim is made.
