@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-26",
+  "source": {
+    "editionId": "rrsif-2026-09-21-authoritative-candidate",
+    "pdf": "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/DetalleEspecificacTecnCodigoQRfactura.pdf",
+    "pdfSha256": "f86b3c260d8a4963dbc18c5007732b53199156c5d1db63242e68db71501b49eb",
+    "page": 25,
+    "officialQrExample": "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=89890001K&numserie=12345678-G33&fecha=01-01-2024&importe=123.45",
+    "reuse": "AEAT-REUSE-TERMS; attribution and no distortion required"
+  },
+  "artifacts": [
+    {
+      "name": "@nuintun/qrcode",
+      "version": "5.0.3",
+      "registryIntegrity": "sha512-eKxU05NO2A5ycOiAKu9XKaf5akfR0wJHgjBvy4Wgy2dOgBjMh58IHz8gvMwS2IBiqWq63ITntuzP/iuVA2wOHg==",
+      "tarballSha256": "36a4b90a118c56f99d4abdef3461d1eb50b2a7916d4ade7c800b51637e10c57b",
+      "license": "MIT",
+      "runtimeDependencies": {
+        "tslib": "^2.8.1"
+      },
+      "packageEntry": "exports['.']",
+      "publishedAt": "2026-02-06T09:02:23.447Z",
+      "sourceRelease": "GitHub latest release qrcode 5.0.3; npm metadata has no gitHead",
+      "npmSignature": "verified by npm audit signatures",
+      "sourceCommit": "50c35297fdae64b044e57b07dd06329cd1cb7319",
+      "sourceCommitSignature": "unsigned",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1",
+        "workflow": "https://github.com/nuintun/qrcode/.github/workflows/npm-publish.yml",
+        "ref": "refs/heads/main",
+        "attestedDigest": "matches npm tarball integrity"
+      }
+    },
+    {
+      "name": "qr",
+      "version": "0.7.0",
+      "registryIntegrity": "sha512-/VrrACmOAwZVipuRITwfEwOL5oAMEHH5PTmBWaGtlTom2Thxaa+rhmna4zU9PRN2uLw2wdccbkHOLGZb1Q9SdA==",
+      "tarballSha256": "632ef43ecb74f7eb5f578e978068bcbfba0fbba36101e79c079a6d95f24d8865",
+      "license": "MIT OR Apache-2.0",
+      "runtimeDependencies": {},
+      "packageEntry": "exports['./decode.js']",
+      "publishedAt": "2026-08-31T09:44:21.824Z",
+      "sourceCommit": "be475cca488635b8a71e158ac6190a5c78a201a8",
+      "npmSignature": "verified by npm audit signatures",
+      "sourceCommitSignature": "GitHub verified commit",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1",
+        "workflow": "https://github.com/paulmillr/qr/.github/workflows/release.yml",
+        "ref": "refs/tags/0.7.0",
+        "attestedDigest": "matches npm tarball integrity"
+      }
+    },
+    {
+      "name": "@zxing/library",
+      "version": "0.23.0",
+      "registryIntegrity": "sha512-6fkkoFwP8CHxl6ugnPsj74PLJgX2iRv5zczGAyt5OBzQgxFhuhF0NCEc4t4OvSr8xAv2MRLlI0Iu9ZGDZQ2urA==",
+      "tarballSha256": "e49f1076d9af70179c9fbb5026cda67e48864f3bced64fff548237208cc2ff32",
+      "license": "Apache-2.0",
+      "runtimeDependencies": {
+        "ts-custom-error": "^3.3.1"
+      },
+      "publishedAt": "2026-04-29",
+      "decision": "Rejected: upstream maintenance-only status and package engines require Node >=24, while project minimum is Node 22.14.0"
+    }
+  ],
+  "security": {
+    "npmAuditReviewedAt": "2026-09-26",
+    "directCandidates": {
+      "total": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "fullWorkspace": {
+      "total": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "npmSignatureAudit": {
+      "verifiedPackages": 232,
+      "verifiedAttestations": 87
+    },
+    "osv": "Required exact-PR CI gate; not represented as locally completed",
+    "temporaryImageTool": {
+      "name": "sharp",
+      "version": "0.34.5",
+      "projectDependency": false,
+      "npmAudit": {
+        "total": 1,
+        "high": 1,
+        "critical": 0
+      },
+      "purpose": "temporary admission-only crop and image variant generation; excluded from workspace and product dependency graphs"
+    }
+  },
+  "officialVectorProbe": {
+    "toolchain": {
+      "node": "24.21.0",
+      "sharp": "0.34.5",
+      "pdfRasterizer": "pdftoppm (Poppler)"
+    },
+    "raster": {
+      "file": "generated temporary crop from page 25",
+      "sha256": "eef0f6b16bfa7cf92c6f279651115593038e16ee28ec8b3e3a6ed326512d354a",
+      "width": 230,
+      "height": 230
+    },
+    "variants": [
+      "source crop",
+      "90-degree rotation",
+      "2x nearest-neighbor upscale",
+      "JPEG quality 80"
+    ],
+    "result": "qr/decode.js and @zxing/library@0.23.0 decoded the exact official payload for all four variants",
+    "runtimeMatrix": [
+      {
+        "node": "22.14.0",
+        "result": "passed official annex decode and encoder API smoke"
+      },
+      {
+        "node": "22.23.2",
+        "result": "passed official annex decode and encoder API smoke"
+      },
+      {
+        "node": "24.21.0",
+        "result": "passed official annex decode and encoder API smoke"
+      }
+    ]
+  },
+  "syntheticCrossDecode": {
+    "encoder": "@nuintun/qrcode@5.0.3 Encoder, level M, Byte segment",
+    "decoder": "qr/decode.js and @zxing/library@0.23.0",
+    "payloads": 2,
+    "results": "both decoders returned exact bytes for both symbols at 4 pixels per module",
+    "limitation": "synthetic cross-decode is interoperability evidence only; the official PDF image was the independent oracle"
+  },
+  "selection": {
+    "encoder": "@nuintun/qrcode@5.0.3",
+    "testOnlyDecoder": "qr@0.7.0, qr/decode.js only",
+    "independenceBoundary": "separate decoder implementation and package entry from the production encoder; qr documents ZXing inspiration, so no claim of algorithm-family diversity",
+    "runtimeInvariant": "qr must remain development-only and absent from runtime dependency graph and packed product; encoder is consumed only through a private port"
+  },
+  "offlinePackedConsumer": {
+    "observation": "The repository verifies packed artifacts with npm offline mode; npm ci from the lockfile caches the package tarball but not the registry packument needed to resolve its dependency from packed consumers.",
+    "prewarm": "The pinned setup-engineering action runs npm cache add @nuintun/qrcode@5.0.3 and npm cache add tslib@2.8.1 before offline consumer checks; these are the exact direct and transitive packages in this encoder dependency closure.",
+    "probe": "A clean npm cache confirmed npm cache add stores registry packument and tarball entries. The first CI retry confirmed the encoder packument was resolved and exposed the previously uncached transitive tslib packument; exact-head CI after both prewarms remains authoritative."
+  }
+}
