@@ -3403,3 +3403,84 @@ or release claim is made by this decision read-back.
 
 Closes #85 after this read-back PR and its exact-head and protected-push checks
 pass and the new protected-main identity is verified.
+
+## P4-E dependency admission protected read-back — 2026-09-26
+
+This append-only record supersedes the prior P4-E “issue #83 remains open”
+state: exact encoder/decoder dependency admission is now merged, and its exact
+protected push is green. Issue `#90` tracks this final protected-main
+read-back. P4-E implementation remains prohibited until issue `#90` closes
+through its own signed+DCO read-back PR and protected push. `creationAllowed=false`
+remains in force.
+
+### Admission PR and exact protected identity
+
+- **Admission PR:** [#89](https://github.com/noeos/verifactu/pull/89) closed
+  readiness issue `#83`. It selected the frozen runtime-private encoder
+  `@nuintun/qrcode@5.0.3` and development-only decoder `qr@0.7.0` restricted
+  to `qr/decode.js`. It added exact integrity, registry/source/provenance,
+  license, dependency, audit, official-vector, and residual-risk evidence in
+  `config/admission/qr-provider-evidence/admission-probe.json` and
+  `config/admission/dependencies.json`. The lockfile and package manifests
+  admit the exact encoder and decoder; no QR implementation or test path was
+  introduced.
+- **Exact PR head:** `3112cdf6f8f9d4d48adfa963ba9d227e83fb3fa0`, tree
+  `2b7aed4edc3b845ef7b7b652235e3423b3a7abd1`, parent
+  `fc717895b932a525f40b5b67cc41a898086de19b`. GitHub verified its signature
+  and its commit message has the canonical `Signed-off-by` trailer. All 26/26
+  exact-head check-runs passed, including DCO, required-check closure,
+  dependency review, OSV, package signatures/licences, packed consumers,
+  P2/P3/P4 gates, CodeQL and every configured runtime/platform cell.
+- **Protected identity:** PR `#89` merged by signed squash on 2026-09-26 as
+  `1691a10d76c033d26da8480ac85d77c5a5a792bd`, tree
+  `2b7aed4edc3b845ef7b7b652235e3423b3a7abd1`, sole parent
+  `898988e9c2f77feee24ab1132a3c5a84f4a8a775`. GitHub reports a valid commit
+  signature; the squash message has the canonical DCO trailer. Issue `#83` is
+  closed.
+- **Protected-push closure:** 25/25 check-runs passed on exactly
+  `1691a10d76c033d26da8480ac85d77c5a5a792bd`, including
+  `Required · required-check closure`. The successful workflow runs were
+  Required engineering foundation `36266464599`, Engineering CI
+  `36266464551`, Conformance `36266464587`, Security `36266464560`, and
+  Regulatory source observation `36266464572`; each run's head SHA is the
+  protected squash.
+
+### Exact-head evidence and CI correction
+
+Local candidate evidence passed before PR creation: `policy:format` 82/82,
+`policy:docs` 542/542, `policy:architecture` 31/31,
+`policy:supply-chain` 259/259, `policy:workflow` 17/17,
+`integration:tarball-consumers` 4/4 and `gate:p4-readiness` 2/2 with zero
+skips. These dirty-worktree reports are development evidence; the successful
+PR-head and protected-push checks are authoritative for their exact subjects.
+
+The initial PR head `fc717895b932a525f40b5b67cc41a898086de19b` exposed that
+`npm ci` cached the encoder tarball but not its registry packument, which the
+repository's offline packed-consumer gate requires. Its dependent consumer,
+P2 and regulatory gates failed for `ENOTCACHED`; required-check closure then
+reported four missing reports. A first remediation added the encoder cache
+entry, after which exact head `dc43097aa8f448b066e2b2e5faddc080aa4b1a7c`
+advanced to the next missing item, the encoder's sole runtime dependency
+`tslib@2.8.1`. The final PR head prewarms both exact packages in the pinned
+`.github/actions/setup-engineering` action. Its complete matrix and protected
+push passed, including packed-consumer/offline integration and closure.
+
+### Admission facts and limits
+
+The official QR oracle is the exact example printed in the digest-pinned AEAT
+QR specification PDF; it decoded with `qr/decode.js` and a second reader over
+the recorded image variants and Node runtime cells. `qr@0.7.0` has zero runtime
+dependencies, remains development-only, and its selected decoder entry is
+outside the product package. It documents ZXing inspiration, so independence
+is an implementation/package boundary from the selected encoder, not
+algorithm-family diversity. The encoder has a verified registry signature
+and matching SLSA provenance, but its bound source commit is unsigned; this
+remains a recorded supply-chain residual risk. The temporary admission-only
+image tool had one high audit advisory and is excluded from project dependency
+graphs.
+
+Admission does not establish that a future QR payload, symbol or invoice is
+regulatorily valid; it is not AEAT acceptance, legal approval, compliance,
+publication or release evidence. The next authorized work is only issue `#90`'s
+dedicated main read-back. QR implementation remains barred until that read-back
+PR and its exact protected-push checks pass.
