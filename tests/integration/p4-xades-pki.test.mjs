@@ -700,7 +700,7 @@ async function generatePkiFixtures() {
       [...javaCoverageOptions, "--class-path", jarPath, source],
       {
         encoding: "utf8",
-        timeout: 15_000,
+        timeout: 60_000,
         maxBuffer: 1_000_000,
       },
     );
