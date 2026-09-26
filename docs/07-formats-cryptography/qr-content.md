@@ -18,8 +18,10 @@ required query names/order, invoice issuer/number/date/amount lexical forms,
 percent encoding, UTF-8 bytes, maximum length and mode-dependent legend. Test
 and production endpoints/legends cannot be inferred from a loose boolean.
 
-The builder accepts validated invoice/record facts and an edition endpoint
-identity, not an arbitrary URL. It returns canonical payload text/bytes, parsed
+The invoice identifier uses the edition-defined series and invoice number as a
+direct concatenation; no delimiter is inferred or inserted. The builder accepts
+validated invoice/record facts and an edition endpoint identity, not an arbitrary
+URL. It returns canonical payload text/bytes, parsed
 field view, artifact digest and required visible legend. Verification parses
 strictly, rejects duplicate/unknown/missing parameters, wrong environment/mode,
 noncanonical encoding and mismatch with expected invoice/record.
