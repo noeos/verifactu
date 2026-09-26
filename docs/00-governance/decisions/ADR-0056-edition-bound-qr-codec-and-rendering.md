@@ -5,7 +5,7 @@ status: accepted
 authority: decision
 owner: architecture-owner
 created: 2026-09-24
-last-reviewed: 2026-09-24
+last-reviewed: 2026-09-26
 dependencies: [ADR-0009, ADR-0018, ADR-0021, ADR-0034, ADR-0038]
 sources: [SRC-0014, SRC-0015, SRC-0025]
 historical-inputs: [REV-045, REV-046, REV-062]
@@ -38,14 +38,25 @@ never truncate or rewrite official content.
 
 ## Decision
 
-The implementation candidate is `@nuintun/qrcode@5.0.3` for matrix encoding;
-`@zxing/library@0.23.0` is a test-only independent decode oracle and must not
-enter the public runtime dependency graph. ZXing's package is marked as
-maintenance-only, so it is a candidate rather than an unconditional selection:
-before admission, compare currently maintained independent readers and record
-why the selected oracle remains appropriate. Both candidates require fresh exact
-integrity, licence, transitive graph, vulnerability and package-admission checks
-before implementation; changing either candidate requires a decision update.
+The selected encoder is `@nuintun/qrcode@5.0.3`, behind a private port. The
+selected test-only decode oracle is `qr@0.7.0`, imported only through
+`qr/decode.js`; neither its package-root encoder nor its DOM helpers are used.
+The decoder must stay outside the runtime dependency graph and packed product.
+The frozen `@zxing/library@0.23.0` alternative was compared and rejected:
+upstream marks it maintenance-only, and its declared runtime requires Node 24
+while this project supports Node 22.14.0. The selected `qr` release has no
+runtime dependencies and its signed 0.7.0 source commit is bound to the package
+by SLSA provenance. It decoded the exact QR image in the frozen AEAT PDF annex
+in the minimum, latest-22 and primary Node cells, as well as four image
+variants. `qr` documents ZXing inspiration; its independence is an implementation
+and package boundary from the selected `@nuintun` encoder, not algorithmic
+lineage diversity. The encoder's SLSA provenance binds its registry artifact to
+an unsigned source commit; this remains a supply-chain residual risk mitigated
+by the verified registry signature, exact integrity, private port and
+implementation-independent vectors. Exact transitive graph, licenses and
+vulnerability review are recorded in `config/admission/dependencies.json` and
+the P4-E admission evidence. Changing either candidate requires a new decision
+and admission before implementation.
 
 The pure payload codec binds edition, mode/environment, exact ordered fields,
 UTF-8/percent encoding, length and visible legend to the pinned source data.

@@ -817,17 +817,18 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
     "candidate identity",
   );
   assert(
-    candidate.providerCandidates.qrDecoder.version === "0.23.0" &&
+    candidate.providerCandidates.qrDecoder.name === "qr" &&
+      candidate.providerCandidates.qrDecoder.version === "0.7.0" &&
       candidate.providerCandidates.qrDecoder.integrity ===
-        "sha512-6fkkoFwP8CHxl6ugnPsj74PLJgX2iRv5zczGAyt5OBzQgxFhuhF0NCEc4t4OvSr8xAv2MRLlI0Iu9ZGDZQ2urA==" &&
-      candidate.providerCandidates.qrDecoder.license === "Apache-2.0" &&
+        "sha512-/VrrACmOAwZVipuRITwfEwOL5oAMEHH5PTmBWaGtlTom2Thxaa+rhmna4zU9PRN2uLw2wdccbkHOLGZb1Q9SdA==" &&
+      candidate.providerCandidates.qrDecoder.license === "MIT OR Apache-2.0" &&
       candidate.providerCandidates.qrDecoder.role ===
-        "test-only independent decode oracle" &&
-      candidate.providerCandidates.qrDecoder.maintenanceState.includes(
-        "compare maintained alternatives",
+        "test-only independent decode oracle via qr/decode.js" &&
+      candidate.providerCandidates.qrDecoder.admissionState.includes(
+        "protected PR required before P4-E",
       ),
     "P4_PLAN_QR_DECODER",
-    "candidate identity and maintenance caveat",
+    "selected oracle identity and preimplementation admission",
   );
   assert(
     candidate.providerCandidates.xadesProvider.version === "6.5" &&

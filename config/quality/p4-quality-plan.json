@@ -785,13 +785,13 @@
       "admissionState": "exact candidate frozen; full dependency admission before P4-E"
     },
     "qrDecoder": {
-      "name": "@zxing/library",
-      "version": "0.23.0",
-      "integrity": "sha512-6fkkoFwP8CHxl6ugnPsj74PLJgX2iRv5zczGAyt5OBzQgxFhuhF0NCEc4t4OvSr8xAv2MRLlI0Iu9ZGDZQ2urA==",
-      "license": "Apache-2.0",
-      "role": "test-only independent decode oracle",
-      "maintenanceState": "maintenance-only; compare maintained alternatives before admission",
-      "admissionState": "exact candidate frozen; full dependency admission before P4-E"
+      "name": "qr",
+      "version": "0.7.0",
+      "integrity": "sha512-/VrrACmOAwZVipuRITwfEwOL5oAMEHH5PTmBWaGtlTom2Thxaa+rhmna4zU9PRN2uLw2wdccbkHOLGZb1Q9SdA==",
+      "license": "MIT OR Apache-2.0",
+      "role": "test-only independent decode oracle via qr/decode.js",
+      "maintenanceState": "active release 2026-08-31; exact tag commit verified; zero runtime dependencies",
+      "admissionState": "selected after official-vector comparison; exact dependency admission and protected PR required before P4-E"
     },
     "xadesProvider": {
       "name": "EU Digital Signature Services",
