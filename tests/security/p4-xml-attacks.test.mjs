@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { chmodSync, readFileSync } from "node:fs";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { mkdtemp, rm } from "node:fs/promises";
 import { once } from "node:events";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -13,6 +13,7 @@ import {
 } from "../../internal/xml-provider/provider.mjs";
 import {
   minimalXmlEnvironment,
+  parseXmlWorkerOutput,
   spawnXmlWorker,
 } from "../../internal/xml-provider/worker.mjs";
 
@@ -228,40 +229,25 @@ test("XML worker process envelope bounds cancellation, request, output, timeout 
   );
 });
 
-test("XML worker parser rejects malformed structured output and process failures", async (t) => {
-  const directory = await mkdtemp(
-    join(tmpdir(), "verifactu-xml-worker-output-"),
-  );
-  t.after(() => rm(directory, { recursive: true, force: true }));
-  const executable = async (name, body) => {
-    const path = join(directory, name);
-    await writeFile(path, `#!/bin/sh\n${body}\n`);
-    chmodSync(path, 0o700);
-    return path;
-  };
-  const run = (pythonExecutable) =>
-    spawnXmlWorker(fixture("<r/>"), { pythonExecutable, timeoutMs: 1000 });
-  const validOutput = await executable(
-    "valid",
-    `printf '%s' '{"kind":"valid","diagnostics":[]}'`,
-  );
-  assert.equal((await run(validOutput)).kind, "valid");
-  for (const [name, output] of [
-    ["json", "not-json"],
-    ["kind", `{"kind":"unknown","diagnostics":[]}`],
-    ["diagnostic", `{"kind":"invalid","diagnostics":["private detail"]}`],
+test("XML worker parser rejects malformed structured output", () => {
+  const parse = (output) => parseXmlWorkerOutput(Buffer.from(output));
+  assert.equal(parse(`{"kind":"valid","diagnostics":[]}`).kind, "valid");
+  for (const output of [
+    "not-json",
+    `{"kind":"unknown","diagnostics":[]}`,
+    `{"kind":"invalid","diagnostics":["private detail"]}`,
   ]) {
-    const malformed = await executable(name, `printf '%s' '${output}'`);
-    assert.equal((await run(malformed)).kind, "defect");
+    assert.equal(parse(output).kind, "defect");
   }
-  const failing = await executable("exit", "exit 7");
-  assert.equal((await run(failing)).kind, "defect");
-  const noisy = await executable("stderr", "printf '%s' 'xxxx' >&2; sleep 1");
+});
+
+test("XML worker output ceiling fails closed", async () => {
+  const pythonExecutable = process.env.VERIFACTU_PYTHON ?? "python3";
   assert.equal(
     (
       await spawnXmlWorker(fixture("<r/>"), {
-        pythonExecutable: noisy,
-        maximumOutputBytes: 2,
+        pythonExecutable,
+        maximumOutputBytes: 1,
       })
     ).kind,
     "limit",

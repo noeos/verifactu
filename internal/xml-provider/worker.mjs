@@ -421,7 +421,7 @@ export async function spawnXmlWorker(request, options = {}) {
           finish({ kind: "defect", diagnostics: ["DIAG-XSD-PROVIDER"] });
           return;
         }
-        finish(parseWorkerOutput(stdout));
+        finish(parseXmlWorkerOutput(stdout));
       });
       child.stdin.on("error", () => undefined);
       child.stdin.end(payload);
@@ -431,7 +431,7 @@ export async function spawnXmlWorker(request, options = {}) {
   });
 }
 
-function parseWorkerOutput(stdout) {
+export function parseXmlWorkerOutput(stdout) {
   try {
     const result = JSON.parse(stdout.toString("utf8"));
     if (
