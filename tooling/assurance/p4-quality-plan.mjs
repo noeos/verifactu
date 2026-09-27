@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
@@ -77,7 +77,11 @@ function readZipEntry(archivePath, entryName) {
   return result.stdout;
 }
 
-export function validateP4QualityPlan(candidate, discoveredProduction = []) {
+export function validateP4QualityPlan(
+  candidate,
+  discoveredProduction,
+  discoveredTestFiles,
+) {
   assert(
     javaProvider.schemaVersion === 1 &&
       javaProvider.id === "JAVA-PROVIDER-ADMISSION-0001" &&
@@ -607,14 +611,34 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
     "unapproved production path",
   );
   assert(
-    discoveredProduction.every((path) =>
-      candidate.productionModules.includes(path),
+    candidate.productionModules.every((path) =>
+      existsSync(resolve(root, path)),
     ),
-    "P4_PLAN_UNDECLARED_PRODUCTION",
-    discoveredProduction
-      .filter((path) => !candidate.productionModules.includes(path))
+    "P4_PLAN_MISSING_PRODUCTION",
+    candidate.productionModules
+      .filter((path) => !existsSync(resolve(root, path)))
       .join(","),
   );
+  if (discoveredProduction !== undefined)
+    assert(
+      discoveredProduction.every((path) =>
+        candidate.productionModules.includes(path),
+      ),
+      "P4_PLAN_UNDECLARED_PRODUCTION",
+      discoveredProduction
+        .filter((path) => !candidate.productionModules.includes(path))
+        .join(","),
+    );
+  if (discoveredProduction !== undefined)
+    assert(
+      candidate.productionModules.every((path) =>
+        discoveredProduction.includes(path),
+      ),
+      "P4_PLAN_UNTRACKED_PRODUCTION",
+      candidate.productionModules
+        .filter((path) => !discoveredProduction.includes(path))
+        .join(","),
+    );
   assert(
     Array.isArray(candidate.testFiles) && candidate.testFiles.length === 26,
     "P4_PLAN_TEST_POPULATION",
@@ -628,6 +652,21 @@ export function validateP4QualityPlan(candidate, discoveredProduction = []) {
     "P4_PLAN_TEST_SCOPE",
     "test outside declared test tree",
   );
+  assert(
+    candidate.testFiles.every((path) => existsSync(resolve(root, path))),
+    "P4_PLAN_MISSING_TEST",
+    candidate.testFiles
+      .filter((path) => !existsSync(resolve(root, path)))
+      .join(","),
+  );
+  if (discoveredTestFiles !== undefined)
+    assert(
+      candidate.testFiles.every((path) => discoveredTestFiles.includes(path)),
+      "P4_PLAN_UNTRACKED_TEST",
+      candidate.testFiles
+        .filter((path) => !discoveredTestFiles.includes(path))
+        .join(","),
+    );
 
   const thresholds = candidate.coverage?.thresholds;
   assert(
@@ -897,7 +936,7 @@ assert(
   "P4_PLAN_UNDECLARED_TEST",
   discoveredP4Tests.filter((path) => !plan.testFiles.includes(path)).join(","),
 );
-validateP4QualityPlan(plan, discoveredProduction);
+validateP4QualityPlan(plan, discoveredProduction, discoveredP4Tests);
 
 const doc = await readFile(
   resolve(root, "docs/17-roadmap-risk/p4-quality-plan.md"),
@@ -987,6 +1026,13 @@ for (const row of plan.criticalCatalogue.slice(36)) {
   );
 }
 
+const baselineTree = `${plan.governingProtectedMain}^{tree}`;
+const baselineTreeProbe = spawnSync("git", ["cat-file", "-e", baselineTree], {
+  cwd: root,
+});
+if (baselineTreeProbe.status !== 0)
+  git("fetch", "--no-tags", "origin", plan.governingProtectedMain);
+
 const baselinePaths = git(
   "ls-tree",
   "-r",
@@ -996,8 +1042,7 @@ const baselinePaths = git(
   .split(/\r?\n/u)
   .filter(Boolean);
 assert(
-  git("rev-parse", `${plan.governingProtectedMain}^{tree}`) ===
-    plan.governingProtectedTree &&
+  git("rev-parse", baselineTree) === plan.governingProtectedTree &&
     canonical(
       baselinePaths.filter((path) => plan.productionModules.includes(path)),
     ) === canonical(["packages/verifactu/src/index.ts"]) &&
@@ -1055,6 +1100,41 @@ const negativeCases = [
     "P4_PLAN_UNDECLARED_PRODUCTION",
     (value) =>
       validateP4QualityPlan(value, ["internal/xades-provider/not-planned.mjs"]),
+  ],
+  [
+    "P4_PLAN_MISSING_PRODUCTION",
+    (value) => {
+      const missing = "packages/verifactu/src/editions/__missing__.ts";
+      value.productionModules[0] = missing;
+      validateP4QualityPlan(value);
+    },
+  ],
+  [
+    "P4_PLAN_MISSING_TEST",
+    (value) => {
+      const missing = "tests/unit/__missing__.test.mjs";
+      value.testFiles[0] = missing;
+      validateP4QualityPlan(value);
+    },
+  ],
+  [
+    "P4_PLAN_UNTRACKED_PRODUCTION",
+    (value) =>
+      validateP4QualityPlan(
+        value,
+        discoveredProduction.filter(
+          (path) => path !== value.productionModules[0],
+        ),
+      ),
+  ],
+  [
+    "P4_PLAN_UNTRACKED_TEST",
+    (value) =>
+      validateP4QualityPlan(
+        value,
+        discoveredProduction,
+        discoveredP4Tests.filter((path) => path !== value.testFiles[0]),
+      ),
   ],
 ];
 let killed = 0;

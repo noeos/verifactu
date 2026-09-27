@@ -25,6 +25,7 @@ import { createDecimal } from "../../evidence/runs/artifacts/build/verifactu/dis
 import { createAltaRecord } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/records.js";
 import {
   encodeRequest,
+  decodeResponse,
   DSS_JVM_OPTIONS,
   minimalEnvironment,
   spawnDssBridge,
@@ -56,6 +57,8 @@ const javacExecutable = process.env.JAVA_HOME
     : "javac";
 
 test("bridge encoder rejects unknown commands and malformed evidence lists", () => {
+  assert.equal(encodeRequest(null), null);
+  assert.equal(encodeRequest({ ...request, certificateChainDer: null }), null);
   assert.equal(encodeRequest({ ...request, command: "SHELL" }), null);
   assert.equal(encodeRequest({ ...request, crlEvidence: ["not bytes"] }), null);
   assert.equal(
@@ -65,14 +68,53 @@ test("bridge encoder rejects unknown commands and malformed evidence lists", () 
     }),
     null,
   );
+  for (const key of [
+    "editionId",
+    "profileId",
+    "targetName",
+    "artifactDigestSha256",
+    "signingTimeMs",
+    "validationTimeMs",
+    "maximumRevocationAgeSeconds",
+    "expectedSignerFingerprintSha256",
+  ]) {
+    for (const value of ["x".repeat(129), "bad\nvalue", "bad\u0000value"]) {
+      assert.equal(encodeRequest({ ...request, [key]: value }), null);
+    }
+  }
+  for (const key of ["artifactBytes", "signerCertificateDer", "signatureBytes"])
+    assert.equal(encodeRequest({ ...request, [key]: "not bytes" }), null);
 });
 
 test("bridge encoder serializes a bounded request using strict base64 lines", () => {
   const encoded = encodeRequest(request);
   assert.ok(encoded instanceof Uint8Array);
+  assert.ok(
+    encodeRequest({ ...request, signatureBytes: undefined }) instanceof
+      Uint8Array,
+  );
   const lines = new TextDecoder().decode(encoded).trimEnd().split("\n");
   assert.ok(lines.length >= 17);
   assert.ok(lines.every((line) => /^(?:[A-Za-z0-9+/]*={0,2})$/u.test(line)));
+});
+
+test("DSS response decoder rejects malformed framing and validates every field", () => {
+  const valid = decodeResponse(
+    Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nNONE\nYQ==\n", "ascii"),
+  );
+  assert.equal(valid.kind, "VERIFIED");
+  assert.deepEqual([...valid.payload], [97]);
+  for (const malformed of [
+    Buffer.from([0xff]),
+    Buffer.from("bad\nVERIFIED\nNONE\nYQ==\n"),
+    Buffer.from("VERIFACTU-DSS-1\nMAYBE\nNONE\nYQ==\n"),
+    Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nsecret\nYQ==\n"),
+    Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nNONE\nYQ=\n"),
+    Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nNONE\nYR==\n"),
+    Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nNONE\nYQ==\nextra\n"),
+  ]) {
+    assert.equal(decodeResponse(malformed).kind, "DEFECT");
+  }
 });
 
 test("bridge child environment excludes unrelated parent secrets", () => {
@@ -89,6 +131,30 @@ test("bridge child environment excludes unrelated parent secrets", () => {
     if (previous === undefined) delete process.env[key];
     else process.env[key] = previous;
   }
+  assert.deepEqual(
+    minimalEnvironment("win32", {
+      PATH: "C:\\Windows\\System32",
+      JAVA_HOME: "C:\\Java",
+      SystemRoot: "C:\\Windows",
+      WINDIR: "C:\\Windows",
+      SECRET: "drop",
+    }),
+    {
+      PATH: "C:\\Windows\\System32",
+      JAVA_HOME: "C:\\Java",
+      SystemRoot: "C:\\Windows",
+      WINDIR: "C:\\Windows",
+    },
+  );
+  assert.deepEqual(minimalEnvironment("win32", { PATH: "" }), { PATH: "" });
+  assert.deepEqual(
+    minimalEnvironment("linux", {
+      PATH: "/bin",
+      SystemRoot: "ignored",
+      WINDIR: "ignored",
+    }),
+    { PATH: "/bin" },
+  );
 });
 
 test("DSS JVM enables the process network-deny policy", () => {
@@ -519,6 +585,106 @@ test("bridge process applies deadline and cancellation, with a minimal environme
     assert.equal(cancelled.diagnostic, "DIAG-XADES-CANCELLED");
   } finally {
     await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("DSS worker rejects oversized requests, output, diagnostics and failed process outcomes", async (t) => {
+  const directory = await mkdtemp(
+    join(tmpdir(), "verifactu-dss-worker-census-"),
+  );
+  const source = join(directory, "eu/noeos/verifactu/bridge/DssBridge.java");
+  const classPath = join(directory, "classes");
+  await mkdir(join(directory, "eu/noeos/verifactu/bridge"), {
+    recursive: true,
+  });
+  await mkdir(classPath);
+  const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
+  await writeFile(
+    source,
+    `package eu.noeos.verifactu.bridge; public final class DssBridge { public static void main(String[] args) throws Exception { ${body} } }\n`,
+  );
+  await promisify(execFile)(javacExecutable, [
+    "--release",
+    "21",
+    "-d",
+    classPath,
+    source,
+  ]);
+  t.after(() => rm(directory, { recursive: true, force: true }));
+
+  const response = (mode) =>
+    spawnDssBridge(
+      { ...request, editionId: mode },
+      {
+        javaExecutable:
+          process.env.VERIFACTU_JAVA ??
+          (process.platform === "win32" ? "java.exe" : "java"),
+        jarPath: classPath,
+      },
+    );
+  assert.equal((await response("valid")).kind, "VERIFIED");
+  assert.equal(
+    (
+      await spawnDssBridge(
+        { ...request, editionId: "valid" },
+        {
+          javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+          jarPath: classPath,
+          maximumOutputBytes: 0,
+        },
+      )
+    ).kind,
+    "LIMIT",
+  );
+  assert.equal((await response("stdout")).kind, "LIMIT");
+  assert.equal((await response("stderr")).kind, "LIMIT");
+  assert.equal((await response("diagnostic")).kind, "LIMIT");
+  assert.equal((await response("exit")).kind, "DEFECT");
+  assert.equal(
+    (
+      await spawnDssBridge(request, {
+        javaExecutable: "/missing/verifactu-java",
+        jarPath: classPath,
+      })
+    ).kind,
+    "UNAVAILABLE",
+  );
+  assert.equal(
+    (
+      await spawnDssBridge(request, {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        cwd: "/missing/verifactu-dss-cwd",
+      })
+    ).kind,
+    "UNAVAILABLE",
+  );
+  assert.equal(
+    (
+      await spawnDssBridge(request, {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        cwd: Symbol("invalid cwd"),
+      })
+    ).kind,
+    "UNAVAILABLE",
+  );
+  assert.equal(
+    encodeRequest({ ...request, artifactBytes: new Uint8Array(18_000_000) }),
+    null,
+  );
+  const previousAgent = process.env.VERIFACTU_JACOCO_AGENT;
+  const previousDestination = process.env.VERIFACTU_JACOCO_DESTFILE;
+  try {
+    process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
+    process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
+    assert.equal((await spawnDssBridge(request)).kind, "DEFECT");
+  } finally {
+    if (previousAgent === undefined) delete process.env.VERIFACTU_JACOCO_AGENT;
+    else process.env.VERIFACTU_JACOCO_AGENT = previousAgent;
+    if (previousDestination === undefined)
+      delete process.env.VERIFACTU_JACOCO_DESTFILE;
+    else process.env.VERIFACTU_JACOCO_DESTFILE = previousDestination;
   }
 });
 

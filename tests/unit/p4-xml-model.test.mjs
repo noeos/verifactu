@@ -24,7 +24,7 @@ test("XML model freezes the tree and emits deterministic UTF-8 with expanded nam
         { prefix: "p", namespaceUri: "urn:attr" },
       ],
       attributes: [
-        { name: name("z", "", null), value: "a\nb\t\"&" },
+        { name: name("z", "", null), value: 'a\nb\t"&' },
         { name: name("a", "urn:attr", "p"), value: "café €" },
       ],
       children: [
@@ -52,9 +52,15 @@ test("XML model freezes the tree and emits deterministic UTF-8 with expanded nam
   const bytes = serializeXmlDocument(first.value);
   assert.equal(bytes.status, "ok");
   const xml = new TextDecoder("utf-8", { fatal: true }).decode(bytes.value);
-  assert.equal(xml, new TextDecoder().decode(serializeXmlDocument(second.value).value));
+  assert.equal(
+    xml,
+    new TextDecoder().decode(serializeXmlDocument(second.value).value),
+  );
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>/u);
-  assert.match(xml, /xmlns="urn:default" xmlns:p="urn:attr" xmlns:x="urn:example"/u);
+  assert.match(
+    xml,
+    /xmlns="urn:default" xmlns:p="urn:attr" xmlns:x="urn:example"/u,
+  );
   assert.match(xml, / p:a="café €"/u);
   assert.match(xml, /z="a&#xA;b&#x9;&quot;&amp;"/u);
   assert.match(xml, /&lt;&amp;&gt;&#xD;/u);
@@ -133,13 +139,18 @@ test("XML model rejects malformed names, bindings, duplicate expanded attributes
     { ...base, root: { ...base.root, children: [leaf("bad\u0001")] } },
     {
       ...base,
-      root: { ...base.root, children: [{ kind: "comment", value: "bad--comment" }] },
+      root: {
+        ...base.root,
+        children: [{ kind: "comment", value: "bad--comment" }],
+      },
     },
     {
       ...base,
       root: {
         ...base.root,
-        children: [{ kind: "processing-instruction", target: "xml", data: "bad" }],
+        children: [
+          { kind: "processing-instruction", target: "xml", data: "bad" },
+        ],
       },
     },
   ];
@@ -187,4 +198,144 @@ test("XML model applies a total serialized-byte ceiling before allocating output
   });
   assert.equal(result.status, "invalid");
   assert.equal(result.diagnostics[0].code, "DIAG-XML-MODEL");
+});
+
+test("XML model fails closed across namespace, attribute, node, and text boundaries", () => {
+  const document = (overrides = {}) => ({
+    root: {
+      kind: "element",
+      name: name("r"),
+      namespaces: [],
+      attributes: [],
+      children: [],
+      ...overrides,
+    },
+  });
+  const invalidDocuments = [
+    document({ namespaces: null }),
+    document({ namespaces: [null] }),
+    document({ namespaces: [{ prefix: null, namespaceUri: "bad\u0000uri" }] }),
+    document({ namespaces: [{ prefix: 1, namespaceUri: "urn:x" }] }),
+    document({
+      namespaces: [
+        { prefix: "p", namespaceUri: "urn:x" },
+        { prefix: "p", namespaceUri: "urn:y" },
+      ],
+    }),
+    document({ namespaces: [{ prefix: "bad:name", namespaceUri: "urn:x" }] }),
+    document({ namespaces: [{ prefix: "xmlns", namespaceUri: "urn:x" }] }),
+    document({
+      namespaces: [
+        { prefix: "p", namespaceUri: "http://www.w3.org/2000/xmlns/" },
+      ],
+    }),
+    document({ namespaces: [{ prefix: "xml", namespaceUri: "urn:not-xml" }] }),
+    document({
+      namespaces: [
+        { prefix: "p", namespaceUri: "http://www.w3.org/XML/1998/namespace" },
+      ],
+    }),
+    document({ namespaces: [{ prefix: "p", namespaceUri: "" }] }),
+    document({ name: name("r", "urn:missing", "p") }),
+    document({ attributes: null }),
+    document({ attributes: [null] }),
+    document({ attributes: [{ name: name("xmlns"), value: "x" }] }),
+    document({ attributes: [{ name: name("a"), value: 1 }] }),
+    document({ attributes: [{ name: name("a"), value: "bad\u0001" }] }),
+    document({
+      attributes: [{ name: name("a", "urn:missing", "p"), value: "x" }],
+    }),
+    document({
+      attributes: [
+        { name: name("a"), value: "x" },
+        { name: name("a"), value: "y" },
+      ],
+    }),
+    document({ children: null }),
+    document({ children: [false] }),
+    document({ children: [{ kind: "unknown" }] }),
+    document({ children: [{ kind: "comment", value: "trailing-" }] }),
+    document({
+      children: [
+        { kind: "processing-instruction", target: "bad:name", data: "" },
+      ],
+    }),
+    document({
+      children: [
+        { kind: "processing-instruction", target: "trace", data: "bad?>data" },
+      ],
+    }),
+    document({
+      children: [
+        { kind: "processing-instruction", target: "trace", data: "bad\u0000" },
+      ],
+    }),
+    document({ children: [leaf("x".repeat(2_097_153))] }),
+  ];
+  let nested = document().root;
+  for (let index = 0; index < 65; index += 1) {
+    nested = {
+      kind: "element",
+      name: name("n"),
+      namespaces: [],
+      attributes: [],
+      children: [nested],
+    };
+  }
+  invalidDocuments.push({ root: nested });
+  invalidDocuments.push(
+    document({ children: Array.from({ length: 100_001 }, () => leaf("")) }),
+  );
+  invalidDocuments.push(
+    document({
+      attributes: Array.from({ length: 4_097 }, (_, index) => ({
+        name: name(`a${index}`),
+        value: "",
+      })),
+    }),
+  );
+  invalidDocuments.push(
+    document({
+      namespaces: Array.from({ length: 257 }, (_, index) => ({
+        prefix: `p${index}`,
+        namespaceUri: `urn:${index}`,
+      })),
+    }),
+  );
+  for (const input of invalidDocuments) {
+    const result = defineXmlDocument(input);
+    assert.equal(result.status, "invalid");
+    assert.equal(result.diagnostics[0].code, "DIAG-XML-MODEL");
+  }
+});
+
+test("XML model accepts the complete valid scalar ranges and empty processing instructions", () => {
+  const document = {
+    root: {
+      kind: "element",
+      name: name("𐀀Root", "urn:unicode", "u"),
+      namespaces: [
+        { prefix: "u", namespaceUri: "urn:unicode" },
+        { prefix: "xml", namespaceUri: "http://www.w3.org/XML/1998/namespace" },
+      ],
+      attributes: [
+        {
+          name: name("lang", "http://www.w3.org/XML/1998/namespace", "xml"),
+          value: "ñ\uE000😀'\"",
+        },
+      ],
+      children: [
+        leaf('\uE000😀"\n\t'),
+        { kind: "processing-instruction", target: "trace", data: "" },
+      ],
+    },
+  };
+  const defined = defineXmlDocument(document);
+  assert.equal(defined.status, "ok");
+  const serialized = serializeXmlDocument(defined.value);
+  assert.equal(serialized.status, "ok");
+  const xml = new TextDecoder().decode(serialized.value);
+  assert.match(xml, /𐀀Root/u);
+  assert.match(xml, /ñ\uE000😀/u);
+  assert.match(xml, /\uE000😀"\n\t<\?trace\?>/u);
 });

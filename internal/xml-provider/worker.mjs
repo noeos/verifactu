@@ -314,6 +314,22 @@ except Exception:
     write_result("defect", "DIAG-XSD-PROVIDER")
 `;
 
+export function exceedsXmlOutputLimit(accumulatedBytes, chunkBytes, maximumBytes) {
+  return accumulatedBytes + chunkBytes > maximumBytes;
+}
+
+export function minimalXmlEnvironment(
+  platform = process.platform,
+  source = process.env,
+) {
+  const env = { PATH: source.PATH ?? "" };
+  if (platform === "win32") {
+    if (source.SystemRoot) env.SystemRoot = source.SystemRoot;
+    if (source.WINDIR) env.WINDIR = source.WINDIR;
+  }
+  return env;
+}
+
 const VALID_WORKER_KINDS = new Set([
   "valid",
   "invalid",
@@ -323,7 +339,16 @@ const VALID_WORKER_KINDS = new Set([
   "defect",
 ]);
 
+export function createXmlWorkerSpawner(processSpawner) {
+  return (request, options = {}) =>
+    spawnXmlWorkerWith(processSpawner, request, options);
+}
+
 export async function spawnXmlWorker(request, options = {}) {
+  return spawnXmlWorkerWith(spawn, request, options);
+}
+
+async function spawnXmlWorkerWith(processSpawner, request, options) {
   if (options.signal?.aborted)
     return Object.freeze({
       kind: "cancelled",
@@ -366,20 +391,26 @@ export async function spawnXmlWorker(request, options = {}) {
     timer.unref?.();
     options.signal?.addEventListener("abort", abort, { once: true });
     try {
-      const env = { PATH: process.env.PATH ?? "" };
-      if (process.platform === "win32") {
-        if (process.env.SystemRoot) env.SystemRoot = process.env.SystemRoot;
-        if (process.env.WINDIR) env.WINDIR = process.env.WINDIR;
-      }
-      child = spawn(pythonExecutable, ["-I", "-c", XML_WORKER_SOURCE], {
+      const env = minimalXmlEnvironment();
+      child = processSpawner(
+        pythonExecutable,
+        ["-I", "-c", XML_WORKER_SOURCE],
+        {
         cwd: options.cwd ?? process.cwd(),
         env,
         shell: false,
         stdio: ["pipe", "pipe", "pipe"],
         windowsHide: true,
-      });
+        },
+      );
       child.stdout.on("data", (chunk) => {
-        if (stdout.length + chunk.length > maximumOutputBytes) {
+        if (
+          exceedsXmlOutputLimit(
+            stdout.length,
+            chunk.length,
+            maximumOutputBytes,
+          )
+        ) {
           stop("output");
           return;
         }
@@ -387,7 +418,8 @@ export async function spawnXmlWorker(request, options = {}) {
       });
       child.stderr.on("data", (chunk) => {
         stderrBytes += chunk.length;
-        if (stderrBytes > maximumOutputBytes) stop("output");
+        if (exceedsXmlOutputLimit(0, stderrBytes, maximumOutputBytes))
+          stop("output");
       });
       child.on("error", (error) => {
         finish(
@@ -413,7 +445,7 @@ export async function spawnXmlWorker(request, options = {}) {
           finish({ kind: "defect", diagnostics: ["DIAG-XSD-PROVIDER"] });
           return;
         }
-        finish(parseWorkerOutput(stdout));
+        finish(parseXmlWorkerOutput(stdout));
       });
       child.stdin.on("error", () => undefined);
       child.stdin.end(payload);
@@ -423,7 +455,7 @@ export async function spawnXmlWorker(request, options = {}) {
   });
 }
 
-function parseWorkerOutput(stdout) {
+export function parseXmlWorkerOutput(stdout) {
   try {
     const result = JSON.parse(stdout.toString("utf8"));
     if (

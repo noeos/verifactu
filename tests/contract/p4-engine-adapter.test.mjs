@@ -149,6 +149,102 @@ test("profile refuses fiscal plaintext, extra fields, malformed order and unsafe
   );
 });
 
+test("profile projection validates every identifier, artifact, predecessor, and algorithm boundary", () => {
+  const projection = ENGINE_PROFILE_TEST_VECTORS[1].projection;
+  const malformed = [
+    { schema: "other" },
+    { contextId: "plain-context" },
+    { sequenceId: "plain-sequence" },
+    { recordId: "plain-record" },
+    { editionId: "bad edition" },
+    { operationKind: "unknown" },
+    { position: -1 },
+    { position: 1_000_001 },
+    { position: Number.MAX_SAFE_INTEGER + 1 },
+    { artifacts: null },
+    { artifacts: [] },
+    {
+      artifacts: Array.from({ length: 17 }, (_, order) => ({
+        order,
+        kind: "xml",
+        digest: artifactDigest,
+      })),
+    },
+    { artifacts: [{ order: 1, kind: "xml", digest: artifactDigest }] },
+    { artifacts: [{ order: 0, kind: "unknown", digest: artifactDigest }] },
+    { artifacts: [{ order: 0, kind: "xml", digest: "bad" }] },
+    {
+      artifacts: [
+        { order: 0, kind: "xml", digest: artifactDigest, extra: true },
+      ],
+    },
+    {
+      artifacts: [
+        { order: 0, kind: "xml", digest: artifactDigest },
+        { order: 1, kind: "xml", digest: artifactDigest },
+      ],
+    },
+    { predecessorEvidenceDigest: "bad" },
+    { algorithmIds: [] },
+    { algorithmIds: Array.from({ length: 9 }, (_, index) => `alg-${index}`) },
+    { algorithmIds: ["INVALID"] },
+    { algorithmIds: ["sha-512", "sha-256"] },
+    { algorithmIds: ["sha-256", "sha-256"] },
+  ];
+  for (const overrides of malformed) {
+    assert.equal(
+      isEngineProfileProjection({ ...projection, ...overrides }),
+      false,
+      JSON.stringify(overrides),
+    );
+  }
+
+  const input = {
+    ...projection,
+    claims: claimSet,
+  };
+  for (const invalidInput of [
+    { ...input, unexpected: true },
+    { ...input, schema: "unknown" },
+    { ...input, position: -1 },
+    { ...input, claims: [] },
+    { ...input, claims: { claims: "not-an-array" } },
+  ]) {
+    assert.equal(createEngineProfileProjection(invalidInput).status, "invalid");
+  }
+});
+
+test("profile normalization reports bounded success and rejects invalid canonical bytes", () => {
+  const profile = createEngineNormalizationProfile();
+  const projection = ENGINE_PROFILE_TEST_VECTORS[0].projection;
+  let written;
+  const sink = {
+    byteLength: 0,
+    write(bytes) {
+      written = bytes.slice();
+    },
+  };
+  const normalized = profile.normalize(projection, sink, ENGINE_PROFILE_LIMITS);
+  assert.equal(normalized.ok, true);
+  assert.equal(normalized.value.byteLength, written.byteLength);
+  assert.ok(written.byteLength > 0);
+  assert.equal(
+    profile.normalize(projection, sink, {
+      ...ENGINE_PROFILE_LIMITS,
+      maxPayloadBytes: 1,
+    }).ok,
+    false,
+  );
+  assert.equal(
+    profile.normalize(
+      { ...projection, operationKind: "unknown" },
+      sink,
+      ENGINE_PROFILE_LIMITS,
+    ).ok,
+    false,
+  );
+});
+
 test("P4-CB-033 profile boundaries contain hostile proxies and sink failures", () => {
   const profile = createEngineNormalizationProfile();
   const throwingPrototype = new Proxy(

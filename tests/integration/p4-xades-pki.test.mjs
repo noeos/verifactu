@@ -439,6 +439,26 @@ const policy = {
 };
 
 test("PKI observation requires evidence and a fresh caller-time interval", () => {
+  for (const invalidPolicy of [
+    null,
+    {},
+    { ...policy, validationTimeMs: Number.NaN },
+    { ...policy, maximumRevocationAgeSeconds: 172_801 },
+    { ...policy, crlEvidence: null },
+    { ...policy, ocspEvidence: null },
+  ]) {
+    const result = normalizePkiObservation(
+      { status: "valid", thisUpdateMs: 1, nextUpdateMs: 2 },
+      invalidPolicy,
+    );
+    assert.equal(result.status, "unknown");
+    assert.equal(result.thisUpdateMs, null);
+    assert.equal(result.nextUpdateMs, null);
+  }
+  assert.equal(
+    normalizePkiObservation({ status: "unsupported" }, policy).status,
+    "unknown",
+  );
   assert.equal(
     normalizePkiObservation(
       {

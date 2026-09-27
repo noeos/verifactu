@@ -134,6 +134,55 @@ test("engine evidence digest shape is required only for verified claims", () => 
   );
 });
 
+test("claim constructors reject every malformed status, field, and evidence combination", () => {
+  const validBase = {
+    kind: "cryptographic",
+    status: "valid",
+    evidenceDigest: digest,
+    diagnostics: [],
+  };
+  for (const malformed of [
+    null,
+    { ...validBase, extra: true },
+    { ...validBase, kind: "unknown" },
+    { ...validBase, status: "pending" },
+    { ...validBase, diagnostics: null },
+    {
+      ...validBase,
+      diagnostics: Array.from({ length: 33 }, (_, index) => `DIAG-${index}`),
+    },
+    { ...validBase, diagnostics: ["a"] },
+    { ...validBase, diagnostics: ["DIAG-OK", "DIAG-OK"] },
+    { ...validBase, evidenceDigest: "sha512:" + "a".repeat(128) },
+    { ...validBase, evidenceDigest: undefined },
+    {
+      ...validBase,
+      status: "invalid",
+      evidenceDigest: undefined,
+      diagnostics: [],
+    },
+  ]) {
+    assert.equal(createVerificationClaim(malformed).status, "invalid");
+  }
+  assert.equal(createVerificationClaimSet(null).status, "invalid");
+  assert.equal(
+    createVerificationClaimSet([{}, {}, {}, {}, {}]).status,
+    "invalid",
+  );
+  assert.equal(getVerificationClaim({ claims: [] }, "aeat"), undefined);
+  assert.equal(
+    replaceVerificationClaim(claimSet().value, { kind: "invalid" }).status,
+    "invalid",
+  );
+  assert.equal(
+    replaceVerificationClaim(
+      { claims: [claim("official-format", "valid")] },
+      claim("aeat", "invalid"),
+    ).status,
+    "invalid",
+  );
+});
+
 test("claim boundaries contain throwing proxies without echoing their data", () => {
   const throwingPrototype = new Proxy(
     {},

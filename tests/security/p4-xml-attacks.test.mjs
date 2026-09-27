@@ -1,13 +1,24 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
-import { once } from "node:events";
+import { mkdtemp, rm } from "node:fs/promises";
+import { EventEmitter, once } from "node:events";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { PassThrough } from "node:stream";
 import test from "node:test";
 import {
   createXmlXsdProvider,
   PINNED_SCHEMAS,
   XML_EDITION_ID,
 } from "../../internal/xml-provider/provider.mjs";
+import {
+  createXmlWorkerSpawner,
+  exceedsXmlOutputLimit,
+  minimalXmlEnvironment,
+  parseXmlWorkerOutput,
+  spawnXmlWorker,
+} from "../../internal/xml-provider/worker.mjs";
 
 const sourceRoot =
   "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources";
@@ -15,6 +26,39 @@ const schemaPaths = {
   "xsd-suministro-informacion": "aeat/SuministroInformacion.xsd",
   "xmldsig-schema": "standards/xmldsig-core-schema.xsd",
 };
+
+test("XML worker output limit accepts its exact ceiling and rejects overflow", () => {
+  assert.equal(exceedsXmlOutputLimit(4, 6, 10), false);
+  assert.equal(exceedsXmlOutputLimit(4, 7, 10), true);
+});
+
+test("XML worker preserves only required environment across supported platforms", () => {
+  assert.deepEqual(
+    minimalXmlEnvironment("win32", {
+      PATH: "C:\\Windows\\System32",
+      SystemRoot: "C:\\Windows",
+      WINDIR: "C:\\Windows",
+      SECRET: "drop",
+    }),
+    {
+      PATH: "C:\\Windows\\System32",
+      SystemRoot: "C:\\Windows",
+      WINDIR: "C:\\Windows",
+    },
+  );
+  assert.deepEqual(minimalXmlEnvironment("win32", { PATH: "" }), {
+    PATH: "",
+  });
+  assert.deepEqual(
+    minimalXmlEnvironment("linux", {
+      PATH: "/usr/bin",
+      SystemRoot: "ignored",
+      WINDIR: "ignored",
+    }),
+    { PATH: "/usr/bin" },
+  );
+});
+
 function fixture(xml) {
   return {
     editionId: XML_EDITION_ID,
@@ -66,7 +110,10 @@ test("provider denies DTDs, external entities, XInclude, and remote schema hints
     assert.equal(results[2].diagnostics[0], "DIAG-XML-XINCLUDE");
     assert.equal(results[3].status, "invalid");
     assert.equal(httpRequests, 0);
-    assert.doesNotMatch(JSON.stringify(results), /root:|network-accessed|\/etc\/passwd/u);
+    assert.doesNotMatch(
+      JSON.stringify(results),
+      /root:|network-accessed|\/etc\/passwd/u,
+    );
   } finally {
     server.close();
     await once(server, "close");
@@ -95,7 +142,9 @@ test("incremental parser limits depth, nodes, attributes, namespaces, and text",
 
 test("hard byte ceiling, deadline, cancellation, and unavailable workers fail closed", async () => {
   const provider = createXmlXsdProvider();
-  const tooLarge = await provider.validate(fixture(`<r>${"x".repeat(4_194_304)}</r>`));
+  const tooLarge = await provider.validate(
+    fixture(`<r>${"x".repeat(4_194_304)}</r>`),
+  );
   assert.equal(tooLarge.status, "limit");
   assert.equal(tooLarge.diagnostics[0], "DIAG-XML-BYTES");
 
@@ -104,17 +153,157 @@ test("hard byte ceiling, deadline, cancellation, and unavailable workers fail cl
   assert.equal(deadline.diagnostics[0], "DIAG-XML-DEADLINE");
 
   const controller = new AbortController();
-  const validating = provider.validate(fixture(`<r>${"x".repeat(1_000_000)}</r>`), {
-    signal: controller.signal,
-  });
+  const validating = provider.validate(
+    fixture(`<r>${"x".repeat(1_000_000)}</r>`),
+    {
+      signal: controller.signal,
+    },
+  );
   setTimeout(() => controller.abort(), 1).unref?.();
   const cancelled = await validating;
   assert.equal(cancelled.status, "cancelled");
   assert.equal(cancelled.diagnostics[0], "DIAG-XML-CANCELLED");
 
-  const unavailable = await createXmlXsdProvider({ pythonExecutable: "/missing/python" }).validate(
-    fixture("<r/>"),
-  );
+  const unavailable = await createXmlXsdProvider({
+    pythonExecutable: "/missing/python",
+  }).validate(fixture("<r/>"));
   assert.equal(unavailable.status, "unavailable");
   assert.equal(unavailable.diagnostics[0], "DIAG-XSD-UNAVAILABLE");
+});
+
+test("XML worker process envelope bounds cancellation, request, output, timeout and spawn failures", async () => {
+  const request = fixture("<r/>");
+  const cancelledController = new AbortController();
+  cancelledController.abort();
+  assert.equal(
+    (await spawnXmlWorker(request, { signal: cancelledController.signal }))
+      .kind,
+    "cancelled",
+  );
+
+  assert.equal(
+    (
+      await spawnXmlWorker(
+        { payload: "x".repeat(18_000_001) },
+        { pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3" },
+      )
+    ).kind,
+    "limit",
+  );
+
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        maximumOutputBytes: 1,
+      })
+    ).kind,
+    "limit",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        timeoutMs: 1,
+      })
+    ).kind,
+    "limit",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: "/missing/verifactu-python",
+      })
+    ).kind,
+    "unavailable",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        cwd: "/missing/verifactu-worker-cwd",
+      })
+    ).kind,
+    "unavailable",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        cwd: Symbol("invalid cwd"),
+      })
+    ).kind,
+    "unavailable",
+  );
+});
+
+test("XML worker parser rejects malformed structured output", () => {
+  const parse = (output) => parseXmlWorkerOutput(Buffer.from(output));
+  assert.equal(parse(`{"kind":"valid","diagnostics":[]}`).kind, "valid");
+  for (const output of [
+    "not-json",
+    `{"kind":"unknown","diagnostics":[]}`,
+    `{"kind":"invalid","diagnostics":["private detail"]}`,
+  ]) {
+    assert.equal(parse(output).kind, "defect");
+  }
+});
+
+test("XML worker output ceiling fails closed", async () => {
+  const pythonExecutable = process.env.VERIFACTU_PYTHON ?? "python3";
+  assert.equal(
+    (
+      await spawnXmlWorker(fixture("<r/>"), {
+        pythonExecutable,
+        maximumOutputBytes: 1,
+      })
+    ).kind,
+    "limit",
+  );
+});
+
+test("XML worker stderr overflow stops its child and fails closed", async () => {
+  const spawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () =>
+      setImmediate(() => child.emit("close", null, "SIGTERM"));
+    setImmediate(() => child.stderr.write(Buffer.from("overflow")));
+    return child;
+  });
+  assert.equal(
+    (await spawner(fixture("<r/>"), { maximumOutputBytes: 1 })).kind,
+    "limit",
+  );
+});
+
+test("XML worker normalizes child spawn errors and post-spawn cancellation", async () => {
+  const failedSpawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    setImmediate(() =>
+      child.emit("error", Object.assign(new Error("spawn failed"), { code: "EACCES" })),
+    );
+    return child;
+  });
+  assert.equal((await failedSpawner(fixture("<r/>"))).kind, "defect");
+
+  const controller = new AbortController();
+  const cancelledSpawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
+    return child;
+  });
+  const pending = cancelledSpawner(fixture("<r/>"), {
+    signal: controller.signal,
+  });
+  controller.abort();
+  assert.equal((await pending).kind, "cancelled");
 });
