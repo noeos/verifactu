@@ -38,13 +38,11 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The append-only P4 protected read-backs below supersede the stale restart
-capsule and earlier current-state statements where they conflict. P4-A, P4-B,
-and P4-C have protected final read-backs. P4-D implementation PR `#80` is
-merged on protected `main` at `e4f66c6a92d5b47bba9271c89688da78a87ca0da`;
-its dedicated final implementation read-back is in progress under issue `#81`.
-P4-E remains gated until that handoff PR and its protected-push checks pass.
-Later P4-E–P7 sections remain forward requirements unless superseded by a
-newer protected read-back. `creationAllowed=false`.
+capsule and earlier current-state statements where they conflict. P4-A–P4-E
+have protected final read-backs. P4-F implementation PR `#99` is merged on
+protected `main` at `7d129703bf6077549d94cb3066db286c422190e8`; its dedicated
+final implementation read-back is in progress under issue `#100`. P4-G remains
+gated until that handoff PR and its protected-push checks pass. `creationAllowed=false`.
 
 ## Historical initial baseline control — retained
 
@@ -95,18 +93,18 @@ Historical detail belongs in phase records below.
 | Field                        | Current value                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                     |
-| Current phase                | P4-D implementation final protected read-back, issue `#81`; P4-E remains gated until its protected closure.                                                                      |
-| Phase status                 | P1–P4-C have final read-backs. P4-D implementation PR `#80` is merged and all observed exact-head/protected-push checks pass; its dedicated handoff is pending. `creationAllowed=false`. |
-| Last evidence-complete wave  | P4-C final protected read-back PR `#74`; P4-D implementation is protected but not phase-closed until issue `#81` read-back merges.                                              |
-| Local repository             | Protected `main` includes P4-D private DSS bridge/provider, offline PKI boundary, and P4-D tests. This read-back branch contains only the handoff update.                           |
-| Protected `main` SHA         | P4-D implementation squash `e4f66c6a92d5b47bba9271c89688da78a87ca0da`, tree `2e5c61a0f16a216006215739cfcca1a9b089aa6d`, parent `b7a106d2658efdc14f6c03706ca8d73a81359342`. |
-| GitHub effective state       | PR #80 exact head passed 26/26 checks; protected squash passed 25/25 check-runs including required-check closure. Five protected push workflows succeeded on the exact SHA.       |
+| Current phase                | P4-F implementation final protected read-back, issue `#100`; P4-G remains gated until its protected closure.                                                                      |
+| Phase status                 | P1–P4-E have final read-backs. P4-F implementation PR `#99` is merged and its 25 exact-head and 25 protected-push check-runs succeeded; dedicated handoff is pending. `creationAllowed=false`. |
+| Last evidence-complete wave  | P4-E final protected read-back PR `#97`; P4-F implementation is protected but not phase-closed until issue `#100` read-back merges.                                               |
+| Local repository             | Protected `main` includes P4-F claims and the private admitted Verification Engine adapter. This read-back branch contains only the handoff update.                               |
+| Protected `main` SHA         | P4-F implementation squash `7d129703bf6077549d94cb3066db286c422190e8`, tree `380acf6735ff25e3811baffd52513371f968acf0`, parent `4b46e704c367c5792dd3c0f1ad8907ca1f2707f5`. |
+| GitHub effective state       | PR #99 exact head passed 25/25 check-runs; protected squash passed 25/25 check-runs including required-check closure. Five protected push workflows succeeded on the exact SHA.        |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
-| Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted; fiscal integration is P4-F scope.                                                                                   |
+| Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
 | Public packages              | Three `0.0.0-development` package shells; not published. P4-D provider and its new internal interfaces are not re-exported from `packages/verifactu/src/index.ts`.                |
 | External gates               | Legal, AEAT, stable-performance, independent-assurance and publication gates remain downstream; none is claimed.                                                                |
-| Immediate instruction        | Complete issue `#81` through a dedicated signed+DCO handoff PR, verify its exact-head and protected-push checks, then start P4-E from that resulting protected `main`.               |
+| Immediate instruction        | Complete issue `#100` through a dedicated signed+DCO handoff PR and verify its exact-head and protected-push checks; only then start P4-G from the resulting protected `main`.     |
 
 ## Phase ledger
 
@@ -116,7 +114,7 @@ Historical detail belongs in phase records below.
 | P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa`                       | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`              | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
-| P4    | active            | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | —                                          | readiness + A–G    | P4-A–C have final read-backs; P4-D implementation is merged at `e4f66c6`, with dedicated final handoff issue `#81` in progress. |
+| P4    | active            | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | —                                          | readiness + A–G    | P4-A–E have final read-backs; P4-F implementation is merged at `7d12970`, with dedicated final handoff issue `#100` in progress. |
 | P5    | planned           | P4 closure required                                              | —                                          | —                  | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
@@ -3524,3 +3522,67 @@ P4-E implements private edition/mode/environment-bound QR payload construction a
 After issue #96 closes through its dedicated signed+DCO read-back PR and the exact-head plus protected-push matrices pass, create a separate bounded P4-F work item and branch from the then-current protected `main`. P4-G cumulative closure remains pending. Do not start P4-F from this implementation merge alone.
 
 Refs #92 and #96
+
+## P4-F implementation final protected read-back — 2026-09-27
+
+This append-only record covers the P4-F implementation protected merge and
+supersedes the earlier handoff statement that P4-F remained future work. Issue
+`#100` tracks this separate final read-back. P4-G remains gated until this
+read-back PR and its protected-push checks pass. `creationAllowed=false`.
+
+### Implementation PR and protected identity
+
+- **Implementation issue and PR:** issue `#98` was implemented by PR
+  [#99](https://github.com/noeos/verifactu/pull/99), based on protected `main`
+  `4b46e704c367c5792dd3c0f1ad8907ca1f2707f5`. Exact head
+  `25ba7dfe486b0ee8cd8f2e2f20ee4f4682328032`, tree
+  `380acf6735ff25e3811baffd52513371f968acf0`, sole parent
+  `4b46e704c367c5792dd3c0f1ad8907ca1f2707f5`. Its SSH signature verifies and
+  its commit contains the canonical DCO trailer.
+- **PR exact-head checks:** 25/25 check-runs passed, including all 17 required
+  checks and required-check closure. The workflow runs were Required
+  engineering foundation `36288844001`, Engineering CI `36288844014`,
+  Conformance `36288844028`, Security `36288844017`, and Regulatory source
+  observation `36288844007`. The hosted secret scan passed after replacing a
+  test-only invoice fixture that Gitleaks classified as a generic API key.
+- **Protected identity:** PR `#99` merged by squash on 2026-09-27 as
+  `7d129703bf6077549d94cb3066db286c422190e8`, tree
+  `380acf6735ff25e3811baffd52513371f968acf0`, sole parent
+  `4b46e704c367c5792dd3c0f1ad8907ca1f2707f5`. GitHub reports a valid commit
+  signature; the squash message ends with a real canonical
+  `Signed-off-by: Daniel David <ddcandales@gmail.com>` trailer. Issue `#98` is
+  closed and the source branch was deleted.
+- **Protected-push closure:** all 25/25 check-runs passed on the exact squash,
+  including required-check closure. The five successful workflow runs, each on
+  that SHA, were Required engineering foundation `36289871297`, Engineering
+  CI `36289871306`, Conformance `36289871321`, Security `36289871292`, and
+  Regulatory source observation `36289871296`.
+
+### Exact-head local evidence
+
+All task reports bind to PR head `25ba7dfe486b0ee8cd8f2e2f20ee4f4682328032`
+and tree `380acf6735ff25e3811baffd52513371f968acf0`. The recorded toolchain was
+Node `24.21.0`, npm `11.19.1`, Python `3.13.15`, Java `21.0.12.1+1`, and Maven
+`3.9.12`. Report paths are local evidence locators; SHA-256 binds report bytes.
+
+| Task | Result | Input digest | Output digest | Local report SHA-256 |
+| --- | --- | --- | --- | --- |
+| `test:p4-f` v9 | 5/5 campaigns, 25 cases, zero skips; 4,096 P4-PROP-012 executions; P4-MUT-033..036 killed (4/4); lines 100%, branches 89.52%, functions 100% | `9a37ea944ecbbac2b73d481a553da7a5d86001728e0ed8d3674151836b2814b1` | `a96963b17f095959b70884d3ac00d8ac66eca86dea221f88e36ff85f7188770a` | `f9132d3c91c54ef8f985a81130fcb8bc3b4ec09659145d57459813341da9da31` |
+| `test:p4-a` v13 | 9/9 campaigns, 38 cases, zero skips; lines 99.97%, branches 95.58%, functions 100% | `e24571c4ff213990a1c128cedcf79bbe4c24c57dfb472b0b05c2a81614235709` | `b0c930df9ce3e4ff39f148ec281267b87cd4132a1b0c0ce38463eb824d43a8c3` | `2e09ddfb6ce3719fd4ad8dc4e7fe18429c27e62b6c357bb22792b272e6e70e2c` |
+| `gate:p4-readiness` v1 | 2/2, zero skips or diagnostics | `a2d91106258db7d893b1158600008d391034a83e07257b07ead2c03db9c80a6d` | `48bf8b7a1d5c16200919fb6fb70e861680f4acc626ff4ab5696076f5023d6a82` | `f4c192aab919c50f6d0615dcfccecfcfadf098a8f643a2594a4cc612a32ba473` |
+| `gate:platform` v1 | 12/12, zero skips or diagnostics | `4e5f14fc5fe3c7c7fa60cb0ec970fec928a39862548b39ef39a01d897c33ff5a` | `77b02e5a8ff8b34c3a9699fc9c467a3e2a12ebb8661567fcfebb6c7a66edb1fa` | `711da9052a77ce00836007a15d912c848be863610d429f43cc3b4ebb02dd3796` |
+| `gate:p2` v1 | 10/10, zero skips or diagnostics | `a2d91106258db7d893b1158600008d391034a83e07257b07ead2c03db9c80a6d` | `87c4d7cb90c4c39171ab49478ebcd0ce1487a5fd8e66e9a23850047aa766d022` | `153715a0bc7ac4b9e46afe42040bc70037f009dd8bcdfda2e5bf4efd2267a4f6` |
+
+An admitted Gitleaks scan of all 86 repository commits found no leaks. P4-F adds
+the private claims and verification-engine adapter described above without a
+new public export. The implementation and these checks establish no legal,
+fiscal-compliance, AEAT-acceptance, publication, or release claim; the
+Verification Engine is not an official fiscal oracle. `creationAllowed=false`
+remains in force.
+
+After issue `#100` closes through its dedicated signed+DCO read-back PR and the
+exact-head plus protected-push matrices pass, start P4-G as a separate bounded
+work item from the then-current protected `main`. Do not report cumulative P4
+closure before P4-G and all applicable closure controls pass.
+
+Refs #98 and #100

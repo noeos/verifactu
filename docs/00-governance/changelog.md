@@ -146,3 +146,19 @@ changelog and makes no compliance, publication or support claim.
   read-back PR #74 passes its own protected closure. Frozen P4 populations
   remain unchanged, `creationAllowed=false`, and no compliance, AEAT
   acceptance, publication or release claim is made.
+
+## 2026-09-27 — P4-F implementation protected
+
+- PR #99 closed implementation issue #98. Exact head
+  `25ba7dfe486b0ee8cd8f2e2f20ee4f4682328032` passed 25/25 check-runs,
+  including all 17 required contexts and required-check closure.
+- Protected squash `7d129703bf6077549d94cb3066db286c422190e8` has tree
+  `380acf6735ff25e3811baffd52513371f968acf0`, sole parent
+  `4b46e704c367c5792dd3c0f1ad8907ca1f2707f5`, valid GitHub signature and
+  canonical DCO. Its protected push passed all 25 check-runs and five
+  workflows. Clean exact-head tasks passed: P4-F 5/5, P4-A 9/9,
+  readiness 2/2, platform 12/12, and P2 10/10, all without skips.
+- P4-F's dedicated final protected read-back is issue #100. P4-G remains
+  gated until that separate documentation PR and its protected-push checks
+  pass. `creationAllowed=false`; no legal, fiscal-compliance, AEAT-acceptance,
+  publication or release claim is made.
