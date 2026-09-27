@@ -144,7 +144,8 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with: &checkout
           ref: ${{ env.VERIFACTU_SUBJECT_SHA }}
-          fetch-depth: 1
+          # P4 quality validation reads the frozen protected P3-B tree.
+          fetch-depth: 0
           persist-credentials: false
       - uses: ./.github/actions/setup-engineering
         with: *primary
