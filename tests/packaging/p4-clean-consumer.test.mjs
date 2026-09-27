@@ -7,6 +7,8 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
+const npmRoot = process.env.VERIFACTU_NPM_ROOT ?? join(root, "node_modules");
+const npmCli = join(npmRoot, "npm/bin/npm-cli.js");
 const run = (command, args, cwd) => {
   const result = spawnSync(command, args, {
     cwd,
@@ -21,6 +23,7 @@ const run = (command, args, cwd) => {
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return result.stdout;
 };
+const runNpm = (args, cwd) => run(process.execPath, [npmCli, ...args], cwd);
 
 test("packed package installs into an isolated offline consumer", async (t) => {
   const temp = await mkdtemp(join(tmpdir(), "verifactu-p4-consumer-"));
@@ -36,18 +39,35 @@ test("packed package installs into an isolated offline consumer", async (t) => {
   for (const file of ["package.json", "LICENSE", "NOTICE", "README.md"])
     await cp(join(packageRoot, file), join(staged, file));
   const packed = JSON.parse(
-    run("npm", ["pack", "--json", "--pack-destination", temp], staged),
+    runNpm(["pack", "--json", "--pack-destination", temp], staged),
   );
   assert.equal(packed.length, 1);
   const tarball = join(temp, packed[0].filename);
+  const runtimeRoot = join(temp, "runtime");
+  await mkdir(runtimeRoot);
+  const runtimeTarballs = [];
+  for (const name of [
+    "@noeos/verification-engine",
+    "@nuintun/qrcode",
+    "tslib",
+  ]) {
+    const runtimePackage = join(root, "node_modules", ...name.split("/"));
+    const runtimePack = JSON.parse(
+      runNpm(
+        ["pack", "--json", "--pack-destination", runtimeRoot],
+        runtimePackage,
+      ),
+    );
+    assert.equal(runtimePack.length, 1);
+    runtimeTarballs.push(join(runtimeRoot, runtimePack[0].filename));
+  }
   const consumer = join(temp, "consumer");
   await mkdir(consumer);
   await writeFile(
     join(consumer, "package.json"),
     JSON.stringify({ name: "p4-consumer", private: true, type: "module" }),
   );
-  run(
-    "npm",
+  runNpm(
     [
       "install",
       "--offline",
@@ -55,6 +75,7 @@ test("packed package installs into an isolated offline consumer", async (t) => {
       "--no-audit",
       "--no-fund",
       tarball,
+      ...runtimeTarballs,
     ],
     consumer,
   );
