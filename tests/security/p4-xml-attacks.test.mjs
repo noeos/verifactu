@@ -278,3 +278,32 @@ test("XML worker stderr overflow stops its child and fails closed", async () => 
     "limit",
   );
 });
+
+test("XML worker normalizes child spawn errors and post-spawn cancellation", async () => {
+  const failedSpawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    setImmediate(() =>
+      child.emit("error", Object.assign(new Error("spawn failed"), { code: "EACCES" })),
+    );
+    return child;
+  });
+  assert.equal((await failedSpawner(fixture("<r/>"))).kind, "defect");
+
+  const controller = new AbortController();
+  const cancelledSpawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
+    return child;
+  });
+  const pending = cancelledSpawner(fixture("<r/>"), {
+    signal: controller.signal,
+  });
+  controller.abort();
+  assert.equal((await pending).kind, "cancelled");
+});
