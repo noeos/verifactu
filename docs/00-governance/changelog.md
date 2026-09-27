@@ -162,3 +162,19 @@ changelog and makes no compliance, publication or support claim.
   gated until that separate documentation PR and its protected-push checks
   pass. `creationAllowed=false`; no legal, fiscal-compliance, AEAT-acceptance,
   publication or release claim is made.
+
+## 2026-09-27 — P4-G cumulative implementation protected
+
+- PR #103 completed the frozen P4-G cumulative campaign on all 44 production
+  modules and 26 registered tests. Its five exact runtime/platform cells passed
+  with 189 cases, 198/198 task checks, zero skips/failures, all 13 report
+  classes, Node and Java coverage, and the independent oracle. Exact artifact
+  IDs and SHA-256 digests are in `docs/17-roadmap-risk/handoff.md`.
+- Protected squash `35c886b31ca6d94dcd19bde889046b5a092cdaba` has tree
+  `afe9ef71b64c81f238a208f9185bce9939c2afc3`, sole parent
+  `aba0b5f2f9362120131c83773ae1536f5cefc1e3`, a valid GitHub signature and a
+  canonical DCO trailer. Its protected-push matrix passed all 25 check-runs
+  across five workflows. Issue #102 remains open for its dedicated signed+DCO
+  final handoff PR and protected-push read-back. `creationAllowed=false`; no
+  compliance, AEAT acceptance, certification, publication or release claim is
+  made.

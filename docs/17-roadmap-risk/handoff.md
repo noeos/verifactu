@@ -38,11 +38,10 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The append-only P4 protected read-backs below supersede the stale restart
-capsule and earlier current-state statements where they conflict. P4-A–P4-E
-have protected final read-backs. P4-F implementation PR `#99` is merged on
-protected `main` at `7d129703bf6077549d94cb3066db286c422190e8`; its dedicated
-final implementation read-back is in progress under issue `#100`. P4-G remains
-gated until that handoff PR and its protected-push checks pass. `creationAllowed=false`.
+capsule and earlier current-state statements where they conflict. P4-A–P4-F
+have protected final read-backs. P4-G implementation PR `#103` is merged on
+protected `main` at `35c886b31ca6d94dcd19bde889046b5a092cdaba`; its dedicated
+final read-back is in progress under issue `#102`. `creationAllowed=false`.
 
 ## Historical initial baseline control — retained
 
@@ -93,18 +92,18 @@ Historical detail belongs in phase records below.
 | Field                        | Current value                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                     |
-| Current phase                | P4-F implementation final protected read-back, issue `#100`; P4-G remains gated until its protected closure.                                                                      |
-| Phase status                 | P1–P4-E have final read-backs. P4-F implementation PR `#99` is merged and its 25 exact-head and 25 protected-push check-runs succeeded; dedicated handoff is pending. `creationAllowed=false`. |
-| Last evidence-complete wave  | P4-E final protected read-back PR `#97`; P4-F implementation is protected but not phase-closed until issue `#100` read-back merges.                                               |
-| Local repository             | Protected `main` includes P4-F claims and the private admitted Verification Engine adapter. This read-back branch contains only the handoff update.                               |
-| Protected `main` SHA         | P4-F implementation squash `7d129703bf6077549d94cb3066db286c422190e8`, tree `380acf6735ff25e3811baffd52513371f968acf0`, parent `4b46e704c367c5792dd3c0f1ad8907ca1f2707f5`. |
-| GitHub effective state       | PR #99 exact head passed 25/25 check-runs; protected squash passed 25/25 check-runs including required-check closure. Five protected push workflows succeeded on the exact SHA.        |
+| Current phase                | P4-G implementation final protected read-back, issue `#102`.                                                                      |
+| Phase status                 | P1–P4-F have final read-backs. P4-G implementation PR `#103` is merged and its 25 exact-head and 25 protected-push check-runs succeeded; dedicated handoff is pending. `creationAllowed=false`. |
+| Last evidence-complete wave  | P4-F final protected read-back; P4-G implementation is protected but not phase-closed until issue `#102` read-back merges.                                               |
+| Local repository             | Protected `main` includes the P4-G cumulative implementation. This read-back branch contains only the handoff update.                               |
+| Protected `main` SHA         | P4-G implementation squash `35c886b31ca6d94dcd19bde889046b5a092cdaba`, tree `afe9ef71b64c81f238a208f9185bce9939c2afc3`, parent `aba0b5f2f9362120131c83773ae1536f5cefc1e3`. |
+| GitHub effective state       | PR #103 exact head passed 25/25 check-runs; protected squash passed 25/25 check-runs including required-check closure. Five protected push workflows succeeded on the exact SHA.        |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
 | Public packages              | Three `0.0.0-development` package shells; not published. P4-D provider and its new internal interfaces are not re-exported from `packages/verifactu/src/index.ts`.                |
 | External gates               | Legal, AEAT, stable-performance, independent-assurance and publication gates remain downstream; none is claimed.                                                                |
-| Immediate instruction        | Complete issue `#100` through a dedicated signed+DCO handoff PR and verify its exact-head and protected-push checks; only then start P4-G from the resulting protected `main`.     |
+| Immediate instruction        | Complete issue `#102` through this dedicated signed+DCO handoff PR and verify its exact-head and protected-push checks; then close P4-G and preserve downstream P5 prerequisites.     |
 
 ## Phase ledger
 
@@ -114,7 +113,7 @@ Historical detail belongs in phase records below.
 | P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa`                       | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`              | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
-| P4    | active            | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | —                                          | readiness + A–G    | P4-A–E have final read-backs; P4-F implementation is merged at `7d12970`, with dedicated final handoff issue `#100` in progress. |
+| P4    | active            | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | —                                          | readiness + A–G    | P4-A–F have final read-backs; P4-G implementation is merged at `35c886b`, with dedicated final handoff issue `#102` in progress. |
 | P5    | planned           | P4 closure required                                              | —                                          | —                  | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
@@ -3586,3 +3585,114 @@ work item from the then-current protected `main`. Do not report cumulative P4
 closure before P4-G and all applicable closure controls pass.
 
 Refs #98 and #100
+
+## P4-G cumulative implementation protected read-back — 2026-09-27
+
+This append-only record supersedes prior statements that P4-G remained gated
+until implementation. The implementation is protected; this separate final
+read-back remains open under issue `#102` until this PR and its protected push
+pass. The frozen cumulative evidence binds to implementation candidate tree
+`afe9ef71b64c81f238a208f9185bce9939c2afc3`. `creationAllowed=false` remains
+in force.
+
+### Implementation PR and protected identity
+
+- **Implementation issue and PR:** issue `#102` authorized the cumulative P4-G
+  campaign; implementation PR [#103](https://github.com/noeos/verifactu/pull/103)
+  was based on protected `main` `aba0b5f2f9362120131c83773ae1536f5cefc1e3`.
+  Exact PR head `dab1e1cb49b13bef7444e5783e57651c3b97e65c`, tree
+  `afe9ef71b64c81f238a208f9185bce9939c2afc3`; its commits were SSH-signed and
+  carried canonical DCO trailers.
+- **Exact-head closure:** 25/25 check-runs passed on the exact PR head,
+  including all required contexts and required-check closure. The five frozen
+  compatibility cells and cumulative `gate:p2` passed. PR #103 was squash
+  merged on 2026-09-27 as `35c886b31ca6d94dcd19bde889046b5a092cdaba`, tree
+  `afe9ef71b64c81f238a208f9185bce9939c2afc3`, sole parent
+  `aba0b5f2f9362120131c83773ae1536f5cefc1e3`. GitHub reports a valid verified
+  commit signature and the squash message has a canonical
+  `Signed-off-by: Daniel David <ddcandales@gmail.com>` trailer.
+- **Protected-push read-back:** the repository ruleset for `main` (ID
+  `23705155`) requires PRs, linear history, signed commits and 17 required
+  checks. All 25 check-runs passed on exact protected SHA
+  `35c886b31ca6d94dcd19bde889046b5a092cdaba`, including required-check closure.
+  Workflow runs, each bound to that SHA: Required engineering foundation
+  `36312352314`, Engineering CI `36312352277`, Conformance `36312352235`,
+  Security `36312352281`, Regulatory source observation `36312352211`.
+  `main` read-back returned the same SHA and tree.
+
+### Cumulative exact-subject evidence
+
+The five retained compatibility artifacts from run
+[36311423179](https://github.com/noeos/verifactu/actions/runs/36311423179)
+were downloaded and independently inspected. Every report names the exact
+candidate SHA/tree above, contains all 26 frozen P4 test files and 189 test
+cases, reports 198/198 task checks, zero failures and zero skips, and includes
+all 13 required report classes. Each reports `creationAllowed=false`, Java
+lines 98.68%, branches 95.32%, methods 100.00%, Java mutation 100%, and a
+passing 9/9 Python oracle. Node coverage is 99.98% lines, 95.16% branches and
+99.31% functions. The frozen production population is all 44 handwritten
+production modules. These retained campaign reports are the authoritative
+cumulative evidence; they do not claim official fiscal correctness or external
+acceptance.
+
+| Cell | Environment | Result | Artifact ID | ZIP SHA-256 |
+| --- | --- | --- | ---: | --- |
+| P4-COMPAT-001 | Ubuntu 24.04, Node 22.14.0, npm 10.9.2 | passed | 10928698005 | `fd86d45cacbcab7a8897a077de69fa4f5a5c26eafaf551b595622dc3176b9169` |
+| P4-COMPAT-002 | Ubuntu 24.04, Node 22.23.2, npm 11.19.1 | passed | 10928857656 | `f1f2f63b7251db38473b75f96cd477b397f62dfa90da50d5f1e1af28a89601190` |
+| P4-COMPAT-003 | Ubuntu 24.04, Node 24.21.0, npm 11.19.1 | passed | 10928509885 | `a42d51ff8f8491e1ab461c935a11a62ec04694d96ba8b38f5b43eae65de3e729` |
+| P4-COMPAT-004 | Windows 2025, Node 24.21.0, npm 11.19.1 | passed | 10928753029 | `18436b1d8634631bf7c93e19e6ad472754d696c1f341b8fba247cf211230da36` |
+| P4-COMPAT-005 | macOS 15, Node 24.21.0, npm 11.19.1 | passed | 10928633041 | `e6a4c7379d1be482b5af1df489b8b65ad2678a3910bf68824c2ca092834fce9c` |
+
+All 13 report classes are present in every cell: Node coverage, critical
+branches, mutation, property runs with seeds/shrinks, fuzz corpus/seeds, seeded
+faults, official and independent vectors, security attacks, performance and
+resource ceilings, compatibility matrix, clean packed consumer, reproducible
+offline DSS build/bridge coverage, and Maven/SBOM/shade/licence/NOTICE
+reconciliation. Artifact files include `test--p4-g.json` and
+`artifacts/p4-g-cumulative/**`. The GitHub artifacts have the workflow's
+14-day retention; their IDs and archive digests above provide immutable
+locators while retained. Java/Maven and package supply-chain results are
+included in the reported cumulative cells.
+
+### Implementation and retained corrections
+
+P4-G makes `gate:p4` the canonical cumulative gate and invokes it through P2
+and required platform gates. The frozen plan validates all 44 production
+modules and 26 registered tests, including baseline-by-SHA recovery for
+shallow clones. The task aggregates Node V8 and JaCoCo coverage, validates all
+13 report classes, binds reports to the exact source/tree and compatibility
+cell, and cross-checks with the independent Python oracle. It adds adversarial
+coverage for XML/XAdES/provider paths, PKI, models, package consumers, offline
+DSS builds and supporting execution helpers. No public entrypoint or
+publication action is added; `creationAllowed=false` is unchanged.
+
+The retained initial failures and corrections are:
+
+- Windows process-spawn tests now use a portable injected process boundary and
+  directly validate parser outputs, stderr overflow, spawn failure and
+  post-spawn cancellation.
+- The packed-consumer path now provisions offline runtime tarballs and invokes
+  the admitted npm CLI through Node on Windows; `VERIFACTU_NPM_ROOT` binds the
+  exact admitted npm installation.
+- The pinned SPDX model uses its direct release asset URL after the API asset
+  route returned HTTP 403; the SHA-256 and 183176-byte model identity are
+  unchanged. Baseline fetch-by-SHA is handled by the common plan validator.
+
+These corrections were included before the final exact-head run; the complete
+candidate campaign and both exact-head/protected-push closures passed. No
+threshold, denominator, frozen population, or `creationAllowed` value was
+reduced to obtain passing results.
+
+### Exit and remaining boundary
+
+The cumulative P4-G campaign, exact-head required-check closure, protected
+squash, protected-push matrix and current `main` read-back are successful.
+This phase record is pending only its own dedicated signed+DCO PR exact-head
+and protected-push closure and final protected-main read-back. On completion,
+P4 becomes `evidence-complete`; P5 remains planned and must start from the
+resulting protected `main` under its own readiness and issue controls. Legal,
+fiscal-compliance, AEAT acceptance, certification, independent assurance,
+stable-performance, publication and release gates remain downstream and are
+not claimed here.
+
+Refs #102 and #103
