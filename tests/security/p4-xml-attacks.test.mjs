@@ -12,6 +12,7 @@ import {
   XML_EDITION_ID,
 } from "../../internal/xml-provider/provider.mjs";
 import {
+  exceedsXmlOutputLimit,
   minimalXmlEnvironment,
   parseXmlWorkerOutput,
   spawnXmlWorker,
@@ -23,6 +24,11 @@ const schemaPaths = {
   "xsd-suministro-informacion": "aeat/SuministroInformacion.xsd",
   "xmldsig-schema": "standards/xmldsig-core-schema.xsd",
 };
+
+test("XML worker output limit accepts its exact ceiling and rejects overflow", () => {
+  assert.equal(exceedsXmlOutputLimit(4, 6, 10), false);
+  assert.equal(exceedsXmlOutputLimit(4, 7, 10), true);
+});
 
 test("XML worker preserves only required environment across supported platforms", () => {
   assert.deepEqual(

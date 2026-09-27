@@ -314,6 +314,10 @@ except Exception:
     write_result("defect", "DIAG-XSD-PROVIDER")
 `;
 
+export function exceedsXmlOutputLimit(accumulatedBytes, chunkBytes, maximumBytes) {
+  return accumulatedBytes + chunkBytes > maximumBytes;
+}
+
 export function minimalXmlEnvironment(
   platform = process.platform,
   source = process.env,
@@ -387,7 +391,13 @@ export async function spawnXmlWorker(request, options = {}) {
         windowsHide: true,
       });
       child.stdout.on("data", (chunk) => {
-        if (stdout.length + chunk.length > maximumOutputBytes) {
+        if (
+          exceedsXmlOutputLimit(
+            stdout.length,
+            chunk.length,
+            maximumOutputBytes,
+          )
+        ) {
           stop("output");
           return;
         }
@@ -395,7 +405,8 @@ export async function spawnXmlWorker(request, options = {}) {
       });
       child.stderr.on("data", (chunk) => {
         stderrBytes += chunk.length;
-        if (stderrBytes > maximumOutputBytes) stop("output");
+        if (exceedsXmlOutputLimit(0, stderrBytes, maximumOutputBytes))
+          stop("output");
       });
       child.on("error", (error) => {
         finish(
