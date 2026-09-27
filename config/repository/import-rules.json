@@ -5,6 +5,18 @@
     "@noeos/verifactu": {
       "root": "packages/verifactu/src",
       "mayImportPackages": [],
+      "mayImportPackagesByFile": {
+        "packages/verifactu/src/ports/verification-engine.ts": [
+          "@noeos/verification-engine"
+        ],
+        "packages/verifactu/src/verification/engine-profile.ts": [
+          "@noeos/verification-engine"
+        ],
+        "packages/verifactu/src/verification/engine-adapter.ts": [
+          "@noeos/verification-engine"
+        ]
+      },
+      "forbiddenPrefixes": ["@noeos/verification-engine/"],
       "forbiddenBuiltins": [
         "node:child_process",
         "node:crypto",

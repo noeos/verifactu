@@ -28,6 +28,18 @@ async function mutation(id, control, module, before, after, observe) {
     for (const name of ["provider.mjs", "pki.mjs", "worker.mjs"])
       await cp(resolve("internal/xades-provider", name), join(xades, name));
     await writeFile(join(temporary, "package.json"), '{"type":"module"}\n');
+    const admittedEngine = join(
+      temporary,
+      "node_modules",
+      "@noeos",
+      "verification-engine",
+    );
+    await mkdir(join(temporary, "node_modules", "@noeos"), { recursive: true });
+    await cp(
+      resolve("node_modules/@noeos/verification-engine"),
+      admittedEngine,
+      { recursive: true },
+    );
     const javaSource = module.endsWith(".java");
     const target = javaSource
       ? join(temporary, "mutated", module)
@@ -1301,6 +1313,279 @@ test("P4-MUT-041 prevents network-enabled Java policy in the DSS worker", async 
       assert.ok(
         DSS_JVM_OPTIONS.includes("-Djava.security.manager=allow"),
         "P4-CB-041 process network-deny assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-033 rejects artifacts whose order does not match the profile", async () => {
+  await mutation(
+    "P4-MUT-033",
+    "P4-CB-033",
+    "verification/engine-profile.js",
+    "value.order === index",
+    "true",
+    async ({ load }) => {
+      const { createEngineProfileProjection, ENGINE_PROFILE_TEST_VECTORS } =
+        await load("verification/engine-profile.js");
+      const { createVerificationClaimSet } = await load(
+        "verification/claims.js",
+      );
+      const d = (c) => `sha256:${c.repeat(64)}`;
+      const claims = createVerificationClaimSet([
+        {
+          kind: "official-format",
+          status: "valid",
+          evidenceDigest: d("a"),
+          diagnostics: [],
+        },
+        {
+          kind: "cryptographic",
+          status: "indeterminate",
+          diagnostics: ["DIAG-CRYPTO-UNKNOWN"],
+        },
+        {
+          kind: "certificate-authorization",
+          status: "indeterminate",
+          diagnostics: ["DIAG-CERT-UNKNOWN"],
+        },
+        {
+          kind: "aeat",
+          status: "unsupported",
+          diagnostics: ["DIAG-AEAT-UNSUPPORTED"],
+        },
+        {
+          kind: "noeos-evidence",
+          status: "indeterminate",
+          diagnostics: ["DIAG-NOEOS-PENDING"],
+        },
+      ]).value;
+      const vector = ENGINE_PROFILE_TEST_VECTORS[1].projection;
+      assert.equal(
+        createEngineProfileProjection({
+          ...vector,
+          artifacts: [...vector.artifacts].reverse(),
+          claims,
+        }).status,
+        "invalid",
+        "P4-CB-033 artifact order assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-034 rejects altered record evidence after independent verification", async () => {
+  await mutation(
+    "P4-MUT-034",
+    "P4-CB-034",
+    "verification/engine-adapter.js",
+    [
+      { before: 'verification.status !== "valid"', after: "false" },
+      {
+        before: "!validRecordEvidence(verification.evidence, projected.value)",
+        after: "false",
+      },
+    ],
+    undefined,
+    async ({ load }) => {
+      const { createVerificationClaimSet } = await load(
+        "verification/claims.js",
+      );
+      const { createNoeosEngineEvidence, verifyNoeosEngineEvidence } =
+        await load("verification/engine-adapter.js");
+      const d = (c) => `sha256:${c.repeat(64)}`,
+        o = (c) => `opaque:${c.repeat(64)}`;
+      const claims = createVerificationClaimSet([
+        {
+          kind: "official-format",
+          status: "valid",
+          evidenceDigest: d("a"),
+          diagnostics: [],
+        },
+        {
+          kind: "cryptographic",
+          status: "valid",
+          evidenceDigest: d("b"),
+          diagnostics: [],
+        },
+        {
+          kind: "certificate-authorization",
+          status: "indeterminate",
+          diagnostics: ["DIAG-CERT-UNKNOWN"],
+        },
+        {
+          kind: "aeat",
+          status: "unsupported",
+          diagnostics: ["DIAG-AEAT-UNSUPPORTED"],
+        },
+        {
+          kind: "noeos-evidence",
+          status: "indeterminate",
+          diagnostics: ["DIAG-NOEOS-PENDING"],
+        },
+      ]).value;
+      const input = {
+        contextId: o("0"),
+        sequenceId: o("1"),
+        recordId: o("3"),
+        editionId: "rrsif-2026-09-21-active",
+        operationKind: "anulacion",
+        artifacts: [{ order: 0, kind: "xml", digest: d("a") }],
+        predecessorEvidenceDigest: d("d"),
+        algorithmIds: ["sha-256"],
+        claims,
+        position: 1,
+      };
+      const created = createNoeosEngineEvidence(input);
+      const altered = {
+        ...created.value.recordEvidence,
+        recordDigest: "0".repeat(64),
+      };
+      const result = verifyNoeosEngineEvidence(input, altered);
+      assert.notEqual(
+        result.value.status,
+        "valid",
+        "P4-CB-034 independent evidence verification assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-035 keeps an aborted Engine verification indeterminate", async () => {
+  await mutation(
+    "P4-MUT-035",
+    "P4-CB-035",
+    "verification/engine-adapter.js",
+    'verification.status !== "valid"',
+    "false",
+    async ({ load }) => {
+      const { createVerificationClaimSet } = await load(
+        "verification/claims.js",
+      );
+      const { createNoeosEngineEvidence, verifyNoeosEngineEvidence } =
+        await load("verification/engine-adapter.js");
+      const { createEngine } = await import("@noeos/verification-engine");
+      const d = (c) => `sha256:${c.repeat(64)}`,
+        o = (c) => `opaque:${c.repeat(64)}`;
+      const claims = createVerificationClaimSet([
+        {
+          kind: "official-format",
+          status: "valid",
+          evidenceDigest: d("a"),
+          diagnostics: [],
+        },
+        {
+          kind: "cryptographic",
+          status: "valid",
+          evidenceDigest: d("b"),
+          diagnostics: [],
+        },
+        {
+          kind: "certificate-authorization",
+          status: "indeterminate",
+          diagnostics: ["DIAG-CERT-UNKNOWN"],
+        },
+        {
+          kind: "aeat",
+          status: "unsupported",
+          diagnostics: ["DIAG-AEAT-UNSUPPORTED"],
+        },
+        {
+          kind: "noeos-evidence",
+          status: "indeterminate",
+          diagnostics: ["DIAG-NOEOS-PENDING"],
+        },
+      ]).value;
+      const input = {
+        contextId: o("0"),
+        sequenceId: o("1"),
+        recordId: o("3"),
+        editionId: "rrsif-2026-09-21-active",
+        operationKind: "anulacion",
+        artifacts: [{ order: 0, kind: "xml", digest: d("a") }],
+        predecessorEvidenceDigest: d("d"),
+        algorithmIds: ["sha-256"],
+        claims,
+        position: 1,
+      };
+      const evidence = createNoeosEngineEvidence(input).value.recordEvidence;
+      const port = {
+        createEngine(options) {
+          const engine = createEngine(options);
+          return new Proxy(engine, {
+            get(target, key, receiver) {
+              if (key === "verifyRecord")
+                return (request) => ({
+                  ...Reflect.get(target, key, receiver).call(target, request),
+                  status: "aborted",
+                });
+              return Reflect.get(target, key, receiver);
+            },
+          });
+        },
+      };
+      const result = verifyNoeosEngineEvidence(input, evidence, port);
+      assert.equal(
+        result.value.status,
+        "indeterminate",
+        "P4-CB-035 abort remains indeterminate assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-036 redacts malformed profile identity data from diagnostics", async () => {
+  await mutation(
+    "P4-MUT-036",
+    "P4-CB-036",
+    "verification/engine-profile.js",
+    'if (!isEngineProfileProjection(projection))\n            return invalid("DIAG-ENGINE-PROJECTION", "domain");\n        const artifacts',
+    'if (!isEngineProfileProjection(projection))\n            return invalid(input.recordId, "domain");\n        const artifacts',
+    async ({ load }) => {
+      const { createVerificationClaimSet } = await load(
+        "verification/claims.js",
+      );
+      const { createEngineProfileProjection, ENGINE_PROFILE_TEST_VECTORS } =
+        await load("verification/engine-profile.js");
+      const d = (c) => `sha256:${c.repeat(64)}`;
+      const claims = createVerificationClaimSet([
+        {
+          kind: "official-format",
+          status: "valid",
+          evidenceDigest: d("a"),
+          diagnostics: [],
+        },
+        {
+          kind: "cryptographic",
+          status: "indeterminate",
+          diagnostics: ["DIAG-CRYPTO-UNKNOWN"],
+        },
+        {
+          kind: "certificate-authorization",
+          status: "indeterminate",
+          diagnostics: ["DIAG-CERT-UNKNOWN"],
+        },
+        {
+          kind: "aeat",
+          status: "unsupported",
+          diagnostics: ["DIAG-AEAT-UNSUPPORTED"],
+        },
+        {
+          kind: "noeos-evidence",
+          status: "indeterminate",
+          diagnostics: ["DIAG-NOEOS-PENDING"],
+        },
+      ]).value;
+      const vector = ENGINE_PROFILE_TEST_VECTORS[0].projection;
+      const result = createEngineProfileProjection({
+        ...vector,
+        recordId: "ES12345678",
+        claims,
+      });
+      assert.doesNotMatch(
+        JSON.stringify(result),
+        /ES12345678/u,
+        "P4-CB-036 diagnostic redaction assertion",
       );
     },
   );
