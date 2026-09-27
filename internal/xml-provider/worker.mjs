@@ -339,7 +339,16 @@ const VALID_WORKER_KINDS = new Set([
   "defect",
 ]);
 
+export function createXmlWorkerSpawner(processSpawner) {
+  return (request, options = {}) =>
+    spawnXmlWorkerWith(processSpawner, request, options);
+}
+
 export async function spawnXmlWorker(request, options = {}) {
+  return spawnXmlWorkerWith(spawn, request, options);
+}
+
+async function spawnXmlWorkerWith(processSpawner, request, options) {
   if (options.signal?.aborted)
     return Object.freeze({
       kind: "cancelled",
@@ -383,13 +392,17 @@ export async function spawnXmlWorker(request, options = {}) {
     options.signal?.addEventListener("abort", abort, { once: true });
     try {
       const env = minimalXmlEnvironment();
-      child = spawn(pythonExecutable, ["-I", "-c", XML_WORKER_SOURCE], {
+      child = processSpawner(
+        pythonExecutable,
+        ["-I", "-c", XML_WORKER_SOURCE],
+        {
         cwd: options.cwd ?? process.cwd(),
         env,
         shell: false,
         stdio: ["pipe", "pipe", "pipe"],
         windowsHide: true,
-      });
+        },
+      );
       child.stdout.on("data", (chunk) => {
         if (
           exceedsXmlOutputLimit(

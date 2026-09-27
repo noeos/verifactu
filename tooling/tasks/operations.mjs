@@ -3076,6 +3076,49 @@ async function integrationConsumers(context) {
   const tarballs = manifest.subjects.map((subject) =>
     resolve(packageRoot, "tarballs", subject.file),
   );
+  const runtimeTarballRoot = resolve(consumerRoot, "runtime-tarballs");
+  await rm(runtimeTarballRoot, { recursive: true, force: true });
+  await mkdir(runtimeTarballRoot, { recursive: true, mode: 0o700 });
+  const lock = await readJson(resolve(context.root, "package-lock.json"));
+  for (const name of [
+    "@noeos/verification-engine",
+    "@nuintun/qrcode",
+    "tslib",
+  ]) {
+    const packageDirectory = resolve(context.root, "node_modules", name);
+    const packageManifest = await readJson(
+      resolve(packageDirectory, "package.json"),
+    );
+    const lockEntry = lock.packages[`node_modules/${name}`];
+    assert(
+      lockEntry &&
+        lockEntry.version === packageManifest.version &&
+        lockEntry.integrity,
+      "CONSUMER_RUNTIME_LOCK",
+      name,
+    );
+    const packed = await runNpm(
+      [
+        "pack",
+        "--offline",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        runtimeTarballRoot,
+        ".",
+      ],
+      { cwd: packageDirectory, timeoutMs: 30000 },
+    );
+    assert(packed.code === 0, "CONSUMER_RUNTIME_PACK", name);
+    const [result] = JSON.parse(packed.stdout);
+    const path = resolve(runtimeTarballRoot, result.filename);
+    assert(
+      result.name === name && result.version === lockEntry.version,
+      "CONSUMER_RUNTIME_PACKAGE_IDENTITY",
+      name,
+    );
+    tarballs.push(path);
+  }
   const install = await run(
     process.execPath,
     [

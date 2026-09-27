@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
-import { once } from "node:events";
+import { EventEmitter, once } from "node:events";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { PassThrough } from "node:stream";
 import test from "node:test";
 import {
   createXmlXsdProvider,
@@ -12,6 +13,7 @@ import {
   XML_EDITION_ID,
 } from "../../internal/xml-provider/provider.mjs";
 import {
+  createXmlWorkerSpawner,
   exceedsXmlOutputLimit,
   minimalXmlEnvironment,
   parseXmlWorkerOutput,
@@ -256,6 +258,23 @@ test("XML worker output ceiling fails closed", async () => {
         maximumOutputBytes: 1,
       })
     ).kind,
+    "limit",
+  );
+});
+
+test("XML worker stderr overflow stops its child and fails closed", async () => {
+  const spawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () =>
+      setImmediate(() => child.emit("close", null, "SIGTERM"));
+    setImmediate(() => child.stderr.write(Buffer.from("overflow")));
+    return child;
+  });
+  assert.equal(
+    (await spawner(fixture("<r/>"), { maximumOutputBytes: 1 })).kind,
     "limit",
   );
 });
