@@ -109,6 +109,195 @@ test("P4-CB-034 public Engine tarball profile emits and independently verifies e
   assert.equal(verified.value.status, "valid");
 });
 
+test("Engine evidence validators reject altered link and record evidence fields", () => {
+  const genesisInput = request();
+  const genesis = createNoeosEngineEvidence(genesisInput);
+  assert.equal(genesis.status, "ok");
+  const link = genesis.value.linkEvidence;
+  const badLinks = [
+    { ...link, $schema: "wrong" },
+    { ...link, protocolVersion: 2 },
+    { ...link, contextId: opaque("9") },
+    { ...link, sequenceId: opaque("9") },
+    { ...link, recordId: opaque("9") },
+    { ...link, profile: { ...link.profile, id: "wrong" } },
+    { ...link, profile: { ...link.profile, version: "2.0.0" } },
+    { ...link, algorithm: "sha-512" },
+    { ...link, normalizedByteLength: 0 },
+    { ...link, normalizedByteLength: 65_537 },
+    { ...link, contentDigest: "invalid" },
+    { ...link, recordDigest: "invalid" },
+    { ...link, position: 1 },
+    { ...link, previous: { kind: "digest", value: "a".repeat(64) } },
+    { ...link, previous: { kind: "none", extra: true } },
+    { ...link, linkDigest: "invalid" },
+    { ...link, extra: true },
+  ];
+  for (const evidence of badLinks) {
+    const result = verifyNoeosEngineEvidence(genesisInput, evidence);
+    assert.equal(result.status, "ok");
+    assert.equal(result.value.status, "invalid");
+  }
+
+  const linkedInput = request({
+    predecessorEvidenceDigest: d("d"),
+    position: 1,
+  });
+  const linked = createNoeosEngineEvidence(linkedInput);
+  assert.equal(linked.status, "ok");
+  const record = linked.value.recordEvidence;
+  const badRecords = [
+    { ...record, $schema: "wrong" },
+    { ...record, protocolVersion: 2 },
+    { ...record, contextId: opaque("9") },
+    { ...record, recordId: opaque("9") },
+    { ...record, profile: { ...record.profile, id: "wrong" } },
+    { ...record, profile: { ...record.profile, version: "2.0.0" } },
+    { ...record, algorithm: "sha-512" },
+    { ...record, normalizedByteLength: 0 },
+    { ...record, normalizedByteLength: 65_537 },
+    { ...record, contentDigest: "invalid" },
+    { ...record, recordDigest: "invalid" },
+    { ...record, extra: true },
+  ];
+  for (const evidence of badRecords) {
+    const result = verifyNoeosEngineEvidence(linkedInput, evidence);
+    assert.equal(result.status, "ok");
+    assert.equal(result.value.status, "invalid");
+  }
+  for (const hashResult of [
+    {
+      ok: false,
+      diagnostics: [{ code: "PROFILE_UNKNOWN" }],
+    },
+    { ok: true, value: {}, diagnostics: [] },
+  ]) {
+    const hashFailurePort = {
+      createEngine(options) {
+        const engine = createEngine(options);
+        return new Proxy(engine, {
+          get(target, key, receiver) {
+            if (key === "hashRecord") return () => hashResult;
+            return Reflect.get(target, key, receiver);
+          },
+        });
+      },
+    };
+    const result = createNoeosEngineEvidence(linkedInput, hashFailurePort);
+    assert.equal(result.status, "ok");
+    const noeos = getVerificationClaim(result.value.claims, "noeos-evidence");
+    assert.equal(noeos.status, "invalid");
+    assert.match(noeos.diagnostics[0], /^DIAG-ENGINE-/u);
+  }
+
+  const summary = genesis.value.chainSummary;
+  const badSummaries = [
+    { ...summary, $schema: "wrong" },
+    { ...summary, protocolVersion: 2 },
+    { ...summary, contextId: opaque("9") },
+    { ...summary, sequenceId: opaque("9") },
+    { ...summary, profile: { ...summary.profile, id: "wrong" } },
+    { ...summary, profile: { ...summary.profile, version: "2.0.0" } },
+    { ...summary, algorithm: "sha-512" },
+    { ...summary, count: 2 },
+    { ...summary, firstPosition: 1 },
+    { ...summary, lastPosition: 1 },
+    { ...summary, finalLinkDigest: d("f") },
+    { ...summary, status: "invalid" },
+  ];
+  for (const alteredSummary of badSummaries) {
+    const summaryPort = {
+      createEngine(options) {
+        const engine = createEngine(options);
+        return new Proxy(engine, {
+          get(target, key, receiver) {
+            if (key === "createChain")
+              return () => ({
+                append: () => ({
+                  ok: true,
+                  value: link,
+                  diagnostics: [],
+                }),
+                finalize: () => ({
+                  ok: true,
+                  value: alteredSummary,
+                  diagnostics: [],
+                }),
+              });
+            return Reflect.get(target, key, receiver);
+          },
+        });
+      },
+    };
+    const result = createNoeosEngineEvidence(genesisInput, summaryPort);
+    assert.equal(result.status, "ok");
+    assert.equal(
+      getVerificationClaim(result.value.claims, "noeos-evidence").status,
+      "invalid",
+    );
+  }
+});
+
+test("Engine verification claims preserve invalid, indeterminate, unsupported, and digest failures", () => {
+  const input = request();
+  const created = createNoeosEngineEvidence(input);
+  assert.equal(created.status, "ok");
+  for (const [status, expected, code] of [
+    ["invalid", "invalid", "CHAIN_PREDECESSOR_MISMATCH"],
+    ["indeterminate", "indeterminate", "EVIDENCE_SCHEMA_INVALID"],
+    ["unsupported", "unsupported", "PROFILE_UNKNOWN"],
+  ]) {
+    const port = {
+      createEngine(options) {
+        const engine = createEngine(options);
+        return new Proxy(engine, {
+          get(target, key, receiver) {
+            if (key === "verifyChain")
+              return () => ({
+                status,
+                diagnostics: [{ code }],
+                evidence: undefined,
+                stats: {},
+                boundaries: { start: "unverified", end: "unverified" },
+                verificationMode: "fragment",
+              });
+            return Reflect.get(target, key, receiver);
+          },
+        });
+      },
+    };
+    const result = verifyNoeosEngineEvidence(
+      input,
+      created.value.linkEvidence,
+      port,
+    );
+    assert.equal(result.status, "ok");
+    assert.equal(result.value.status, expected);
+    assert.equal(result.value.diagnostics[0], `DIAG-ENGINE-${code}`);
+  }
+
+  const digestFailurePort = {
+    createEngine(options) {
+      const engine = createEngine(options);
+      return new Proxy(engine, {
+        get(target, key, receiver) {
+          if (key === "digestEvidence")
+            return () => ({ ok: false, diagnostics: [] });
+          return Reflect.get(target, key, receiver);
+        },
+      });
+    },
+  };
+  const digestFailure = verifyNoeosEngineEvidence(
+    input,
+    created.value.linkEvidence,
+    digestFailurePort,
+  );
+  assert.equal(digestFailure.status, "ok");
+  assert.equal(digestFailure.value.status, "unsupported");
+  assert.equal(digestFailure.value.diagnostics[0], "DIAG-ENGINE-UNSUPPORTED");
+});
+
 test("P4-CB-034 installed Engine package exposes the admitted CommonJS API", () => {
   const require = createRequire(import.meta.url);
   const entry = require.resolve("@noeos/verification-engine");

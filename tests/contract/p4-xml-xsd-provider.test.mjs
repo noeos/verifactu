@@ -65,13 +65,17 @@ test("provider rejects a foreign edition, malformed request, and pre-aborted ope
       return { kind: "valid", diagnostics: [] };
     },
   });
-  const foreign = await provider.validate(request({ editionId: "other-edition" }));
+  const foreign = await provider.validate(
+    request({ editionId: "other-edition" }),
+  );
   assert.equal(foreign.status, "unavailable");
   assert.equal(foreign.diagnostics[0], "DIAG-XML-EDITION");
   assert.equal((await provider.validate(null)).status, "defect");
   const controller = new AbortController();
   controller.abort();
-  const cancelled = await provider.validate(request(), { signal: controller.signal });
+  const cancelled = await provider.validate(request(), {
+    signal: controller.signal,
+  });
   assert.equal(cancelled.status, "cancelled");
   assert.equal(cancelled.diagnostics[0], "DIAG-XML-CANCELLED");
   assert.equal(calls, 0);
@@ -79,14 +83,20 @@ test("provider rejects a foreign edition, malformed request, and pre-aborted ope
 
 test("worker bridge accepts only bounded structured diagnostics", async () => {
   const provider = createXmlXsdProvider({
-    execute: async () => ({ kind: "invalid", diagnostics: ["DIAG-XSD-INVALID"] }),
+    execute: async () => ({
+      kind: "invalid",
+      diagnostics: ["DIAG-XSD-INVALID"],
+    }),
   });
   const result = await provider.validate(request());
   assert.equal(result.status, "invalid");
   assert.equal(result.xsd, "invalid");
 
   const malformed = createXmlXsdProvider({
-    execute: async () => ({ kind: "invalid", diagnostics: ["taxpayer-secret"] }),
+    execute: async () => ({
+      kind: "invalid",
+      diagnostics: ["taxpayer-secret"],
+    }),
   });
   const safe = await malformed.validate(request());
   assert.equal(safe.status, "defect");
@@ -118,4 +128,76 @@ test("schema resource and input byte ceilings fail before process creation", asy
   assert.equal(unknownBudget.status, "limit");
   assert.equal(unknownBudget.diagnostics[0], "DIAG-XML-LIMITS");
   assert.equal(calls, 0);
+});
+
+test("worker statuses, exceptions, and diagnostic bounds map to stable outcomes", async () => {
+  for (const [kind, status] of [
+    ["limit", "limit"],
+    ["cancelled", "cancelled"],
+    ["unavailable", "unavailable"],
+    ["defect", "defect"],
+  ]) {
+    const provider = createXmlXsdProvider({
+      execute: async () => ({ kind, diagnostics: ["DIAG-XSD-CASE"] }),
+    });
+    const result = await provider.validate(request());
+    assert.equal(result.status, status);
+    assert.equal(
+      result.diagnostics[0],
+      kind === "cancelled" ? "DIAG-XML-CANCELLED" : "DIAG-XSD-CASE",
+    );
+  }
+
+  const throwing = createXmlXsdProvider({
+    execute: async () => {
+      throw new Error("private detail");
+    },
+  });
+  assert.deepEqual((await throwing.validate(request())).diagnostics, [
+    "DIAG-XSD-PROVIDER",
+  ]);
+  for (const diagnostics of [
+    Array.from({ length: 9 }, () => "DIAG-XSD-TOO-MANY"),
+    ["DIAG-XSD-" + "A".repeat(80)],
+    [1],
+  ]) {
+    const malformed = createXmlXsdProvider({
+      execute: async () => ({ kind: "valid", diagnostics }),
+    });
+    assert.equal((await malformed.validate(request())).status, "defect");
+  }
+});
+
+test("request and limit normalization reject malformed values before worker execution", async () => {
+  let calls = 0;
+  const provider = createXmlXsdProvider({
+    execute: async () => {
+      calls += 1;
+      return { kind: "valid", diagnostics: [] };
+    },
+  });
+  for (const malformed of [
+    { xml: "not bytes" },
+    { rootSchemaId: 4 },
+    { schemas: {} },
+    { schemas: [null] },
+  ]) {
+    assert.equal(
+      (await provider.validate(request(malformed))).status,
+      "defect",
+    );
+  }
+  assert.equal(
+    (await provider.validate(request(), { deadlineMs: 0 })).diagnostics[0],
+    "DIAG-XML-DEADLINE",
+  );
+  assert.equal(
+    (await provider.validate(request(), { limits: null })).status,
+    "valid",
+  );
+  assert.equal(
+    (await provider.validate(request(), { limits: [] })).diagnostics[0],
+    "DIAG-XML-LIMITS",
+  );
+  assert.equal(calls, 1);
 });

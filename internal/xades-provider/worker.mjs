@@ -199,6 +199,10 @@ export function encodeRequest(request) {
     !request ||
     typeof request !== "object" ||
     !["SIGN_PREPARE", "SIGN_COMPLETE", "VERIFY"].includes(request.command) ||
+    !(request.artifactBytes instanceof Uint8Array) ||
+    !(request.signerCertificateDer instanceof Uint8Array) ||
+    (request.signatureBytes !== undefined &&
+      !(request.signatureBytes instanceof Uint8Array)) ||
     !Array.isArray(request.certificateChainDer) ||
     !Array.isArray(request.trustAnchorsDer) ||
     !Array.isArray(request.crlEvidence) ||
@@ -291,12 +295,15 @@ function decodeBase64(value) {
   return bytes.toString("base64") === value ? new Uint8Array(bytes) : null;
 }
 
-export function minimalEnvironment() {
-  const env = { PATH: process.env.PATH ?? "" };
-  if (process.env.JAVA_HOME) env.JAVA_HOME = process.env.JAVA_HOME;
-  if (process.platform === "win32") {
-    if (process.env.SystemRoot) env.SystemRoot = process.env.SystemRoot;
-    if (process.env.WINDIR) env.WINDIR = process.env.WINDIR;
+export function minimalEnvironment(
+  platform = process.platform,
+  source = process.env,
+) {
+  const env = { PATH: source.PATH ?? "" };
+  if (source.JAVA_HOME) env.JAVA_HOME = source.JAVA_HOME;
+  if (platform === "win32") {
+    if (source.SystemRoot) env.SystemRoot = source.SystemRoot;
+    if (source.WINDIR) env.WINDIR = source.WINDIR;
   }
   return env;
 }

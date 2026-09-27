@@ -1,13 +1,20 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { readFileSync } from "node:fs";
+import { chmodSync, readFileSync } from "node:fs";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { once } from "node:events";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import {
   createXmlXsdProvider,
   PINNED_SCHEMAS,
   XML_EDITION_ID,
 } from "../../internal/xml-provider/provider.mjs";
+import {
+  minimalXmlEnvironment,
+  spawnXmlWorker,
+} from "../../internal/xml-provider/worker.mjs";
 
 const sourceRoot =
   "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources";
@@ -15,6 +22,34 @@ const schemaPaths = {
   "xsd-suministro-informacion": "aeat/SuministroInformacion.xsd",
   "xmldsig-schema": "standards/xmldsig-core-schema.xsd",
 };
+
+test("XML worker preserves only required environment across supported platforms", () => {
+  assert.deepEqual(
+    minimalXmlEnvironment("win32", {
+      PATH: "C:\\Windows\\System32",
+      SystemRoot: "C:\\Windows",
+      WINDIR: "C:\\Windows",
+      SECRET: "drop",
+    }),
+    {
+      PATH: "C:\\Windows\\System32",
+      SystemRoot: "C:\\Windows",
+      WINDIR: "C:\\Windows",
+    },
+  );
+  assert.deepEqual(minimalXmlEnvironment("win32", { PATH: "" }), {
+    PATH: "",
+  });
+  assert.deepEqual(
+    minimalXmlEnvironment("linux", {
+      PATH: "/usr/bin",
+      SystemRoot: "ignored",
+      WINDIR: "ignored",
+    }),
+    { PATH: "/usr/bin" },
+  );
+});
+
 function fixture(xml) {
   return {
     editionId: XML_EDITION_ID,
@@ -66,7 +101,10 @@ test("provider denies DTDs, external entities, XInclude, and remote schema hints
     assert.equal(results[2].diagnostics[0], "DIAG-XML-XINCLUDE");
     assert.equal(results[3].status, "invalid");
     assert.equal(httpRequests, 0);
-    assert.doesNotMatch(JSON.stringify(results), /root:|network-accessed|\/etc\/passwd/u);
+    assert.doesNotMatch(
+      JSON.stringify(results),
+      /root:|network-accessed|\/etc\/passwd/u,
+    );
   } finally {
     server.close();
     await once(server, "close");
@@ -95,7 +133,9 @@ test("incremental parser limits depth, nodes, attributes, namespaces, and text",
 
 test("hard byte ceiling, deadline, cancellation, and unavailable workers fail closed", async () => {
   const provider = createXmlXsdProvider();
-  const tooLarge = await provider.validate(fixture(`<r>${"x".repeat(4_194_304)}</r>`));
+  const tooLarge = await provider.validate(
+    fixture(`<r>${"x".repeat(4_194_304)}</r>`),
+  );
   assert.equal(tooLarge.status, "limit");
   assert.equal(tooLarge.diagnostics[0], "DIAG-XML-BYTES");
 
@@ -104,17 +144,126 @@ test("hard byte ceiling, deadline, cancellation, and unavailable workers fail cl
   assert.equal(deadline.diagnostics[0], "DIAG-XML-DEADLINE");
 
   const controller = new AbortController();
-  const validating = provider.validate(fixture(`<r>${"x".repeat(1_000_000)}</r>`), {
-    signal: controller.signal,
-  });
+  const validating = provider.validate(
+    fixture(`<r>${"x".repeat(1_000_000)}</r>`),
+    {
+      signal: controller.signal,
+    },
+  );
   setTimeout(() => controller.abort(), 1).unref?.();
   const cancelled = await validating;
   assert.equal(cancelled.status, "cancelled");
   assert.equal(cancelled.diagnostics[0], "DIAG-XML-CANCELLED");
 
-  const unavailable = await createXmlXsdProvider({ pythonExecutable: "/missing/python" }).validate(
-    fixture("<r/>"),
-  );
+  const unavailable = await createXmlXsdProvider({
+    pythonExecutable: "/missing/python",
+  }).validate(fixture("<r/>"));
   assert.equal(unavailable.status, "unavailable");
   assert.equal(unavailable.diagnostics[0], "DIAG-XSD-UNAVAILABLE");
+});
+
+test("XML worker process envelope bounds cancellation, request, output, timeout and spawn failures", async () => {
+  const request = fixture("<r/>");
+  const cancelledController = new AbortController();
+  cancelledController.abort();
+  assert.equal(
+    (await spawnXmlWorker(request, { signal: cancelledController.signal }))
+      .kind,
+    "cancelled",
+  );
+
+  assert.equal(
+    (
+      await spawnXmlWorker(
+        { payload: "x".repeat(18_000_001) },
+        { pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3" },
+      )
+    ).kind,
+    "limit",
+  );
+
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        maximumOutputBytes: 1,
+      })
+    ).kind,
+    "limit",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        timeoutMs: 1,
+      })
+    ).kind,
+    "limit",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: "/missing/verifactu-python",
+      })
+    ).kind,
+    "unavailable",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        cwd: "/missing/verifactu-worker-cwd",
+      })
+    ).kind,
+    "unavailable",
+  );
+  assert.equal(
+    (
+      await spawnXmlWorker(request, {
+        pythonExecutable: process.env.VERIFACTU_PYTHON ?? "python3",
+        cwd: Symbol("invalid cwd"),
+      })
+    ).kind,
+    "unavailable",
+  );
+});
+
+test("XML worker parser rejects malformed structured output and process failures", async (t) => {
+  const directory = await mkdtemp(
+    join(tmpdir(), "verifactu-xml-worker-output-"),
+  );
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const executable = async (name, body) => {
+    const path = join(directory, name);
+    await writeFile(path, `#!/bin/sh\n${body}\n`);
+    chmodSync(path, 0o700);
+    return path;
+  };
+  const run = (pythonExecutable) =>
+    spawnXmlWorker(fixture("<r/>"), { pythonExecutable, timeoutMs: 1000 });
+  const validOutput = await executable(
+    "valid",
+    `printf '%s' '{"kind":"valid","diagnostics":[]}'`,
+  );
+  assert.equal((await run(validOutput)).kind, "valid");
+  for (const [name, output] of [
+    ["json", "not-json"],
+    ["kind", `{"kind":"unknown","diagnostics":[]}`],
+    ["diagnostic", `{"kind":"invalid","diagnostics":["private detail"]}`],
+  ]) {
+    const malformed = await executable(name, `printf '%s' '${output}'`);
+    assert.equal((await run(malformed)).kind, "defect");
+  }
+  const failing = await executable("exit", "exit 7");
+  assert.equal((await run(failing)).kind, "defect");
+  const noisy = await executable("stderr", "printf '%s' 'xxxx' >&2; sleep 1");
+  assert.equal(
+    (
+      await spawnXmlWorker(fixture("<r/>"), {
+        pythonExecutable: noisy,
+        maximumOutputBytes: 2,
+      })
+    ).kind,
+    "limit",
+  );
 });

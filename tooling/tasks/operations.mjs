@@ -1,4 +1,4 @@
-import { createReadStream } from "node:fs";
+import { createReadStream, existsSync } from "node:fs";
 import { execFile, spawnSync } from "node:child_process";
 import {
   cp,
@@ -1924,6 +1924,403 @@ async function testP4F(context) {
       "P4-PROP-012x4096 seed=1346650369 retries=0 discards=0",
       "criticalMutants=4/4 P4-MUT-033..036",
       `mutationTests=${mutationPass}/${mutationCount}`,
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
+async function testP4G(context) {
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p4-quality-plan.json"),
+  );
+  const files = plan.testFiles;
+  assert(files.length === 26, "P4G_TEST_POPULATION", files.length);
+  assert(
+    files.every((path) => existsSync(resolve(context.root, path))),
+    "P4G_TEST_PATH_MISSING",
+    files.filter((path) => !existsSync(resolve(context.root, path))).join(","),
+  );
+  const javaHome = process.env.JAVA_HOME;
+  const java = process.env.VERIFACTU_JAVA;
+  const maven = process.env.VERIFACTU_MAVEN;
+  const repository = process.env.VERIFACTU_MAVEN_REPOSITORY;
+  assert(
+    [javaHome, java, maven, repository].every(
+      (value) => typeof value === "string" && value.length > 0,
+    ),
+    "P4G_TOOLCHAIN_INPUTS",
+    "admitted JDK and offline Maven repository are required",
+  );
+  const admission = await readJson(
+    resolve(context.root, "config/admission/java-provider.json"),
+  );
+  const agentComponent = admission.components.find(
+    (component) =>
+      component.purl ===
+      "pkg:maven/org.jacoco/org.jacoco.agent@0.8.15?classifier=runtime",
+  );
+  assert(agentComponent, "P4G_JACOCO_ADMISSION", "pinned agent is absent");
+  const agent = resolve(
+    repository,
+    "org/jacoco/org.jacoco.agent/0.8.15/org.jacoco.agent-0.8.15-runtime.jar",
+  );
+  assert(
+    (await sha256File(agent)) === agentComponent.jarSha256,
+    "P4G_JACOCO_INTEGRITY",
+    agent,
+  );
+  const artifactRoot = resolve(
+    context.root,
+    "evidence/runs/artifacts/p4-g-cumulative",
+  );
+  await mkdir(artifactRoot, { recursive: true });
+  const v8Root = resolve(artifactRoot, "v8");
+  await rm(v8Root, { recursive: true, force: true });
+  await mkdir(v8Root, { recursive: true });
+  const jacocoData = resolve(
+    context.root,
+    "internal/xades-provider/dss/target/jacoco.exec",
+  );
+  await rm(jacocoData, { force: true });
+  process.env.JAVA_HOME = javaHome;
+  process.env.VERIFACTU_JAVA_MUTATION = "1";
+  process.env.VERIFACTU_JACOCO_AGENT = agent;
+  process.env.VERIFACTU_JACOCO_DESTFILE = jacocoData;
+  process.env.NODE_V8_COVERAGE = v8Root;
+  const result = await run(
+    process.execPath,
+    [
+      "--experimental-test-coverage",
+      "--test-coverage-include=**/artifacts/build/verifactu/dist/**/*.js",
+      "--test-coverage-include=internal/xml-provider/*.mjs",
+      "--test-coverage-include=internal/xades-provider/*.mjs",
+      "--test-coverage-lines=98",
+      "--test-coverage-branches=95",
+      "--test-coverage-functions=98",
+      "--test",
+      "--test-reporter=tap",
+      ...files,
+    ],
+    { cwd: context.root, timeoutMs: 900000 },
+  );
+  await writeFile(resolve(artifactRoot, "node-test.tap"), result.stdout);
+  await writeFile(resolve(artifactRoot, "node-test.stderr"), result.stderr);
+  assert(
+    result.code === 0,
+    "P4G_CUMULATIVE_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.trim(),
+  );
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P4G_CUMULATIVE_TEST_REPORT", result.stdout.slice(-2000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P4G_CUMULATIVE_TEST_COMPLETENESS",
+    `${tests}/${passed}, failed=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  delete process.env.VERIFACTU_JAVA_MUTATION;
+  delete process.env.VERIFACTU_JACOCO_AGENT;
+  delete process.env.VERIFACTU_JACOCO_DESTFILE;
+  delete process.env.NODE_V8_COVERAGE;
+  const javaCoverage = await runMaven(
+    maven,
+    [
+      "-o",
+      `-Dmaven.repo.local=${repository}`,
+      "-f",
+      "internal/xades-provider/dss/pom.xml",
+      "org.jacoco:jacoco-maven-plugin:0.8.15:report",
+      `-Djacoco.dataFile=${jacocoData}`,
+    ],
+    {
+      cwd: context.root,
+      env: { ...process.env, JAVA_HOME: javaHome },
+      timeoutMs: 120000,
+    },
+  );
+  assert(
+    javaCoverage.code === 0,
+    "P4G_JAVA_COVERAGE_EXECUTION",
+    `${javaCoverage.stdout}${javaCoverage.stderr}`.trim(),
+  );
+  const jacocoPath = resolve(
+    context.root,
+    "internal/xades-provider/dss/target/site/jacoco/jacoco.xml",
+  );
+  const jacocoXml = await readFile(jacocoPath, "utf8");
+  await writeFile(resolve(artifactRoot, "jacoco.xml"), jacocoXml);
+  await copyFile(jacocoData, resolve(artifactRoot, "jacoco.exec"));
+  await writeFile(
+    resolve(artifactRoot, "jacoco-report.log"),
+    javaCoverage.stdout + javaCoverage.stderr,
+  );
+  const bridge =
+    /<sourcefile name="DssBridge\.java">[\s\S]*?<\/sourcefile>/u.exec(
+      jacocoXml,
+    )?.[0];
+  assert(
+    bridge,
+    "P4G_JAVA_COVERAGE_BRIDGE",
+    "DssBridge.java absent from JaCoCo output",
+  );
+  const javaPercent = (type) => {
+    const matches = [
+      ...bridge.matchAll(
+        new RegExp(
+          `<counter type="${type}" missed="(\\d+)" covered="(\\d+)"\\/>`,
+          "gu",
+        ),
+      ),
+    ];
+    assert(matches.length === 1, "P4G_JAVA_COVERAGE_COUNTER", type);
+    const missed = Number(matches[0][1]);
+    const covered = Number(matches[0][2]);
+    return (covered / (missed + covered)) * 100;
+  };
+  const javaLines = javaPercent("LINE");
+  const javaBranches = javaPercent("BRANCH");
+  const javaMethods = javaPercent("METHOD");
+  assert(
+    javaLines >= 98 && javaBranches >= 95 && javaMethods >= 98,
+    "P4G_JAVA_COVERAGE_THRESHOLD",
+    `${javaLines}/${javaBranches}/${javaMethods}`,
+  );
+  const oracle = await run(
+    process.env.VERIFACTU_PYTHON ?? "python3",
+    ["internal/independent-oracles/p4_oracle.py"],
+    { cwd: context.root, timeoutMs: 30000 },
+  );
+  assert(
+    oracle.code === 0,
+    "P4G_INDEPENDENT_ORACLE_EXECUTION",
+    oracle.stderr || oracle.stdout,
+  );
+  const oracleReport = JSON.parse(oracle.stdout.trim().split(/\r?\n/u).at(-1));
+  assert(
+    oracleReport.status === "passed" &&
+      oracleReport.executed === oracleReport.selected &&
+      oracleReport.failed.length === 0 &&
+      oracleReport.creationAllowed === false,
+    "P4G_INDEPENDENT_ORACLE_REPORT",
+    JSON.stringify(oracleReport),
+  );
+  const npmVersionResult = await runNpm(["--version"], {
+    cwd: context.root,
+    timeoutMs: 30000,
+  });
+  assert(
+    npmVersionResult.code === 0,
+    "P4G_NPM_VERSION",
+    npmVersionResult.stderr || npmVersionResult.stdout,
+  );
+  const npmVersion = npmVersionResult.stdout.trim();
+  const runnerOS =
+    process.platform === "win32"
+      ? "windows-2025"
+      : process.platform === "darwin"
+        ? "macos-15"
+        : "ubuntu-24.04";
+  const compatibilityCell = plan.compatibilityMatrix.find(
+    (cell) =>
+      cell.os === runnerOS &&
+      cell.node === process.versions.node &&
+      cell.npm === npmVersion,
+  );
+  assert(
+    compatibilityCell,
+    "P4G_COMPATIBILITY_CELL",
+    `${runnerOS}/node-${process.versions.node}/npm-${npmVersion}`,
+  );
+  await writeFile(resolve(artifactRoot, "node-test.stderr"), result.stderr);
+  await writeFile(resolve(artifactRoot, "p4-oracle.json"), oracle.stdout);
+  const coverage =
+    /^# all files\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)/mu.exec(
+      result.stdout,
+    );
+  assert(
+    coverage,
+    "P4G_CUMULATIVE_COVERAGE_REPORT",
+    result.stdout.slice(-3000),
+  );
+  const [, lines, branches, functions] = coverage;
+  const dependencies = new Map(
+    context.dependencyReports.map((report) => [report.taskId, report]),
+  );
+  const reportClasses = [
+    [
+      "coverage-report",
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
+    ],
+    [
+      "critical-branch-report",
+      [
+        "p4:quality-plan",
+        "test:p4-a",
+        "test:p4-c",
+        "test:p4-d",
+        "test:p4-e",
+        "test:p4-f",
+      ],
+    ],
+    [
+      "mutation-report",
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
+    ],
+    [
+      "property-report-with-seeds-and-shrinks",
+      ["test:p4-a", "test:p4-e", "test:p4-f"],
+    ],
+    [
+      "fuzz-report-with-corpus-and-seeds",
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e"],
+    ],
+    [
+      "seeded-fault-report",
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e"],
+    ],
+    [
+      "official-and-independent-vector-report",
+      [
+        "oracle:independent",
+        "test:p4-a",
+        "test:p4-c",
+        "test:p4-d",
+        "test:p4-e",
+        "test:p4-f",
+      ],
+    ],
+    [
+      "security-attack-report",
+      ["test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
+    ],
+    ["performance-and-resource-report", []],
+    ["compatibility-matrix-report", []],
+    ["clean-packed-consumer-report", ["integration:tarball-consumers"]],
+    [
+      "DSS reproducible offline build and bridge coverage",
+      ["test:p4-d", "package:reproducibility"],
+    ],
+    [
+      "Maven/SBOM/shade/licence/NOTICE reconciliation",
+      [
+        "test:p4-d",
+        "package:allowlists",
+        "sbom:component-graph",
+        "sbom:documents",
+      ],
+    ],
+  ];
+  assert(
+    reportClasses.length === plan.requiredEvidence.length &&
+      reportClasses.every(
+        ([name, taskIds]) =>
+          plan.requiredEvidence.includes(name) &&
+          taskIds.every((taskId) => dependencies.has(taskId)),
+      ),
+    "P4G_REQUIRED_EVIDENCE_CENSUS",
+    JSON.stringify(
+      reportClasses.map(([name, taskIds]) => [
+        name,
+        taskIds.filter((taskId) => !dependencies.has(taskId)),
+      ]),
+    ),
+  );
+  const evidenceReports = reportClasses.map(([name, taskIds]) => ({
+    name,
+    reports: taskIds.map((taskId) => ({
+      taskId,
+      outputDigest: dependencies.get(taskId)?.outputDigest,
+    })),
+    rawArtifactNames:
+      name === "performance-and-resource-report"
+        ? ["node-test.tap", "jacoco.xml"]
+        : name === "compatibility-matrix-report"
+          ? []
+          : undefined,
+    requiredCells:
+      name === "compatibility-matrix-report"
+        ? plan.compatibilityMatrix
+        : undefined,
+  }));
+  const rawArtifacts = [
+    ["node-test.tap", await sha256File(resolve(artifactRoot, "node-test.tap"))],
+    ["jacoco.xml", await sha256File(resolve(artifactRoot, "jacoco.xml"))],
+    ["jacoco.exec", await sha256File(resolve(artifactRoot, "jacoco.exec"))],
+    [
+      "p4-oracle.json",
+      await sha256File(resolve(artifactRoot, "p4-oracle.json")),
+    ],
+    [
+      "v8-coverage",
+      await digestFiles(
+        context.root,
+        (await walk(v8Root))
+          .filter((entry) => entry.type === "file")
+          .map((entry) => relativePosix(context.root, entry.path)),
+      ),
+    ],
+  ];
+  const summary = {
+    schemaVersion: 1,
+    subject: context.identity.subject,
+    tree: context.identity.tree,
+    testFiles: files,
+    tests: Number(tests),
+    passed: Number(passed),
+    skipped: Number(skipped),
+    coverage: {
+      linesPercent: Number(lines),
+      branchesPercent: Number(branches),
+      functionsPercent: Number(functions),
+    },
+    oracle: oracleReport,
+    reportClasses: evidenceReports,
+    rawArtifacts,
+    compatibilityCell: {
+      id: compatibilityCell.id,
+      os: runnerOS,
+      node: process.versions.node,
+      npm: npmVersion,
+      status: "passed",
+    },
+    directPrerequisites: context.dependencyReports.map((report) => ({
+      taskId: report.taskId,
+      outputDigest: report.outputDigest,
+    })),
+  };
+  await writeJsonAtomic(
+    resolve(artifactRoot, "cumulative-summary.json"),
+    summary,
+  );
+  return {
+    selected: Number(tests) + oracleReport.selected,
+    executed: Number(tests) + oracleReport.executed,
+    passed: Number(passed) + oracleReport.passed,
+    outputDigest: sha256(
+      result.stdout +
+        result.stderr +
+        javaCoverage.stdout +
+        jacocoXml +
+        oracle.stdout +
+        oracle.stderr,
+    ),
+    diagnostics: [
+      `frozenTestFiles=${files.length}`,
+      `testCases=${tests}`,
+      `coverage.lines=${lines}`,
+      `coverage.branches=${branches}`,
+      `coverage.functions=${functions}`,
+      `java.coverage.lines=${javaLines.toFixed(2)}`,
+      `java.coverage.branches=${javaBranches.toFixed(2)}`,
+      `java.coverage.functions=${javaMethods.toFixed(2)}`,
+      `independentOracle=${oracleReport.passed}/${oracleReport.selected}`,
       `subject=${context.identity.subject}`,
     ],
   };
@@ -4100,6 +4497,7 @@ export const operations = {
   testP4D,
   testP4E,
   testP4F,
+  testP4G,
   buildPackages,
   packageAllowlists,
   packageReproducibility,
@@ -4139,6 +4537,10 @@ export const operationCapabilities = Object.freeze({
   testP4D: { tools: ["node", "java", "maven"], network: "denied" },
   testP4E: { tools: ["node"], network: "denied" },
   testP4F: { tools: ["node"], network: "denied" },
+  testP4G: {
+    tools: ["node", "python", "java", "maven", "npm"],
+    network: "denied",
+  },
   buildPackages: { tools: ["node", "typescript"], network: "denied" },
   packageAllowlists: {
     tools: ["node", "typescript", "npm"],

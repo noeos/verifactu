@@ -197,6 +197,27 @@ test("record planning validates input and returns a deterministic immutable plan
     planRecord({ ...input, digest, record: anulacion.value }).value.recordKind,
     "anulacion",
   );
+  for (const rejected of [
+    planRecord(null),
+    planRecord({ ...input, digest, record: null }),
+    planRecord({ ...input, digest, operationId: id("tenant", "wrong-kind") }),
+    planRecord({ ...input, digest, expiresAt: "not-an-instant" }),
+    planRecord({
+      ...input,
+      digest: { providerId: "bad", digest: () => "bad" },
+    }),
+    planRecord({
+      ...input,
+      digest: {
+        providerId: "throws",
+        digest: () => {
+          throw new Error("private digest");
+        },
+      },
+    }),
+  ]) {
+    assert.equal(rejected.status, "invalid");
+  }
 });
 test("official projection preserves absence, empty, zero, nil and declared field order", () => {
   const projected = projectOfficialFields(fields);
@@ -459,6 +480,28 @@ test("fingerprint recomputes only supported edition-bound digest", () => {
     "sha512:" +
       createHash("sha512").update(result.value.preimage).digest("hex"),
   );
+  const exposed = result.value.preimage;
+  exposed[0] ^= 0xff;
+  assert.notDeepEqual(exposed, result.value.preimage);
+  for (const malformed of [
+    null,
+    { editionId: id("tenant", "wrong"), expectedEditionId: editionId },
+    { editionId, expectedEditionId: id("tenant", "wrong") },
+    { editionId, expectedEditionId: editionId, rule: null },
+  ]) {
+    assert.equal(createFingerprint(malformed).status, "invalid");
+  }
+  assert.equal(
+    createFingerprint({
+      editionId,
+      expectedEditionId: editionId,
+      algorithm: "sha256",
+      fields: projected,
+      rule,
+      digest: { providerId: "bad-digest", digest: () => "invalid" },
+    }).status,
+    "invalid",
+  );
 });
 test("byte artifact custody snapshots bytes and permits only exact monotonic transitions", () => {
   const source = new TextEncoder().encode("<record/>");
@@ -602,6 +645,50 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
         transform: "copy",
         state: "produced",
       },
+      digest,
+    ).status,
+    "invalid",
+  );
+  const validInput = {
+    artifactId: "artifact-2",
+    context,
+    editionId,
+    kind: "xml",
+    mediaType: "application/xml",
+    bytes: new TextEncoder().encode("<record/>").slice(),
+    parentIds: [],
+    transform: "serialize",
+    state: "produced",
+  };
+  for (const malformed of [
+    null,
+    { ...validInput, artifactId: "" },
+    { ...validInput, artifactId: "x".repeat(257) },
+    { ...validInput, context: null },
+    {
+      ...validInput,
+      context: { ...context, editionId: id("edition", "other") },
+    },
+    { ...validInput, editionId: id("edition", "other") },
+    { ...validInput, kind: "" },
+    { ...validInput, mediaType: "xml" },
+    { ...validInput, bytes: "not-bytes" },
+    { ...validInput, parentIds: null },
+    { ...validInput, parentIds: [""] },
+    { ...validInput, transform: "" },
+  ]) {
+    assert.equal(createXmlArtifact(malformed, digest).status, "invalid");
+  }
+  assert.equal(
+    createXmlArtifact(validInput, { providerId: "bad", digest: () => "bad" })
+      .status,
+    "invalid",
+  );
+  assert.equal(
+    transitionXmlArtifact(
+      { ...bounded.value },
+      "validated",
+      bounded.value.bytes,
       digest,
     ).status,
     "invalid",

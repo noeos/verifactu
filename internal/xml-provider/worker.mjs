@@ -314,6 +314,18 @@ except Exception:
     write_result("defect", "DIAG-XSD-PROVIDER")
 `;
 
+export function minimalXmlEnvironment(
+  platform = process.platform,
+  source = process.env,
+) {
+  const env = { PATH: source.PATH ?? "" };
+  if (platform === "win32") {
+    if (source.SystemRoot) env.SystemRoot = source.SystemRoot;
+    if (source.WINDIR) env.WINDIR = source.WINDIR;
+  }
+  return env;
+}
+
 const VALID_WORKER_KINDS = new Set([
   "valid",
   "invalid",
@@ -366,11 +378,7 @@ export async function spawnXmlWorker(request, options = {}) {
     timer.unref?.();
     options.signal?.addEventListener("abort", abort, { once: true });
     try {
-      const env = { PATH: process.env.PATH ?? "" };
-      if (process.platform === "win32") {
-        if (process.env.SystemRoot) env.SystemRoot = process.env.SystemRoot;
-        if (process.env.WINDIR) env.WINDIR = process.env.WINDIR;
-      }
+      const env = minimalXmlEnvironment();
       child = spawn(pythonExecutable, ["-I", "-c", XML_WORKER_SOURCE], {
         cwd: options.cwd ?? process.cwd(),
         env,

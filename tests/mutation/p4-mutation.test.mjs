@@ -327,7 +327,13 @@ test("P4-MUT-006 kills an instant without an explicit offset", async () => {
     "(Z|[+-]\\d{2}:(\\d{2}))?$",
     async ({ load }) => {
       const { createFiscalInstant } = await load("domain/date-time.js");
-      const result = createFiscalInstant("2025-01-01T12:00:00");
+      let result;
+      assert.doesNotThrow(
+        () => {
+          result = createFiscalInstant("2025-01-01T12:00:00");
+        },
+        "P4-CB-006 instant rejection remains total",
+      );
       assert.equal(
         result.status,
         "invalid",
