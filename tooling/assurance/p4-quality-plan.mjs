@@ -1026,6 +1026,13 @@ for (const row of plan.criticalCatalogue.slice(36)) {
   );
 }
 
+const baselineTree = `${plan.governingProtectedMain}^{tree}`;
+const baselineTreeProbe = spawnSync("git", ["cat-file", "-e", baselineTree], {
+  cwd: root,
+});
+if (baselineTreeProbe.status !== 0)
+  git("fetch", "--no-tags", "origin", plan.governingProtectedMain);
+
 const baselinePaths = git(
   "ls-tree",
   "-r",
@@ -1035,8 +1042,7 @@ const baselinePaths = git(
   .split(/\r?\n/u)
   .filter(Boolean);
 assert(
-  git("rev-parse", `${plan.governingProtectedMain}^{tree}`) ===
-    plan.governingProtectedTree &&
+  git("rev-parse", baselineTree) === plan.governingProtectedTree &&
     canonical(
       baselinePaths.filter((path) => plan.productionModules.includes(path)),
     ) === canonical(["packages/verifactu/src/index.ts"]) &&
