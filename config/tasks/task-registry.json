@@ -170,7 +170,7 @@
     },
     {
       "id": "policy:architecture",
-      "version": 1,
+      "version": 2,
       "owner": "architecture-owner",
       "dependencies": ["policy:tree"],
       "inputs": [
@@ -331,7 +331,7 @@
     },
     {
       "id": "test:p4-a",
-      "version": 10,
+      "version": 13,
       "owner": "quality-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -343,7 +343,8 @@
         "tests/unit/p4-plans-artifacts.test.mjs",
         "tests/mutation/p4-mutation.test.mjs",
         "tests/property/p4-properties.test.mjs",
-        "tests/security/p4-isolation-redaction.test.mjs"
+        "tests/security/p4-isolation-redaction.test.mjs",
+        "tooling/tasks/operations.mjs"
       ],
       "outputs": ["evidence/runs/test--p4-a.json"],
       "workingDirectory": ".",
@@ -361,7 +362,7 @@
     },
     {
       "id": "test:p4-c",
-      "version": 10,
+      "version": 11,
       "owner": "cryptography-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -397,7 +398,7 @@
     },
     {
       "id": "test:p4-d",
-      "version": 86,
+      "version": 87,
       "owner": "cryptography-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -484,6 +485,39 @@
       "reportSchema": "evidence/schemas/task-report.schema.json",
       "zeroWork": "fail",
       "operation": "testP4E",
+      "tools": ["node"]
+    },
+    {
+      "id": "test:p4-f",
+      "version": 9,
+      "owner": "cryptography-owner",
+      "dependencies": ["build:packages", "test:p4-e"],
+      "inputs": [
+        "package-lock.json",
+        "config/admission/dependencies.json",
+        "packages/verifactu/src/verification/**",
+        "packages/verifactu/src/ports/verification-engine.ts",
+        "tests/unit/p4-claims.test.mjs",
+        "tests/contract/p4-engine-adapter.test.mjs",
+        "tests/integration/p4-engine-tarball.test.mjs",
+        "tests/security/p4-isolation-redaction.test.mjs",
+        "tests/mutation/p4-mutation.test.mjs",
+        "config/repository/import-rules.json",
+        "tooling/tasks/operations.mjs",
+        "config/quality/p4-quality-plan.json"
+      ],
+      "outputs": ["evidence/runs/test--p4-f.json"],
+      "workingDirectory": ".",
+      "toolProfile": "primary",
+      "environment": ["CI", "PATH", "VERIFACTU_SUBJECT_SHA"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 240,
+      "concurrencyLock": "p4-f-engine-tests",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "testP4F",
       "tools": ["node"]
     },
     {
@@ -874,7 +908,8 @@
         "build:packages",
         "test:p4-c",
         "test:p4-d",
-        "test:p4-e"
+        "test:p4-e",
+        "test:p4-f"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -904,7 +939,8 @@
         "test:p4-a",
         "test:p4-c",
         "test:p4-d",
-        "test:p4-e"
+        "test:p4-e",
+        "test:p4-f"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],

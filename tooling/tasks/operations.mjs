@@ -260,9 +260,11 @@ export function validateImportText(source, fileName, packageRule) {
         `${fileName}: ${specifier}`,
       );
     }
+    const filePackages = packageRule.mayImportPackagesByFile?.[fileName] ?? [];
     if (
       specifier.startsWith("@noeos/") &&
-      !packageRule.mayImportPackages.includes(specifier)
+      !packageRule.mayImportPackages.includes(specifier) &&
+      !filePackages.includes(specifier)
     ) {
       assert(false, "IMPORT_PACKAGE_FORBIDDEN", `${fileName}: ${specifier}`);
     }
@@ -1494,7 +1496,13 @@ async function testP4A(context) {
   ];
   const result = await run(
     process.execPath,
-    ["--experimental-test-coverage", "--test", "--test-reporter=tap", ...files],
+    [
+      "--experimental-test-coverage",
+      "--test-coverage-exclude=**/verification/*.js",
+      "--test",
+      "--test-reporter=tap",
+      ...files,
+    ],
     { cwd: context.root, timeoutMs: 120000 },
   );
   assert(
@@ -1558,8 +1566,8 @@ async function testP4A(context) {
     ["chain-field-swap", "P4-MUT-015"],
   ];
   assert(
-    Number(mutants) === 33 &&
-      Number(killed) === 33 &&
+    Number(mutants) === 37 &&
+      Number(killed) === 37 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1705,8 +1713,8 @@ async function testP4C(context) {
     ),
   ];
   assert(
-    Number(mutants) === 33 &&
-      Number(killed) === 33 &&
+    Number(mutants) === 37 &&
+      Number(killed) === 37 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1792,6 +1800,130 @@ async function testP4E(context) {
       "fuzz=P4-FUZZ-005x4096 seed=1346650369 retries=0 discards=0",
       "encoder=@nuintun/qrcode@5.0.3",
       "decoder=qr@0.7.0/qr/decode.js",
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
+async function testP4F(context) {
+  const files = [
+    "tests/unit/p4-claims.test.mjs",
+    "tests/contract/p4-engine-adapter.test.mjs",
+    "tests/integration/p4-engine-tarball.test.mjs",
+    "tests/security/p4-isolation-redaction.test.mjs",
+  ];
+  const result = await run(
+    process.execPath,
+    [
+      "--experimental-test-coverage",
+      "--test-coverage-include=**/verification/*.js",
+      "--test",
+      "--test-reporter=tap",
+      ...files,
+    ],
+    { cwd: context.root, timeoutMs: 180000 },
+  );
+  assert(
+    result.code === 0,
+    "P4F_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.trim(),
+  );
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P4F_TEST_REPORT", result.stdout.slice(-1000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P4F_TEST_COMPLETENESS",
+    `${tests}/${passed}, failed=${failed}, skipped=${skipped}`,
+  );
+  const coverage =
+    /^# all files\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)/mu.exec(
+      result.stdout,
+    );
+  assert(coverage, "P4F_COVERAGE_REPORT", result.stdout.slice(-2000));
+  const [, coverageLinesText, coverageBranchesText, coverageFunctionsText] =
+    coverage;
+  for (const required of [
+    "P4-CB-032",
+    "P4-CB-033",
+    "P4-CB-034",
+    "P4-CB-035",
+    "P4-CB-036",
+    "P4-PROP-012",
+  ])
+    assert(result.stdout.includes(required), "P4F_CAMPAIGN_MISSING", required);
+  const propertySource = await readFile(
+    join(context.root, "tests/unit/p4-claims.test.mjs"),
+    "utf8",
+  );
+  assert(
+    /P4-PROP-012 claim aggregation[\s\S]*?for \(let index = 0; index < 4096; index \+= 1\)/u.test(
+      propertySource,
+    ),
+    "P4F_PROPERTY_EXECUTION_COUNT",
+    "P4-PROP-012 must execute exactly 4,096 deterministic cases",
+  );
+  const mutations = await run(
+    process.execPath,
+    ["--test", "--test-reporter=tap", "tests/mutation/p4-mutation.test.mjs"],
+    { cwd: context.root, timeoutMs: 180000 },
+  );
+  assert(
+    mutations.code === 0,
+    "P4F_MUTATION_EXECUTION",
+    `${mutations.stdout}${mutations.stderr}`.trim(),
+  );
+  const mutationStats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      mutations.stdout,
+    );
+  assert(mutationStats, "P4F_MUTATION_REPORT", mutations.stdout.slice(-1000));
+  const [
+    ,
+    mutationCount,
+    ,
+    mutationPass,
+    mutationFail,
+    mutationCancelled,
+    mutationSkipped,
+  ] = mutationStats;
+  assert(
+    Number(mutationCount) === Number(mutationPass) &&
+      Number(mutationFail) === 0 &&
+      Number(mutationCancelled) === 0 &&
+      Number(mutationSkipped) === 0,
+    "P4F_MUTATION_COMPLETENESS",
+    `${mutationPass}/${mutationCount}, fail=${mutationFail}, skipped=${mutationSkipped}`,
+  );
+  for (const mutant of ["P4-MUT-033", "P4-MUT-034", "P4-MUT-035", "P4-MUT-036"])
+    assert(
+      mutations.stdout.includes(`# Subtest: ${mutant}`),
+      "P4F_MUTANT_MISSING",
+      mutant,
+    );
+  return {
+    selected: files.length + 1,
+    executed: files.length + 1,
+    passed: files.length + 1,
+    outputDigest: sha256(
+      result.stdout + result.stderr + mutations.stdout + mutations.stderr,
+    ),
+    diagnostics: [
+      `testCases=${tests}`,
+      `skipped=${skipped}`,
+      `coverage.line=${coverageLinesText}`,
+      `coverage.branch=${coverageBranchesText}`,
+      `coverage.function=${coverageFunctionsText}`,
+      "P4-PROP-012x4096 seed=1346650369 retries=0 discards=0",
+      "criticalMutants=4/4 P4-MUT-033..036",
+      `mutationTests=${mutationPass}/${mutationCount}`,
       `subject=${context.identity.subject}`,
     ],
   };
@@ -2138,8 +2270,8 @@ async function testP4D(context) {
     ),
   ];
   assert(
-    Number(mutants) === 35 &&
-      Number(killed) === 35 &&
+    Number(mutants) === 39 &&
+      Number(killed) === 39 &&
       Number(mutationFailures) === 0 &&
       Number(mutationCancelled) === 0 &&
       Number(mutationSkipped) === 0 &&
@@ -2229,7 +2361,7 @@ async function testP4D(context) {
       "properties=P4-PROP-013x4096 seed=1346650369 retries=0 discards=0",
       "fuzz=P4-FUZZ-007x4096 seed=1346651655; P4-FUZZ-008x4096 seed=1430257929; minimized failures=0",
       `seededFaults=${p4DSeededFaults.length}/${p4DSeededFaults.length} ${p4DSeededFaults.map(([fault]) => fault).join(",")}`,
-      "criticalMutants=9/9 P4-D (P4-MUT-026..029,037..041); total=34/43; future-wave P4-MUT-030..036,042..043 pending",
+      "criticalMutants=9/9 P4-D (P4-MUT-026..029,037..041); registered campaign now includes P4-F P4-MUT-033..036",
       `subject=${context.identity.subject}`,
     ],
   };
@@ -3967,6 +4099,7 @@ export const operations = {
   testP4C,
   testP4D,
   testP4E,
+  testP4F,
   buildPackages,
   packageAllowlists,
   packageReproducibility,
@@ -4005,6 +4138,7 @@ export const operationCapabilities = Object.freeze({
   testP4C: { tools: ["node", "python"], network: "denied" },
   testP4D: { tools: ["node", "java", "maven"], network: "denied" },
   testP4E: { tools: ["node"], network: "denied" },
+  testP4F: { tools: ["node"], network: "denied" },
   buildPackages: { tools: ["node", "typescript"], network: "denied" },
   packageAllowlists: {
     tools: ["node", "typescript", "npm"],
