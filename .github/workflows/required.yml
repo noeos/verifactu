@@ -199,6 +199,14 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: p4-g-cumulative-node-22-14-ubuntu
+          path: |
+            evidence/runs/test--p4-g.json
+            evidence/runs/artifacts/p4-g-cumulative/**
+          if-no-files-found: error
+          retention-days: 14
       - name: Write leaf report
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.14.0' --job-id node-22-14-ubuntu --output ci-reports/node-22-14-ubuntu.json --task-report evidence/runs/gate--platform.json
@@ -236,6 +244,14 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: p4-g-cumulative-node-22-23-ubuntu
+          path: |
+            evidence/runs/test--p4-g.json
+            evidence/runs/artifacts/p4-g-cumulative/**
+          if-no-files-found: error
+          retention-days: 14
       - name: Write leaf report
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.23.2' --job-id node-22-23-ubuntu --output ci-reports/node-22-23-ubuntu.json --task-report evidence/runs/gate--platform.json
@@ -271,6 +287,14 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: p4-g-cumulative-node-24-ubuntu
+          path: |
+            evidence/runs/test--p4-g.json
+            evidence/runs/artifacts/p4-g-cumulative/**
+          if-no-files-found: error
+          retention-days: 14
       - name: Write leaf report
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 24.21.0' --job-id node-24-ubuntu --output ci-reports/node-24-ubuntu.json --task-report evidence/runs/gate--platform.json
@@ -306,6 +330,14 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: p4-g-cumulative-node-24-windows
+          path: |
+            evidence/runs/test--p4-g.json
+            evidence/runs/artifacts/p4-g-cumulative/**
+          if-no-files-found: error
+          retention-days: 14
       - name: Write leaf report
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · windows-2025 · Node 24.21.0' --job-id node-24-windows --output ci-reports/node-24-windows.json --task-report evidence/runs/gate--platform.json
@@ -360,6 +392,14 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: p4-g-cumulative-node-24-macos
+          path: |
+            evidence/runs/test--p4-g.json
+            evidence/runs/artifacts/p4-g-cumulative/**
+          if-no-files-found: error
+          retention-days: 14
       - name: Write leaf report
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · macos-15 · Node 24.21.0' --job-id node-24-macos --output ci-reports/node-24-macos.json --task-report evidence/runs/gate--platform.json
