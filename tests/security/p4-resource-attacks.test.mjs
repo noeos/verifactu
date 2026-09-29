@@ -61,6 +61,24 @@ test("bridge encoder rejects unknown commands and malformed evidence lists", () 
   assert.equal(encodeRequest({ ...request, certificateChainDer: null }), null);
   assert.equal(encodeRequest({ ...request, command: "SHELL" }), null);
   assert.equal(encodeRequest({ ...request, crlEvidence: ["not bytes"] }), null);
+  assert.equal(encodeRequest({ ...request, trustAnchorsDer: null }), null);
+  assert.equal(encodeRequest({ ...request, crlEvidence: null }), null);
+  assert.equal(
+    encodeRequest({
+      ...request,
+      certificateChainDer: Array.from({ length: 32 }, (_, index) =>
+        index === 31 ? "not bytes" : new Uint8Array(),
+      ),
+    }),
+    null,
+  );
+  assert.equal(
+    encodeRequest({
+      ...request,
+      certificateChainDer: Array.from({ length: 33 }, () => new Uint8Array()),
+    }),
+    null,
+  );
   assert.equal(
     encodeRequest({
       ...request,
@@ -96,6 +114,13 @@ test("bridge encoder serializes a bounded request using strict base64 lines", ()
   const lines = new TextDecoder().decode(encoded).trimEnd().split("\n");
   assert.ok(lines.length >= 17);
   assert.ok(lines.every((line) => /^(?:[A-Za-z0-9+/]*={0,2})$/u.test(line)));
+  assert.ok(
+    encodeRequest({
+      ...request,
+      editionId: "e".repeat(128),
+      certificateChainDer: Array.from({ length: 32 }, () => new Uint8Array()),
+    }) instanceof Uint8Array,
+  );
 });
 
 test("DSS response decoder rejects malformed framing and validates every field", () => {
