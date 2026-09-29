@@ -93,11 +93,47 @@ test("chain link keeps predecessor and current digest distinct and verifies scop
   const input = new TextEncoder().encode("ordered=fields");
   const link = createChainLink(f.context, id, null, input, digest);
   assert.equal(link.status, "ok");
+  assert.equal(
+    createChainLink(null, id, null, input, digest).status,
+    "invalid",
+  );
   assert.match(link.value.currentDigest, /^sha256:[0-9a-f]{64}$/u);
   assert.equal(link.value.previousDigest, null);
   assert.equal(
+    verifyChainLink(link.value, null, null, input, digest).status,
+    "invalid",
+  );
+  assert.equal(
     verifyChainLink(link.value, f.context, null, input, digest).status,
     "ok",
+  );
+  assert.equal(
+    verifyChainLink(
+      { ...link.value, previousDigest: "bad-digest" },
+      f.context,
+      "bad-digest",
+      input,
+      digest,
+    ).status,
+    "invalid",
+  );
+  const otherContext = createFiscalContext({
+    ...f.context,
+    tenantId: f.id("tenant", "other-context"),
+  }).value;
+  assert.equal(
+    verifyChainLink(
+      { ...link.value, context: otherContext },
+      f.context,
+      null,
+      input,
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    verifyChainLink(link.value, f.context, null, input, digest).value,
+    true,
   );
   assert.equal(
     verifyChainLink(
@@ -186,6 +222,16 @@ test("chain link keeps predecessor and current digest distinct and verifies scop
       digest,
     ),
     { status: "verified", headDigest: link.value.currentDigest },
+  );
+  assert.deepEqual(
+    verifyCompleteChain(
+      [{ ...link.value, context: otherContext }],
+      new Map(),
+      f.context,
+      link.value.currentDigest,
+      digest,
+    ),
+    { status: "broken", code: "DIAG-CHAIN-LINK" },
   );
   assert.equal(
     verifyCompleteChain(
