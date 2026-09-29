@@ -73,7 +73,15 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     "invalid",
   );
   assert.equal(
+    transitionMode(null, { ...start, effectiveFrom: "not-an-instant" }).status,
+    "invalid",
+  );
+  assert.equal(
     transitionMode(null, { ...start, mode: "unrecognized" }).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionMode({ ...start, mode: "unrecognized" }, pending).status,
     "invalid",
   );
   assert.equal(
@@ -109,6 +117,57 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     ).status,
     "ok",
   );
+});
+
+test("mode resolution respects context and the half-open effective interval", () => {
+  const x = f();
+  const open = {
+    context: x.context,
+    mode: "verifactu",
+    effectiveFrom: x.at,
+    effectiveUntil: null,
+    authorizationId: "auth",
+    evidenceId: "ev",
+  };
+  assert.equal(
+    resolveMode([open], "2025-01-03T00:00:00Z", x.context).status,
+    "ok",
+  );
+  assert.equal(
+    resolveMode(
+      [{ ...open, effectiveFrom: "2025-01-02T00:00:00Z" }],
+      x.at,
+      x.context,
+    ).status,
+    "indeterminate",
+    "a tenure beginning after the observation time is not active",
+  );
+  assert.equal(
+    resolveMode(
+      [
+        {
+          ...open,
+          context: { ...x.context, tenantId: x.id("tenant", "other") },
+        },
+      ],
+      x.at,
+      x.context,
+    ).status,
+    "indeterminate",
+    "a tenure for another context is not active",
+  );
+  assert.equal(
+    resolveMode(
+      [{ ...open, effectiveUntil: "2025-01-02T00:00:00Z" }],
+      "2025-01-02T00:00:00Z",
+      x.context,
+    ).status,
+    "indeterminate",
+    "the effective interval excludes its end timestamp",
+  );
+  const unresolved = resolveMode([], x.at, x.context);
+  assert.equal(unresolved.status, "indeterminate");
+  assert.equal(unresolved.diagnostics[0].retryable, false);
 });
 
 test("regulated events are append-only and separate from billing chain sequencing", () => {
