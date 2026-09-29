@@ -1553,6 +1553,11 @@ async function testP4A(context) {
       /# Subtest: P4-MUT-(?:00[1-9]|01\d|02[0-5]|029|03[7-9]|04[01])\b/gu,
     ),
   ];
+  const harnessCases = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
+    ),
+  ];
   const p4AFaults = [
     ["codec-stage-skip", "P4-MUT-001"],
     ["duplicate-member-accept", "P4-MUT-002"],
@@ -1571,8 +1576,9 @@ async function testP4A(context) {
     ["artifact-byte-copy-loss", "P4-MUT-022"],
   ];
   assert(
-    Number(mutants) === 41 &&
-      Number(killed) === 41 &&
+    Number(mutants) - harnessCases.length === 41 &&
+      Number(killed) - harnessCases.length === 41 &&
+      harnessCases.length === 1 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1738,9 +1744,15 @@ async function testP4C(context) {
       /# Subtest: P4-MUT-(?:00[1-9]|01\d|02[0-5]|029|03[7-9]|04[01])\b/gu,
     ),
   ];
+  const p4cHarnessCases = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
+    ),
+  ];
   assert(
-    Number(mutants) === 41 &&
-      Number(killed) === 41 &&
+    Number(mutants) - p4cHarnessCases.length === 41 &&
+      Number(killed) - p4cHarnessCases.length === 41 &&
+      p4cHarnessCases.length === 1 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -3401,9 +3413,15 @@ async function testP4D(context) {
       /# Subtest: P4-MUT-0(?:26|27|28|29|37|38|39|40|41)\b/gu,
     ),
   ];
+  const dHarnessCases = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
+    ),
+  ];
   assert(
-    Number(mutants) === 43 &&
-      Number(killed) === 43 &&
+    Number(mutants) - dHarnessCases.length === 43 &&
+      Number(killed) - dHarnessCases.length === 43 &&
+      dHarnessCases.length === 1 &&
       Number(mutationFailures) === 0 &&
       Number(mutationCancelled) === 0 &&
       Number(mutationSkipped) === 0 &&

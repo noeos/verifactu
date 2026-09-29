@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { registerHooks } from "node:module";
+import { register } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import ts from "typescript";
@@ -69,16 +69,8 @@ if (sourcePath.endsWith(".ts")) {
   runtimeSource = emitted.outputText;
 }
 
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (context.parentURL === runtimeUrl)
-      return nextResolve(specifier, { ...context, parentURL: runtimeUrl });
-    return nextResolve(specifier, context);
-  },
-  load(url, context, nextLoad) {
-    if (url !== runtimeUrl) return nextLoad(url, context);
-    return { format: "module", source: runtimeSource, shortCircuit: true };
-  },
+register(new URL("./p4-mutation-hooks.mjs", import.meta.url), import.meta.url, {
+  data: { runtimeUrl, runtimeSource },
 });
 
 process.emitWarning(

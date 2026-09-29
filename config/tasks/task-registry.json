@@ -528,7 +528,7 @@
     },
     {
       "id": "test:p4-g",
-      "version": 42,
+      "version": 43,
       "owner": "quality-owner",
       "dependencies": [
         "test:p4-a",
@@ -556,6 +556,7 @@
         "tooling/assurance/p4-mutation-catalog.mjs",
         "tooling/assurance/P4JavaMutationCatalog.java",
         "tooling/assurance/p4-mutation-loader.mjs",
+        "tooling/assurance/p4-mutation-hooks.mjs",
         "tooling/assurance/p4-overall-mutation-campaign.mjs",
         "tooling/tasks/operations.mjs",
         "tooling/lib/core.mjs",

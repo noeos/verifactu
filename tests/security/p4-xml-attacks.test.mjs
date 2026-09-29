@@ -539,15 +539,28 @@ test("XML worker normalizes child spawn errors and post-spawn cancellation", asy
     child.stdout = new PassThrough();
     child.stderr = new PassThrough();
     child.stdin = new PassThrough();
-    setImmediate(() =>
-      child.emit(
-        "error",
-        Object.assign(new Error("spawn failed"), { code: "EACCES" }),
-      ),
-    );
+    setImmediate(() => {
+      try {
+        child.emit(
+          "error",
+          Object.assign(new Error("spawn failed"), { code: "EACCES" }),
+        );
+      } finally {
+        child.stdout.destroy();
+        child.stderr.destroy();
+        child.stdin.destroy();
+      }
+    });
     return child;
   });
-  assert.equal((await failedSpawner(fixture("<r/>"))).kind, "defect");
+  const failedSpawn = await Promise.race([
+    failedSpawner(fixture("<r/>")),
+    new Promise((resolve) =>
+      setTimeout(() => resolve("still-pending"), 100),
+    ),
+  ]);
+  assert.notEqual(failedSpawn, "still-pending");
+  assert.equal(failedSpawn.kind, "defect");
 
   const controller = new AbortController();
   const cancelledSpawner = createXmlWorkerSpawner(() => {

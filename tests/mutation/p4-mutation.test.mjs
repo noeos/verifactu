@@ -16,6 +16,10 @@ import {
   mutationCompileFailed,
   javaMutationTestSelections,
 } from "../../tooling/assurance/p4-overall-mutation-campaign.mjs";
+import {
+  initialize as initializeMutationHooks,
+  load as loadMutationHooks,
+} from "../../tooling/assurance/p4-mutation-hooks.mjs";
 
 {
   assert.deepEqual(javaMutationTestSelections({ line: 120 }), [[
@@ -28,16 +32,30 @@ import {
   ]]);
   assert.deepEqual(javaMutationTestSelections({ line: 420 }), [[
     "tests/security/p4-resource-attacks.test.mjs",
-    "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+    "^(?:Java bridge enforces every top-level request identity and artifact bound|Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
   ]]);
   assert.deepEqual(javaMutationTestSelections({ line: 455 }), [[
     "tests/security/p4-signature-attacks.test.mjs",
     "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
   ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 145 }), [[
+  assert.deepEqual(javaMutationTestSelections({ line: 530 }), [[
     "tests/security/p4-resource-attacks.test.mjs",
-    "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+    "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
   ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 569 }), [[
+    "tests/security/p4-signature-attacks.test.mjs",
+    "^DSS distinguishes optional and malformed embedded KeyValue data$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 145 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+    ],
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+    ],
+  ]);
   assert.deepEqual(javaMutationTestSelections({ line: 640 }), [[
     "tests/integration/p4-xades-pki.test.mjs",
     "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
@@ -87,6 +105,10 @@ import {
     ],
   );
   assert.deepEqual(
+    patterns(qr, 308, "tests/contract/p4-qr-provider.test.mjs"),
+    ["^P4-E compact PNG keeps stored blocks bounded$"],
+  );
+  assert.deepEqual(
     patterns(qr, 320, "tests/contract/p4-qr-provider.test.mjs"),
     [
       "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
@@ -126,6 +148,13 @@ import {
   );
   assert.equal(
     focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 627,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs [--test-name-pattern=^opaque signer callback cannot hold the provider past its explicit deadline$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
       module: "internal/xades-provider/pki.mjs",
       line: 60,
     }),
@@ -150,7 +179,7 @@ import {
       module: "internal/xml-provider/worker.mjs",
       line: 370,
     }),
-    "tests/security/p4-xml-attacks.test.mjs",
+    "tests/security/p4-xml-attacks.test.mjs [--test-name-pattern=^XML worker normalizes child spawn errors and post-spawn cancellation$]",
   );
   assert.equal(
     focusedProviderMutationTest({
@@ -171,6 +200,23 @@ import {
     true,
   );
 }
+
+test("overall mutation loader intercepts only its exact runtime module", async () => {
+  const runtimeUrl = "file:///tmp/verifactu-mutation-runtime.mjs";
+  const runtimeSource = "export const mutated = true;";
+  initializeMutationHooks({ runtimeUrl, runtimeSource });
+  const fallback = async (url) => ({ format: "module", source: url });
+
+  assert.deepEqual(await loadMutationHooks(runtimeUrl, {}, fallback), {
+    format: "module",
+    source: runtimeSource,
+    shortCircuit: true,
+  });
+  assert.deepEqual(
+    await loadMutationHooks("file:///tmp/unrelated.mjs", {}, fallback),
+    { format: "module", source: "file:///tmp/unrelated.mjs" },
+  );
+});
 
 const built = resolve("evidence/runs/artifacts/build/verifactu/dist");
 const xmlSchemaSourceRoot = resolve(

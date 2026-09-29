@@ -291,6 +291,10 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
     { ...valid, scale: 0 },
     { ...valid, scale: 33 },
     { ...valid, scale: 1.5 },
+    { ...valid, symbolSizeMm: Number.NaN },
+    { ...valid, symbolSizeMm: Number.POSITIVE_INFINITY },
+    { ...valid, quietZoneMm: Number.NaN },
+    { ...valid, quietZoneMm: Number.POSITIVE_INFINITY },
     { ...valid, symbolSizeMm: 29 },
     { ...valid, symbolSizeMm: 41 },
     { ...valid, quietZoneMm: 1 },
@@ -337,6 +341,14 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
   );
   assert.equal(
     renderQrPng(payload, null, valid, digest).diagnostics[0].code,
+    "DIAG-QR-RENDER-INPUT",
+  );
+  assert.equal(
+    renderQrSvg(payload, {}, valid, digest).diagnostics[0].code,
+    "DIAG-QR-RENDER-INPUT",
+  );
+  assert.equal(
+    renderQrPng(payload, {}, valid, digest).diagnostics[0].code,
     "DIAG-QR-RENDER-INPUT",
   );
   assert.equal(
@@ -430,11 +442,27 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
   );
   assert.equal(exactPng.status, "ok");
   assert.equal(exactPng.value.width, 4096);
+  const minimumScale = { scale: 1, symbolSizeMm: 30, quietZoneMm: 2 };
+  assert.equal(
+    renderQrSvg(payload, exactDimensionMatrix, minimumScale, digest).status,
+    "ok",
+  );
+  assert.equal(
+    renderQrPng(payload, exactDimensionMatrix, minimumScale, digest).status,
+    "ok",
+  );
 });
 
 test("P4-E encoder port enforces admitted byte and correction-level input", () => {
   assert.equal(
     qrPort.encode(new Uint8Array(), "M").diagnostics[0].code,
+    "DIAG-QR-ENCODER-INPUT",
+  );
+  assert.equal(
+    qrPort.encode(
+      new DataView(new Uint8Array([65]).buffer),
+      "M",
+    ).diagnostics[0].code,
     "DIAG-QR-ENCODER-INPUT",
   );
   assert.equal(qrPort.encode(new Uint8Array([0xff]), "M").status, "invalid");
@@ -554,8 +582,51 @@ test("P4-E deterministic PNG supports multi-block bounded rasters", () => {
   assert.ok(imageData);
   const raw = inflateSync(imageData);
   assert.equal(raw.length, expectedRawLength);
+  assert.equal(
+    imageData.length,
+    2 + raw.length + Math.ceil(raw.length / 65_535) * 5 + 4,
+  );
   for (let y = 0; y < rendered.value.height; y += 1)
     assert.equal(raw[y * (rendered.value.width + 1)], 0);
+});
+
+test("P4-E compact PNG keeps stored blocks bounded", () => {
+  const payload = buildQrPayload(
+    record(),
+    { id: editionId, environment: "test", mode: "verifactu" },
+    digest,
+  ).value;
+  const matrix = {
+    encode: () => ({
+      status: "ok",
+      value: { size: 21, get: (x, y) => x === y && x % 2 === 0 },
+    }),
+  };
+  const rendered = renderQrPng(
+    payload,
+    matrix,
+    { scale: 1, symbolSizeMm: 30, quietZoneMm: 2 },
+    digest,
+  );
+  assert.equal(rendered.status, "ok");
+  const bytes = rendered.value.bytes;
+  let offset = 8;
+  let idat;
+  while (offset < bytes.length) {
+    const view = new DataView(bytes.buffer, bytes.byteOffset + offset);
+    const length = view.getUint32(0, false);
+    const name = Buffer.from(bytes.subarray(offset + 4, offset + 8)).toString(
+      "ascii",
+    );
+    if (name === "IDAT") idat = bytes.subarray(offset + 8, offset + 8 + length);
+    offset += length + 12;
+  }
+  assert.ok(idat);
+  const raw = inflateSync(idat);
+  assert.equal(
+    idat.length,
+    2 + raw.length + Math.ceil(raw.length / 65_535) * 5 + 4,
+  );
 });
 
 test("P4-E PNG encodes exact raster pixels, physical density and chunk checksums", () => {

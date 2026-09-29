@@ -170,6 +170,8 @@ test("XML model rejects malformed names, bindings, duplicate expanded attributes
   };
   const variants = [
     { ...base, root: { ...base.root, name: name("bad:name") } },
+    { ...base, root: { ...base.root, name: name("1starts-with-digit") } },
+    { ...base, root: { ...base.root, name: name("contains?invalid") } },
     {
       ...base,
       root: {
@@ -219,6 +221,12 @@ test("XML model rejects malformed names, bindings, duplicate expanded attributes
     assert.equal(result.diagnostics[0].code, "DIAG-XML-MODEL");
     assert.doesNotMatch(JSON.stringify(result), /bad:name|bad--comment/u);
   }
+
+  for (const input of [null, {}, { root: null }]) {
+    const result = defineXmlDocument(input);
+    assert.equal(result.status, "invalid");
+    assert.equal(result.diagnostics[0].code, "DIAG-XML-MODEL");
+  }
 });
 
 test("XML model distinguishes default element namespaces from unprefixed attributes", () => {
@@ -243,6 +251,32 @@ test("XML model distinguishes default element namespaces from unprefixed attribu
   });
   assert.equal(valid.status, "ok");
   assert.equal(serializeXmlDocument(valid.value).status, "ok");
+});
+
+test("XML serializer orders expanded attributes by namespace then local name", () => {
+  const defined = defineXmlDocument({
+    root: {
+      kind: "element",
+      name: name("root"),
+      namespaces: [
+        { prefix: "z", namespaceUri: "urn:z" },
+        { prefix: "a", namespaceUri: "urn:a" },
+      ],
+      attributes: [
+        { name: name("z", "urn:z", "z"), value: "z" },
+        { name: name("z", "urn:a", "a"), value: "second" },
+        { name: name("a", "urn:a", "a"), value: "first" },
+      ],
+      children: [],
+    },
+  });
+  assert.equal(defined.status, "ok");
+  const serialized = serializeXmlDocument(defined.value);
+  assert.equal(serialized.status, "ok");
+  assert.equal(
+    new TextDecoder("utf-8", { fatal: true }).decode(serialized.value),
+    '<?xml version="1.0" encoding="UTF-8"?><root xmlns:a="urn:a" xmlns:z="urn:z" a:a="first" a:z="second" z:z="z"/>',
+  );
 });
 
 test("XML model applies a total serialized-byte ceiling before allocating output", () => {
@@ -408,6 +442,7 @@ test("XML model fails closed across namespace, attribute, node, and text boundar
     document({ namespaces: null }),
     document({ namespaces: [null] }),
     document({ namespaces: [{ prefix: null, namespaceUri: "bad\u0000uri" }] }),
+    document({ namespaces: [{ prefix: "p", namespaceUri: "bad\u0000uri" }] }),
     document({ namespaces: [{ prefix: 1, namespaceUri: "urn:x" }] }),
     document({
       namespaces: [
@@ -518,7 +553,7 @@ test("XML model accepts the complete valid scalar ranges and empty processing in
         },
       ],
       children: [
-        leaf('\uE000😀"\n\t'),
+        leaf('\u007F\u07FF\uD7FF\uE000\uFFFD𐀀􏿿"\n\t'),
         { kind: "processing-instruction", target: "trace", data: "" },
       ],
     },
@@ -530,5 +565,113 @@ test("XML model accepts the complete valid scalar ranges and empty processing in
   const xml = new TextDecoder().decode(serialized.value);
   assert.match(xml, /𐀀Root/u);
   assert.match(xml, /ñ\uE000😀/u);
-  assert.match(xml, /\uE000😀"\n\t<\?trace\?>/u);
+  assert.match(xml, /\u007F\u07FF\uD7FF\uE000\uFFFD𐀀􏿿/u);
+  assert.match(xml, /􏿿"\n\t<\?trace\?>/u);
+});
+
+test("XML model accepts each documented exact capacity", () => {
+  const documentElement = (overrides = {}) => ({
+    kind: "element",
+    name: name("r"),
+    namespaces: [],
+    attributes: [],
+    children: [],
+    ...overrides,
+  });
+  const exactNodes = {
+    root: documentElement({
+      children: Array.from(
+        { length: XML_LIMITS.maximumNodes - 1 },
+        () => leaf(""),
+      ),
+    }),
+  };
+  assert.equal(defineXmlDocument(exactNodes).status, "ok");
+  const exactElementNodes = {
+    root: documentElement({
+      children: Array.from(
+        { length: XML_LIMITS.maximumNodes - 1 },
+        () => documentElement(),
+      ),
+    }),
+  };
+  assert.equal(defineXmlDocument(exactElementNodes).status, "ok");
+
+  let exactDepth = documentElement();
+  for (let depth = 1; depth < XML_LIMITS.maximumDepth; depth += 1)
+    exactDepth = documentElement({ children: [exactDepth] });
+  assert.equal(defineXmlDocument({ root: exactDepth }).status, "ok");
+
+  assert.equal(
+    defineXmlDocument({
+      root: documentElement({
+        attributes: Array.from(
+          { length: XML_LIMITS.maximumAttributes },
+          (_, index) => ({ name: name(`a${index}`), value: "" }),
+        ),
+      }),
+    }).status,
+    "ok",
+  );
+  assert.equal(
+    defineXmlDocument({
+      root: documentElement({
+        namespaces: Array.from(
+          { length: XML_LIMITS.maximumNamespaces },
+          (_, index) => ({ prefix: `p${index}`, namespaceUri: `urn:${index}` }),
+        ),
+      }),
+    }).status,
+    "ok",
+  );
+
+  const exactText = defineXmlDocument({
+    root: documentElement({
+      children: [leaf("x".repeat(XML_LIMITS.maximumTextBytes))],
+    }),
+  });
+  assert.equal(exactText.status, "ok");
+  const exactAttribute = defineXmlDocument({
+    root: documentElement({
+      attributes: [
+        { name: name("a"), value: "x".repeat(XML_LIMITS.maximumTextBytes) },
+      ],
+    }),
+  });
+  assert.equal(exactAttribute.status, "ok");
+
+  const declaration = '<?xml version="1.0" encoding="UTF-8"?>';
+  const baselineBytes = new TextEncoder().encode(`${declaration}<r></r>`)
+    .byteLength;
+  const remainingBytes = XML_LIMITS.maximumXmlBytes - baselineBytes;
+  const ampersandCount = Math.floor(remainingBytes / 5);
+  const exactMarkupText =
+    "&".repeat(ampersandCount) + "x".repeat(remainingBytes % 5);
+  const exactDocument = defineXmlDocument({
+    root: documentElement({
+      children: [leaf(exactMarkupText)],
+    }),
+  });
+  assert.equal(exactDocument.status, "ok");
+  const serialized = serializeXmlDocument(exactDocument.value);
+  assert.equal(serialized.status, "ok");
+  assert.equal(serialized.value.byteLength, XML_LIMITS.maximumXmlBytes);
+
+  const encoder = new TextEncoder();
+  for (const point of [0x7f, 0x7ff, 0xd7ff, 0xe000, 0xfffd, 0x10000, 0x10ffff]) {
+    const scalar = String.fromCodePoint(point);
+    const remainingScalarBytes = remainingBytes - encoder.encode(scalar).byteLength;
+    const scalarAmpersands = Math.floor(remainingScalarBytes / 5);
+    const scalarText =
+      "&".repeat(scalarAmpersands) +
+      scalar +
+      "x".repeat(remainingScalarBytes % 5);
+    assert.equal(
+      defineXmlDocument({
+        root: documentElement({ children: [leaf(scalarText)] }),
+      }).status,
+      "ok",
+      `valid XML scalar U+${point.toString(16).toUpperCase()}`,
+    );
+  }
 });

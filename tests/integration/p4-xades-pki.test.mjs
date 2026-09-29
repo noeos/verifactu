@@ -1009,7 +1009,22 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
   const alreadySigned = new TextEncoder().encode(
     `${new TextDecoder().decode(artifactBytes).replace("</sum1:RegistroAlta>", "")}<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></sum1:RegistroAlta>`,
   );
+  const wrongRoot = new TextEncoder().encode(
+    new TextDecoder()
+      .decode(artifactBytes)
+      .replaceAll("RegistroAlta", "RegistroAnulacion"),
+  );
+  const wrongNamespace = new TextEncoder().encode(
+    new TextDecoder()
+      .decode(artifactBytes)
+      .replace(
+        "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroInformacion.xsd",
+        "https://example.invalid/SuministroInformacion.xsd",
+      ),
+  );
   for (const [name, bytes] of [
+    ["wrong target root", wrongRoot],
+    ["wrong root namespace", wrongNamespace],
     ["duplicate IDs", duplicateIds],
     ["existing signature", alreadySigned],
   ]) {
@@ -1035,6 +1050,16 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
     authorization: "indeterminate",
     algorithm: "valid",
   });
+
+  const exactMaximumAgeSigned = await provider.sign({
+    ...signRequest,
+    maximumRevocationAgeSeconds: 172_800,
+  });
+  assert.equal(
+    exactMaximumAgeSigned.status,
+    "signed",
+    JSON.stringify(exactMaximumAgeSigned),
+  );
 
   const purposeCertificateDer = new Uint8Array(
     Buffer.from(fixture.purposeCertificate, "base64"),

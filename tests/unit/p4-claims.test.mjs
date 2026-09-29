@@ -149,6 +149,7 @@ test("claim constructors reject every malformed status, field, and evidence comb
   };
   for (const malformed of [
     null,
+    Object.setPrototypeOf(Object.assign([], validBase), null),
     { ...validBase, extra: true },
     { ...validBase, kind: "unknown" },
     { ...validBase, status: "pending" },
@@ -187,6 +188,64 @@ test("claim constructors reject every malformed status, field, and evidence comb
     ).status,
     "invalid",
   );
+  assert.equal(
+    getVerificationClaim(
+      { claims: { find: () => claim("aeat", "invalid") } },
+      "aeat",
+    ),
+    undefined,
+  );
+
+  const classInstance = Object.assign(
+    new (class ClaimRecord {})(),
+    validBase,
+  );
+  assert.equal(createVerificationClaim(classInstance).status, "invalid");
+  const prototypeTrap = new Proxy({ ...validBase }, {
+    getPrototypeOf() {
+      throw new Error("private prototype trap");
+    },
+  });
+  assert.equal(createVerificationClaim(prototypeTrap).status, "invalid");
+  assert.equal(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "invalid",
+      diagnostics: ["DIAG-CLAIM"],
+      unexpected: true,
+    }).status,
+    "invalid",
+  );
+  assert.equal(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "pending",
+      diagnostics: ["DIAG-CLAIM"],
+    }).status,
+    "invalid",
+  );
+  const hiddenDiagnostics = { kind: "cryptographic", status: "invalid" };
+  Object.defineProperty(hiddenDiagnostics, "diagnostics", {
+    value: ["DIAG-CLAIM"],
+  });
+  assert.equal(createVerificationClaim(hiddenDiagnostics).status, "invalid");
+  assert.equal(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "indeterminate",
+      diagnostics: Array.from({ length: 32 }, (_, index) => `DIAG-${index}`),
+    }).status,
+    "ok",
+  );
+
+  const arrayLikeClaimSet = {
+    length: CLAIM_KINDS.length,
+    some: () => false,
+    *[Symbol.iterator]() {
+      yield* claimSet().value.claims;
+    },
+  };
+  assert.equal(createVerificationClaimSet(arrayLikeClaimSet).status, "invalid");
 });
 
 test("claim boundaries contain throwing proxies without echoing their data", () => {

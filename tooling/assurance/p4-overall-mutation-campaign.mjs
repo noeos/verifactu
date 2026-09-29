@@ -12,7 +12,7 @@ import { resolve, relative, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { run } from "../lib/core.mjs";
+import { clearTimeout } from "node:timers";
 
 const execPath = process.execPath;
 
@@ -147,7 +147,6 @@ function mappingsForSourceMap(sourceMap, mapUrl, sourcePath) {
   let sourceIndex = 0;
   let originalLine = 0;
   let originalColumn = 0;
-  let nameIndex = 0;
   const generatedLines = sourceMap.mappings.split(";");
   for (
     let generatedLine = 0;
@@ -165,7 +164,6 @@ function mappingsForSourceMap(sourceMap, mapUrl, sourcePath) {
       sourceIndex += values[1];
       originalLine += values[2];
       originalColumn += values[3];
-      if (values.length === 5) nameIndex += values[4];
       if (targetIndexes.has(sourceIndex))
         mappings.push({
           generatedLine,
@@ -235,7 +233,7 @@ async function runtimeLocation(root, mutation, cache = new Map()) {
     };
     cache.set(mutation.module, moduleData);
   }
-  const { runtimePath, runtimeUrl, runtimeSource, mappings } = moduleData;
+  const { runtimePath, runtimeSource, mappings } = moduleData;
   const { line, column } = lineAndColumn(productionSource, mutation.start);
   const nearestMappings = mappings.filter(
     (entry) => entry.originalLine === line && entry.originalColumn <= column,
@@ -453,10 +451,28 @@ function selectedTest(path, pattern) {
 
 export function focusedProviderMutationTest(mutation) {
   const { module, line } = mutation;
+  if (
+    module === "internal/xades-provider/provider.mjs" &&
+    line >= 624 &&
+    line < 640
+  )
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^opaque signer callback cannot hold the provider past its explicit deadline$",
+    );
   if (module === "internal/xades-provider/provider.mjs")
     return "tests/contract/p4-xades-provider.test.mjs";
   if (module === "internal/xml-provider/provider.mjs")
     return "tests/contract/p4-xml-xsd-provider.test.mjs";
+  if (
+    module === "internal/xml-provider/worker.mjs" &&
+    line >= 368 &&
+    line < 380
+  )
+    return selectedTest(
+      "tests/security/p4-xml-attacks.test.mjs",
+      "^XML worker normalizes child spawn errors and post-spawn cancellation$",
+    );
   if (module === "internal/xml-provider/worker.mjs")
     return "tests/security/p4-xml-attacks.test.mjs";
   if (module === "packages/verifactu/src/verification/engine-adapter.ts")
@@ -584,7 +600,6 @@ export async function executeNodeMutation(root, mutation, options = {}) {
         loader,
         "--test",
         "--test-concurrency=1",
-        "--test-isolation=none",
         "--test-reporter=tap",
       ];
       if (pattern) args.push(`--test-name-pattern=${pattern}`);
@@ -692,6 +707,13 @@ export function mutationTestPatterns(mutation, test, options = {}) {
   const qrModule =
     mutation.module === "packages/verifactu/src/application/qr.ts";
   if (qrModule && test === "tests/contract/p4-qr-provider.test.mjs") {
+    if (mutation.line >= 307 && mutation.line < 310)
+      return [
+        {
+          pattern: "^P4-E compact PNG keeps stored blocks bounded$",
+          timeoutMs: normalTimeout,
+        },
+      ];
     if (mutation.line < 161)
       return [
         {
@@ -835,6 +857,17 @@ export function javaMutationTestSelections(mutation) {
         "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
       ],
     ];
+  if (line >= 140 && line < 149)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+      ],
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+      ],
+    ];
   if (line < 157)
     return [
       [
@@ -878,7 +911,14 @@ export function javaMutationTestSelections(mutation) {
     return [
       [
         JAVA_MUTATION_TESTS[2],
-        "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+        "^(?:Java bridge enforces every top-level request identity and artifact bound|Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+      ],
+    ];
+  if (line >= 529 && line < 536)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
       ],
     ];
   if (line < 546)
@@ -888,11 +928,18 @@ export function javaMutationTestSelections(mutation) {
         "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
       ],
     ];
+  if (line >= 564 && line < 578)
+    return [
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^DSS distinguishes optional and malformed embedded KeyValue data$",
+      ],
+    ];
   if (line < 578)
     return [
       [
         JAVA_MUTATION_TESTS[1],
-        "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+        "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation|DSS distinguishes optional and malformed embedded KeyValue data)$",
       ],
     ];
   if (line < 618)
@@ -1124,12 +1171,7 @@ export async function executeJavaMutation(root, mutation, options = {}) {
     const tests = [];
     for (const [test, pattern] of selections) {
       tests.push(test);
-      const args = [
-        "--test",
-        "--test-concurrency=1",
-        "--test-isolation=none",
-        "--test-reporter=tap",
-      ];
+      const args = ["--test", "--test-concurrency=1", "--test-reporter=tap"];
       if (pattern) args.push(`--test-name-pattern=${pattern}`);
       args.push(test);
       const result = await runMutationTest(execPath, args, {
@@ -1223,6 +1265,7 @@ export async function executeOverallMutationCampaign(
     "tooling/assurance/p4-mutation-catalog.mjs",
     "tooling/assurance/P4JavaMutationCatalog.java",
     "tooling/assurance/p4-mutation-loader.mjs",
+    "tooling/assurance/p4-mutation-hooks.mjs",
     "tooling/assurance/p4-overall-mutation-campaign.mjs",
     ...plan.testFiles,
   ];
@@ -1257,7 +1300,7 @@ export async function executeOverallMutationCampaign(
       }),
     ),
   };
-  let completed = new Map();
+  const completed = new Map();
   try {
     const lines = (await readFile(journalPath, "utf8")).trim().split(/\r?\n/u);
     const header = JSON.parse(lines[0]);

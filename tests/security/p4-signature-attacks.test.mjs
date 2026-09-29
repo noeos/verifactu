@@ -303,6 +303,11 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "invalid",
       `${name}: ${JSON.stringify(result)}`,
     );
+    assert.equal(
+      result.cryptographic,
+      "not-evaluated",
+      `${name} must be rejected by profile validation before cryptography`,
+    );
   }
 
   const replaceInside = (xml, anchor, before, after) => {
@@ -318,6 +323,20 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
     return prefix + suffix.replace(before, after);
   };
   const structuralMutations = [
+    [
+      "wrong SignedInfo name with the child count preserved",
+      (xml) =>
+        xml
+          .replaceAll("<ds:SignedInfo>", "<ds:OtherSignedInfo>")
+          .replaceAll("</ds:SignedInfo>", "</ds:OtherSignedInfo>"),
+    ],
+    [
+      "wrong SignatureValue name with the child count preserved",
+      (xml) =>
+        xml
+          .replaceAll("<ds:SignatureValue>", "<ds:OtherSignatureValue>")
+          .replaceAll("</ds:SignatureValue>", "</ds:OtherSignatureValue>"),
+    ],
     [
       "signature value child name",
       (xml) => xml.replaceAll("SignatureValue", "OtherSignatureValue"),
@@ -647,6 +666,11 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "invalid",
       `${name}: ${JSON.stringify(result)}`,
     );
+    assert.equal(
+      result.cryptographic,
+      "not-evaluated",
+      `${name} must be rejected by profile validation before cryptography`,
+    );
   }
 });
 
@@ -708,7 +732,7 @@ test("DSS distinguishes optional and malformed embedded KeyValue data", async ()
       "malformed modulus encoding",
       source.replace(
         /<ds:Modulus>[\s\S]*?<\/ds:Modulus>/u,
-        "<ds:Modulus>!!!!</ds:Modulus>",
+        "<ds:Modulus>A===</ds:Modulus>",
       ),
     ],
     [
