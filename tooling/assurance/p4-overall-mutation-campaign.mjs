@@ -823,6 +823,10 @@ const JAVA_MUTATION_TESTS = [
   "tests/security/p4-resource-attacks.test.mjs",
 ];
 
+// The exact macOS P4-G run hit 19 false 90s timeouts in Java/XAdES integration
+// selections; keep the zero-timeout gate while allowing those probes to finish.
+export const DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS = 180_000;
+
 export function javaMutationTestSelections(mutation) {
   const line = mutation.line;
   if (line < 104)
@@ -1186,7 +1190,7 @@ export async function executeJavaMutation(root, mutation, options = {}) {
           VERIFACTU_DSS_JAR: classPath,
           VERIFACTU_JAVA_MUTATION: "0",
         },
-        timeoutMs: options.timeoutMs ?? 90_000,
+        timeoutMs: options.timeoutMs ?? DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS,
         maxBuffer: 16 * 1024 * 1024,
       });
       const failedRows = result.stdout

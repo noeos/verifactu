@@ -15,6 +15,7 @@ import {
   mutationTestPatterns,
   mutationCompileFailed,
   javaMutationTestSelections,
+  DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS,
 } from "../../tooling/assurance/p4-overall-mutation-campaign.mjs";
 import {
   initialize as initializeMutationHooks,
@@ -22,6 +23,8 @@ import {
 } from "../../tooling/assurance/p4-mutation-hooks.mjs";
 
 {
+  assert.equal(DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS, 180_000);
+
   assert.deepEqual(javaMutationTestSelections({ line: 120 }), [
     [
       "tests/security/p4-resource-attacks.test.mjs",
