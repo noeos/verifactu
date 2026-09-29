@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { inflateSync } from "node:zlib";
 import { decodeQR } from "qr/decode.js";
 import test from "node:test";
 import {
@@ -230,9 +231,7 @@ test("P4-E rejects cross-edition payloads, oversized fields and render bounds", 
   );
   assert.ok(svg.includes(`viewBox="0 0 ${viewSize} ${viewSize}"`));
   assert.ok(
-    svg.includes(
-      `<path fill="#fff" d="M0 0h${viewSize}v${viewSize}H0z"/>`,
-    ),
+    svg.includes(`<path fill="#fff" d="M0 0h${viewSize}v${viewSize}H0z"/>`),
   );
   assert.equal(decodeRenderedSvg(rendered.value, 4), payload.text);
 });
@@ -273,6 +272,10 @@ test("P4-E rejects forged record facts, unsupported QR lexicals and digest failu
     }).status,
     "invalid",
   );
+  assert.equal(
+    buildQrPayload(base, edition, null).diagnostics[0].code,
+    "DIAG-QR-DIGEST",
+  );
 });
 
 test("P4-E rejects malformed encoder ports, matrices and render option boundaries", () => {
@@ -283,6 +286,8 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
   ).value;
   const valid = { scale: 4, symbolSizeMm: 35, quietZoneMm: 2 };
   const invalidOptions = [
+    null,
+    undefined,
     { ...valid, scale: 0 },
     { ...valid, scale: 33 },
     { ...valid, scale: 1.5 },
@@ -294,6 +299,11 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
   for (const options of invalidOptions)
     assert.equal(
       renderQrSvg(payload, qrPort, options, digest).status,
+      "invalid",
+    );
+  for (const options of invalidOptions)
+    assert.equal(
+      renderQrPng(payload, qrPort, options, digest).status,
       "invalid",
     );
   const failingDigest = { providerId: "test:bad-digest", digest: () => "bad" };
@@ -329,6 +339,14 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
     renderQrPng(payload, null, valid, digest).diagnostics[0].code,
     "DIAG-QR-RENDER-INPUT",
   );
+  assert.equal(
+    renderQrSvg(null, qrPort, valid, digest).diagnostics[0].code,
+    "DIAG-QR-RENDER-INPUT",
+  );
+  assert.equal(
+    renderQrPng(null, qrPort, valid, digest).diagnostics[0].code,
+    "DIAG-QR-RENDER-INPUT",
+  );
   const ports = [
     {
       encode: () => {
@@ -336,6 +354,7 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
       },
     },
     { encode: () => ({ status: "unavailable" }) },
+    { encode: () => ({ status: "ok", value: null }) },
     { encode: () => ({ status: "ok", value: { size: 20, get: () => false } }) },
     {
       encode: () => ({ status: "ok", value: { size: 178, get: () => false } }),
@@ -375,13 +394,13 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
   };
   const maximumOptions = { scale: 32, symbolSizeMm: 40, quietZoneMm: 6 };
   assert.equal(
-    renderQrSvg(payload, oversizedMatrix, maximumOptions, digest)
-      .diagnostics[0].code,
+    renderQrSvg(payload, oversizedMatrix, maximumOptions, digest).diagnostics[0]
+      .code,
     "DIAG-QR-DIMENSION-LIMIT",
   );
   assert.equal(
-    renderQrPng(payload, oversizedMatrix, maximumOptions, digest)
-      .diagnostics[0].code,
+    renderQrPng(payload, oversizedMatrix, maximumOptions, digest).diagnostics[0]
+      .code,
     "DIAG-QR-DIMENSION-LIMIT",
   );
   const exactDimensionMatrix = {
@@ -515,5 +534,118 @@ test("P4-E deterministic PNG supports multi-block bounded rasters", () => {
     digest,
   );
   assert.equal(rendered.status, "ok");
-  assert.ok((rendered.value.width + 1) * rendered.value.height > 65_535);
+  const expectedRawLength = (rendered.value.width + 1) * rendered.value.height;
+  assert.ok(expectedRawLength > 65_535);
+  const png = rendered.value.bytes;
+  let offset = 8;
+  let imageData;
+  while (offset < png.length) {
+    const length = new DataView(png.buffer, png.byteOffset + offset).getUint32(
+      0,
+      false,
+    );
+    const name = Buffer.from(png.subarray(offset + 4, offset + 8)).toString(
+      "ascii",
+    );
+    if (name === "IDAT")
+      imageData = png.subarray(offset + 8, offset + 8 + length);
+    offset += length + 12;
+  }
+  assert.ok(imageData);
+  const raw = inflateSync(imageData);
+  assert.equal(raw.length, expectedRawLength);
+  for (let y = 0; y < rendered.value.height; y += 1)
+    assert.equal(raw[y * (rendered.value.width + 1)], 0);
+});
+
+test("P4-E PNG encodes exact raster pixels, physical density and chunk checksums", () => {
+  const payload = buildQrPayload(
+    record(),
+    { id: editionId, environment: "test", mode: "verifactu" },
+    digest,
+  ).value;
+  const matrix = {
+    encode: () => ({
+      status: "ok",
+      value: {
+        size: 21,
+        get: (x, y) => x === y && x % 2 === 0,
+      },
+    }),
+  };
+  const rendered = renderQrPng(
+    payload,
+    matrix,
+    { scale: 2, symbolSizeMm: 35, quietZoneMm: 2 },
+    digest,
+  );
+  assert.equal(rendered.status, "ok");
+
+  const bytes = rendered.value.bytes;
+  assert.deepEqual(
+    [...bytes.subarray(0, 8)],
+    [137, 80, 78, 71, 13, 10, 26, 10],
+  );
+  const chunks = [];
+  let offset = 8;
+  while (offset < bytes.length) {
+    const view = new DataView(bytes.buffer, bytes.byteOffset + offset);
+    const length = view.getUint32(0, false);
+    const name = Buffer.from(bytes.subarray(offset + 4, offset + 8)).toString(
+      "ascii",
+    );
+    const data = bytes.subarray(offset + 8, offset + 8 + length);
+    chunks.push({ name, data, crc: view.getUint32(8 + length, false) });
+    offset += length + 12;
+  }
+  assert.deepEqual(
+    chunks.map(({ name }) => name),
+    ["IHDR", "pHYs", "IDAT", "IEND"],
+  );
+
+  const crc32 = (input) => {
+    let crc = 0xffff_ffff;
+    for (const byte of input) {
+      crc ^= byte;
+      for (let bit = 0; bit < 8; bit += 1)
+        crc = (crc >>> 1) ^ ((crc & 1) === 1 ? 0xedb8_8320 : 0);
+    }
+    return (crc ^ 0xffff_ffff) >>> 0;
+  };
+  for (const { name, data, crc } of chunks) {
+    const nameBytes = Buffer.from(name, "ascii");
+    const crcInput = new Uint8Array(nameBytes.length + data.length);
+    crcInput.set(nameBytes);
+    crcInput.set(data, nameBytes.length);
+    assert.equal(crc32(crcInput), crc, `${name} CRC`);
+  }
+
+  const header = chunks[0].data;
+  const headerView = new DataView(header.buffer, header.byteOffset);
+  assert.equal(headerView.getUint32(0, false), 50);
+  assert.equal(headerView.getUint32(4, false), 50);
+  assert.deepEqual([...header.subarray(8)], [8, 0, 0, 0, 0]);
+  const physical = chunks[1].data;
+  const physicalView = new DataView(physical.buffer, physical.byteOffset);
+  assert.equal(physicalView.getUint32(0, false), 1200);
+  assert.equal(physicalView.getUint32(4, false), 1200);
+  assert.equal(physical[8], 1);
+
+  const actualRaster = inflateSync(chunks[2].data);
+  const expectedRaster = new Uint8Array(51 * 50);
+  for (let y = 0; y < 50; y += 1) {
+    expectedRaster[y * 51] = 0;
+    for (let x = 0; x < 50; x += 1) {
+      const moduleCoordinate = Math.floor(x / 2) - 2;
+      const moduleRow = Math.floor(y / 2) - 2;
+      expectedRaster[y * 51 + x + 1] =
+        moduleCoordinate === moduleRow &&
+        moduleRow >= 0 &&
+        moduleRow < 21 &&
+        moduleRow % 2 === 0
+          ? 0
+          : 255;
+    }
+  }
+  assert.deepEqual([...actualRaster], [...expectedRaster]);
 });

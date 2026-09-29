@@ -98,6 +98,7 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
     editionId: f.context.editionId,
   };
   assert.equal(createAnulacionRecord(cancel).status, "ok");
+  assert.equal(createAnulacionRecord(null).status, "invalid");
   assert.equal(
     createAnulacionRecord({ ...cancel, cause: "x".repeat(256) }).status,
     "ok",
@@ -108,6 +109,10 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
   );
   assert.equal(
     createAnulacionRecord({ ...cancel, cause: "" }).status,
+    "invalid",
+  );
+  assert.equal(
+    createAnulacionRecord({ ...cancel, cause: null }).status,
     "invalid",
   );
   assert.equal(
@@ -130,6 +135,7 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
 
 test("alta construction rejects mismatched kinds, dates, totals and chain self-links", () => {
   const f = fixture();
+  assert.equal(createAltaRecord(null).status, "invalid");
   const record = {
     kind: "alta",
     id: f.get("record", "r1"),
@@ -163,6 +169,124 @@ test("alta construction rejects mismatched kinds, dates, totals and chain self-l
   ];
   for (const input of invalidInputs)
     assert.equal(createAltaRecord(input).status, "invalid");
+});
+
+test("record constructors reject combinations of simultaneous contract faults", () => {
+  const f = fixture();
+  const alta = {
+    kind: "alta",
+    id: f.get("record", "r1"),
+    context: f.context,
+    document: f.doc,
+    issueDate: createFiscalDate("2025-01-01").value,
+    generatedAt: f.at,
+    total: createDecimal("12.50", { maxIntegerDigits: 8, maxScale: 2 }).value,
+    predecessorId: null,
+    editionId: f.context.editionId,
+  };
+  const altaFaults = [
+    ["kind", (record) => ({ ...record, kind: "anulacion" })],
+    ["id", (record) => ({ ...record, id: null })],
+    ["context", (record) => ({ ...record, context: null })],
+    ["document", (record) => ({ ...record, document: null })],
+    ["total", (record) => ({ ...record, total: null })],
+    ["generatedAt", (record) => ({ ...record, generatedAt: null })],
+    ["editionId", (record) => ({ ...record, editionId: null })],
+    ["id kind", (record) => ({ ...record, id: f.get("tenant", "wrong") })],
+    [
+      "edition kind",
+      (record) => ({ ...record, editionId: f.get("record", "wrong") }),
+    ],
+    ["issueDate", (record) => ({ ...record, issueDate: f.at })],
+    ["self predecessor", (record) => ({ ...record, predecessorId: record.id })],
+    [
+      "context edition",
+      (record) => ({
+        ...record,
+        context: { ...record.context, editionId: f.get("edition", "other") },
+      }),
+    ],
+    [
+      "document issuer",
+      (record) => ({
+        ...record,
+        document: { ...record.document, issuer: f.get("taxpayer", "other") },
+      }),
+    ],
+  ];
+  for (const [name, fault] of altaFaults)
+    assert.equal(
+      createAltaRecord(fault(alta)).status,
+      "invalid",
+      `alta rejects ${name}`,
+    );
+  for (let left = 0; left < altaFaults.length; left++)
+    for (let right = left + 1; right < altaFaults.length; right++) {
+      const [leftName, leftFault] = altaFaults[left];
+      const [rightName, rightFault] = altaFaults[right];
+      assert.equal(
+        createAltaRecord(rightFault(leftFault(alta))).status,
+        "invalid",
+        `alta rejects ${leftName} with ${rightName}`,
+      );
+    }
+
+  const anulacion = {
+    kind: "anulacion",
+    id: f.get("record", "r2"),
+    context: f.context,
+    target: f.doc,
+    cause: "duplicate",
+    generatedAt: f.at,
+    predecessorId: null,
+    editionId: f.context.editionId,
+  };
+  const anulacionFaults = [
+    ["kind", (record) => ({ ...record, kind: "alta" })],
+    ["id", (record) => ({ ...record, id: null })],
+    ["context", (record) => ({ ...record, context: null })],
+    ["target", (record) => ({ ...record, target: null })],
+    ["empty cause", (record) => ({ ...record, cause: "" })],
+    ["long cause", (record) => ({ ...record, cause: "x".repeat(257) })],
+    ["generatedAt", (record) => ({ ...record, generatedAt: null })],
+    ["editionId", (record) => ({ ...record, editionId: null })],
+    ["id kind", (record) => ({ ...record, id: f.get("tenant", "wrong") })],
+    [
+      "edition kind",
+      (record) => ({ ...record, editionId: f.get("record", "wrong") }),
+    ],
+    ["self predecessor", (record) => ({ ...record, predecessorId: record.id })],
+    [
+      "context edition",
+      (record) => ({
+        ...record,
+        context: { ...record.context, editionId: f.get("edition", "other") },
+      }),
+    ],
+    [
+      "target issuer",
+      (record) => ({
+        ...record,
+        target: { ...record.target, issuer: f.get("taxpayer", "other") },
+      }),
+    ],
+  ];
+  for (const [name, fault] of anulacionFaults)
+    assert.equal(
+      createAnulacionRecord(fault(anulacion)).status,
+      "invalid",
+      `anulacion rejects ${name}`,
+    );
+  for (let left = 0; left < anulacionFaults.length; left++)
+    for (let right = left + 1; right < anulacionFaults.length; right++) {
+      const [leftName, leftFault] = anulacionFaults[left];
+      const [rightName, rightFault] = anulacionFaults[right];
+      assert.equal(
+        createAnulacionRecord(rightFault(leftFault(anulacion))).status,
+        "invalid",
+        `anulacion rejects ${leftName} with ${rightName}`,
+      );
+    }
 });
 
 test("correction and substitution append immutable history and reject self-links/cycles", () => {
@@ -266,10 +390,13 @@ test("correction and substitution append immutable history and reject self-links
   );
   const atLimit = [...belowLimit, nextRelation];
   assert.equal(
-    addCorrection({ relations: atLimit }, {
-      ...nextRelation,
-      source: { ...second, number: "limit-after-next" },
-    }).status,
+    addCorrection(
+      { relations: atLimit },
+      {
+        ...nextRelation,
+        source: { ...second, number: "limit-after-next" },
+      },
+    ).status,
     "invalid",
     "a graph already containing 100,000 relations rejects another",
   );

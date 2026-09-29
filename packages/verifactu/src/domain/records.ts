@@ -52,26 +52,24 @@ function isValidDecimal(value: Decimal): boolean {
 }
 
 export function createAltaRecord(input: AltaRecord): Result<AltaRecord> {
+  if (!input || typeof input !== "object")
+    return invalid("DIAG-ALTA-REQUIRED", "domain");
   const context = input.context ? createFiscalContext(input.context) : null;
   const document = input.document
     ? createFiscalDocumentIdentity(input.document)
     : null;
   if (
     input.kind !== "alta" ||
-    !input.id ||
-    !input.context ||
-    !input.document ||
-    !input.total ||
-    !input.generatedAt ||
-    !input.editionId ||
     !isIdentity(input.id, "record") ||
     !isIdentity(input.editionId, "edition") ||
     (input.predecessorId !== null &&
       !isIdentity(input.predecessorId, "record")) ||
     context?.status !== "ok" ||
     document?.status !== "ok" ||
+    typeof input.issueDate !== "string" ||
     createFiscalDate(input.issueDate).status !== "ok" ||
     input.issueDate !== input.document.issueDate ||
+    typeof input.generatedAt !== "string" ||
     createFiscalInstant(input.generatedAt).status !== "ok" ||
     !isValidDecimal(input.total) ||
     (input.predecessorId !== null &&
@@ -92,19 +90,17 @@ export function createAltaRecord(input: AltaRecord): Result<AltaRecord> {
 export function createAnulacionRecord(
   input: AnulacionRecord,
 ): Result<AnulacionRecord> {
+  if (!input || typeof input !== "object")
+    return invalid("DIAG-ANULACION-REQUIRED", "domain");
   const context = input.context ? createFiscalContext(input.context) : null;
   const target = input.target
     ? createFiscalDocumentIdentity(input.target)
     : null;
   if (
     input.kind !== "anulacion" ||
-    !input.id ||
-    !input.context ||
-    !input.target ||
-    !input.cause ||
+    typeof input.cause !== "string" ||
+    input.cause.length === 0 ||
     input.cause.length > 256 ||
-    !input.generatedAt ||
-    !input.editionId ||
     !isIdentity(input.id, "record") ||
     !isIdentity(input.editionId, "edition") ||
     (input.predecessorId !== null &&
@@ -113,6 +109,7 @@ export function createAnulacionRecord(
       sameIdentity(input.id, input.predecessorId)) ||
     context?.status !== "ok" ||
     target?.status !== "ok" ||
+    typeof input.generatedAt !== "string" ||
     createFiscalInstant(input.generatedAt).status !== "ok" ||
     !sameIdentity(input.context.editionId, input.editionId) ||
     !sameIdentity(input.target.issuer, input.context.taxpayerId)

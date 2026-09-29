@@ -77,7 +77,7 @@ import {
   assert.deepEqual(
     patterns(qr, 250, "tests/contract/p4-qr-provider.test.mjs"),
     [
-      "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries)$",
+      "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
     ],
   );
   assert.deepEqual(
@@ -89,7 +89,7 @@ import {
   assert.deepEqual(
     patterns(qr, 320, "tests/contract/p4-qr-provider.test.mjs"),
     [
-      "^P4-E rejects malformed encoder ports, matrices and render option boundaries$",
+      "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
     ],
   );
   assert.deepEqual(

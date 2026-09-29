@@ -60,22 +60,10 @@ function buildQrPayloadInternal(
   digestProvider: DigestPort,
 ): Result<QrPayload> {
   if (
-    !record ||
-    typeof record !== "object" ||
-    record.kind !== "alta" ||
-    !record.editionId ||
-    !record.context?.editionId ||
-    !record.document?.issuer ||
-    !record.total ||
-    !record.issueDate ||
-    !record.generatedAt ||
     !edition ||
     edition.id !== EDITION ||
-    !digestProvider ||
     (edition.environment !== "test" && edition.environment !== "production") ||
-    (edition.mode !== "verifactu" && edition.mode !== "non-verifactu") ||
-    record.editionId.value !== EDITION ||
-    record.context.editionId.value !== EDITION
+    (edition.mode !== "verifactu" && edition.mode !== "non-verifactu")
   )
     return invalid("DIAG-QR-EDITION-RECORD", "edition");
   let facts: AltaRecord;
@@ -87,6 +75,8 @@ function buildQrPayloadInternal(
   } catch {
     return invalid("DIAG-QR-EDITION-RECORD", "edition");
   }
+  if (facts.editionId.value !== EDITION)
+    return invalid("DIAG-QR-EDITION-RECORD", "edition");
   if (
     facts.document.issuer.value.length !== 9 ||
     !isPrintableAscii(facts.document.issuer.value)
@@ -193,7 +183,7 @@ export function createQrEncoderPort(): QrEncoderPort {
 }
 
 function encodeMatrix(qr: QrEncoderPort, bytes: Uint8Array): QrMatrix | null {
-  if (!qr || typeof qr.encode !== "function") return null;
+  if (typeof qr.encode !== "function") return null;
   let encoded: Result<QrMatrix>;
   try {
     encoded = qr.encode(bytes.slice(), "M");
@@ -219,8 +209,7 @@ export function renderQrSvg(
   options: QrRenderOptions,
   digestProvider: DigestPort,
 ): Result<QrArtifact> {
-  const canonical =
-    payload && typeof payload === "object" ? payloads.get(payload) : undefined;
+  const canonical = payloads.get(payload);
   if (
     !canonical ||
     !qr ||
@@ -352,8 +341,7 @@ export function renderQrPng(
   options: QrRenderOptions,
   digestProvider: DigestPort,
 ): Result<QrArtifact> {
-  const canonical =
-    payload && typeof payload === "object" ? payloads.get(payload) : undefined;
+  const canonical = payloads.get(payload);
   if (
     !canonical ||
     !qr ||

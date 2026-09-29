@@ -600,12 +600,12 @@ export function mutationTestPatterns(mutation, test, options = {}) {
     if (mutation.line < 290)
       return [{
         pattern:
-          "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries)$",
+          "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
         timeoutMs: normalTimeout,
       }];
     return [{
       pattern:
-        "^P4-E rejects malformed encoder ports, matrices and render option boundaries$",
+        "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
       timeoutMs: normalTimeout,
     }];
   }

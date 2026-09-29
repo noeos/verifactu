@@ -291,12 +291,106 @@ test("XML model accounts for serialized bytes in every node class", () => {
     {
       root: element({
         attributes: [{ name: name("a"), value: attributeBytes }],
-        children: [{ kind: "processing-instruction", target: "p", data: commentBytes }],
+        children: [
+          { kind: "processing-instruction", target: "p", data: commentBytes },
+        ],
       }),
     },
   ];
   for (const document of overLimitDocuments)
     assert.equal(defineXmlDocument(document).status, "invalid");
+});
+
+test("XML model rejects exact one-byte serialized overflows in each markup class", () => {
+  const limit = XML_LIMITS.maximumXmlBytes;
+  const declaration = '<?xml version="1.0" encoding="UTF-8"?>';
+  const encoder = new TextEncoder();
+  const element = (overrides = {}) => ({
+    kind: "element",
+    name: name("r"),
+    namespaces: [],
+    attributes: [],
+    children: [],
+    ...overrides,
+  });
+  const makeDocument = (root) => ({ root });
+  const exact = (value) => encoder.encode(value).byteLength;
+
+  const textBase = exact(`${declaration}<r></r>`);
+  const textCharacters = (limit + 1 - textBase) / 5;
+  assert.equal(Number.isInteger(textCharacters), true);
+  assert.equal(
+    exact(`${declaration}<r>${"&amp;".repeat(textCharacters)}</r>`),
+    limit + 1,
+  );
+  assert.equal(
+    defineXmlDocument(
+      makeDocument(element({ children: [leaf("&".repeat(textCharacters))] })),
+    ).status,
+    "invalid",
+  );
+
+  const attributeBase = exact(`${declaration}<r a=""/>`);
+  const attributeCharacters = (limit + 1 - attributeBase) / 6;
+  assert.equal(Number.isInteger(attributeCharacters), true);
+  assert.equal(
+    exact(`${declaration}<r a="${"&quot;".repeat(attributeCharacters)}"/>`),
+    limit + 1,
+  );
+  assert.equal(
+    defineXmlDocument(
+      makeDocument(
+        element({
+          attributes: [
+            { name: name("a"), value: '"'.repeat(attributeCharacters) },
+          ],
+        }),
+      ),
+    ).status,
+    "invalid",
+  );
+
+  const instructionBase = exact(`${declaration}<r><??></r>`);
+  const instructionTargetLength = limit + 1 - instructionBase;
+  const instructionTarget = "t".repeat(instructionTargetLength);
+  assert.equal(
+    exact(`${declaration}<r><?${instructionTarget}?></r>`),
+    limit + 1,
+  );
+  assert.equal(
+    defineXmlDocument(
+      makeDocument(
+        element({
+          children: [
+            {
+              kind: "processing-instruction",
+              target: instructionTarget,
+              data: "",
+            },
+          ],
+        }),
+      ),
+    ).status,
+    "invalid",
+  );
+
+  const namespaceBase = exact(`${declaration}<p:r xmlns:p=""/>`);
+  const namespaceUri = "n".repeat(limit + 1 - namespaceBase);
+  assert.equal(
+    exact(`${declaration}<p:r xmlns:p="${namespaceUri}"/>`),
+    limit + 1,
+  );
+  assert.equal(
+    defineXmlDocument(
+      makeDocument(
+        element({
+          name: name("r", namespaceUri, "p"),
+          namespaces: [{ prefix: "p", namespaceUri }],
+        }),
+      ),
+    ).status,
+    "invalid",
+  );
 });
 
 test("XML model fails closed across namespace, attribute, node, and text boundaries", () => {
