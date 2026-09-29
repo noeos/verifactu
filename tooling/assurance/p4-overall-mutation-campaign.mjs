@@ -597,7 +597,7 @@ export async function executeNodeMutation(root, mutation, options = {}) {
     const runSelection = async (test, pattern, timeoutMs) => {
       const args = [
         "--import",
-        loader,
+        pathToFileURL(loader).href,
         "--test",
         "--test-concurrency=1",
         "--test-reporter=tap",
