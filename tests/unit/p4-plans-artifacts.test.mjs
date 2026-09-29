@@ -332,7 +332,21 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   );
   assert.equal(
     serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\udfff" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
       [{ name: "A", order: 0, presence: "value", value: "😀" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\udbff\udfff" }],
       { ...rule, fields: ["A"] },
     ).status,
     "ok",
@@ -358,6 +372,26 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   assert.equal(
     serializeOfficialProjection(projected, { ...rule, separator: "0123456789" })
       .status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(projected, { ...rule, separator: "12345678" })
+      .status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(projected, { ...rule, separator: "123456789" })
+      .status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [
+        { name: "A", order: 0, presence: "empty", value: "" },
+        { name: "A", order: 1, presence: "empty", value: "" },
+      ],
+      { ...rule, fields: ["A", "A"] },
+    ).status,
     "invalid",
   );
   assert.equal(
@@ -710,6 +744,8 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     { ...validInput, bytes: "not-bytes" },
     { ...validInput, parentIds: null },
     { ...validInput, parentIds: [""] },
+    { ...validInput, parentIds: [42] },
+    { ...validInput, parentIds: [null] },
     { ...validInput, transform: "" },
   ]) {
     assert.equal(createXmlArtifact(malformed, digest).status, "invalid");
@@ -717,6 +753,16 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
   assert.equal(
     createXmlArtifact(validInput, { providerId: "bad", digest: () => "bad" })
       .status,
+    "invalid",
+  );
+  assert.equal(
+    createXmlArtifact(validInput, {
+      providerId: "test:sha512-failure",
+      digest: (algorithm, bytes) =>
+        algorithm === "sha512"
+          ? "invalid"
+          : createHash("sha256").update(bytes).digest("hex"),
+    }).status,
     "invalid",
   );
   assert.equal(
