@@ -615,6 +615,17 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     digest,
   );
   assert.equal(artifact.status, "ok");
+  const validInput = {
+    artifactId: "artifact-2",
+    context,
+    editionId,
+    kind: "xml",
+    mediaType: "application/xml",
+    bytes: new TextEncoder().encode("<record/>").slice(),
+    parentIds: [],
+    transform: "serialize",
+    state: "produced",
+  };
   source[0] = 0;
   assert.equal(new TextDecoder().decode(artifact.value.bytes), "<record/>");
   const exposed = artifact.value.bytes;
@@ -705,6 +716,23 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
   assert.equal(
     createXmlArtifact(
       {
+        artifactId: "x".repeat(256),
+        context,
+        editionId,
+        kind: "xml",
+        mediaType: "application/xml",
+        bytes: artifact.value.bytes,
+        parentIds: [],
+        transform: "copy",
+        state: "produced",
+      },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
         artifactId: "bad",
         context,
         editionId,
@@ -718,6 +746,39 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
       digest,
     ).status,
     "invalid",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
+        ...validInput,
+        artifactId: "artifact-max-bytes",
+        bytes: new Uint8Array(8 * 1024 * 1024),
+      },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
+        ...validInput,
+        artifactId: "artifact-first-product-boundary",
+        bytes: new Uint8Array(1024 * 1024 + 8 + 1),
+      },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
+        ...validInput,
+        artifactId: "artifact-second-product-boundary",
+        bytes: new Uint8Array(8 * 1024 + 1024 + 1),
+      },
+      digest,
+    ).status,
+    "ok",
   );
   assert.equal(
     createXmlArtifact(
@@ -753,17 +814,6 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     ).status,
     "invalid",
   );
-  const validInput = {
-    artifactId: "artifact-2",
-    context,
-    editionId,
-    kind: "xml",
-    mediaType: "application/xml",
-    bytes: new TextEncoder().encode("<record/>").slice(),
-    parentIds: [],
-    transform: "serialize",
-    state: "produced",
-  };
   const constantDigest = {
     providerId: "test:constant-digest",
     digest: (algorithm) => "a".repeat(algorithm === "sha256" ? 64 : 128),
@@ -782,6 +832,23 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     ).status,
     "invalid",
   );
+  for (const mismatchedAlgorithm of ["sha256", "sha512"]) {
+    assert.equal(
+      transitionXmlArtifact(
+        bounded.value,
+        "validated",
+        bounded.value.bytes,
+        {
+          providerId: `test:mismatched-${mismatchedAlgorithm}`,
+          digest: (algorithm, bytes) =>
+            algorithm === mismatchedAlgorithm
+              ? "f".repeat(algorithm === "sha256" ? 64 : 128)
+              : createHash(algorithm).update(bytes).digest("hex"),
+        },
+      ).status,
+      "invalid",
+    );
+  }
   for (const malformed of [
     null,
     { ...validInput, artifactId: "" },
