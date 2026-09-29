@@ -251,6 +251,12 @@ test("official projection preserves absence, empty, zero, nil and declared field
       { name: "NilValue", presence: "nil", value: null },
     ],
   );
+  const firstField = projectOfficialFields([
+    { name: "First", order: 0, value: { presence: "empty" } },
+  ]);
+  assert.equal(firstField.status, "ok");
+  assert.equal(firstField.value[0].order, 0);
+  assert.equal(projectOfficialFields([null]).status, "invalid");
   assert.equal(
     projectOfficialFields([
       { name: "Optional", order: 0, value: { presence: "absent" } },
@@ -485,8 +491,20 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   );
 });
 test("fingerprint recomputes only supported edition-bound digest", () => {
+  assert.equal(createFingerprint(null).status, "invalid");
   const projected = projectOfficialFields(fields).value.filter((field) =>
     rule.fields.includes(field.name),
+  );
+  assert.equal(
+    createFingerprint({
+      editionId: id("tenant", editionId.value),
+      expectedEditionId: editionId,
+      algorithm: "sha256",
+      fields: projected,
+      rule,
+      digest,
+    }).status,
+    "invalid",
   );
   const result = createFingerprint({
     editionId,
@@ -842,18 +860,13 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
   );
   for (const mismatchedAlgorithm of ["sha256", "sha512"]) {
     assert.equal(
-      transitionXmlArtifact(
-        bounded.value,
-        "validated",
-        bounded.value.bytes,
-        {
-          providerId: `test:mismatched-${mismatchedAlgorithm}`,
-          digest: (algorithm, bytes) =>
-            algorithm === mismatchedAlgorithm
-              ? "f".repeat(algorithm === "sha256" ? 64 : 128)
-              : createHash(algorithm).update(bytes).digest("hex"),
-        },
-      ).status,
+      transitionXmlArtifact(bounded.value, "validated", bounded.value.bytes, {
+        providerId: `test:mismatched-${mismatchedAlgorithm}`,
+        digest: (algorithm, bytes) =>
+          algorithm === mismatchedAlgorithm
+            ? "f".repeat(algorithm === "sha256" ? 64 : 128)
+            : createHash(algorithm).update(bytes).digest("hex"),
+      }).status,
       "invalid",
     );
   }
