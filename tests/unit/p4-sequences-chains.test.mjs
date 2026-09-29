@@ -64,6 +64,29 @@ test("billing sequence rejects duplicate, gap and wrong-scope predecessor", () =
   );
 });
 
+test("billing sequence rejects malformed record data and foreign context", () => {
+  const f = fixture();
+  const valid = {
+    id: f.id("record", "r1"),
+    context: f.context,
+    occurredAt: "2025-01-01T00:00:00Z",
+    predecessorId: null,
+  };
+  const sequence = { context: f.context, records: [] };
+  for (const item of [
+    { ...valid, id: f.id("tenant", "wrong-kind") },
+    { ...valid, occurredAt: "not-an-instant" },
+    {
+      ...valid,
+      context: {
+        ...f.context,
+        tenantId: f.id("tenant", "foreign-tenant"),
+      },
+    },
+  ])
+    assert.equal(appendSequence(sequence, item).status, "invalid");
+});
+
 test("chain link keeps predecessor and current digest distinct and verifies scope", () => {
   const f = fixture();
   const id = f.id("record", "r1");
