@@ -183,6 +183,11 @@ test("regulated events are append-only and separate from billing chain sequencin
   const sequence = { context: x.context, events: [] };
   assert.equal(appendEvent(sequence, event).status, "ok");
   assert.equal(
+    appendEvent(sequence, { ...event, id: x.id("tenant", "wrong-kind") })
+      .status,
+    "invalid",
+  );
+  assert.equal(
     appendEvent(sequence, { ...event, previousEventId: event.id }).status,
     "invalid",
   );
@@ -195,6 +200,11 @@ test("regulated events are append-only and separate from billing chain sequencin
     previousEventId: event.id,
   };
   assert.equal(appendEvent(first, second).status, "ok");
+  assert.equal(
+    appendEvent(first, { ...second, occurredAt: event.occurredAt }).status,
+    "ok",
+    "event timestamps may be equal while remaining nondecreasing",
+  );
   assert.equal(
     appendEvent(first, { ...second, occurredAt: "2024-12-31T00:00:00Z" })
       .status,
