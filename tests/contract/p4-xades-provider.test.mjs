@@ -327,7 +327,9 @@ test("verification enforces exact artifact, certificate, evidence, and time boun
     crlEvidence: [new Uint8Array([2])],
   });
   assert.equal(excessiveCertificates.status, "defect");
-  assert.deepEqual(excessiveCertificates.diagnostics, ["DIAG-XADES-CERTIFICATE"]);
+  assert.deepEqual(excessiveCertificates.diagnostics, [
+    "DIAG-XADES-CERTIFICATE",
+  ]);
   assert.equal(bridgeCalls, 3);
 
   const maximumCertificateBytes = new Uint8Array(
@@ -348,7 +350,9 @@ test("verification enforces exact artifact, certificate, evidence, and time boun
     crlEvidence: [new Uint8Array([2])],
   });
   assert.equal(excessiveCertificateBytes.status, "defect");
-  assert.deepEqual(excessiveCertificateBytes.diagnostics, ["DIAG-XADES-CERTIFICATE"]);
+  assert.deepEqual(excessiveCertificateBytes.diagnostics, [
+    "DIAG-XADES-CERTIFICATE",
+  ]);
   assert.equal(bridgeCalls, 4);
 
   const artifactBytes = new Uint8Array([1]);
@@ -356,7 +360,9 @@ test("verification enforces exact artifact, certificate, evidence, and time boun
   const firstEvidenceBytes = 1;
   const exactCombinedEvidence = await verify({
     artifactBytes,
-    artifactDigestSha256: createHash("sha256").update(artifactBytes).digest("hex"),
+    artifactDigestSha256: createHash("sha256")
+      .update(artifactBytes)
+      .digest("hex"),
     trustAnchorsDer: [new Uint8Array(firstEvidenceBytes)],
     crlEvidence: [new Uint8Array(exactEvidenceBytes - firstEvidenceBytes)],
   });
@@ -364,12 +370,16 @@ test("verification enforces exact artifact, certificate, evidence, and time boun
   assert.equal(bridgeCalls, 5);
   const excessiveCombinedEvidence = await verify({
     artifactBytes,
-    artifactDigestSha256: createHash("sha256").update(artifactBytes).digest("hex"),
+    artifactDigestSha256: createHash("sha256")
+      .update(artifactBytes)
+      .digest("hex"),
     trustAnchorsDer: [new Uint8Array(firstEvidenceBytes)],
     crlEvidence: [new Uint8Array(exactEvidenceBytes - firstEvidenceBytes + 1)],
   });
   assert.equal(excessiveCombinedEvidence.status, "defect");
-  assert.deepEqual(excessiveCombinedEvidence.diagnostics, ["DIAG-XADES-EVIDENCE"]);
+  assert.deepEqual(excessiveCombinedEvidence.diagnostics, [
+    "DIAG-XADES-EVIDENCE",
+  ]);
   assert.equal(bridgeCalls, 5);
 
   let signBridgeCalls = 0;
@@ -411,14 +421,14 @@ test("verification enforces exact artifact, certificate, evidence, and time boun
   assert.equal(signBridgeCalls, 3);
   const tooLargeSignerCertificate = await sign({
     keyHandle: "key",
-    certificateDer: new Uint8Array(
-      XADES_LIMITS.maximumCertificateBytes + 1,
-    ),
+    certificateDer: new Uint8Array(XADES_LIMITS.maximumCertificateBytes + 1),
     certificateChainDer: [],
     sign: async () => new Uint8Array(256),
   });
   assert.equal(tooLargeSignerCertificate.status, "invalid");
-  assert.deepEqual(tooLargeSignerCertificate.diagnostics, ["DIAG-XADES-CERTIFICATE"]);
+  assert.deepEqual(tooLargeSignerCertificate.diagnostics, [
+    "DIAG-XADES-CERTIFICATE",
+  ]);
   assert.equal(signBridgeCalls, 3);
   const exactChainCount = await sign({
     keyHandle: "key",
@@ -459,7 +469,10 @@ test("signer shape failures keep their diagnosis and never reach the bridge", as
     [{ ...valid, signer: undefined }, "DIAG-XADES-REQUEST"],
     [{ ...valid, signer: null }, "DIAG-XADES-REQUEST"],
     [{ ...valid, signer: { ...signer, sign: null } }, "DIAG-XADES-SIGNER"],
-    [{ ...valid, signer: { ...signer, certificateDer: "not DER bytes" } }, "DIAG-XADES-SIGNER"],
+    [
+      { ...valid, signer: { ...signer, certificateDer: "not DER bytes" } },
+      "DIAG-XADES-SIGNER",
+    ],
     [
       {
         ...valid,
@@ -475,59 +488,63 @@ test("signer shape failures keep their diagnosis and never reach the bridge", as
   }
 });
 
-test("opaque signer callback cannot hold the provider past its explicit deadline", { timeout: 3_000 }, async () => {
-  const provider = createXadesProvider({
-    execute: async (request) => ({
-      kind: "TBS",
-      diagnostic: "NONE",
-      payload: new Uint8Array([9]),
-    }),
-  });
-  const request = {
-    ...valid,
-    signer: {
-      keyHandle: "test-provider:key-1",
-      certificateDer: new Uint8Array([3]),
-      certificateChainDer: [],
-      sign: () => new Promise(() => {}),
-    },
-  };
-  const result = await provider.sign(request, { deadlineMs: 25 });
-  assert.equal(result.status, "limit");
-  assert.equal(result.diagnostics[0], "DIAG-XADES-DEADLINE");
-
-  const slowSignerProvider = createXadesProvider({
-    execute: async (bridgeRequest) =>
-      bridgeRequest.command === "SIGN_PREPARE"
-        ? {
-            kind: "TBS",
-            diagnostic: "NONE",
-            payload: new Uint8Array([9]),
-          }
-        : {
-            kind: "UNAVAILABLE",
-            diagnostic: "NONE",
-            payload: new Uint8Array(),
-          },
-  });
-  const slowResult = await slowSignerProvider.sign(
-    {
+test(
+  "opaque signer callback cannot hold the provider past its explicit deadline",
+  { timeout: 3_000 },
+  async () => {
+    const provider = createXadesProvider({
+      execute: async (request) => ({
+        kind: "TBS",
+        diagnostic: "NONE",
+        payload: new Uint8Array([9]),
+      }),
+    });
+    const request = {
       ...valid,
       signer: {
-        keyHandle: "test-provider:slow-key",
+        keyHandle: "test-provider:key-1",
         certificateDer: new Uint8Array([3]),
         certificateChainDer: [],
-        sign: () => {
-          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
-          return new Uint8Array(256);
+        sign: () => new Promise(() => {}),
+      },
+    };
+    const result = await provider.sign(request, { deadlineMs: 25 });
+    assert.equal(result.status, "limit");
+    assert.equal(result.diagnostics[0], "DIAG-XADES-DEADLINE");
+
+    const slowSignerProvider = createXadesProvider({
+      execute: async (bridgeRequest) =>
+        bridgeRequest.command === "SIGN_PREPARE"
+          ? {
+              kind: "TBS",
+              diagnostic: "NONE",
+              payload: new Uint8Array([9]),
+            }
+          : {
+              kind: "UNAVAILABLE",
+              diagnostic: "NONE",
+              payload: new Uint8Array(),
+            },
+    });
+    const slowResult = await slowSignerProvider.sign(
+      {
+        ...valid,
+        signer: {
+          keyHandle: "test-provider:slow-key",
+          certificateDer: new Uint8Array([3]),
+          certificateChainDer: [],
+          sign: () => {
+            Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+            return new Uint8Array(256);
+          },
         },
       },
-    },
-    { deadlineMs: 20 },
-  );
-  assert.equal(slowResult.status, "limit");
-  assert.equal(slowResult.diagnostics[0], "DIAG-XADES-DEADLINE");
-});
+      { deadlineMs: 20 },
+    );
+    assert.equal(slowResult.status, "limit");
+    assert.equal(slowResult.diagnostics[0], "DIAG-XADES-DEADLINE");
+  },
+);
 
 test("signing accepts only bounded prepared, completed, and self-verified output", async () => {
   const signedBytes = new TextEncoder().encode("<signed/>");
@@ -831,7 +848,11 @@ test("signing treats a callback failure at the operation deadline as a limit", a
     execute: async (bridgeRequest) =>
       bridgeRequest.command === "SIGN_PREPARE"
         ? { kind: "TBS", diagnostic: "NONE", payload: new Uint8Array([9]) }
-        : { kind: "DEFECT", diagnostic: "DIAG-XADES-PROVIDER", payload: new Uint8Array() },
+        : {
+            kind: "DEFECT",
+            diagnostic: "DIAG-XADES-PROVIDER",
+            payload: new Uint8Array(),
+          },
   });
   const signer = {
     keyHandle: "provider-test:key",
@@ -1043,6 +1064,10 @@ test("application signs only eligible artifacts and releases verified exact byte
       return { status: "signed", bytes: signedBytes, verification };
     },
   };
+  const missingRequest = await signEligibleArtifact(null, provider, { digest });
+  assert.equal(missingRequest.status, "invalid");
+  assert.deepEqual(missingRequest.diagnostics, ["DIAG-XADES-ARTIFACT"]);
+  assert.equal(calls, 0);
   const request = {
     artifact,
     targetName: "RegistroAlta",
