@@ -304,6 +304,18 @@ test("correction and substitution append immutable history and reject self-links
   const first = addCorrection(empty, edge);
   assert.equal(first.status, "ok");
   assert.equal(empty.relations.length, 0);
+  const selfLink = addCorrection(empty, {
+    ...edge,
+    source: second,
+    target: second,
+  });
+  assert.equal(selfLink.status, "invalid");
+  assert.equal(selfLink.diagnostics[0].code, "DIAG-CORRECTION-CONFLICT");
+  assert.equal(
+    addCorrection(empty, { ...edge, evidenceId: "" }).status,
+    "invalid",
+    "an otherwise valid unique correction still requires evidence",
+  );
   const foreignContext = {
     ...f.context,
     tenantId: f.get("tenant", "foreign-tenant"),
