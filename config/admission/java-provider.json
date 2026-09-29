@@ -73,7 +73,7 @@
     },
     "maven": {
       "version": "3.9.12",
-      "distributionUrl": "https://archive.apache.org/dist/maven/maven-3/3.9.12/binaries/apache-maven-3.9.12-bin.tar.gz",
+      "distributionUrl": "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.12/apache-maven-3.9.12-bin.tar.gz",
       "sha512": "0a1be79f02466533fc1a80abbef8796e4f737c46c6574ede5658b110899942a94db634477dfd3745501c80aef9aac0d4f841d38574373f7e2d24cce89d694f70",
       "signature": "verified",
       "signerFingerprint": "84789D24DF77A32433CE1F079EB80E92EB2135B1",

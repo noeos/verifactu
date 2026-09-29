@@ -785,6 +785,14 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
           'Target="#different-signature"',
         ),
     ],
+    [
+      "qualifying target without fragment prefix",
+      (xml) =>
+        xml.replace(
+          'Target="#xmldsig-90637596-e368-4bd0-bcf8-d9a7be617d9a"',
+          'Target="xxmldsig-90637596-e368-4bd0-bcf8-d9a7be617d9a"',
+        ),
+    ],
   ];
   for (const [name, mutate] of structuralMutations) {
     const xml = mutate(source);
