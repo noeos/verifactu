@@ -205,6 +205,14 @@ test("record planning validates input and returns a deterministic immutable plan
     planRecord({ ...input, digest, record: anulacion.value }).value.recordKind,
     "anulacion",
   );
+  assert.equal(
+    planRecord({
+      ...input,
+      digest,
+      record: { ...anulacion.value, kind: "unknown" },
+    }).status,
+    "invalid",
+  );
   for (const rejected of [
     planRecord(null),
     planRecord({ ...input, digest, record: null }),
