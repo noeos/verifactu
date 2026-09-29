@@ -92,6 +92,10 @@ test("P4-CB-017 operation plan is effect-free and rejects undeclared effects", (
     "invalid",
   );
   assert.equal(
+    createOperationPlan({ ...input, context: null }).status,
+    "invalid",
+  );
+  assert.equal(
     createOperationPlan({ ...input, operationId: id("tenant", "wrong-kind") })
       .status,
     "invalid",
@@ -145,6 +149,10 @@ test("record planning validates input and returns a deterministic immutable plan
   assert.equal(first.status, "ok");
   assert.deepEqual(first.value, second.value);
   assert.match(first.value.semanticDigest, /^sha256:[0-9a-f]{64}$/u);
+  assert.equal(
+    first.value.semanticDigest,
+    "sha256:c593a88b5a67c543f3300bdaa540f3cdf59a3689fffc3511045709681351775c",
+  );
   assert.equal(Object.isFrozen(first.value), true);
   assert.equal(Object.isFrozen(first.value.context), true);
   assert.equal(Object.isFrozen(first.value.actions), true);
@@ -671,8 +679,7 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
   };
   const constantDigest = {
     providerId: "test:constant-digest",
-    digest: (algorithm) =>
-      "a".repeat(algorithm === "sha256" ? 64 : 128),
+    digest: (algorithm) => "a".repeat(algorithm === "sha256" ? 64 : 128),
   };
   const collisionArtifact = createXmlArtifact(
     { ...validInput, artifactId: "artifact-collision" },

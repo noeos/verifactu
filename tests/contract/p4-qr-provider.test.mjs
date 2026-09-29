@@ -28,6 +28,12 @@ const digest = {
   digest: (_algorithm, bytes) =>
     createHash("sha256").update(bytes).digest("hex"),
 };
+
+test("QR encoder rejects non-Uint8Array byte sources", () => {
+  const payload = new TextEncoder().encode("nonempty").buffer;
+  assert.equal(qrPort.encode(payload, "M").status, "invalid");
+});
+
 function record({
   series = "12345678-G",
   number = "33",
@@ -459,10 +465,8 @@ test("P4-E encoder port enforces admitted byte and correction-level input", () =
     "DIAG-QR-ENCODER-INPUT",
   );
   assert.equal(
-    qrPort.encode(
-      new DataView(new Uint8Array([65]).buffer),
-      "M",
-    ).diagnostics[0].code,
+    qrPort.encode(new DataView(new Uint8Array([65]).buffer), "M").diagnostics[0]
+      .code,
     "DIAG-QR-ENCODER-INPUT",
   );
   assert.equal(qrPort.encode(new Uint8Array([0xff]), "M").status, "invalid");

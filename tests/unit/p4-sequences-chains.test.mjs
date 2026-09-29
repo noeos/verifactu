@@ -68,6 +68,16 @@ test("chain link keeps predecessor and current digest distinct and verifies scop
     "ok",
   );
   assert.equal(
+    verifyChainLink(
+      { ...link.value, context: null },
+      f.context,
+      null,
+      input,
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
     createChainLink(
       f.context,
       f.id("record", "r2"),
