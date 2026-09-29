@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { inflateRawSync } from "node:zlib";
 import test from "node:test";
@@ -8,6 +9,68 @@ import {
   XADES_EDITION_ID,
   XADES_PROFILE_ID,
 } from "../../internal/xades-provider/provider.mjs";
+import { DSS_JVM_OPTIONS } from "../../internal/xades-provider/worker.mjs";
+
+function rawWireRequest(artifactBytes) {
+  const fields = [
+    "VERIFACTU-DSS-1",
+    "VERIFY",
+    XADES_EDITION_ID,
+    XADES_PROFILE_ID,
+    "RegistroAlta",
+    createHash("sha256").update(artifactBytes).digest("hex"),
+    "1738620000000",
+    "1738620000000",
+    "86400",
+    "",
+    artifactBytes,
+    new Uint8Array(),
+    "0",
+    new Uint8Array(),
+    "0",
+    "0",
+    "0",
+  ];
+  return Buffer.from(
+    fields
+      .map((field) => Buffer.from(field).toString("base64") + "\n")
+      .join(""),
+    "ascii",
+  );
+}
+
+function runRawBridge(input) {
+  const java =
+    process.env.VERIFACTU_JAVA ??
+    (process.platform === "win32" ? "java.exe" : "java");
+  const jar =
+    process.env.VERIFACTU_DSS_JAR ??
+    "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar";
+  return spawnSync(
+    java,
+    [...DSS_JVM_OPTIONS, "-cp", jar, "eu.noeos.verifactu.bridge.DssBridge"],
+    { input, encoding: "utf8", timeout: 10_000, maxBuffer: 4_096 },
+  );
+}
+
+function bridgeReport(result) {
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u);
+  return Buffer.from(result.stdout.trimEnd().split("\n")[3], "base64")
+    .toString("ascii")
+    .split("\t");
+}
+
+function assertJavaRejectsBeforeCrypto(artifactBytes, name) {
+  const result = runRawBridge(rawWireRequest(artifactBytes));
+  const report = bridgeReport(result);
+  assert.equal(report[0], "INVALID", `${name}: Java profile`);
+  assert.equal(report[1], "NOT_EVALUATED", `${name}: Java crypto`);
+  assert.ok(
+    ["DIAG-XADES-PROFILE", "DIAG-XADES-XML"].includes(report[12]),
+    `${name}: Java must identify profile or XML failure, got ${report[12]}`,
+  );
+}
 
 function zipEntry(archive, wantedName) {
   const end = archive.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
@@ -36,6 +99,24 @@ function zipEntry(archive, wantedName) {
     offset += 46 + nameBytes + extraBytes + commentBytes;
   }
   assert.fail(`missing vector ${wantedName}`);
+}
+
+function moveSignatureValueBeforeSignedInfo(xml) {
+  const valueStart = xml.indexOf("<ds:SignatureValue");
+  const valueOpenEnd = xml.indexOf(">", valueStart) + 1;
+  const valueEnd =
+    xml.indexOf("</ds:SignatureValue>", valueOpenEnd) +
+    "</ds:SignatureValue>".length;
+  const infoStart = xml.indexOf("<ds:SignedInfo");
+  assert.ok(valueStart >= 0 && valueOpenEnd > 0 && valueEnd > valueOpenEnd);
+  assert.ok(infoStart >= 0 && infoStart < valueStart);
+  const valueBlock = xml.slice(valueStart, valueEnd);
+  return (
+    xml.slice(0, infoStart) +
+    valueBlock +
+    xml.slice(infoStart, valueStart) +
+    xml.slice(valueEnd)
+  );
 }
 
 test("signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks", async () => {
@@ -193,13 +274,33 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
     validationTime: "2025-02-04T00:00:00Z",
     maximumRevocationAgeSeconds: 86_400,
   };
+  const directBaseline = runRawBridge(
+    rawWireRequest(new TextEncoder().encode(source)),
+  );
+  assert.equal(directBaseline.status, 0, directBaseline.stderr);
+  const baselineReport = Buffer.from(
+    directBaseline.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(
+    baselineReport[0],
+    "VALID",
+    "Java accepts the official profile vector",
+  );
   const replacements = [
     [
       "root namespace",
       "SuministroInformacion.xsd",
       "SuministroInformacion-wrong.xsd",
     ],
-    ["signature child order", "<ds:SignedInfo>", "<ds:Object/><ds:SignedInfo>"],
+    ["signature child order", moveSignatureValueBeforeSignedInfo],
+    [
+      "extra signature child",
+      "</ds:Signature>",
+      "<ds:OtherSignatureChild/></ds:Signature>",
+    ],
     [
       "canonicalization algorithm",
       "REC-xml-c14n-20010315",
@@ -264,8 +365,8 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
     ],
     [
       "unsigned properties",
-      "</xades:QualifyingProperties>",
-      "<xades:UnsignedProperties/><xades:QualifyingProperties>",
+      "<xades:SignedDataObjectProperties>",
+      "<xades:SignedDataObjectProperties><xades:UnsignedProperties/>",
     ],
     [
       "certificate digest value",
@@ -284,7 +385,10 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
     ],
   ];
   for (const [name, before, after] of replacements) {
-    const xml = source.replace(before, after);
+    const xml =
+      typeof before === "function"
+        ? before(source)
+        : source.replace(before, after);
     assert.notEqual(
       xml,
       source,
@@ -308,6 +412,20 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "not-evaluated",
       `${name} must be rejected by profile validation before cryptography`,
     );
+
+    const directResult = runRawBridge(rawWireRequest(artifactBytes));
+    const directReport = bridgeReport(directResult);
+    assert.equal(directReport[0], "INVALID", `${name}: Java profile`);
+    assert.equal(
+      directReport[1],
+      "NOT_EVALUATED",
+      `${name} must be rejected by Java before cryptography`,
+    );
+    assert.equal(
+      directReport[12],
+      "DIAG-XADES-PROFILE",
+      `${name}: Java diagnostic`,
+    );
   }
 
   const replaceInside = (xml, anchor, before, after) => {
@@ -323,6 +441,13 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
     return prefix + suffix.replace(before, after);
   };
   const structuralMutations = [
+    [
+      "duplicate IDs",
+      (xml) =>
+        xml
+          .replace("<sum1:IDVersion>", '<sum1:IDVersion Id="duplicate">')
+          .replace("<sum1:IDFactura>", '<sum1:IDFactura Id="duplicate">'),
+    ],
     [
       "wrong SignedInfo name with the child count preserved",
       (xml) =>
@@ -379,6 +504,18 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "key info with three children",
       (xml) =>
         xml.replace("</ds:KeyInfo>", "<ds:KeyName/><ds:KeyName/></ds:KeyInfo>"),
+    ],
+    [
+      "wrong KeyValue child name",
+      (xml) =>
+        xml
+          .replace("<ds:KeyValue>", "<ds:OtherKeyValue>")
+          .replace("</ds:KeyValue>", "</ds:OtherKeyValue>"),
+    ],
+    [
+      "wrong KeyValue child namespace",
+      (xml) =>
+        xml.replace("<ds:KeyValue>", '<ds:KeyValue xmlns:ds="urn:wrong">'),
     ],
     [
       "missing canonicalization method",
@@ -482,7 +619,10 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
     [
       "extra object child",
       (xml) =>
-        xml.replace("</ds:Object>", "<xades:OtherProperty/></ds:Object>"),
+        xml.replace(
+          "</ds:Object>",
+          '<xades:OtherProperty xmlns:xades="http://uri.etsi.org/01903/v1.3.2#"/></ds:Object>',
+        ),
     ],
     [
       "second signature object",
@@ -671,7 +811,27 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "not-evaluated",
       `${name} must be rejected by profile validation before cryptography`,
     );
+    assertJavaRejectsBeforeCrypto(artifactBytes, name);
   }
+  const signingCertificateStart = source.indexOf("<xades:SigningCertificate>");
+  const signingCertificateEnd =
+    source.indexOf("</xades:SigningCertificate>", signingCertificateStart) +
+    "</xades:SigningCertificate>".length;
+  assert.ok(signingCertificateStart >= 0 && signingCertificateEnd > 0);
+  const missingCertificateDigestMethod =
+    source.slice(0, signingCertificateStart) +
+    source
+      .slice(signingCertificateStart, signingCertificateEnd)
+      .replaceAll(
+        '<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>',
+        '<ds:OtherDigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>',
+      ) +
+    source.slice(signingCertificateEnd);
+  assert.notEqual(missingCertificateDigestMethod, source);
+  assertJavaRejectsBeforeCrypto(
+    new TextEncoder().encode(missingCertificateDigestMethod),
+    "missing certificate digest method",
+  );
 });
 
 test("DSS distinguishes optional and malformed embedded KeyValue data", async () => {

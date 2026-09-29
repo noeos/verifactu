@@ -913,6 +913,10 @@ export function javaMutationTestSelections(mutation) {
         JAVA_MUTATION_TESTS[2],
         "^(?:Java bridge enforces every top-level request identity and artifact bound|Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
       ],
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^DSS rejects each altered XAdES profile component before crypto validation$",
+      ],
     ];
   if (line >= 529 && line < 536)
     return [

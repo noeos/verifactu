@@ -263,7 +263,10 @@ async function probeUnsignedTargetRules(cases) {
       { encoding: "utf8", timeout: 15_000, maxBuffer: 16 * 1024 },
     );
     assert.equal(result.status, 0, result.stderr);
-    return result.stdout.trim().split(/\r?\n/u).map((value) => value === "true");
+    return result.stdout
+      .trim()
+      .split(/\r?\n/u)
+      .map((value) => value === "true");
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -519,10 +522,7 @@ test("Java bridge enforces every top-level request identity and artifact bound",
     rawWireRequest({ artifactBytes: exactLimit }),
   );
   assert.equal(exactLimitResult.status, 0, exactLimitResult.stderr);
-  assert.match(
-    exactLimitResult.stdout,
-    /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u,
-  );
+  assert.match(exactLimitResult.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u);
   const exactLimitReport = Buffer.from(
     exactLimitResult.stdout.trimEnd().split("\n")[3],
     "base64",
@@ -577,15 +577,18 @@ test("Java XML parser enforces depth, node, attribute and expanded-text limits",
   const exactNodes = `<r>${"<n/>".repeat(99_999)}</r>`;
   const exactAttributes = `<r ${Array.from({ length: 4_096 }, (_, i) => `a${i}="x"`).join(" ")}/>`;
   const exactText = `<r>${"x".repeat(2_097_152)}</r>`;
+  const exactCdataText = `<r><![CDATA[${"x".repeat(2_097_152)}]]></r>`;
   const nested = `${"<n>".repeat(65)}x${"</n>".repeat(65)}`;
   const tooManyNodes = `<r>${"<n/>".repeat(100_000)}</r>`;
   const tooManyAttributes = `<r ${Array.from({ length: 4_097 }, (_, i) => `a${i}="x"`).join(" ")}/>`;
   const tooMuchText = `<r>${"x".repeat(2_097_153)}</r>`;
+  const tooMuchCdataText = `<r><![CDATA[${"x".repeat(2_097_153)}]]></r>`;
   for (const [name, xml] of [
     ["depth", nested],
     ["nodes", tooManyNodes],
     ["attributes", tooManyAttributes],
     ["expanded text", tooMuchText],
+    ["expanded CDATA text", tooMuchCdataText],
   ]) {
     const result = runRawBridge(
       rawWireRequest({ artifactBytes: new TextEncoder().encode(xml) }),
@@ -598,11 +601,67 @@ test("Java XML parser enforces depth, node, attribute and expanded-text limits",
     );
   }
 
+  const doctype =
+    '<!DOCTYPE RegistroAlta [<!ENTITY secret SYSTEM "file:///etc/passwd">]>' +
+    "<RegistroAlta>&secret;</RegistroAlta>";
+  const doctypeResult = runRawBridge(
+    rawWireRequest({ artifactBytes: new TextEncoder().encode(doctype) }),
+  );
+  assert.equal(doctypeResult.status, 0, doctypeResult.stderr);
+  assert.match(
+    doctypeResult.stdout,
+    /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u,
+    "DOCTYPE and external entities must be rejected by the Java parser",
+  );
+  const doctypeReport = Buffer.from(
+    doctypeResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(doctypeReport[12], "DIAG-XADES-XML");
+
+  const xinclude = new TextEncoder().encode(
+    '<RegistroAlta xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="file:///etc/passwd" parse="xml"/></RegistroAlta>',
+  );
+  const xincludeResult = runRawBridge(
+    rawWireRequest({ artifactBytes: xinclude }),
+  );
+  assert.equal(xincludeResult.status, 0, xincludeResult.stderr);
+  assert.match(xincludeResult.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u);
+  const xincludeReport = Buffer.from(
+    xincludeResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(xincludeReport[12], "DIAG-XADES-PROFILE");
+
+  const internalEntity =
+    '<!DOCTYPE RegistroAlta [<!ENTITY expanded "expanded-text">]>' +
+    "<RegistroAlta>&expanded;</RegistroAlta>";
+  const internalEntityResult = runRawBridge(
+    rawWireRequest({ artifactBytes: new TextEncoder().encode(internalEntity) }),
+  );
+  assert.equal(internalEntityResult.status, 0, internalEntityResult.stderr);
+  assert.match(
+    internalEntityResult.stdout,
+    /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u,
+  );
+  const internalEntityReport = Buffer.from(
+    internalEntityResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(internalEntityReport[12], "DIAG-XADES-XML");
+
   for (const [name, xml] of [
     ["exact depth", exactDepth],
     ["exact node count", exactNodes],
     ["exact attribute count", exactAttributes],
     ["exact expanded text", exactText],
+    ["exact expanded CDATA text", exactCdataText],
   ]) {
     const result = runRawBridge(
       rawWireRequest({ artifactBytes: new TextEncoder().encode(xml) }),
@@ -856,98 +915,61 @@ test("bridge process applies deadline and cancellation, with a minimal environme
   }
 });
 
-test("DSS worker rejects oversized requests, output, diagnostics and failed process outcomes", { timeout: 15_000 }, async (t) => {
-  const directory = await mkdtemp(
-    join(tmpdir(), "verifactu-dss-worker-census-"),
-  );
-  const source = join(directory, "eu/noeos/verifactu/bridge/DssBridge.java");
-  const classPath = join(directory, "classes");
-  await mkdir(join(directory, "eu/noeos/verifactu/bridge"), {
-    recursive: true,
-  });
-  await mkdir(classPath);
-  const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
-  await writeFile(
-    source,
-    `package eu.noeos.verifactu.bridge; public final class DssBridge { public static void main(String[] args) throws Exception { ${body} } }\n`,
-  );
-  await promisify(execFile)(javacExecutable, [
-    "--release",
-    "21",
-    "-d",
-    classPath,
-    source,
-  ]);
-  t.after(() => rm(directory, { recursive: true, force: true }));
-
-  const response = (mode) =>
-    spawnDssBridge(
-      { ...request, editionId: mode },
-      {
-        javaExecutable:
-          process.env.VERIFACTU_JAVA ??
-          (process.platform === "win32" ? "java.exe" : "java"),
-        jarPath: classPath,
-      },
+test(
+  "DSS worker rejects oversized requests, output, diagnostics and failed process outcomes",
+  { timeout: 15_000 },
+  async (t) => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "verifactu-dss-worker-census-"),
     );
-  assert.equal((await response("valid")).kind, "VERIFIED");
-  assert.equal(
-    (
-      await spawnDssBridge(
-        { ...request, editionId: "valid" },
+    const source = join(directory, "eu/noeos/verifactu/bridge/DssBridge.java");
+    const classPath = join(directory, "classes");
+    await mkdir(join(directory, "eu/noeos/verifactu/bridge"), {
+      recursive: true,
+    });
+    await mkdir(classPath);
+    const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
+    await writeFile(
+      source,
+      `package eu.noeos.verifactu.bridge; public final class DssBridge { public static void main(String[] args) throws Exception { ${body} } }\n`,
+    );
+    await promisify(execFile)(javacExecutable, [
+      "--release",
+      "21",
+      "-d",
+      classPath,
+      source,
+    ]);
+    t.after(() => rm(directory, { recursive: true, force: true }));
+
+    const response = (mode) =>
+      spawnDssBridge(
+        { ...request, editionId: mode },
         {
-          javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+          javaExecutable:
+            process.env.VERIFACTU_JAVA ??
+            (process.platform === "win32" ? "java.exe" : "java"),
           jarPath: classPath,
-          maximumOutputBytes: 0,
         },
-      )
-    ).kind,
-    "LIMIT",
-  );
-  assert.equal((await response("stdout")).kind, "LIMIT");
-  assert.equal((await response("stderr")).kind, "LIMIT");
-  assert.equal((await response("diagnostic")).kind, "LIMIT");
-  assert.equal((await response("exit")).kind, "DEFECT");
-  assert.equal(
-    (
-      await spawnDssBridge(request, {
-        javaExecutable: "/missing/verifactu-java",
-        jarPath: classPath,
-      })
-    ).kind,
-    "UNAVAILABLE",
-  );
-  assert.equal(
-    (
-      await spawnDssBridge(request, {
-        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
-        jarPath: classPath,
-        cwd: "/missing/verifactu-dss-cwd",
-      })
-    ).kind,
-    "UNAVAILABLE",
-  );
-  assert.equal(
-    (
-      await spawnDssBridge(request, {
-        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
-        jarPath: classPath,
-        cwd: Symbol("invalid cwd"),
-      })
-    ).kind,
-    "UNAVAILABLE",
-  );
-  assert.equal(
-    encodeRequest({ ...request, artifactBytes: new Uint8Array(18_000_000) }),
-    null,
-  );
-  const previousAgent = process.env.VERIFACTU_JACOCO_AGENT;
-  const previousDestination = process.env.VERIFACTU_JACOCO_DESTFILE;
-  try {
-    process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
-    process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
-    assert.equal((await spawnDssBridge(request)).kind, "DEFECT");
-    delete process.env.VERIFACTU_JACOCO_DESTFILE;
+      );
+    assert.equal((await response("valid")).kind, "VERIFIED");
+    assert.equal(
+      (
+        await spawnDssBridge(
+          { ...request, editionId: "valid" },
+          {
+            javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+            jarPath: classPath,
+            maximumOutputBytes: 0,
+          },
+        )
+      ).kind,
+      "LIMIT",
+    );
+    assert.equal((await response("stdout")).kind, "LIMIT");
+    assert.equal((await response("stderr")).kind, "LIMIT");
+    assert.equal((await response("diagnostic")).kind, "LIMIT");
+    assert.equal((await response("exit")).kind, "DEFECT");
     assert.equal(
       (
         await spawnDssBridge(request, {
@@ -955,16 +977,58 @@ test("DSS worker rejects oversized requests, output, diagnostics and failed proc
           jarPath: classPath,
         })
       ).kind,
-      "DEFECT",
+      "UNAVAILABLE",
     );
-  } finally {
-    if (previousAgent === undefined) delete process.env.VERIFACTU_JACOCO_AGENT;
-    else process.env.VERIFACTU_JACOCO_AGENT = previousAgent;
-    if (previousDestination === undefined)
+    assert.equal(
+      (
+        await spawnDssBridge(request, {
+          javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+          jarPath: classPath,
+          cwd: "/missing/verifactu-dss-cwd",
+        })
+      ).kind,
+      "UNAVAILABLE",
+    );
+    assert.equal(
+      (
+        await spawnDssBridge(request, {
+          javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+          jarPath: classPath,
+          cwd: Symbol("invalid cwd"),
+        })
+      ).kind,
+      "UNAVAILABLE",
+    );
+    assert.equal(
+      encodeRequest({ ...request, artifactBytes: new Uint8Array(18_000_000) }),
+      null,
+    );
+    const previousAgent = process.env.VERIFACTU_JACOCO_AGENT;
+    const previousDestination = process.env.VERIFACTU_JACOCO_DESTFILE;
+    try {
+      process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
+      process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
+      assert.equal((await spawnDssBridge(request)).kind, "DEFECT");
       delete process.env.VERIFACTU_JACOCO_DESTFILE;
-    else process.env.VERIFACTU_JACOCO_DESTFILE = previousDestination;
-  }
-});
+      assert.equal(
+        (
+          await spawnDssBridge(request, {
+            javaExecutable: "/missing/verifactu-java",
+            jarPath: classPath,
+          })
+        ).kind,
+        "DEFECT",
+      );
+    } finally {
+      if (previousAgent === undefined)
+        delete process.env.VERIFACTU_JACOCO_AGENT;
+      else process.env.VERIFACTU_JACOCO_AGENT = previousAgent;
+      if (previousDestination === undefined)
+        delete process.env.VERIFACTU_JACOCO_DESTFILE;
+      else process.env.VERIFACTU_JACOCO_DESTFILE = previousDestination;
+    }
+  },
+);
 
 const qrEditionId = "rrsif-2026-09-21-authoritative-candidate";
 const qrId = (kind, value) => createIdentity(kind, value).value;

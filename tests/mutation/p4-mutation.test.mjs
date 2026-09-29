@@ -22,30 +22,46 @@ import {
 } from "../../tooling/assurance/p4-mutation-hooks.mjs";
 
 {
-  assert.deepEqual(javaMutationTestSelections({ line: 120 }), [[
-    "tests/security/p4-resource-attacks.test.mjs",
-    "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
-  ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 250 }), [[
-    "tests/integration/p4-xades-pki.test.mjs",
-    "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
-  ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 420 }), [[
-    "tests/security/p4-resource-attacks.test.mjs",
-    "^(?:Java bridge enforces every top-level request identity and artifact bound|Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
-  ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 455 }), [[
-    "tests/security/p4-signature-attacks.test.mjs",
-    "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
-  ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 530 }), [[
-    "tests/security/p4-resource-attacks.test.mjs",
-    "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
-  ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 569 }), [[
-    "tests/security/p4-signature-attacks.test.mjs",
-    "^DSS distinguishes optional and malformed embedded KeyValue data$",
-  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 120 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 250 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 420 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java bridge enforces every top-level request identity and artifact bound|Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+    ],
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects each altered XAdES profile component before crypto validation$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 455 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 530 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 569 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS distinguishes optional and malformed embedded KeyValue data$",
+    ],
+  ]);
   assert.deepEqual(javaMutationTestSelections({ line: 145 }), [
     [
       "tests/integration/p4-xades-pki.test.mjs",
@@ -56,21 +72,23 @@ import {
       "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
     ],
   ]);
-  assert.deepEqual(javaMutationTestSelections({ line: 640 }), [[
-    "tests/integration/p4-xades-pki.test.mjs",
-    "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
-  ]]);
-  assert.deepEqual(javaMutationTestSelections({ line: 760 }), [[
-    "tests/security/p4-resource-attacks.test.mjs",
-    "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
-  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 640 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 760 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+    ],
+  ]);
 
   const integration = "tests/integration/p4-qr-roundtrip.test.mjs";
   const qr = "packages/verifactu/src/application/qr.ts";
   const patterns = (module, line, test = integration) =>
-    mutationTestPatterns({ module, line }, test).map(
-      (entry) => entry.pattern,
-    );
+    mutationTestPatterns({ module, line }, test).map((entry) => entry.pattern);
 
   assert.deepEqual(patterns(qr, 100), [
     "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
@@ -116,7 +134,9 @@ import {
   );
   assert.deepEqual(
     patterns(qr, 320, "tests/integration/p4-qr-roundtrip.test.mjs"),
-    ["^P4-E PNG renderer is deterministic, bounded and independently decodable$"],
+    [
+      "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+    ],
   );
   assert.equal(
     focusedProviderMutationTest({
