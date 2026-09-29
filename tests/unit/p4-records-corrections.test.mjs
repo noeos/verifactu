@@ -43,6 +43,22 @@ function fixture() {
 
 test("alta and anulacion enforce exhaustive kind-specific identity fields", () => {
   const f = fixture();
+  assert.equal(
+    createFiscalDocumentIdentity({
+      ...f.doc,
+      series: "s".repeat(60),
+      number: "n".repeat(60),
+    }).status,
+    "ok",
+  );
+  assert.equal(
+    createFiscalDocumentIdentity({ ...f.doc, series: "s".repeat(61) }).status,
+    "invalid",
+  );
+  assert.equal(
+    createFiscalDocumentIdentity({ ...f.doc, number: "n".repeat(61) }).status,
+    "invalid",
+  );
   const record = {
     kind: "alta",
     id: f.get("record", "r1"),
@@ -82,6 +98,10 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
     editionId: f.context.editionId,
   };
   assert.equal(createAnulacionRecord(cancel).status, "ok");
+  assert.equal(
+    createAnulacionRecord({ ...cancel, cause: "x".repeat(256) }).status,
+    "ok",
+  );
   assert.equal(
     createAnulacionRecord({ ...cancel, kind: "alta" }).status,
     "invalid",
@@ -129,6 +149,10 @@ test("alta construction rejects mismatched kinds, dates, totals and chain self-l
     { ...record, document: null },
     { ...record, issueDate: createFiscalDate("2025-01-02").value },
     { ...record, generatedAt: "no-time" },
+    // Runtime callers can bypass the TypeScript Decimal type. The public
+    // constructor must still reject a truthy primitive before freezing it.
+    { ...record, total: "12.50" },
+    { ...record, total: { ...record.total, text: 12 } },
     { ...record, total: { ...record.total, coefficient: 1n } },
     { ...record, predecessorId: record.id },
     { ...record, editionId: f.get("edition", "different") },
@@ -227,11 +251,26 @@ test("correction and substitution append immutable history and reject self-links
     ).status,
     "invalid",
   );
+  const belowLimit = Array.from({ length: 99_999 }, (_, index) => ({
+    ...edge,
+    source: { ...second, number: `limit-${index}` },
+  }));
+  const nextRelation = {
+    ...edge,
+    source: { ...second, number: "limit-next" },
+  };
   assert.equal(
-    addCorrection(
-      { relations: Array.from({ length: 100_000 }, () => edge) },
-      edge,
-    ).status,
+    addCorrection({ relations: belowLimit }, nextRelation).status,
+    "ok",
+    "99,999 existing relations permit the 100,000th relation",
+  );
+  const atLimit = [...belowLimit, nextRelation];
+  assert.equal(
+    addCorrection({ relations: atLimit }, {
+      ...nextRelation,
+      source: { ...second, number: "limit-after-next" },
+    }).status,
     "invalid",
+    "a graph already containing 100,000 relations rejects another",
   );
 });

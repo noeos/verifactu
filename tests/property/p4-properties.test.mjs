@@ -33,6 +33,11 @@ function random(seed = SEED) {
   };
 }
 const next = random();
+function propertyReport(t, property, corpus) {
+  t.diagnostic(
+    `${property} executions=4096 seed=${SEED} discards=0 corpusSha256=${corpus.digest("hex")}`,
+  );
+}
 const id = (kind, value) => createIdentity(kind, value).value;
 const context = createFiscalContext({
   tenantId: id("tenant", "property-tenant"),
@@ -46,11 +51,13 @@ const instant = (day) =>
 const digest = (bytes) =>
   `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
 
-test(`P4-PROP-001 staged decode failures do not advance (seed=${SEED})`, () => {
+test(`P4-PROP-001 staged decode failures do not advance (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const malformed = new TextEncoder().encode(
       `{"id":"${index}","id":"${index + 1}"}`,
     );
+    corpus.update(malformed);
     const result = decodeJson(malformed, { required: ["id"] });
     assert.equal(result.status, "invalid", `seed=${SEED} case=${index}`);
     assert.equal(
@@ -59,11 +66,14 @@ test(`P4-PROP-001 staged decode failures do not advance (seed=${SEED})`, () => {
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-001", corpus);
 });
 
-test("P4-PROP-008 plans are deterministic and deeply immutable", () => {
+test("P4-PROP-008 plans are deterministic and deeply immutable", (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const value = "operation-" + index + "-" + Math.floor(next() * 0x7fffffff);
+    corpus.update(value);
     const input = {
       operationId: id("operation", value),
       context,
@@ -95,9 +105,11 @@ test("P4-PROP-008 plans are deterministic and deeply immutable", () => {
     );
     assert.equal(Object.isFrozen(first.value.actions), true, "case=" + index);
   }
+  propertyReport(t, "P4-PROP-008", corpus);
 });
 
-test("P4-PROP-009 projection preserves presence and order", () => {
+test("P4-PROP-009 projection preserves presence and order", (t) => {
+  const corpus = createHash("sha256");
   const presences = ["value", "empty", "zero", "nil", "absent"];
   for (let index = 0; index < 4096; index += 1) {
     const presence = presences[Math.floor(next() * presences.length)];
@@ -124,6 +136,7 @@ test("P4-PROP-009 projection preserves presence and order", () => {
         allowNil: true,
       },
     ];
+    corpus.update(JSON.stringify(fields));
     const projected = projectOfficialFields(fields);
     assert.equal(projected.status, "ok", "case=" + index);
     assert.deepEqual(
@@ -146,11 +159,14 @@ test("P4-PROP-009 projection preserves presence and order", () => {
     const first = projected.value.find((field) => field.name === "first");
     if (first) assert.equal(first.presence, presence, "case=" + index);
   }
+  propertyReport(t, "P4-PROP-009", corpus);
 });
 
-test(`P4-PROP-002 typed identities never substitute (seed=${SEED})`, () => {
+test(`P4-PROP-002 typed identities never substitute (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const value = `id-${Math.floor(next() * 0x7fffffff)}-${index}`;
+    corpus.update(value);
     const tenant = id("tenant", value);
     const taxpayer = id("taxpayer", value);
     assert.equal(
@@ -159,15 +175,18 @@ test(`P4-PROP-002 typed identities never substitute (seed=${SEED})`, () => {
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-002", corpus);
 });
 
-test(`P4-PROP-003 decimal parse and representation preserve exact lexical value (seed=${SEED})`, () => {
+test(`P4-PROP-003 decimal parse and representation preserve exact lexical value (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const whole = Math.floor(next() * 1_000_000);
     const fraction = Math.floor(next() * 100)
       .toString()
       .padStart(2, "0");
     const text = `${whole}.${fraction}`;
+    corpus.update(text);
     const parsed = createDecimal(text, { maxIntegerDigits: 6, maxScale: 2 });
     assert.equal(parsed.status, "ok", `seed=${SEED} case=${index}`);
     assert.equal(parsed.value.text, text, `seed=${SEED} case=${index}`);
@@ -177,14 +196,17 @@ test(`P4-PROP-003 decimal parse and representation preserve exact lexical value 
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-003", corpus);
 });
 
-test(`P4-PROP-004 date and instant acceptance remains exact (seed=${SEED})`, () => {
+test(`P4-PROP-004 date and instant acceptance remains exact (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const year = 2020 + Math.floor(next() * 10);
     const month = 1 + Math.floor(next() * 12);
     const date = `${year}-${String(month).padStart(2, "0")}-01`;
     const at = `${date}T12:30:45Z`;
+    corpus.update(date).update(at);
     assert.equal(
       createFiscalDate(date).value,
       date,
@@ -196,9 +218,11 @@ test(`P4-PROP-004 date and instant acceptance remains exact (seed=${SEED})`, () 
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-004", corpus);
 });
 
-test(`P4-PROP-005 submission transition table is total and closed (seed=${SEED})`, () => {
+test(`P4-PROP-005 submission transition table is total and closed (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   const states = [
     "notEligible",
     "queued",
@@ -212,18 +236,22 @@ test(`P4-PROP-005 submission transition table is total and closed (seed=${SEED})
   for (let index = 0; index < 4096; index += 1) {
     const from = states[Math.floor(next() * states.length)];
     const to = states[Math.floor(next() * states.length)];
+    corpus.update(`${from}\0${to}`);
     assert.equal(
       typeof canTransitionSubmission(from, to),
       "boolean",
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-005", corpus);
 });
 
-test(`P4-PROP-006 mode tenures preserve adjacent interval boundaries (seed=${SEED})`, () => {
+test(`P4-PROP-006 mode tenures preserve adjacent interval boundaries (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const day = 1 + Math.floor(next() * 27);
     const followingDay = day + 1;
+    corpus.update(`${day}\0${followingDay}`);
     const first = {
       context,
       mode: "nonVerifactu",
@@ -252,11 +280,14 @@ test(`P4-PROP-006 mode tenures preserve adjacent interval boundaries (seed=${SEE
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-006", corpus);
 });
 
-test(`P4-PROP-007 chain recomputation detects a one-byte mutation (seed=${SEED})`, () => {
+test(`P4-PROP-007 chain recomputation detects a one-byte mutation (seed=${SEED})`, (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const payload = new TextEncoder().encode(`record=${index};seed=${SEED}`);
+    corpus.update(payload);
     const link = createChainLink(
       context,
       id("record", `r${index}`),
@@ -273,4 +304,5 @@ test(`P4-PROP-007 chain recomputation detects a one-byte mutation (seed=${SEED})
       `seed=${SEED} case=${index}`,
     );
   }
+  propertyReport(t, "P4-PROP-007", corpus);
 });

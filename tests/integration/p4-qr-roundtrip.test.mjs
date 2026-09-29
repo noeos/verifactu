@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { decodeQR } from "qr/decode.js";
-import { inflateSync } from "node:zlib";
+import { crc32, inflateSync } from "node:zlib";
 import {
   buildQrPayload,
   createQrEncoderPort,
@@ -159,7 +159,8 @@ async function mutateQr(id, edits, observe) {
   }
 }
 
-test("P4-PROP-014 QR bytes round-trip exactly through independent decode (4096 executions)", () => {
+test("P4-PROP-014 QR bytes round-trip exactly through independent decode (4096 executions)", (t) => {
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     const editionConfig = {
       id: editionId,
@@ -182,10 +183,16 @@ test("P4-PROP-014 QR bytes round-trip exactly through independent decode (4096 e
       payload.value.bytes,
       `seed=1346650369 case=${index}`,
     );
+    corpus.update(payload.value.bytes);
+    corpus.update(artifact.value.bytes);
   }
+  t.diagnostic(
+    `P4-PROP-014 executions=4096 seed=1346650369 discards=0 corpusSha256=${corpus.digest("hex")}`,
+  );
 });
 
-test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () => {
+test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", (t) => {
+  const corpus = createHash("sha256");
   const editionIdentity = id("edition", editionId);
   const fiscalContext = createFiscalContext({
     tenantId: id("tenant", "qr-property-tenant"),
@@ -224,6 +231,7 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () 
       new TextEncoder().encode(payload.value.text),
       `seed=1346650369 case=${index}`,
     );
+    corpus.update(payload.value.bytes);
     assert.equal(
       verifyQrPayload(payload.value.text, item.value, editionConfig, digest)
         .status,
@@ -231,6 +239,9 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", () 
       `seed=1346650369 case=${index}`,
     );
   }
+  t.diagnostic(
+    `P4-PROP-011 executions=4096 seed=1346650369 discards=0 corpusSha256=${corpus.digest("hex")}`,
+  );
 });
 
 test("P4-MUT-030 kills QR endpoint or parameter-order drift", async () => {
@@ -267,6 +278,60 @@ test("P4-MUT-031 kills acceptance of noncanonical and duplicate QR parameters", 
         result.status,
         "invalid",
         "P4-CB-031 reject duplicate parameters assertion",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-QR-ENVIRONMENT rejects production URLs for test editions", async () => {
+  await mutateQr(
+    "P4-FAULT-QR-ENVIRONMENT",
+    [
+      [
+        "ENDPOINTS[edition.environment][edition.mode]",
+        "ENDPOINTS.test[edition.mode]",
+      ],
+    ],
+    async ({ buildQrPayload: build }) => {
+      const testPayload = build(
+        record,
+        { id: editionId, environment: "test", mode: "verifactu" },
+        digest,
+      );
+      const productionPayload = build(
+        record,
+        { id: editionId, environment: "production", mode: "verifactu" },
+        digest,
+      );
+      assert.notEqual(
+        testPayload.value.text,
+        productionPayload.value.text,
+        "P4-FAULT-QR-ENVIRONMENT preserves environment-bound endpoints",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-QR-TRUNCATION rejects rewritten payload bytes", async () => {
+  await mutateQr(
+    "P4-FAULT-QR-TRUNCATION",
+    [
+      [
+        "const bytes = encoder.encode(text);",
+        "const bytes = encoder.encode(text.slice(0, -1));",
+      ],
+    ],
+    async ({ buildQrPayload: build }) => {
+      const payload = build(
+        record,
+        { id: editionId, environment: "test", mode: "verifactu" },
+        digest,
+      );
+      assert.equal(payload.status, "ok");
+      assert.deepEqual(
+        payload.value.bytes,
+        new TextEncoder().encode(payload.value.text),
+        "P4-FAULT-QR-TRUNCATION preserves all canonical payload bytes",
       );
     },
   );
@@ -343,8 +408,9 @@ test("P4-MUT-043 kills use of altered bytes instead of independent exact-byte or
   );
 });
 
-test("P4-FUZZ-005 QR payload and rendered symbol decoder remain bounded (4096 executions)", () => {
+test("P4-FUZZ-005 QR payload and rendered symbol decoder remain bounded (4096 executions)", (t) => {
   let state = 0x50444101;
+  const corpus = createHash("sha256");
   const nextByte = () => {
     state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
     return state >>> 24;
@@ -359,6 +425,8 @@ test("P4-FUZZ-005 QR payload and rendered symbol decoder remain bounded (4096 ex
     const chars = new Uint8Array(length);
     for (let offset = 0; offset < length; offset += 1)
       chars[offset] = nextByte();
+    corpus.update(Buffer.from([length >>> 8, length & 0xff]));
+    corpus.update(chars);
     const candidate = new TextDecoder().decode(chars);
     const verified = verifyQrPayload(candidate, record, editionConfig, digest);
     assert.ok(
@@ -375,12 +443,19 @@ test("P4-FUZZ-005 QR payload and rendered symbol decoder remain bounded (4096 ex
       rgba[byte + 2] = color;
       rgba[byte + 3] = 255;
     }
+    corpus.update(
+      Buffer.from([width >>> 8, width & 0xff, height >>> 8, height & 0xff]),
+    );
+    corpus.update(rgba);
     try {
       decodeQR({ width, height, data: rgba });
     } catch {
       // Malformed and non-QR images are expected fuzz outcomes.
     }
   }
+  t.diagnostic(
+    `P4-FUZZ-005 executions=4096 seed=${0x50444101} discards=0 corpusSha256=${corpus.digest("hex")}`,
+  );
 });
 
 test("P4-E PNG renderer is deterministic, bounded and independently decodable", () => {
@@ -400,6 +475,7 @@ test("P4-E PNG renderer is deterministic, bounded and independently decodable", 
   );
   let cursor = 8;
   const idat = [];
+  const chunks = [];
   while (cursor < first.value.bytes.length) {
     const view = new DataView(
       first.value.bytes.buffer,
@@ -409,12 +485,58 @@ test("P4-E PNG renderer is deterministic, bounded and independently decodable", 
     const kind = new TextDecoder().decode(
       first.value.bytes.subarray(cursor + 4, cursor + 8),
     );
+    assert.equal(
+      view.getUint32(8 + chunkLength, false),
+      crc32(first.value.bytes.subarray(cursor + 4, cursor + 8 + chunkLength)),
+      `${kind} chunk CRC-32`,
+    );
+    const data = first.value.bytes.subarray(
+      cursor + 8,
+      cursor + 8 + chunkLength,
+    );
+    chunks.push({ kind, data });
     if (kind === "IDAT")
-      idat.push(
-        first.value.bytes.subarray(cursor + 8, cursor + 8 + chunkLength),
-      );
+      idat.push(data);
     cursor += chunkLength + 12;
   }
+  assert.deepEqual(
+    chunks.map(({ kind }) => kind),
+    ["IHDR", "pHYs", "IDAT", "IEND"],
+  );
+  const imageHeader = new DataView(
+    chunks[0].data.buffer,
+    chunks[0].data.byteOffset,
+    chunks[0].data.byteLength,
+  );
+  assert.equal(chunks[0].data.length, 13);
+  assert.equal(imageHeader.getUint32(0, false), first.value.width);
+  assert.equal(imageHeader.getUint32(4, false), first.value.height);
+  assert.deepEqual([...chunks[0].data.subarray(8)], [8, 0, 0, 0, 0]);
+  const physicalHeader = new DataView(
+    chunks[1].data.buffer,
+    chunks[1].data.byteOffset,
+    chunks[1].data.byteLength,
+  );
+  const independentMatrix = encoderPort.encode(payload.bytes, "M");
+  assert.equal(independentMatrix.status, "ok");
+  const expectedMargin = Math.ceil(
+    (options.quietZoneMm * independentMatrix.value.size) / options.symbolSizeMm,
+  );
+  const expectedViewSize = independentMatrix.value.size + expectedMargin * 2;
+  const expectedDimension = expectedViewSize * options.scale;
+  const expectedPhysicalMm =
+    expectedViewSize * (options.symbolSizeMm / independentMatrix.value.size);
+  assert.equal(first.value.width, expectedDimension);
+  assert.equal(first.value.height, expectedDimension);
+  assert.ok(Math.abs(first.value.widthMm - expectedPhysicalMm) < 1e-10);
+  assert.ok(Math.abs(first.value.heightMm - expectedPhysicalMm) < 1e-10);
+  const expectedPixelsPerMeter = Math.round(
+    (expectedDimension * 1000) / expectedPhysicalMm,
+  );
+  assert.equal(physicalHeader.getUint32(0, false), expectedPixelsPerMeter);
+  assert.equal(physicalHeader.getUint32(4, false), expectedPixelsPerMeter);
+  assert.equal(physicalHeader.getUint8(8), 1);
+  assert.equal(chunks[3].data.length, 0);
   const compressed = new Uint8Array(
     idat.reduce((length, chunk) => length + chunk.length, 0),
   );
@@ -478,5 +600,7 @@ test("P4-E PNG renderer is deterministic, bounded and independently decodable", 
     payload.text,
     "fully damaged symbol cannot satisfy exact-byte verification",
   );
-  assert.throws(() => decodeQR({ width, height, data: new Uint8ClampedArray(8) }));
+  assert.throws(() =>
+    decodeQR({ width, height, data: new Uint8ClampedArray(8) }),
+  );
 });

@@ -71,8 +71,10 @@ function hasCycle(edges: readonly CorrectionRelation[]): boolean {
     .filter(([, count]) => count === 0)
     .map(([node]) => node);
   let visited = 0;
-  while (ready.length > 0) {
-    const node = ready.pop()!;
+  // Array iteration observes nodes appended below, avoiding a mutable loop
+  // guard whose boundary could turn an empty-ready check into a non-terminating
+  // traversal.
+  for (const node of ready) {
     visited += 1;
     for (const target of next.get(node) ?? []) {
       const count = (incoming.get(target) ?? 0) - 1;

@@ -29,7 +29,6 @@ import {
 } from "../ports/verification-engine.js";
 
 const digestPattern = /^[0-9a-f]{64}$/u;
-const opaquePattern = /^opaque:[0-9a-f]{64}$/u;
 const PROFILE = Object.freeze({
   id: ENGINE_PROFILE_ID,
   version: ENGINE_PROFILE_VERSION,
@@ -66,7 +65,10 @@ function validRecordEvidence(
       "recordId",
     ];
     const keys = Object.keys(evidence).sort();
-    const profile = evidence.profile as Record<string, unknown> | undefined;
+    const profile = evidence.profile;
+    if (!profile || typeof profile !== "object" || Array.isArray(profile))
+      return false;
+    const profileRecord = profile as Record<string, unknown>;
     return (
       keys.length === expectedKeys.length &&
       keys.every((key, index) => key === expectedKeys[index]) &&
@@ -74,8 +76,8 @@ function validRecordEvidence(
       evidence.protocolVersion === 1 &&
       evidence.contextId === projection.contextId &&
       evidence.recordId === projection.recordId &&
-      profile?.id === PROFILE.id &&
-      profile?.version === PROFILE.version &&
+      profileRecord.id === PROFILE.id &&
+      profileRecord.version === PROFILE.version &&
       evidence.algorithm === "sha-256" &&
       Number.isSafeInteger(evidence.normalizedByteLength) &&
       (evidence.normalizedByteLength as number) > 0 &&
@@ -138,7 +140,10 @@ function validLinkEvidence(
       "recordId",
       "sequenceId",
     ];
-    const profile = evidence.profile as Record<string, unknown> | undefined;
+    const profile = evidence.profile;
+    if (!profile || typeof profile !== "object" || Array.isArray(profile))
+      return false;
+    const profileRecord = profile as Record<string, unknown>;
     const previous = evidence.previous as Record<string, unknown> | undefined;
     return (
       keys.length === expectedKeys.length &&
@@ -148,8 +153,8 @@ function validLinkEvidence(
       evidence.contextId === projection.contextId &&
       evidence.sequenceId === projection.sequenceId &&
       evidence.recordId === projection.recordId &&
-      profile?.id === PROFILE.id &&
-      profile?.version === PROFILE.version &&
+      profileRecord.id === PROFILE.id &&
+      profileRecord.version === PROFILE.version &&
       evidence.algorithm === "sha-256" &&
       Number.isSafeInteger(evidence.normalizedByteLength) &&
       (evidence.normalizedByteLength as number) > 0 &&
@@ -184,14 +189,17 @@ function validChainSummary(
     if (!value || typeof value !== "object" || Array.isArray(value))
       return false;
     const summary = value as Record<string, unknown>;
-    const profile = summary.profile as Record<string, unknown> | undefined;
+    const profile = summary.profile;
+    if (!profile || typeof profile !== "object" || Array.isArray(profile))
+      return false;
+    const profileRecord = profile as Record<string, unknown>;
     return (
       summary.$schema === CHAIN_SUMMARY_EVIDENCE_SCHEMA &&
       summary.protocolVersion === 1 &&
       summary.contextId === projection.contextId &&
       summary.sequenceId === projection.sequenceId &&
-      profile?.id === PROFILE.id &&
-      profile?.version === PROFILE.version &&
+      profileRecord.id === PROFILE.id &&
+      profileRecord.version === PROFILE.version &&
       summary.algorithm === "sha-256" &&
       summary.count === 1 &&
       summary.firstPosition === position &&
@@ -399,13 +407,6 @@ export function createNoeosEngineEvidence(
   if (claims.status !== "ok") return invalid("DIAG-ENGINE-CLAIMS", "domain");
   const projected = createEngineProfileProjection(input);
   if (projected.status !== "ok") return projected;
-  if (
-    !opaquePattern.test(projected.value.contextId) ||
-    !opaquePattern.test(projected.value.sequenceId) ||
-    !opaquePattern.test(projected.value.recordId)
-  )
-    return invalid("DIAG-ENGINE-INPUT", "domain");
-
   try {
     const engine = enginePort.createEngine({
       profiles: [createEngineNormalizationProfile()],

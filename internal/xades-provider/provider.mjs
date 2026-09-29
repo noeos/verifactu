@@ -322,8 +322,6 @@ function normalizeValidationPolicy(request) {
     request.profileId !== XADES_PROFILE_ID
   )
     return { ok: false, diagnostic: DIAGNOSTICS.edition };
-  if (!TARGETS.has(request.targetName))
-    return { ok: false, diagnostic: DIAGNOSTICS.request };
   const signingTimeMs =
     request.signingTime === undefined
       ? 0
@@ -627,12 +625,14 @@ function untilDeadline(operation, deadlineAt, signal) {
   const duration = Math.max(1, deadlineAt - performance.now());
   return new Promise((resolve, reject) => {
     let settled = false;
-    const finish = (error, value) => {
+    const finish = (...outcome) => {
+      const [error, value] = outcome;
       if (settled) return;
       settled = true;
       clearTimeout(timer);
       signal?.removeEventListener("abort", abort);
-      error ? reject(error) : resolve(value);
+      if (outcome.length === 1) reject(error);
+      else resolve(value);
     };
     const abort = () =>
       finish(Object.assign(new Error("aborted"), { code: "CANCELLED" }));

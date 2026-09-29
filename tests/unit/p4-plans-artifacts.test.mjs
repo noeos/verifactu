@@ -551,6 +551,15 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     "invalid",
   );
   assert.equal(
+    transitionXmlArtifact(
+      bounded.value,
+      "validated",
+      new TextEncoder().encode("!record/>"),
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
     transitionXmlArtifact(bounded.value, "signed", bounded.value.bytes, digest)
       .status,
     "invalid",
@@ -660,6 +669,25 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     transform: "serialize",
     state: "produced",
   };
+  const constantDigest = {
+    providerId: "test:constant-digest",
+    digest: (algorithm) =>
+      "a".repeat(algorithm === "sha256" ? 64 : 128),
+  };
+  const collisionArtifact = createXmlArtifact(
+    { ...validInput, artifactId: "artifact-collision" },
+    constantDigest,
+  );
+  assert.equal(collisionArtifact.status, "ok");
+  assert.equal(
+    transitionXmlArtifact(
+      collisionArtifact.value,
+      "bounded-and-digested",
+      new TextEncoder().encode("!record/>"),
+      constantDigest,
+    ).status,
+    "invalid",
+  );
   for (const malformed of [
     null,
     { ...validInput, artifactId: "" },

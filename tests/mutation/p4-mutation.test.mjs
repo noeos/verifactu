@@ -10,8 +10,176 @@ import { inflateRawSync } from "node:zlib";
 import { promisify } from "node:util";
 import { spawnDssBridge } from "../../internal/xades-provider/worker.mjs";
 import test from "node:test";
+import {
+  focusedProviderMutationTest,
+  mutationTestPatterns,
+  mutationCompileFailed,
+  javaMutationTestSelections,
+} from "../../tooling/assurance/p4-overall-mutation-campaign.mjs";
+
+{
+  assert.deepEqual(javaMutationTestSelections({ line: 120 }), [[
+    "tests/security/p4-resource-attacks.test.mjs",
+    "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 250 }), [[
+    "tests/integration/p4-xades-pki.test.mjs",
+    "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 420 }), [[
+    "tests/security/p4-resource-attacks.test.mjs",
+    "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 455 }), [[
+    "tests/security/p4-signature-attacks.test.mjs",
+    "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 145 }), [[
+    "tests/security/p4-resource-attacks.test.mjs",
+    "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 640 }), [[
+    "tests/integration/p4-xades-pki.test.mjs",
+    "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
+  ]]);
+  assert.deepEqual(javaMutationTestSelections({ line: 760 }), [[
+    "tests/security/p4-resource-attacks.test.mjs",
+    "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+  ]]);
+
+  const integration = "tests/integration/p4-qr-roundtrip.test.mjs";
+  const qr = "packages/verifactu/src/application/qr.ts";
+  const patterns = (module, line, test = integration) =>
+    mutationTestPatterns({ module, line }, test).map(
+      (entry) => entry.pattern,
+    );
+
+  assert.deepEqual(patterns(qr, 100), [
+    "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+    "^P4-PROP-011",
+    "^P4-FUZZ-005",
+  ]);
+  assert.deepEqual(patterns(qr, 200), [
+    "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+  ]);
+  assert.deepEqual(patterns(qr, 250), [
+    "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+  ]);
+  assert.deepEqual(patterns(qr, 400), [
+    "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+  ]);
+  assert.deepEqual(patterns(qr, 285), [
+    "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+  ]);
+  assert.deepEqual(patterns("packages/verifactu/src/domain/records.ts", 40), [
+    "^P4-PROP-011",
+  ]);
+  assert.deepEqual(
+    patterns(qr, 250, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries)$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 100, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^(?:P4-E payload binds canonical ordered query and mode endpoint|P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects forged record facts, unsupported QR lexicals and digest failures|P4-E malformed verifier and edition identities fail closed)$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 320, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^P4-E rejects malformed encoder ports, matrices and render option boundaries$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 320, "tests/integration/p4-qr-roundtrip.test.mjs"),
+    ["^P4-E PNG renderer is deterministic, bounded and independently decodable$"],
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xml-provider/provider.mjs",
+      line: 213,
+    }),
+    "tests/contract/p4-xml-xsd-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "packages/verifactu/src/verification/engine-adapter.ts",
+      line: 54,
+    }),
+    "tests/contract/p4-engine-adapter.test.mjs [--test-name-pattern=^engine evidence rejects null shaped record and chain summaries$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 96,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 623,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/pki.mjs",
+      line: 60,
+    }),
+    "tests/integration/p4-xades-pki.test.mjs [--test-name-pattern=^(?:revoked is terminal and unknown, absent and malformed never become valid|PKI observation requires evidence and a fresh caller-time interval)$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 326,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/worker.mjs",
+      line: 280,
+    }),
+    "tests/security/p4-resource-attacks.test.mjs [--test-name-pattern=^DSS response decoder rejects malformed framing and validates every field$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xml-provider/worker.mjs",
+      line: 370,
+    }),
+    "tests/security/p4-xml-attacks.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 693,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    mutationCompileFailed(
+      "P4_MUTATION_ACTIVE:P4-OM-example:\nSyntaxError: Invalid regular expression",
+      true,
+    ),
+    false,
+  );
+  assert.equal(
+    mutationCompileFailed("P4_MUTATION_TYPESCRIPT_EMIT: invalid syntax", false),
+    true,
+  );
+}
 
 const built = resolve("evidence/runs/artifacts/build/verifactu/dist");
+const xmlSchemaSourceRoot = resolve(
+  "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources",
+);
+const xmlSchemaPaths = {
+  "xsd-suministro-informacion": "aeat/SuministroInformacion.xsd",
+  "xmldsig-schema": "standards/xmldsig-core-schema.xsd",
+};
 let serial = 0;
 
 async function mutation(id, control, module, before, after, observe) {
@@ -127,6 +295,20 @@ async function contextFor(load) {
       installationId: id("installation", "mutation-installation"),
       editionId: id("edition", "mutation-edition"),
     }).value,
+  };
+}
+
+function xsdFaultRequest(xml, pinnedSchemas) {
+  return {
+    editionId: "rrsif-2026-09-21-authoritative-candidate",
+    xml: Buffer.from(xml, "utf8"),
+    rootSchemaId: "xsd-suministro-informacion",
+    schemas: Object.entries(xmlSchemaPaths).map(([id, path]) => ({
+      id,
+      bytes: readFileSync(join(xmlSchemaSourceRoot, path)),
+      sha256: pinnedSchemas[id].sha256,
+    })),
+    semanticStatus: "not-evaluated",
   };
 }
 
@@ -328,12 +510,9 @@ test("P4-MUT-006 kills an instant without an explicit offset", async () => {
     async ({ load }) => {
       const { createFiscalInstant } = await load("domain/date-time.js");
       let result;
-      assert.doesNotThrow(
-        () => {
-          result = createFiscalInstant("2025-01-01T12:00:00");
-        },
-        "P4-CB-006 instant rejection remains total",
-      );
+      assert.doesNotThrow(() => {
+        result = createFiscalInstant("2025-01-01T12:00:00");
+      }, "P4-CB-006 instant rejection remains total");
       assert.equal(
         result.status,
         "invalid",
@@ -859,6 +1038,88 @@ test("P4-MUT-021 kills a fingerprint edition mismatch", async () => {
         }).status,
         "invalid",
         "P4-CB-021 algorithm allowlist assertion",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-ENCODING rejects an unadmitted encoding change", async () => {
+  await mutation(
+    "P4-FAULT-ENCODING",
+    "P4-FAULT-ENCODING",
+    "application/official-serialization.js",
+    'rule.encoding !== "utf-8"',
+    "false",
+    async ({ load }) => {
+      const { serializeOfficialProjection } = await load(
+        "application/official-serialization.js",
+      );
+      const result = serializeOfficialProjection(
+        [{ name: "A", order: 0, presence: "value", value: "1" }],
+        {
+          editionId: { kind: "edition", value: "e" },
+          label: "FP",
+          separator: "&",
+          encoding: "utf-16le",
+          fields: ["A"],
+        },
+      );
+      assert.equal(
+        result.status,
+        "invalid",
+        "P4-FAULT-ENCODING rejects encoding changes",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-ENGINE-VERSION rejects a swapped Engine profile version", async () => {
+  await mutation(
+    "P4-FAULT-ENGINE-VERSION",
+    "P4-FAULT-ENGINE-VERSION",
+    "verification/engine-profile.js",
+    "version: ENGINE_PROFILE_VERSION",
+    'version: "2.0.0"',
+    async ({ load }) => {
+      const { ENGINE_PROFILE_MANIFEST } = await load(
+        "verification/engine-profile.js",
+      );
+      assert.equal(
+        ENGINE_PROFILE_MANIFEST.version,
+        "1.0.0",
+        "P4-FAULT-ENGINE-VERSION exact profile version assertion",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-XSD-CRASH-VALID keeps worker crashes non-valid", async () => {
+  await mutation(
+    "P4-FAULT-XSD-CRASH-VALID",
+    "P4-FAULT-XSD-CRASH-VALID",
+    "internal/xml-provider/provider.mjs",
+    [
+      {
+        before:
+          '} catch {\n    return outcome("defect", "not-evaluated", semantic, ["DIAG-XSD-PROVIDER"]);\n  }\n}',
+        after:
+          '} catch {\n    return outcome("valid", "valid", semantic, []);\n  }\n}',
+      },
+    ],
+    undefined,
+    async ({ load }) => {
+      const { createXmlXsdProvider, PINNED_SCHEMAS } = await load(
+        "internal/xml-provider/provider.mjs",
+      );
+      const result = await createXmlXsdProvider({
+        execute: async () => {
+          throw new Error("seeded worker crash");
+        },
+      }).validate(xsdFaultRequest("<RegistroAlta/>", PINNED_SCHEMAS));
+      assert.notEqual(
+        result.status,
+        "valid",
+        "P4-FAULT-XSD-CRASH-VALID worker crash cannot prove validity",
       );
     },
   );
@@ -1592,6 +1853,46 @@ test("P4-MUT-036 redacts malformed profile identity data from diagnostics", asyn
         JSON.stringify(result),
         /ES12345678/u,
         "P4-CB-036 diagnostic redaction assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-032 kills a global valid flag on the claim set", async () => {
+  await mutation(
+    "P4-MUT-032",
+    "P4-CB-032",
+    "verification/claims.js",
+    "return ok(Object.freeze({ claims }));",
+    'return ok(Object.freeze({ claims, status: "valid" }));',
+    async ({ load }) => {
+      const { CLAIM_KINDS, createVerificationClaimSet } = await load(
+        "verification/claims.js",
+      );
+      const statuses = ["valid", "invalid", "indeterminate", "unsupported"];
+      const result = createVerificationClaimSet(
+        CLAIM_KINDS.map((kind, index) => {
+          const status = statuses[index];
+          return {
+            kind,
+            status,
+            ...(status === "valid"
+              ? { evidenceDigest: `sha256:${"a".repeat(64)}` }
+              : {}),
+            diagnostics: status === "valid" ? [] : [`DIAG-${index}`],
+          };
+        }),
+      );
+      assert.equal(result.status, "ok", "P4-CB-032 creation assertion");
+      assert.equal(
+        Object.hasOwn(result.value, "status"),
+        false,
+        "P4-CB-032 no global status assertion",
+      );
+      assert.equal(
+        Object.hasOwn(result.value, "valid"),
+        false,
+        "P4-CB-032 no global valid assertion",
       );
     },
   );

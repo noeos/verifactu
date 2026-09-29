@@ -55,6 +55,13 @@ test("provider accepts only the exact edition schema closure and digest pins", a
   assert.equal(digestMismatch.status, "defect");
   assert.equal(digestMismatch.diagnostics[0], "DIAG-XSD-RESOURCE-MAP");
   assert.equal(calls, 1);
+
+  const wrongPin = request();
+  wrongPin.schemas[0].sha256 = "0".repeat(64);
+  const pinMismatch = await provider.validate(wrongPin);
+  assert.equal(pinMismatch.status, "defect");
+  assert.equal(pinMismatch.diagnostics[0], "DIAG-XSD-RESOURCE-MAP");
+  assert.equal(calls, 1);
 });
 
 test("provider rejects a foreign edition, malformed request, and pre-aborted operation", async () => {

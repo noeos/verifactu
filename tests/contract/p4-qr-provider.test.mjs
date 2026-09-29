@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { decodeQR } from "qr/decode.js";
 import test from "node:test";
 import {
   createIdentity,
@@ -57,6 +58,35 @@ function record({
     predecessorId: null,
     editionId: edition,
   }).value;
+}
+
+function decodeRenderedSvg(artifact, scale) {
+  const svg = new TextDecoder().decode(artifact.bytes);
+  const view = /<svg[^>]*viewBox="0 0 (\d+) (\d+)"/u.exec(svg);
+  assert.ok(view);
+  const width = Number(view[1]) * scale;
+  const height = Number(view[2]) * scale;
+  const data = new Uint8ClampedArray(width * height * 4);
+  for (let index = 0; index < width * height; index += 1) {
+    data[index * 4] = 255;
+    data[index * 4 + 1] = 255;
+    data[index * 4 + 2] = 255;
+    data[index * 4 + 3] = 255;
+  }
+  const paths = [...svg.matchAll(/M(\d+),(\d+)h1v1h-1z/gu)];
+  assert.ok(paths.length > 0);
+  for (const [, rawX, rawY] of paths) {
+    const x = Number(rawX) * scale;
+    const y = Number(rawY) * scale;
+    for (let dy = 0; dy < scale; dy += 1)
+      for (let dx = 0; dx < scale; dx += 1) {
+        const offset = ((y + dy) * width + x + dx) * 4;
+        data[offset] = 0;
+        data[offset + 1] = 0;
+        data[offset + 2] = 0;
+      }
+  }
+  return decodeQR({ width, height, data });
 }
 
 test("P4-E payload binds canonical ordered query and mode endpoint", () => {
@@ -136,6 +166,22 @@ test("P4-E rejects cross-edition payloads, oversized fields and render bounds", 
     ).status,
     "invalid",
   );
+  assert.equal(
+    buildQrPayload(
+      record({ series: "S".repeat(30), number: "N".repeat(30) }),
+      { id: editionId, environment: "test", mode: "verifactu" },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    buildQrPayload(
+      record({ series: "S".repeat(30), number: "N".repeat(31) }),
+      { id: editionId, environment: "test", mode: "verifactu" },
+      digest,
+    ).status,
+    "invalid",
+  );
   const payload = buildQrPayload(
     record(),
     { id: editionId, environment: "test", mode: "verifactu" },
@@ -166,7 +212,29 @@ test("P4-E rejects cross-edition payloads, oversized fields and render bounds", 
     digest,
   );
   assert.equal(rendered.status, "ok");
-  assert.match(new TextDecoder().decode(rendered.value.bytes), /^<svg/u);
+  const matrix = qrPort.encode(payload.bytes, "M");
+  assert.equal(matrix.status, "ok");
+  const margin = Math.ceil((2 * matrix.value.size) / 35);
+  const viewSize = matrix.value.size + margin * 2;
+  const expectedPhysicalMm = viewSize * (35 / matrix.value.size);
+  assert.ok(Math.abs(rendered.value.widthMm - expectedPhysicalMm) < 1e-10);
+  assert.equal(rendered.value.width, viewSize * 4);
+  assert.equal(rendered.value.height, viewSize * 4);
+  assert.equal(rendered.value.heightMm, expectedPhysicalMm);
+  const svg = new TextDecoder().decode(rendered.value.bytes);
+  assert.match(svg, /^<svg/u);
+  assert.ok(
+    svg.includes(
+      `width="${expectedPhysicalMm.toFixed(3)}mm" height="${expectedPhysicalMm.toFixed(3)}mm"`,
+    ),
+  );
+  assert.ok(svg.includes(`viewBox="0 0 ${viewSize} ${viewSize}"`));
+  assert.ok(
+    svg.includes(
+      `<path fill="#fff" d="M0 0h${viewSize}v${viewSize}H0z"/>`,
+    ),
+  );
+  assert.equal(decodeRenderedSvg(rendered.value, 4), payload.text);
 });
 
 test("P4-E rejects forged record facts, unsupported QR lexicals and digest failures", () => {
@@ -237,6 +305,30 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
     renderQrPng(payload, qrPort, valid, failingDigest).status,
     "invalid",
   );
+  for (const failingCall of [1, 2]) {
+    let calls = 0;
+    const oneDigestFailure = {
+      providerId: `test:bad-digest-${failingCall}`,
+      digest: () => (++calls === failingCall ? "invalid" : "a".repeat(64)),
+    };
+    assert.equal(
+      renderQrSvg(payload, qrPort, valid, oneDigestFailure).diagnostics[0].code,
+      "DIAG-QR-DIGEST",
+    );
+    calls = 0;
+    assert.equal(
+      renderQrPng(payload, qrPort, valid, oneDigestFailure).diagnostics[0].code,
+      "DIAG-QR-DIGEST",
+    );
+  }
+  assert.equal(
+    renderQrSvg(payload, null, valid, digest).diagnostics[0].code,
+    "DIAG-QR-RENDER-INPUT",
+  );
+  assert.equal(
+    renderQrPng(payload, null, valid, digest).diagnostics[0].code,
+    "DIAG-QR-RENDER-INPUT",
+  );
   const ports = [
     {
       encode: () => {
@@ -265,16 +357,90 @@ test("P4-E rejects malformed encoder ports, matrices and render option boundarie
     assert.equal(renderQrSvg(payload, port, valid, digest).status, "invalid");
     assert.equal(renderQrPng(payload, port, valid, digest).status, "invalid");
   }
+  const wrongStatusWithValidMatrix = {
+    encode: () => ({
+      status: "unavailable",
+      value: { size: 21, get: () => false },
+    }),
+  };
+  assert.equal(
+    renderQrSvg(payload, wrongStatusWithValidMatrix, valid, digest).status,
+    "invalid",
+  );
+  const oversizedMatrix = {
+    encode: () => ({
+      status: "ok",
+      value: { size: 177, get: () => false },
+    }),
+  };
+  const maximumOptions = { scale: 32, symbolSizeMm: 40, quietZoneMm: 6 };
+  assert.equal(
+    renderQrSvg(payload, oversizedMatrix, maximumOptions, digest)
+      .diagnostics[0].code,
+    "DIAG-QR-DIMENSION-LIMIT",
+  );
+  assert.equal(
+    renderQrPng(payload, oversizedMatrix, maximumOptions, digest)
+      .diagnostics[0].code,
+    "DIAG-QR-DIMENSION-LIMIT",
+  );
+  const exactDimensionMatrix = {
+    encode: () => ({
+      status: "ok",
+      value: { size: 112, get: () => false },
+    }),
+  };
+  const exactDimensionOptions = {
+    scale: 32,
+    symbolSizeMm: 30,
+    quietZoneMm: 2,
+  };
+  const exactSvg = renderQrSvg(
+    payload,
+    exactDimensionMatrix,
+    exactDimensionOptions,
+    digest,
+  );
+  assert.equal(exactSvg.status, "ok");
+  assert.equal(exactSvg.value.width, 4096);
+  const exactPng = renderQrPng(
+    payload,
+    exactDimensionMatrix,
+    exactDimensionOptions,
+    digest,
+  );
+  assert.equal(exactPng.status, "ok");
+  assert.equal(exactPng.value.width, 4096);
 });
 
 test("P4-E encoder port enforces admitted byte and correction-level input", () => {
-  assert.equal(qrPort.encode(new Uint8Array(), "M").status, "invalid");
+  assert.equal(
+    qrPort.encode(new Uint8Array(), "M").diagnostics[0].code,
+    "DIAG-QR-ENCODER-INPUT",
+  );
   assert.equal(qrPort.encode(new Uint8Array([0xff]), "M").status, "invalid");
   assert.equal(
     qrPort.encode(new TextEncoder().encode("x"), "L").status,
     "invalid",
   );
   assert.equal(qrPort.encode(new TextEncoder().encode("x"), "M").status, "ok");
+  const payload = buildQrPayload(
+    record(),
+    { id: editionId, environment: "test", mode: "verifactu" },
+    digest,
+  ).value;
+  const exactMinimum = {
+    encode: () => ({ status: "ok", value: { size: 21, get: () => false } }),
+  };
+  assert.equal(
+    renderQrSvg(
+      payload,
+      exactMinimum,
+      { scale: 4, symbolSizeMm: 35, quietZoneMm: 2 },
+      digest,
+    ).status,
+    "ok",
+  );
   assert.equal(
     qrPort.encode(new Uint8Array(20_000).fill(65), "M").status,
     "invalid",
@@ -296,6 +462,16 @@ test("P4-E malformed verifier and edition identities fail closed", () => {
   );
   assert.equal(buildQrPayload(valid, edition, null).status, "invalid");
   assert.equal(verifyQrPayload(null, valid, edition, digest).status, "invalid");
+  assert.equal(
+    verifyQrPayload("x".repeat(1_048_576), valid, edition, digest)
+      .diagnostics[0].code,
+    "DIAG-QR-NONCANONICAL",
+  );
+  assert.equal(
+    verifyQrPayload("x".repeat(1_048_577), valid, edition, digest)
+      .diagnostics[0].code,
+    "DIAG-QR-VERIFY-LIMIT",
+  );
   assert.equal(
     verifyQrPayload(valid, valid, edition, digest).status,
     "invalid",

@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 import {
   defineXmlDocument,
   serializeXmlDocument,
+  XML_LIMITS,
 } from "../../evidence/runs/artifacts/build/verifactu/dist/ports/xml-xsd.js";
 
 const name = (localName, namespaceUri = "", prefix = null) => ({
@@ -97,6 +99,63 @@ test("XML model freezes the tree and emits deterministic UTF-8 with expanded nam
       ["pi", "trace", "ok"],
     ],
   });
+});
+
+test("P4-PROP-010 XML model serialize-parse preserves supported infoset (4096 executions)", (t) => {
+  const seed = 0x50444310;
+  const documents = [];
+  const expected = [];
+  const corpus = createHash("sha256");
+  const namespaceHistogram = Array(97).fill(0);
+  for (let index = 0; index < 4096; index += 1) {
+    const namespaceUri = `urn:p4:${(index + seed) % 97}`;
+    namespaceHistogram[(index + seed) % 97] += 1;
+    const text = `value-${seed}-${index}-${(index * 7919) % 65521}`;
+    const defined = defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("root", namespaceUri, "p"),
+        namespaces: [{ prefix: "p", namespaceUri }],
+        attributes: [{ name: name("index"), value: String(index) }],
+        children: [
+          {
+            kind: "element",
+            name: name("value", namespaceUri, "p"),
+            namespaces: [],
+            attributes: [],
+            children: [leaf(text)],
+          },
+        ],
+      },
+    });
+    assert.equal(defined.status, "ok", `seed=${seed} case=${index}`);
+    const serialized = serializeXmlDocument(defined.value);
+    assert.equal(serialized.status, "ok", `seed=${seed} case=${index}`);
+    documents.push(Buffer.from(serialized.value).toString("base64"));
+    corpus.update(Buffer.from(serialized.value));
+    corpus.update(Buffer.from([0]));
+    expected.push(["root", namespaceUri, String(index), "value", text]);
+  }
+  const parsed = JSON.parse(
+    execFileSync(
+      process.env.VERIFACTU_PYTHON ?? "python3",
+      [
+        "-I",
+        "-c",
+        "import base64,json,sys; from lxml import etree; p=etree.XMLParser(load_dtd=False,no_network=True,resolve_entities=False,recover=False); out=[]; [out.append([etree.QName(r).localname,etree.QName(r).namespace,r.get('index'),etree.QName(r[0]).localname,r[0].text]) for r in (etree.fromstring(base64.b64decode(v),p) for v in json.load(sys.stdin))]; print(json.dumps(out,separators=(',',':')))",
+      ],
+      {
+        input: JSON.stringify(documents),
+        encoding: "utf8",
+        timeout: 30_000,
+        maxBuffer: 4 * 1024 * 1024,
+      },
+    ),
+  );
+  assert.deepEqual(parsed, expected);
+  t.diagnostic(
+    `P4-PROP-010 executions=4096 seed=${seed} discards=0 corpusSha256=${corpus.digest("hex")} namespaceHistogram=${namespaceHistogram.join(",")}`,
+  );
 });
 
 test("XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text", () => {
@@ -198,6 +257,46 @@ test("XML model applies a total serialized-byte ceiling before allocating output
   });
   assert.equal(result.status, "invalid");
   assert.equal(result.diagnostics[0].code, "DIAG-XML-MODEL");
+});
+
+test("XML model accounts for serialized bytes in every node class", () => {
+  const limit = XML_LIMITS.maximumXmlBytes;
+  const element = (overrides = {}) => ({
+    kind: "element",
+    name: name("r"),
+    namespaces: [],
+    attributes: [],
+    children: [],
+    ...overrides,
+  });
+  const declarationBytes = "n".repeat(limit);
+  const attributeBytes = "a".repeat(XML_LIMITS.maximumTextBytes - 2);
+  const commentBytes = "c".repeat(XML_LIMITS.maximumTextBytes);
+  const textBytes = "&".repeat(900_000);
+  const overLimitDocuments = [
+    { root: element({ name: name("r".repeat(limit)) }) },
+    {
+      root: element({
+        name: name("r", declarationBytes, "p"),
+        namespaces: [{ prefix: "p", namespaceUri: declarationBytes }],
+      }),
+    },
+    { root: element({ children: [leaf(textBytes)] }) },
+    {
+      root: element({
+        attributes: [{ name: name("a"), value: attributeBytes }],
+        children: [{ kind: "comment", value: commentBytes }],
+      }),
+    },
+    {
+      root: element({
+        attributes: [{ name: name("a"), value: attributeBytes }],
+        children: [{ kind: "processing-instruction", target: "p", data: commentBytes }],
+      }),
+    },
+  ];
+  for (const document of overLimitDocuments)
+    assert.equal(defineXmlDocument(document).status, "invalid");
 });
 
 test("XML model fails closed across namespace, attribute, node, and text boundaries", () => {

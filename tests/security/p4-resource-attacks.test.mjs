@@ -157,6 +157,20 @@ test("bridge child environment excludes unrelated parent secrets", () => {
   );
 });
 
+test("P4-FAULT-PRIVATE-KEY-SERIALIZATION detects private key bytes in bridge requests", () => {
+  const privateKey = new TextEncoder().encode(
+    "P4-PRIVATE-KEY-MUST-REMAIN-IN-OPAQUE-CALLBACK",
+  );
+  const encoded = encodeRequest({ ...request, privateKey });
+  assert.ok(encoded instanceof Uint8Array);
+  const wire = Buffer.from(encoded).toString("ascii");
+  assert.doesNotMatch(wire, /privateKey/u);
+  assert.doesNotMatch(
+    wire,
+    new RegExp(Buffer.from(privateKey).toString("base64"), "u"),
+  );
+});
+
 test("DSS JVM enables the process network-deny policy", () => {
   assert.ok(DSS_JVM_OPTIONS.includes("-Djava.security.manager=allow"));
   assert.ok(DSS_JVM_OPTIONS.includes("-Djava.net.useSystemProxies=false"));
@@ -588,7 +602,7 @@ test("bridge process applies deadline and cancellation, with a minimal environme
   }
 });
 
-test("DSS worker rejects oversized requests, output, diagnostics and failed process outcomes", async (t) => {
+test("DSS worker rejects oversized requests, output, diagnostics and failed process outcomes", { timeout: 15_000 }, async (t) => {
   const directory = await mkdtemp(
     join(tmpdir(), "verifactu-dss-worker-census-"),
   );
@@ -679,6 +693,16 @@ test("DSS worker rejects oversized requests, output, diagnostics and failed proc
     process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
     process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
     assert.equal((await spawnDssBridge(request)).kind, "DEFECT");
+    delete process.env.VERIFACTU_JACOCO_DESTFILE;
+    assert.equal(
+      (
+        await spawnDssBridge(request, {
+          javaExecutable: "/missing/verifactu-java",
+          jarPath: classPath,
+        })
+      ).kind,
+      "DEFECT",
+    );
   } finally {
     if (previousAgent === undefined) delete process.env.VERIFACTU_JACOCO_AGENT;
     else process.env.VERIFACTU_JACOCO_AGENT = previousAgent;
@@ -734,11 +758,15 @@ test("QR verifier rejects duplicate, unknown, missing, noncanonical and cross-en
       "www2.agenciatributaria.gob.es",
     ),
   ];
-  for (const candidate of malformed)
+  for (const [index, candidate] of malformed.entries()) {
     assert.equal(
       verifyQrPayload(candidate, qrRecord, selected, qrDigest).status,
       "invalid",
+      index === 0
+        ? "P4-CB-031 reject duplicate parameters assertion"
+        : undefined,
     );
+  }
 });
 
 test("QR renderer rejects dimension overflow before allocation without fallback", () => {

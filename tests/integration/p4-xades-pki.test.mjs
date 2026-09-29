@@ -152,6 +152,12 @@ public final class PkiFixtureGenerator {
   static String responseKind(Object response) throws Exception {
     var member=response.getClass().getDeclaredMethod("kind"); member.setAccessible(true); return (String)member.invoke(response);
   }
+  static String responseDiagnostic(Object response) throws Exception {
+    var member=response.getClass().getDeclaredMethod("diagnostic"); member.setAccessible(true); return (String)member.invoke(response);
+  }
+  static String responsePayload(Object response) throws Exception {
+    var member=response.getClass().getDeclaredMethod("payload"); member.setAccessible(true); return new String((byte[])member.invoke(response),StandardCharsets.UTF_8);
+  }
   static String recordString(Object record,String field) throws Exception {
     var member=record.getClass().getDeclaredMethod(field); member.setAccessible(true); return (String)member.invoke(record);
   }
@@ -226,9 +232,38 @@ public final class PkiFixtureGenerator {
     BasicOCSPResp basic=b.build(new JcaContentSignerBuilder("SHA256withRSA").setProvider("BC").build(responder.getPrivate()),includeCertificate?new X509CertificateHolder[]{responderCert}:new X509CertificateHolder[0],date(BASE));
     return new OCSPRespBuilder().build(OCSPRespBuilder.SUCCESSFUL,basic).getEncoded();
   }
+  static String xadesFuzzReport(X509CertificateHolder c) throws Exception {
+    final int fuzzCount=4096, seed=0x50444604;
+    Random fuzzer=new Random(seed); MessageDigest corpus=MessageDigest.getInstance("SHA-256");
+    int parsed=0, rejected=0;
+    for(int i=0;i<fuzzCount;i++) {
+      byte[] raw;
+      if(i%4==0) {
+        String xml="<RegistroAlta xmlns=\"https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\"><ds:Signature><ds:SignedInfo>"+Long.toHexString(fuzzer.nextLong())+"</ds:SignedInfo></ds:Signature></RegistroAlta>";
+        raw=xml.getBytes(StandardCharsets.UTF_8);
+      } else {
+        raw=new byte[fuzzer.nextInt(513)]; fuzzer.nextBytes(raw);
+      }
+      corpus.update((byte)(raw.length&0xff)); corpus.update(raw);
+      try {
+        Document document=(Document)dss("parseXml",new Class<?>[]{byte[].class},raw);
+        boolean profile=(Boolean)dss("validateProfile",new Class<?>[]{Document.class,String.class},document,"RegistroAlta");
+        if(profile) throw new AssertionError("P4-FUZZ-004 accepted incomplete signature profile case="+i);
+        parsed++;
+      } catch(java.lang.reflect.InvocationTargetException invalid) { rejected++; }
+      Object request=request(c,List.of(),List.of(),BASE);
+      setRequest(request,"artifact",raw);
+      setRequest(request,"digest",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(raw)));
+      String outcome=responseKind(dss("dispatch",new Class<?>[]{request.getClass()},request));
+      if(!List.of("INVALID","LIMIT").contains(outcome)) throw new AssertionError("P4-FUZZ-004 verifier failed closed seed="+seed+" case="+i+" outcome="+outcome);
+    }
+    return "{\"p4Fuzz004Cases\":"+fuzzCount+",\"p4Fuzz004Seed\":"+seed+",\"p4Fuzz004Parsed\":"+parsed+",\"p4Fuzz004Rejected\":"+rejected+",\"p4Fuzz004VerifierRejected\":"+fuzzCount+",\"p4Fuzz004CorpusSha256\":\""+java.util.HexFormat.of().formatHex(corpus.digest())+"\"}";
+  }
   public static void main(String[] args) throws Exception {
     Security.addProvider(new BouncyCastleProvider());
     KeyPair k=keys(); X509CertificateHolder c=cert(k);
+    if(args.length>0 && "xades-fuzz".equals(args[0])) { System.out.println(xadesFuzzReport(c)); return; }
+    boolean mutationProbes=args.length>0 && "mutation-probes".equals(args[0]);
     KeyPair purposeKey=keys(); X509CertificateHolder purposeCertificate=certWithEku(purposeKey);
     KeyPair other=keys(); X509CertificateHolder otherCert=cert(other);
     X509Certificate runtimeCertificate=new JcaX509CertificateConverter().setProvider("BC").getCertificate(c);
@@ -259,7 +294,11 @@ public final class PkiFixtureGenerator {
     boolean wrongExponentRejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
     rsaKeySignature.replaceChild(rsaKeyValue(rsaKeyXml,rsaModulus,rsaExponent,false),rsaKeySignature.getFirstChild());
     boolean incompleteRsaKeyValueRejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
-    if(!(validKeyValueAccepted&&wrongModulusRejected&&wrongExponentRejected&&incompleteRsaKeyValueRejected&&duplicateKeyValuesRejected)) throw new AssertionError("RSA KeyValue structure and value probes");
+    Element malformedBase64Key=rsaKeyValue(rsaKeyXml,rsaModulus,rsaExponent,true);
+    ((Element)malformedBase64Key.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#","Modulus").item(0)).setTextContent("A===");
+    rsaKeySignature.replaceChild(malformedBase64Key,rsaKeySignature.getFirstChild());
+    boolean malformedKeyValueBase64Rejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
+    if(!(validKeyValueAccepted&&wrongModulusRejected&&wrongExponentRejected&&incompleteRsaKeyValueRejected&&duplicateKeyValuesRejected&&malformedKeyValueBase64Rejected)) throw new AssertionError("RSA KeyValue structure and value probes");
     Object noIssuer=dss("issuerFor",new Class<?>[]{X509Certificate.class,List.class,List.class,List.class},runtimeCertificate,List.of(),List.of(),List.of());
     Object uniqueIssuer=dss("issuerFor",new Class<?>[]{X509Certificate.class,List.class,List.class,List.class},runtimeCertificate,List.of(runtimeCertificate),List.of(),List.of());
     Object ambiguousIssuerProbe=dss("issuerFor",new Class<?>[]{X509Certificate.class,List.class,List.class,List.class},runtimeCertificate,List.of(runtimeCertificate,new JcaX509CertificateConverter().setProvider("BC").getCertificate(otherCert)),List.of(),List.of());
@@ -271,6 +310,18 @@ public final class PkiFixtureGenerator {
     String noAnchorTrust=(String)dss("validatePath",new Class<?>[]{X509Certificate.class,List.class,requestWithoutAnchor.getClass()},runtimeCertificate,List.of(runtimeCertificate),requestWithoutAnchor);
     String timeProbe=(String)dss("validateTime",new Class<?>[]{X509Certificate.class,List.class,requestWithAnchor.getClass()},runtimeCertificate,List.of(runtimeCertificate),requestWithAnchor);
     String expiredTime=(String)dss("validateTime",new Class<?>[]{X509Certificate.class,List.class,requestExpired.getClass()},runtimeCertificate,List.of(runtimeCertificate),requestExpired);
+    Object malformedTimeRequest=request(c,List.of(new byte[]{1}),List.of(),BASE);
+    String malformedTime=(String)dss("validateTime",new Class<?>[]{X509Certificate.class,List.class,malformedTimeRequest.getClass()},runtimeCertificate,List.of(runtimeCertificate),malformedTimeRequest);
+    List<KeyPair> boundedChainKeys=new ArrayList<>(); for(int i=0;i<17;i++)boundedChainKeys.add(keys());
+    List<X509CertificateHolder> boundedChain=new ArrayList<>();
+    for(int i=0;i<16;i++)boundedChain.add(crossCertificate(boundedChainKeys.get(i),boundedChainKeys.get(i+1),"CN=P4 bounded chain "+i,"CN=P4 bounded chain "+(i+1),100+i));
+    boundedChain.add(crossCertificate(boundedChainKeys.get(16),boundedChainKeys.get(16),"CN=P4 bounded chain 16","CN=P4 bounded chain 16",116));
+    var boundedChainLeaf=new JcaX509CertificateConverter().setProvider("BC").getCertificate(boundedChain.get(0));
+    List<byte[]> boundedChainDer=boundedChain.stream().map(item->{try{return item.getEncoded();}catch(Exception failure){throw new RuntimeException(failure);}}).toList();
+    Object boundedChainRequest=request(c,boundedChainDer.subList(1,boundedChainDer.size()),List.of(),BASE);
+    String boundedChainOutcome=(String)dss("validateChainLinks",new Class<?>[]{X509Certificate.class,List.class,boundedChainRequest.getClass()},boundedChainLeaf,List.of(boundedChainLeaf),boundedChainRequest);
+    KeyPair weakRsaKey=weakRsaKeys();
+    byte[] weakRsaProbeCertificate=cert(weakRsaKey).getEncoded();
     boolean chainDuplicateRejected="INVALID".equals(dss("validateChainLinks",new Class<?>[]{X509Certificate.class,List.class,requestWithoutAnchor.getClass()},runtimeCertificate,List.of(runtimeCertificate),request(c,List.of(otherCert.getEncoded(),otherCert.getEncoded()),List.of(),BASE)));
     boolean chainAmbiguityRejected="INVALID".equals(dss("validateChainLinks",new Class<?>[]{X509Certificate.class,List.class,requestWithoutAnchor.getClass()},runtimeCertificate,List.of(runtimeCertificate),request(c,List.of(otherCert.getEncoded(),cert(keys()).getEncoded()),List.of(),BASE)));
     KeyPair cycleAKey=keys(),cycleBKey=keys();
@@ -280,23 +331,23 @@ public final class PkiFixtureGenerator {
     if(!chainCycleRejected) throw new AssertionError("certificate path cycle probe");
     boolean nonemptyParameterChain=dss("parameters",new Class<?>[]{requestWithAnchor.getClass()},request(c,List.of(c.getEncoded()),List.of(),BASE))!=null;
     Object badProtocolRequest=request(c,List.of(),List.of(),BASE); setRequest(badProtocolRequest,"protocol","WRONG");
-    boolean badProtocolRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{badProtocolRequest.getClass()},badProtocolRequest)));
+    boolean badProtocolRejected="DIAG-XADES-REQUEST".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{badProtocolRequest.getClass()},badProtocolRequest)));
     Object badDigestRequest=request(c,List.of(),List.of(),BASE); setRequest(badDigestRequest,"digest","00");
-    boolean badDigestRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{badDigestRequest.getClass()},badDigestRequest)));
+    boolean badDigestRejected="DIAG-XADES-DIGEST".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{badDigestRequest.getClass()},badDigestRequest)));
     Object emptyArtifactRequest=request(c,List.of(),List.of(),BASE); setRequest(emptyArtifactRequest,"artifact",new byte[0]);
-    boolean emptyArtifactRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{emptyArtifactRequest.getClass()},emptyArtifactRequest)));
+    boolean emptyArtifactRejected="DIAG-XADES-REQUEST".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{emptyArtifactRequest.getClass()},emptyArtifactRequest)));
     Object oversizedChainRequest=request(c,List.of(),List.of(),BASE); setRequest(oversizedChainRequest,"chain",new ArrayList<>(java.util.Collections.nCopies(17,c.getEncoded())));
-    boolean oversizedChainLimited="LIMIT".equals(responseKind(dss("dispatch",new Class<?>[]{oversizedChainRequest.getClass()},oversizedChainRequest)));
+    boolean oversizedChainLimited="DIAG-XADES-EVIDENCE-BYTES".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{oversizedChainRequest.getClass()},oversizedChainRequest)));
     Object unknownCommandRequest=request(c,List.of(),List.of(),BASE); setRequest(unknownCommandRequest,"command","UNKNOWN");
-    boolean unknownCommandRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{unknownCommandRequest.getClass()},unknownCommandRequest)));
+    boolean unknownCommandRejected="DIAG-XADES-COMMAND".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{unknownCommandRequest.getClass()},unknownCommandRequest)));
     Object missingPrepareCertificate=request(c,List.of(),List.of(),BASE); setRequest(missingPrepareCertificate,"command","SIGN_PREPARE"); setRequest(missingPrepareCertificate,"signerCertificate",new byte[0]);
-    boolean missingPrepareCertificateRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{missingPrepareCertificate.getClass()},missingPrepareCertificate)));
+    boolean missingPrepareCertificateRejected="DIAG-XADES-CERTIFICATE".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{missingPrepareCertificate.getClass()},missingPrepareCertificate)));
     Object emptySignerComplete=request(c,List.of(),List.of(),BASE); setRequest(emptySignerComplete,"command","SIGN_COMPLETE"); setRequest(emptySignerComplete,"signerCertificate",new byte[0]);
-    boolean emptySignerCompleteRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{emptySignerComplete.getClass()},emptySignerComplete)));
+    boolean emptySignerCompleteRejected="DIAG-XADES-SIGNATURE".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{emptySignerComplete.getClass()},emptySignerComplete)));
     Object badCompleteSignature=request(c,List.of(),List.of(),BASE); setRequest(badCompleteSignature,"command","SIGN_COMPLETE"); setRequest(badCompleteSignature,"signature",new byte[1]);
-    boolean badCompleteSignatureRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{badCompleteSignature.getClass()},badCompleteSignature)));
+    boolean badCompleteSignatureRejected="DIAG-XADES-SIGNATURE".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{badCompleteSignature.getClass()},badCompleteSignature)));
     Object oversizedCompleteSignature=request(c,List.of(),List.of(),BASE); setRequest(oversizedCompleteSignature,"command","SIGN_COMPLETE"); setRequest(oversizedCompleteSignature,"signature",new byte[1025]);
-    boolean oversizedCompleteSignatureRejected="INVALID".equals(responseKind(dss("dispatch",new Class<?>[]{oversizedCompleteSignature.getClass()},oversizedCompleteSignature)));
+    boolean oversizedCompleteSignatureRejected="DIAG-XADES-SIGNATURE".equals(responseDiagnostic(dss("dispatch",new Class<?>[]{oversizedCompleteSignature.getClass()},oversizedCompleteSignature)));
     if(!(badProtocolRejected&&badDigestRejected&&emptyArtifactRejected&&oversizedChainLimited&&unknownCommandRejected&&missingPrepareCertificateRejected&&emptySignerCompleteRejected&&badCompleteSignatureRejected&&oversizedCompleteSignatureRejected)) throw new AssertionError("dispatch rejection probes");
     boolean negativeCursorCountRejected=false; try{cursorList(cursor(List.of("-1".getBytes(StandardCharsets.UTF_8))));}catch(java.lang.reflect.InvocationTargetException expected){negativeCursorCountRejected=true;}
     boolean oversizedCursorCountRejected=false; try{cursorList(cursor(List.of("33".getBytes(StandardCharsets.UTF_8))));}catch(java.lang.reflect.InvocationTargetException expected){oversizedCursorCountRejected=true;}
@@ -410,22 +461,28 @@ public final class PkiFixtureGenerator {
     boolean ocspSignatureRejects= !authorized(new OCSPToken(badBasic,badBasic.getResponses()[0],new CertificateToken(leafCertificate),new CertificateToken(issuerCertificate)),issuerCertificate);
     boolean unsupportedTokenRejects= !authorized(null,issuerCertificate);
     final int fuzzCount=4096, pkiFuzzSeed=0x50444607, protocolFuzzSeed=0x50444608;
-    Random pkiFuzzer=new Random(pkiFuzzSeed); MessageDigest pkiCorpus=MessageDigest.getInstance("SHA-256");
-    Object fuzzRequest=request(c,List.of(),List.of(),BASE);
-    for(int i=0;i<fuzzCount;i++) {
-      byte[] raw=new byte[pkiFuzzer.nextInt(513)]; pkiFuzzer.nextBytes(raw); pkiCorpus.update((byte)(raw.length&0xff)); pkiCorpus.update(raw);
-      setRequest(fuzzRequest,"crls",i%2==0?List.of(raw):List.of()); setRequest(fuzzRequest,"ocsps",i%2==0?List.of():List.of(raw));
-      String outcome=recordString(dss("validateRevocation",new Class<?>[]{X509Certificate.class,List.class,fuzzRequest.getClass()},issuerCertificate,List.of(issuerCertificate),fuzzRequest),"status");
-      if("VALID".equals(outcome)||"REVOKED".equals(outcome)) throw new AssertionError("P4-FUZZ-007 seed="+pkiFuzzSeed+" case="+i+" outcome="+outcome);
-    }
-    Random protocolFuzzer=new Random(protocolFuzzSeed); MessageDigest protocolCorpus=MessageDigest.getInstance("SHA-256");
-    for(int i=0;i<fuzzCount;i++) {
-      byte[] raw=new byte[protocolFuzzer.nextInt(513)]; protocolFuzzer.nextBytes(raw); protocolCorpus.update((byte)(raw.length&0xff)); protocolCorpus.update(raw);
-      try{parsedRequest(raw);}catch(java.lang.reflect.InvocationTargetException rejected){/* malformed protocol input is fail-closed */}
+    MessageDigest pkiCorpus=MessageDigest.getInstance("SHA-256"), protocolCorpus=MessageDigest.getInstance("SHA-256");
+    if(!mutationProbes) {
+      Random pkiFuzzer=new Random(pkiFuzzSeed); Object fuzzRequest=request(c,List.of(),List.of(),BASE);
+      for(int i=0;i<fuzzCount;i++) {
+        byte[] raw=new byte[pkiFuzzer.nextInt(513)]; pkiFuzzer.nextBytes(raw); pkiCorpus.update((byte)(raw.length&0xff)); pkiCorpus.update(raw);
+        setRequest(fuzzRequest,"crls",i%2==0?List.of(raw):List.of()); setRequest(fuzzRequest,"ocsps",i%2==0?List.of():List.of(raw));
+        String outcome=recordString(dss("validateRevocation",new Class<?>[]{X509Certificate.class,List.class,fuzzRequest.getClass()},issuerCertificate,List.of(issuerCertificate),fuzzRequest),"status");
+        if("VALID".equals(outcome)||"REVOKED".equals(outcome)) throw new AssertionError("P4-FUZZ-007 seed="+pkiFuzzSeed+" case="+i+" outcome="+outcome);
+      }
+      Random protocolFuzzer=new Random(protocolFuzzSeed);
+      for(int i=0;i<fuzzCount;i++) {
+        byte[] raw=new byte[protocolFuzzer.nextInt(513)]; protocolFuzzer.nextBytes(raw); protocolCorpus.update((byte)(raw.length&0xff)); protocolCorpus.update(raw);
+        try{parsedRequest(raw);}catch(java.lang.reflect.InvocationTargetException rejected){/* malformed protocol input is fail-closed */}
+      }
     }
     String json="{\"certificate\":\""+b64(c.getEncoded())+"\",\"otherCertificate\":\""+b64(otherCert.getEncoded())+"\",\"privateKey\":\""+b64(k.getPrivate().getEncoded())+"\",\"purposeCertificate\":\""+b64(purposeCertificate.getEncoded())+"\",\"purposePrivateKey\":\""+b64(purposeKey.getPrivate().getEncoded())+"\",\"crlGood\":\""+b64(crl(k,c,false,BASE+86400000))+"\",\"crlRevoked\":\""+b64(crl(k,c,true,BASE+86400000))+"\",\"crlStale\":\""+b64(crl(k,c,false,BASE-1))+"\",\"crlWrongIssuer\":\""+b64(crl(other,otherCert,false,BASE+86400000))+"\",\"ocspGood\":\""+b64(ocsp(k,c,CertificateStatus.GOOD,BASE+3600000))+"\",\"ocspStale\":\""+b64(ocsp(k,c,CertificateStatus.GOOD,BASE+3600000))+"\",\"ocspDelegated\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspFuture\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE+1000,BASE+3600000))+"\",\"ocspNoNextUpdate\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE-1000,0))+"\",\"ocspWrongResponder\":\""+b64(ocspSignedBy(other,otherCert,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspWrongResponderRevoked\":\""+b64(ocspSignedBy(other,otherCert,c,new RevokedStatus(date(BASE-1800000),CRLReason.keyCompromise),BASE-1000,BASE+3600000))+"\",\"ocspUnknown\":\""+b64(ocsp(k,c,new UnknownStatus(),BASE+3600000))+"\",\"ocspRevoked\":\""+b64(ocsp(k,c,new RevokedStatus(date(BASE-1800000),CRLReason.keyCompromise),BASE+3600000))+"\"}";
     String extra=",\"probeDirectSignatureAbsent\":"+directSignatureAbsent+",\"probeChildNull\":"+childNull+",\"probeChildrenNull\":"+childrenNull+",\"probeOptionalKeyValue\":"+keyValueOptional+",\"probeMalformedKeyValueRejected\":"+malformedKeyValueRejected+",\"probeNoIssuer\":"+(noIssuer==null)+",\"probeUniqueIssuer\":"+(uniqueIssuer!=null)+",\"probeAmbiguousIssuer\":"+(ambiguousIssuerProbe==null)+",\"probeChain\":\""+chainProbe+"\",\"probeChainDuplicateRejected\":"+chainDuplicateRejected+",\"probeChainAmbiguityRejected\":"+chainAmbiguityRejected+",\"probeTrust\":\""+trustProbe+"\",\"probeNoAnchorTrust\":\""+noAnchorTrust+"\",\"probeTime\":\""+timeProbe+"\",\"probeExpiredTime\":\""+expiredTime+"\",\"probeZeroLengthXmlRejected\":"+zeroLengthXmlRejected+",\"probeOverLimitXmlRejected\":"+overLimitXmlRejected+",\"probeNoEkuAssessment\":\""+assessmentProbe+"\",\"probeExplicitEkuAssessment\":\""+purposeAssessment+"\",\"probeParameters\":"+(parametersProbe!=null)+",\"probeNonemptyParameterChain\":"+nonemptyParameterChain+",\"crlWrongIssuerName\":\""+b64(mismatchedCrl)+"\",\"authCrlIssuerMismatchRejected\":"+crlAuthorityRejects+",\"authOcspBadSignatureRejected\":"+ocspSignatureRejects+",\"authUnsupportedTokenRejected\":"+unsupportedTokenRejects+",\"ocspDelegatedByName\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000,true,true))+"\",\"ocspDelegatedNoEku\":\""+b64(ocspSignedBy(noEkuKey,noEku,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedWrongEku\":\""+b64(ocspSignedBy(wrongEkuKey,wrongEku,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedNoDigitalSignature\":\""+b64(ocspSignedBy(noDigitalKey,noDigital,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedNoKeyUsage\":\""+b64(ocspSignedBy(noKeyUsageKey,noKeyUsage,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedFuture\":\""+b64(ocspSignedBy(futureKey,future,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedWrongIssuer\":\""+b64(ocspSignedBy(wrongIssuerKey,wrongIssuer,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedWrongIssuerName\":\""+b64(ocspSignedBy(wrongIssuerNameKey,wrongIssuerName,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedNoCertificate\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000,false,false))+"\",\"ocspDelegatedMismatchedResponderId\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000,true,true,new X500Name("CN=Unmatched responder")))+"\",\"ocspDelegatedBadSignature\":\""+b64(badSignature)+"\",\"ocspNoThisUpdate\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,0,BASE+3600000))+"\""; json=json.substring(0,json.length()-1)+extra+"}";
-    json=json.substring(0,json.length()-1)+",\"p4Fuzz007Cases\":"+fuzzCount+",\"p4Fuzz007Seed\":"+pkiFuzzSeed+",\"p4Fuzz007CorpusSha256\":\""+java.util.HexFormat.of().formatHex(pkiCorpus.digest())+"\",\"p4Fuzz008Cases\":"+fuzzCount+",\"p4Fuzz008Seed\":"+protocolFuzzSeed+",\"p4Fuzz008CorpusSha256\":\""+java.util.HexFormat.of().formatHex(protocolCorpus.digest())+"\"}";
+    if(mutationProbes)
+      { boolean weakRsaAlgorithmRejected=false; String weakRsaPayload=""; if(args.length>1) { byte[] official=Base64.getDecoder().decode(args[1]); String original=new String(official,StandardCharsets.UTF_8); String weak=original.replaceAll("(?s)(<ds:X509Certificate>).*?(</ds:X509Certificate>)","$1"+b64(weakRsaProbeCertificate)+"$2"); if(weak.equals(original)) throw new AssertionError("weak RSA certificate insertion probe"); String weakDigest=b64(MessageDigest.getInstance("SHA-1").digest(weakRsaProbeCertificate)); weak=weak.replaceFirst("(?s)(<xades:SigningCertificate>.*?<ds:DigestValue>).*?(</ds:DigestValue>)","$1"+weakDigest+"$2"); weak=weak.replaceAll("(?s)<ds:KeyValue>.*?</ds:KeyValue>",""); byte[] artifact=weak.getBytes(StandardCharsets.UTF_8); Object weakRequest=request(c,List.of(),List.of(),BASE); setRequest(weakRequest,"artifact",artifact); setRequest(weakRequest,"digest",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(artifact))); Object weakResponse=dss("verify",new Class<?>[]{weakRequest.getClass()},weakRequest); weakRsaPayload=responsePayload(weakResponse); weakRsaAlgorithmRejected=weakRsaPayload.contains("DIAG-XADES-ALGORITHM"); }
+        json=json.substring(0,json.length()-1)+",\"mutationProbesPassed\":"+(malformedKeyValueBase64Rejected&&"INDETERMINATE".equals(malformedTime)&&"INDETERMINATE".equals(boundedChainOutcome)&&weakRsaAlgorithmRejected)+",\"probeMalformedKeyValueBase64Rejected\":"+malformedKeyValueBase64Rejected+",\"probeMalformedTime\":\""+malformedTime+"\",\"probeBoundedChain\":\""+boundedChainOutcome+"\",\"probeWeakRsaAlgorithmRejected\":"+weakRsaAlgorithmRejected+",\"probeWeakRsaPayloadBase64\":\""+b64(weakRsaPayload.getBytes(StandardCharsets.UTF_8))+"\"}"; }
+    else
+      json=json.substring(0,json.length()-1)+",\"p4Fuzz007Cases\":"+fuzzCount+",\"p4Fuzz007Seed\":"+pkiFuzzSeed+",\"p4Fuzz007CorpusSha256\":\""+java.util.HexFormat.of().formatHex(pkiCorpus.digest())+"\",\"p4Fuzz008Cases\":"+fuzzCount+",\"p4Fuzz008Seed\":"+protocolFuzzSeed+",\"p4Fuzz008CorpusSha256\":\""+java.util.HexFormat.of().formatHex(protocolCorpus.digest())+"\"}";
     System.out.println(json);
   }
 }
@@ -553,8 +610,9 @@ test("revoked is terminal and unknown, absent and malformed never become valid",
   );
 });
 
-test("P4-PROP-013 revocation uncertainty never upgrades to valid (4096 cases)", () => {
-  let state = 0x50444101 ^ 0x05044013;
+test("P4-PROP-013 revocation uncertainty never upgrades to valid (4096 cases)", (t) => {
+  const seed = 0x50444101 ^ 0x05044013;
+  let state = seed;
   const next = () => {
     state = (state + 0x6d2b79f5) | 0;
     let value = state;
@@ -563,6 +621,8 @@ test("P4-PROP-013 revocation uncertainty never upgrades to valid (4096 cases)", 
     return ((value ^ (value >>> 14)) >>> 0) / 0x1_0000_0000;
   };
   const evidence = [new Uint8Array([0x01])];
+  const corpus = createHash("sha256");
+  const histogram = Object.create(null);
   for (let index = 0; index < 4096; index += 1) {
     const validationTimeMs = Date.parse("2026-09-26T10:00:00Z");
     const maximumRevocationAgeSeconds = 1 + Math.floor(next() * 172_800);
@@ -598,21 +658,34 @@ test("P4-PROP-013 revocation uncertainty never upgrades to valid (4096 cases)", 
         nextUpdateMs: validationTimeMs - 1,
       },
     ];
-    for (const observation of uncertain)
-      assert.notEqual(
-        normalizePkiObservation(observation, policy).status,
-        "valid",
-        `case=${index}`,
-      );
+    corpus.update(
+      JSON.stringify({
+        validationTimeMs,
+        maximumRevocationAgeSeconds,
+        uncertain,
+      }),
+    );
+    for (const observation of uncertain) {
+      const status = normalizePkiObservation(observation, policy).status;
+      histogram[status] = (histogram[status] ?? 0) + 1;
+      assert.notEqual(status, "valid", `seed=${seed} case=${index}`);
+    }
     assert.equal(
       normalizePkiObservation({ status: "revoked" }, policy).status,
       "revoked",
       `case=${index}`,
     );
   }
+  assert.equal(
+    Object.values(histogram).reduce((sum, count) => sum + count, 0),
+    32_768,
+  );
+  t.diagnostic(
+    `P4-PROP-013 executions=4096 seed=${seed} discards=0 corpusSha256=${corpus.digest("hex")} statusHistogram=${JSON.stringify(Object.fromEntries(Object.entries(histogram).sort(([left], [right]) => left.localeCompare(right))))}`,
+  );
 });
 
-test("P4-FUZZ-008 bridge protocol parser is total and bounded (seed=1430257929)", () => {
+test("P4-FUZZ-008 bridge protocol parser is total and bounded (seed=1430257929)", (t) => {
   const fuzzSeed = 0x50444101 ^ 0x05044008;
   let state = fuzzSeed >>> 0;
   const next = () => {
@@ -662,7 +735,11 @@ test("P4-FUZZ-008 bridge protocol parser is total and bounded (seed=1430257929)"
       corpus.update(encoded);
     }
   }
-  assert.match(corpus.digest("hex"), /^[a-f0-9]{64}$/u);
+  const corpusSha256 = corpus.digest("hex");
+  assert.match(corpusSha256, /^[a-f0-9]{64}$/u);
+  t.diagnostic(
+    `P4-FUZZ-008 executions=4096 seed=${fuzzSeed} discards=0 corpusSha256=${corpusSha256}`,
+  );
 });
 
 function archiveEntry(archive, wantedName) {
@@ -696,7 +773,7 @@ function archiveEntry(archive, wantedName) {
   assert.fail(`missing official XAdES vector: ${wantedName}`);
 }
 
-async function generatePkiFixtures() {
+async function generatePkiFixtures(args = []) {
   const directory = await mkdtemp(join(tmpdir(), "verifactu-p4d-pki-"));
   try {
     const source = join(directory, "PkiFixtureGenerator.java");
@@ -717,7 +794,7 @@ async function generatePkiFixtures() {
           ];
     const result = spawnSync(
       process.env.VERIFACTU_JAVA ?? "java",
-      [...javaCoverageOptions, "--class-path", jarPath, source],
+      [...javaCoverageOptions, "--class-path", jarPath, source, ...args],
       {
         encoding: "utf8",
         timeout: 60_000,
@@ -832,14 +909,22 @@ test("exact DSS bridge verifies official XAdES structure and signature without i
   assert.equal(negative.cryptographic, "invalid");
 });
 
-test("DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence", async () => {
+test("DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence", async (t) => {
   const fixture = await generatePkiFixtures();
-  assert.equal(fixture.p4Fuzz007Cases, 4096);
-  assert.equal(fixture.p4Fuzz007Seed, 0x50444607);
-  assert.match(fixture.p4Fuzz007CorpusSha256, /^[a-f0-9]{64}$/u);
+  await t.test(
+    "P4-FUZZ-007 replays 4096 bounded revocation evidence cases",
+    () => {
+      assert.equal(fixture.p4Fuzz007Cases, 4096);
+      assert.equal(fixture.p4Fuzz007Seed, 0x50444607);
+      assert.match(fixture.p4Fuzz007CorpusSha256, /^[a-f0-9]{64}$/u);
+    },
+  );
   assert.equal(fixture.p4Fuzz008Cases, 4096);
   assert.equal(fixture.p4Fuzz008Seed, 0x50444608);
   assert.match(fixture.p4Fuzz008CorpusSha256, /^[a-f0-9]{64}$/u);
+  t.diagnostic(
+    `P4-FUZZ-007 executions=${fixture.p4Fuzz007Cases} seed=${fixture.p4Fuzz007Seed} discards=0 corpusSha256=${fixture.p4Fuzz007CorpusSha256}`,
+  );
   assert.equal(fixture.probeChildNull, true);
   assert.equal(fixture.probeChildrenNull, true);
   assert.equal(fixture.probeOptionalKeyValue, true);
@@ -854,7 +939,10 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
   assert.equal(fixture.probeTrust, "VALID");
   assert.equal(fixture.probeNoAnchorTrust, "INDETERMINATE");
   assert.equal(fixture.probeTime, "VALID");
-  assert.equal(fixture.probeExpiredTime, "INVALID");
+  await t.test(
+    "P4-FAULT-CERTIFICATE-TIME-BYPASS rejects a certificate outside caller time",
+    () => assert.equal(fixture.probeExpiredTime, "INVALID"),
+  );
   assert.equal(fixture.probeZeroLengthXmlRejected, true);
   assert.equal(fixture.probeOverLimitXmlRejected, true);
   assert.match(fixture.probeNoEkuAssessment, /extendedKeyUsage=VALID/u);
@@ -1185,12 +1273,17 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
       crlEvidence: [],
       ocspEvidence: [new Uint8Array(Buffer.from(evidence, "base64"))],
     });
-    assert.equal(
-      unauthorized.status,
-      "indeterminate",
-      `${name}: ${JSON.stringify(unauthorized)}`,
+    await t.test(
+      `P4-FAULT-UNAUTHORIZED-REVOCATION-RESPONDER rejects ${name}`,
+      () => {
+        assert.equal(
+          unauthorized.status,
+          "indeterminate",
+          `${name}: ${JSON.stringify(unauthorized)}`,
+        );
+        assert.equal(unauthorized.revocation, "unknown", name);
+      },
     );
-    assert.equal(unauthorized.revocation, "unknown", name);
   }
 
   const maximumAgeFailure = await provider.verify({
@@ -1250,4 +1343,67 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
   });
   assert.equal(crlRevoked.status, "invalid", JSON.stringify(crlRevoked));
   assert.equal(crlRevoked.revocation, "revoked");
+});
+
+test("P4-FUZZ-004 XAdES bridge verifier is total over its 4096-case corpus", async (t) => {
+  const report = await generatePkiFixtures(["xades-fuzz"]);
+  assert.equal(report.p4Fuzz004Cases, 4096);
+  assert.equal(report.p4Fuzz004Seed, 0x50444604);
+  assert.ok(report.p4Fuzz004Parsed + report.p4Fuzz004Rejected === 4096);
+  assert.equal(report.p4Fuzz004VerifierRejected, 4096);
+  assert.ok(report.p4Fuzz004Rejected > 0);
+  assert.match(report.p4Fuzz004CorpusSha256, /^[a-f0-9]{64}$/u);
+  t.diagnostic(
+    `P4-FUZZ-004 cases=${report.p4Fuzz004Cases} seed=${report.p4Fuzz004Seed} discards=0 parsed=${report.p4Fuzz004Parsed} rejected=${report.p4Fuzz004Rejected} verifierRejected=${report.p4Fuzz004VerifierRejected} corpusSha256=${report.p4Fuzz004CorpusSha256}`,
+  );
+});
+
+test("P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors", async (t) => {
+  const archive = readFileSync(
+    "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/AnexosEjemplosFirmaRegFact.zip",
+  );
+  const officialBytes = archiveEntry(
+    archive,
+    "ejemploRegistro-firmado-epes-xades4j.xml",
+  );
+  const probe = await generatePkiFixtures([
+    "mutation-probes",
+    Buffer.from(officialBytes).toString("base64"),
+  ]);
+  assert.equal(probe.mutationProbesPassed, true, JSON.stringify({
+    malformedKeyValueBase64: probe.probeMalformedKeyValueBase64Rejected,
+    malformedTime: probe.probeMalformedTime,
+    boundedChain: probe.probeBoundedChain,
+    weakRsaAlgorithmRejected: probe.probeWeakRsaAlgorithmRejected,
+    weakRsaPayload: Buffer.from(probe.probeWeakRsaPayloadBase64, "base64").toString("utf8"),
+  }));
+  assert.equal(probe.probeDirectSignatureAbsent, true);
+  assert.equal(probe.probeChildNull, true);
+  assert.equal(probe.probeChildrenNull, true);
+  assert.equal(probe.probeOptionalKeyValue, true);
+  assert.equal(probe.probeMalformedKeyValueRejected, true);
+  assert.equal(probe.probeMalformedKeyValueBase64Rejected, true);
+  assert.equal(probe.probeNoIssuer, true);
+  assert.equal(probe.probeUniqueIssuer, true);
+  assert.equal(probe.probeAmbiguousIssuer, true);
+  assert.equal(probe.probeChain, "VALID");
+  assert.equal(probe.probeChainDuplicateRejected, true);
+  assert.equal(probe.probeChainAmbiguityRejected, true);
+  assert.equal(probe.probeTrust, "VALID");
+  assert.equal(probe.probeNoAnchorTrust, "INDETERMINATE");
+  assert.equal(probe.probeTime, "VALID");
+  assert.equal(probe.probeExpiredTime, "INVALID");
+  assert.equal(probe.probeMalformedTime, "INDETERMINATE");
+  assert.equal(probe.probeBoundedChain, "INDETERMINATE");
+  assert.equal(probe.probeWeakRsaAlgorithmRejected, true);
+  assert.equal(probe.probeZeroLengthXmlRejected, true);
+  assert.equal(probe.probeOverLimitXmlRejected, true);
+  assert.match(probe.probeNoEkuAssessment, /extendedKeyUsage=VALID/u);
+  assert.match(probe.probeExplicitEkuAssessment, /extendedKeyUsage=INDETERMINATE/u);
+  assert.equal(probe.probeParameters, true);
+  assert.equal(probe.probeNonemptyParameterChain, true);
+  assert.equal(probe.authCrlIssuerMismatchRejected, true);
+  assert.equal(probe.authOcspBadSignatureRejected, true);
+  assert.equal(probe.authUnsupportedTokenRejected, true);
+  t.diagnostic("P4-OVERALL-MUTATION-JAVA-PROBE deterministic DSS bridge probes passed");
 });

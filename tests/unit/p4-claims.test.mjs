@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import {
   CLAIM_KINDS,
@@ -26,6 +27,11 @@ function claimSet() {
 }
 
 test("P4-CB-032 preserves each claim outcome without a global valid flag", () => {
+  const nullPrototypeClaim = Object.assign(
+    Object.create(null),
+    claim("official-format", "valid"),
+  );
+  assert.equal(createVerificationClaim(nullPrototypeClaim).status, "ok");
   const result = claimSet();
   assert.equal(result.status, "ok");
   assert.deepEqual(
@@ -241,7 +247,7 @@ test("claim boundaries contain throwing proxies without echoing their data", () 
   );
 });
 
-test("P4-PROP-012 claim aggregation preserves every component status (seed=1346650369)", () => {
+test("P4-PROP-012 claim aggregation preserves every component status (seed=1346650369)", (t) => {
   const kinds = [
     "official-format",
     "cryptographic",
@@ -250,10 +256,14 @@ test("P4-PROP-012 claim aggregation preserves every component status (seed=13466
     "noeos-evidence",
   ];
   const statuses = ["valid", "invalid", "indeterminate", "unsupported"];
+  const corpus = createHash("sha256");
+  const histogram = Object.fromEntries(statuses.map((status) => [status, 0]));
   for (let index = 0; index < 4096; index += 1) {
     const expected = kinds.map(
       (_, component) => statuses[(index + component * 3) % statuses.length],
     );
+    corpus.update(expected.join(","));
+    for (const status of expected) histogram[status] += 1;
     const result = createVerificationClaimSet(
       kinds.map((kind, component) => {
         const status = expected[component];
@@ -278,4 +288,7 @@ test("P4-PROP-012 claim aggregation preserves every component status (seed=13466
     assert.equal(Object.hasOwn(result.value, "status"), false);
     assert.equal(Object.hasOwn(result.value, "valid"), false);
   }
+  t.diagnostic(
+    `P4-PROP-012 executions=4096 seed=1346650369 discards=0 corpusSha256=${corpus.digest("hex")} statusHistogram=${JSON.stringify(histogram)}`,
+  );
 });
