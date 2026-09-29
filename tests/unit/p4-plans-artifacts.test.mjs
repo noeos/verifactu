@@ -339,7 +339,21 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   );
   assert.equal(
     serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\ud800A" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
       [{ name: "A", order: 0, presence: "value", value: "😀" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\ud800\udc00" }],
       { ...rule, fields: ["A"] },
     ).status,
     "ok",
@@ -360,6 +374,24 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   );
   assert.equal(
     serializeOfficialProjection([null], { ...rule, fields: ["A"] }).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(null, { ...rule, fields: [] }).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "future-state", value: "x" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: null }],
+      { ...rule, fields: ["A"] },
+    ).status,
     "invalid",
   );
   assert.equal(
@@ -404,6 +436,27 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   assert.equal(
     serializeOfficialProjection(projected, { ...rule, nilToken: undefined })
       .status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "x" }],
+      { ...rule, fields: ["A"], nilToken: undefined },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "nil", value: null }],
+      { ...rule, fields: ["A"], nilToken: "x".repeat(64) },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "nil", value: null }],
+      { ...rule, fields: ["A"], nilToken: "x".repeat(65) },
+    ).status,
     "invalid",
   );
   assert.equal(
