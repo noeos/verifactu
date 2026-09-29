@@ -501,6 +501,8 @@ test("PKI observation requires evidence and a fresh caller-time interval", () =>
     {},
     { ...policy, validationTimeMs: Number.NaN },
     { ...policy, maximumRevocationAgeSeconds: 172_801 },
+    { ...policy, maximumRevocationAgeSeconds: 1.5 },
+    { ...policy, maximumRevocationAgeSeconds: 0 },
     { ...policy, crlEvidence: null },
     { ...policy, ocspEvidence: null },
   ]) {
@@ -520,12 +522,105 @@ test("PKI observation requires evidence and a fresh caller-time interval", () =>
     normalizePkiObservation(
       {
         status: "valid",
+        thisUpdateMs: policy.validationTimeMs,
+        nextUpdateMs: policy.validationTimeMs + 1,
+      },
+      { ...policy, maximumRevocationAgeSeconds: 172_800 },
+    ).status,
+    "valid",
+    "the declared maximum revocation age is accepted",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
         thisUpdateMs: policy.validationTimeMs - 1000,
         nextUpdateMs: policy.validationTimeMs + 1000,
       },
       policy,
     ).status,
     "valid",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs,
+        nextUpdateMs: policy.validationTimeMs + 1000,
+      },
+      policy,
+    ).status,
+    "valid",
+    "revocation evidence beginning exactly at caller time is fresh",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs - 1,
+        nextUpdateMs: policy.validationTimeMs,
+      },
+      policy,
+    ).status,
+    "valid",
+    "revocation evidence ending exactly at caller time remains current",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs - 86_400_000,
+        nextUpdateMs: policy.validationTimeMs + 1,
+      },
+      policy,
+    ).status,
+    "valid",
+    "the maximum revocation age is inclusive",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs - 0.5,
+        nextUpdateMs: policy.validationTimeMs + 1,
+      },
+      policy,
+    ).status,
+    "stale",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs - 1,
+        nextUpdateMs: policy.validationTimeMs + 0.5,
+      },
+      policy,
+    ).status,
+    "stale",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs - 1001,
+        nextUpdateMs: policy.validationTimeMs + 1,
+      },
+      { ...policy, maximumRevocationAgeSeconds: 1 },
+    ).status,
+    "stale",
+  );
+  assert.equal(
+    normalizePkiObservation(
+      {
+        status: "valid",
+        thisUpdateMs: policy.validationTimeMs - 1,
+        nextUpdateMs: policy.validationTimeMs + 1,
+      },
+      { ...policy, ocspEvidence: [new Uint8Array([2])] },
+    ).status,
+    "valid",
+    "CRL and OCSP evidence must be counted together",
   );
   assert.equal(
     normalizePkiObservation(
@@ -563,6 +658,19 @@ test("PKI observation requires evidence and a fresh caller-time interval", () =>
 });
 
 test("certificate policy keeps chain, trust, time, use, identity and authorization distinct", () => {
+  assert.equal(
+    normalizeCertificateAssessment({
+      chain: "valid",
+      trust: "valid",
+      time: "valid",
+      usage: "valid",
+      extendedKeyUsage: "valid",
+      identity: "valid",
+      authorization: "valid",
+      algorithm: "valid",
+    }).status,
+    "valid",
+  );
   const assessment = normalizeCertificateAssessment({
     chain: "valid",
     trust: "indeterminate",
@@ -1395,13 +1503,20 @@ test("P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors",
     "mutation-probes",
     Buffer.from(officialBytes).toString("base64"),
   ]);
-  assert.equal(probe.mutationProbesPassed, true, JSON.stringify({
-    malformedKeyValueBase64: probe.probeMalformedKeyValueBase64Rejected,
-    malformedTime: probe.probeMalformedTime,
-    boundedChain: probe.probeBoundedChain,
-    weakRsaAlgorithmRejected: probe.probeWeakRsaAlgorithmRejected,
-    weakRsaPayload: Buffer.from(probe.probeWeakRsaPayloadBase64, "base64").toString("utf8"),
-  }));
+  assert.equal(
+    probe.mutationProbesPassed,
+    true,
+    JSON.stringify({
+      malformedKeyValueBase64: probe.probeMalformedKeyValueBase64Rejected,
+      malformedTime: probe.probeMalformedTime,
+      boundedChain: probe.probeBoundedChain,
+      weakRsaAlgorithmRejected: probe.probeWeakRsaAlgorithmRejected,
+      weakRsaPayload: Buffer.from(
+        probe.probeWeakRsaPayloadBase64,
+        "base64",
+      ).toString("utf8"),
+    }),
+  );
   assert.equal(probe.probeDirectSignatureAbsent, true);
   assert.equal(probe.probeChildNull, true);
   assert.equal(probe.probeChildrenNull, true);
@@ -1424,11 +1539,16 @@ test("P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors",
   assert.equal(probe.probeZeroLengthXmlRejected, true);
   assert.equal(probe.probeOverLimitXmlRejected, true);
   assert.match(probe.probeNoEkuAssessment, /extendedKeyUsage=VALID/u);
-  assert.match(probe.probeExplicitEkuAssessment, /extendedKeyUsage=INDETERMINATE/u);
+  assert.match(
+    probe.probeExplicitEkuAssessment,
+    /extendedKeyUsage=INDETERMINATE/u,
+  );
   assert.equal(probe.probeParameters, true);
   assert.equal(probe.probeNonemptyParameterChain, true);
   assert.equal(probe.authCrlIssuerMismatchRejected, true);
   assert.equal(probe.authOcspBadSignatureRejected, true);
   assert.equal(probe.authUnsupportedTokenRejected, true);
-  t.diagnostic("P4-OVERALL-MUTATION-JAVA-PROBE deterministic DSS bridge probes passed");
+  t.diagnostic(
+    "P4-OVERALL-MUTATION-JAVA-PROBE deterministic DSS bridge probes passed",
+  );
 });
