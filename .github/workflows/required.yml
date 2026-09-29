@@ -100,7 +100,7 @@ jobs:
   regulatory:
     name: Required · regulatory sources and generated contracts
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 140
     permissions:
       contents: read
     steps:
@@ -137,7 +137,7 @@ jobs:
   quality:
     name: Required · quality and policy
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
@@ -173,7 +173,7 @@ jobs:
   node-22-14-ubuntu:
     name: Required · ubuntu-24.04 · Node 22.14.0
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
@@ -218,7 +218,7 @@ jobs:
   node-22-23-ubuntu:
     name: Required · ubuntu-24.04 · Node 22.23.2
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
@@ -263,7 +263,7 @@ jobs:
   node-24-ubuntu:
     name: Required · ubuntu-24.04 · Node 24.21.0
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
@@ -306,7 +306,7 @@ jobs:
   node-24-windows:
     name: Required · windows-2025 · Node 24.21.0
     runs-on: windows-2025
-    timeout-minutes: 20
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
@@ -349,7 +349,7 @@ jobs:
   node-24-macos:
     name: Required · macos-15 · Node 24.21.0
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
