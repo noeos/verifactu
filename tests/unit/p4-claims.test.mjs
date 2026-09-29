@@ -118,6 +118,22 @@ test("claim diagnostics are bounded, code-only, unique and deterministic", () =>
     }).status,
     "invalid",
   );
+  assert.deepEqual(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "invalid",
+      diagnostics: [],
+    }).diagnostics,
+    [
+      {
+        code: "DIAG-CLAIM-EVIDENCE",
+        stage: "domain",
+        path: "",
+        severity: "error",
+        retryable: false,
+      },
+    ],
+  );
 });
 
 test("engine evidence digest shape is required only for verified claims", () => {

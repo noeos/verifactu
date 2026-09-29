@@ -152,6 +152,7 @@ test("decimal representation is exact and scale, sign and unsafe number are boun
   );
   for (const policy of [
     { maxIntegerDigits: Number.MAX_SAFE_INTEGER + 1, maxScale: 0 },
+    { maxIntegerDigits: Number.NaN, maxScale: 0 },
     { maxIntegerDigits: 65, maxScale: 0 },
     { maxIntegerDigits: 5, maxScale: -1 },
     { maxIntegerDigits: 5, maxScale: Number.NaN },
