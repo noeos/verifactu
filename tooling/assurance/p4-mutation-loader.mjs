@@ -25,9 +25,10 @@ if (sourcePath.endsWith(".ts")) {
   );
   if (configFile.error)
     throw new Error(
-      `P4_MUTATION_TYPESCRIPT_CONFIG: ${
-        ts.flattenDiagnosticMessageText(configFile.error.messageText, "\n")
-      }`,
+      `P4_MUTATION_TYPESCRIPT_CONFIG: ${ts.flattenDiagnosticMessageText(
+        configFile.error.messageText,
+        "\n",
+      )}`,
     );
   const parsed = ts.parseJsonConfigFileContent(
     configFile.config,

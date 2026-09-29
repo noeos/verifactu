@@ -318,72 +318,126 @@ function pythonMutations(path, source) {
 async function javaAstMutations(root, path, source) {
   const temporary = await mkdtemp(join(tmpdir(), "verifactu-p4-javacatalog-"));
   try {
-    const helperPath = resolve(root, "tooling/assurance/P4JavaMutationCatalog.java");
+    const helperPath = resolve(
+      root,
+      "tooling/assurance/P4JavaMutationCatalog.java",
+    );
     const classes = join(temporary, "classes");
     await mkdir(classes, { recursive: true });
-    const javac = process.env.VERIFACTU_JAVAC ??
+    const javac =
+      process.env.VERIFACTU_JAVAC ??
       (process.env.JAVA_HOME
-        ? resolve(process.env.JAVA_HOME, "bin", process.platform === "win32" ? "javac.exe" : "javac")
+        ? resolve(
+            process.env.JAVA_HOME,
+            "bin",
+            process.platform === "win32" ? "javac.exe" : "javac",
+          )
         : "javac");
-    const java = process.env.VERIFACTU_JAVA ??
+    const java =
+      process.env.VERIFACTU_JAVA ??
       (process.env.JAVA_HOME
-        ? resolve(process.env.JAVA_HOME, "bin", process.platform === "win32" ? "java.exe" : "java")
+        ? resolve(
+            process.env.JAVA_HOME,
+            "bin",
+            process.platform === "win32" ? "java.exe" : "java",
+          )
         : "java");
-    const compile = spawnSync(javac, ["--release", "21", "-d", classes, helperPath], {
-      encoding: "utf8",
-      maxBuffer: 4 * 1024 * 1024,
-      timeout: 60_000,
-    });
+    const compile = spawnSync(
+      javac,
+      ["--release", "21", "-d", classes, helperPath],
+      {
+        encoding: "utf8",
+        maxBuffer: 4 * 1024 * 1024,
+        timeout: 60_000,
+      },
+    );
     if (compile.status !== 0)
       throw new Error(`P4_JAVA_MUTATION_CATALOG_COMPILE: ${compile.stderr}`);
-    const execute = spawnSync(java, ["-cp", classes, "P4JavaMutationCatalog", resolve(root, path)], {
-      encoding: "utf8",
-      maxBuffer: 4 * 1024 * 1024,
-      timeout: 30_000,
-    });
+    const execute = spawnSync(
+      java,
+      ["-cp", classes, "P4JavaMutationCatalog", resolve(root, path)],
+      {
+        encoding: "utf8",
+        maxBuffer: 4 * 1024 * 1024,
+        timeout: 30_000,
+      },
+    );
     if (execute.status !== 0)
       throw new Error(`P4_JAVA_MUTATION_CATALOG_PARSE: ${execute.stderr}`);
     const mutations = JSON.parse(execute.stdout.trim()).map((mutation) => {
       const result = { ...mutation };
-      result.id = mutationId(path, result.operator, result.start, result.before, result.after);
+      result.id = mutationId(
+        path,
+        result.operator,
+        result.start,
+        result.before,
+        result.after,
+      );
       result.module = path;
       result.line = source.slice(0, result.start).split("\n").length;
       result.sourceSha256 = digest(source);
-      result.mutatedSha256 = digest(`${source.slice(0, result.start)}${result.after}${source.slice(result.end)}`);
+      result.mutatedSha256 = digest(
+        `${source.slice(0, result.start)}${result.after}${source.slice(result.end)}`,
+      );
       return result;
     });
     const exclusions = [];
     const compilable = [];
     for (const mutation of mutations) {
-      const candidateDir = await mkdtemp(join(tmpdir(), "verifactu-p4-java-preflight-"));
+      const candidateDir = await mkdtemp(
+        join(tmpdir(), "verifactu-p4-java-preflight-"),
+      );
       try {
         const classes = join(candidateDir, "classes");
         await mkdir(classes, { recursive: true });
         const javaSource = join(candidateDir, "DssBridge.java");
-        await writeFile(javaSource, `${source.slice(0, mutation.start)}${mutation.after}${source.slice(mutation.end)}`);
-        const javac = process.env.VERIFACTU_JAVAC ??
+        await writeFile(
+          javaSource,
+          `${source.slice(0, mutation.start)}${mutation.after}${source.slice(mutation.end)}`,
+        );
+        const javac =
+          process.env.VERIFACTU_JAVAC ??
           (process.env.JAVA_HOME
-            ? resolve(process.env.JAVA_HOME, "bin", process.platform === "win32" ? "javac.exe" : "javac")
+            ? resolve(
+                process.env.JAVA_HOME,
+                "bin",
+                process.platform === "win32" ? "javac.exe" : "javac",
+              )
             : "javac");
-        const jar = process.env.VERIFACTU_DSS_JAR ??
-          resolve(root, "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar");
-        const preflight = spawnSync(javac, ["--release", "21", "-cp", jar, "-d", classes, javaSource], {
-          encoding: "utf8",
-          maxBuffer: 4 * 1024 * 1024,
-          timeout: 60_000,
-        });
+        const jar =
+          process.env.VERIFACTU_DSS_JAR ??
+          resolve(
+            root,
+            "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
+          );
+        const preflight = spawnSync(
+          javac,
+          ["--release", "21", "-cp", jar, "-d", classes, javaSource],
+          {
+            encoding: "utf8",
+            maxBuffer: 4 * 1024 * 1024,
+            timeout: 60_000,
+          },
+        );
         if (preflight.error || preflight.signal || preflight.status === null)
-          throw new Error(`P4_JAVA_MUTATION_PREFLIGHT: ${preflight.error?.message ?? preflight.signal ?? "no compiler status"}`);
+          throw new Error(
+            `P4_JAVA_MUTATION_PREFLIGHT: ${preflight.error?.message ?? preflight.signal ?? "no compiler status"}`,
+          );
         if (preflight.status === 0) {
           compilable.push(mutation);
           continue;
         }
-        const diagnostic = preflight.stderr.replaceAll(candidateDir, "<temporary>").trim();
+        const diagnostic = preflight.stderr
+          .replaceAll(candidateDir, "<temporary>")
+          .trim();
         if (!/\berror:/u.test(diagnostic))
-          throw new Error(`P4_JAVA_MUTATION_PREFLIGHT_FAILURE ${mutation.id}: ${diagnostic.slice(0, 3000)}`);
+          throw new Error(
+            `P4_JAVA_MUTATION_PREFLIGHT_FAILURE ${mutation.id}: ${diagnostic.slice(0, 3000)}`,
+          );
         exclusions.push({
           ...mutation,
-          reason: "This operator application does not produce compilable Java under the admitted JDK 21 and pinned DSS classpath.",
+          reason:
+            "This operator application does not produce compilable Java under the admitted JDK 21 and pinned DSS classpath.",
           compilerDiagnostic: diagnostic.slice(0, 3000),
         });
       } finally {
@@ -407,13 +461,13 @@ export async function discoverOverallMutationCatalog(root, plan) {
     sourceDigests.set(module, digestValue);
     let mutations;
     if (/\.(?:ts|mjs)$/u.test(module)) mutations = astMutations(module, source);
-    else if (module.endsWith(".py")) mutations = pythonMutations(module, source);
+    else if (module.endsWith(".py"))
+      mutations = pythonMutations(module, source);
     else if (module.endsWith(".java")) {
       const javaCatalog = await javaAstMutations(root, module, source);
       mutations = javaCatalog.mutations;
       excludedApplications.push(...javaCatalog.exclusions);
-    }
-    else mutations = tokenMutations(module, source);
+    } else mutations = tokenMutations(module, source);
     const unique = new Map(
       mutations.map((mutation) => [mutation.id, mutation]),
     );
@@ -426,8 +480,13 @@ export async function discoverOverallMutationCatalog(root, plan) {
       module,
       sourceSha256: digestValue,
       applications: moduleMutations.length,
-      discoveredApplications: moduleMutations.length + excludedApplications.filter((mutation) => mutation.module === module).length,
-      excludedApplications: excludedApplications.filter((mutation) => mutation.module === module).length,
+      discoveredApplications:
+        moduleMutations.length +
+        excludedApplications.filter((mutation) => mutation.module === module)
+          .length,
+      excludedApplications: excludedApplications.filter(
+        (mutation) => mutation.module === module,
+      ).length,
     });
   }
   return {

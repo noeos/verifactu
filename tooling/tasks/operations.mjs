@@ -2213,7 +2213,11 @@ async function testP4G(context) {
       concurrency: 4,
       javaHome,
       java,
-      javac: resolve(javaHome, "bin", process.platform === "win32" ? "javac.exe" : "javac"),
+      javac: resolve(
+        javaHome,
+        "bin",
+        process.platform === "win32" ? "javac.exe" : "javac",
+      ),
       python: process.env.VERIFACTU_PYTHON ?? "python3",
       dssJar: resolve(
         context.root,
@@ -2287,7 +2291,10 @@ async function testP4G(context) {
     mutationCatalog.mutants.map((mutation) => [mutation.id, mutation]),
   );
   const expectedExclusions = new Map(
-    mutationCatalog.excludedApplications.map((mutation) => [mutation.id, mutation]),
+    mutationCatalog.excludedApplications.map((mutation) => [
+      mutation.id,
+      mutation,
+    ]),
   );
   const observedExclusions = overallMutation.excludedApplications;
   const invalidExclusions = !Array.isArray(observedExclusions)
@@ -2403,11 +2410,25 @@ async function testP4G(context) {
       typeof mutant.covered !== "boolean" ||
       !Array.isArray(mutant.tests) ||
       new Set(mutant.tests).size !== mutant.tests.length ||
-      !["killed", "survived", "equivalent", "compileError", "testError", "noCoverage", "timeout"].includes(mutant.outcome) ||
-      (["killed", "survived", "equivalent", "testError"].includes(mutant.outcome) && (mutant.compile !== "passed" || mutant.covered !== true || mutant.tests.length === 0)) ||
+      ![
+        "killed",
+        "survived",
+        "equivalent",
+        "compileError",
+        "testError",
+        "noCoverage",
+        "timeout",
+      ].includes(mutant.outcome) ||
+      (["killed", "survived", "equivalent", "testError"].includes(
+        mutant.outcome,
+      ) &&
+        (mutant.compile !== "passed" ||
+          mutant.covered !== true ||
+          mutant.tests.length === 0)) ||
       (mutant.outcome === "timeout" && mutant.tests.length === 0) ||
       (mutant.outcome === "compileError" && mutant.compile !== "failed") ||
-      (mutant.outcome === "noCoverage" && (mutant.compile !== "passed" || mutant.covered !== false)) ||
+      (mutant.outcome === "noCoverage" &&
+        (mutant.compile !== "passed" || mutant.covered !== false)) ||
       (mutant.outcome === "killed" &&
         (!Array.isArray(mutant.killEvidence) ||
           mutant.killEvidence.length === 0)) ||
@@ -2440,16 +2461,28 @@ async function testP4G(context) {
       population?.killed === killedMutants.length &&
       population?.survived === survivedMutants.length &&
       population?.equivalent === equivalentMutants.length &&
-      population?.compileErrors === mutants.filter((mutant) => mutant.outcome === "compileError").length &&
-      population?.testErrors === mutants.filter((mutant) => mutant.outcome === "testError").length &&
+      population?.compileErrors ===
+        mutants.filter((mutant) => mutant.outcome === "compileError").length &&
+      population?.testErrors ===
+        mutants.filter((mutant) => mutant.outcome === "testError").length &&
       population?.compileErrors === 0 &&
       population?.testErrors === 0 &&
       population?.noCoverage === 0 &&
       population?.timeouts === 0 &&
       outcomeCountFrom(mutants, "timeout") === population?.timeouts &&
       outcomeCountFrom(mutants, "noCoverage") === population?.noCoverage &&
-      mutants.length === killedMutants.length + survivedMutants.length + equivalentMutants.length + population?.compileErrors + population?.testErrors + population?.noCoverage + population?.timeouts &&
-      modulePopulation.reduce((sum, entry) => sum + entry.discoveredApplications, 0) ===
+      mutants.length ===
+        killedMutants.length +
+          survivedMutants.length +
+          equivalentMutants.length +
+          population?.compileErrors +
+          population?.testErrors +
+          population?.noCoverage +
+          population?.timeouts &&
+      modulePopulation.reduce(
+        (sum, entry) => sum + entry.discoveredApplications,
+        0,
+      ) ===
         mutants.length + observedExclusions.length &&
       population?.killedPercent ===
         (100 * killedMutants.length) / mutationDenominator,
@@ -2465,7 +2498,9 @@ async function testP4G(context) {
       timeouts: population?.timeouts,
       invalidMutants: invalidMutants.map((mutant) => mutant?.id ?? null),
       excludedApplications: observedExclusions?.length,
-      invalidExclusions: invalidExclusions.map((mutation) => mutation?.id ?? null),
+      invalidExclusions: invalidExclusions.map(
+        (mutation) => mutation?.id ?? null,
+      ),
     }),
   );
   const mutationTestSource = await readFile(

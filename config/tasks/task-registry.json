@@ -528,7 +528,7 @@
     },
     {
       "id": "test:p4-g",
-      "version": 41,
+      "version": 42,
       "owner": "quality-owner",
       "dependencies": [
         "test:p4-a",

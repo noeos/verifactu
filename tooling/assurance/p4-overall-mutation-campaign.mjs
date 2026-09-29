@@ -1,4 +1,12 @@
-import { appendFile, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import {
+  appendFile,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve, relative, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -28,11 +36,18 @@ function runMutationTest(executable, args, options) {
       if (child.exitCode !== null || child.signalCode !== null) return;
       if (process.platform === "win32") {
         child.kill("SIGTERM");
-        const killer = spawn("taskkill.exe", ["/pid", String(child.pid), "/t", "/f"], { windowsHide: true, stdio: "ignore" });
+        const killer = spawn(
+          "taskkill.exe",
+          ["/pid", String(child.pid), "/t", "/f"],
+          { windowsHide: true, stdio: "ignore" },
+        );
         killer.unref();
       } else {
-        try { process.kill(-child.pid, "SIGKILL"); }
-        catch { child.kill("SIGKILL"); }
+        try {
+          process.kill(-child.pid, "SIGKILL");
+        } catch {
+          child.kill("SIGKILL");
+        }
       }
     };
     const timer = setTimeout(() => {
@@ -80,11 +95,15 @@ function tapFailureEvidence(stdout, test) {
     (line, candidate) =>
       candidate > index && /^\s*(?:ok|not ok) \d+ /u.test(line),
   );
-  const block = lines.slice(index, end < 0 ? index + 24 : end).join("\n").trim();
+  const block = lines
+    .slice(index, end < 0 ? index + 24 : end)
+    .join("\n")
+    .trim();
   return [`${test}: ${block.slice(0, 2400)}`];
 }
 
-const BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const BASE64 =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 function decodeVlq(input) {
   const values = [];
@@ -110,9 +129,16 @@ function decodeVlq(input) {
 
 function mappingsForSourceMap(sourceMap, mapUrl, sourcePath) {
   const rootUrl = sourceMap.sourceRoot
-    ? new URL(sourceMap.sourceRoot.endsWith("/") ? sourceMap.sourceRoot : `${sourceMap.sourceRoot}/`, mapUrl)
+    ? new URL(
+        sourceMap.sourceRoot.endsWith("/")
+          ? sourceMap.sourceRoot
+          : `${sourceMap.sourceRoot}/`,
+        mapUrl,
+      )
     : mapUrl;
-  const sourceUrls = sourceMap.sources.map((source) => new URL(source, rootUrl).href);
+  const sourceUrls = sourceMap.sources.map(
+    (source) => new URL(source, rootUrl).href,
+  );
   const sourceUrl = pathToFileURL(sourcePath).href;
   const targetIndexes = new Set(
     sourceUrls.flatMap((value, index) => (value === sourceUrl ? [index] : [])),
@@ -123,7 +149,11 @@ function mappingsForSourceMap(sourceMap, mapUrl, sourcePath) {
   let originalColumn = 0;
   let nameIndex = 0;
   const generatedLines = sourceMap.mappings.split(";");
-  for (let generatedLine = 0; generatedLine < generatedLines.length; generatedLine += 1) {
+  for (
+    let generatedLine = 0;
+    generatedLine < generatedLines.length;
+    generatedLine += 1
+  ) {
     let generatedColumn = 0;
     for (const encoded of generatedLines[generatedLine].split(",")) {
       if (!encoded) continue;
@@ -180,9 +210,14 @@ async function runtimeLocation(root, mutation, cache = new Map()) {
   let moduleData = cache.get(mutation.module);
   if (!moduleData) {
     const packageRoot = resolve(root, "packages/verifactu");
-    const sourceRelative = relative(resolve(packageRoot, "src"), productionPath);
+    const sourceRelative = relative(
+      resolve(packageRoot, "src"),
+      productionPath,
+    );
     if (sourceRelative.startsWith(`..${sep}`) || sourceRelative === "..")
-      throw new Error(`P4_TYPESCRIPT_SOURCE_OUTSIDE_PACKAGE: ${mutation.module}`);
+      throw new Error(
+        `P4_TYPESCRIPT_SOURCE_OUTSIDE_PACKAGE: ${mutation.module}`,
+      );
     const runtimePath = resolve(
       root,
       "evidence/runs/artifacts/build/verifactu/dist",
@@ -262,27 +297,57 @@ function testPathFromCoverage(root, plan, coverage) {
 
 function preferredTestPaths(mutation, plan) {
   const rules = [
-    [/\/domain\/(?:identities|decimal|date-time|context)\.ts$/u, ["tests/unit/p4-values-identities.test.mjs"]],
-    [/\/domain\/(?:records|corrections)\.ts$/u, ["tests/unit/p4-records-corrections.test.mjs"]],
-    [/\/domain\/(?:mode-tenure|events|states)\.ts$/u, ["tests/unit/p4-modes-events-states.test.mjs"]],
-    [/\/domain\/(?:sequences|chains)\.ts$/u, ["tests/unit/p4-sequences-chains.test.mjs"]],
-    [/\/contracts\/(?:staged-codec|results|limits|configuration)\.ts$/u, ["tests/unit/p4-codecs.test.mjs"]],
-    [/\/application\/(?:operation-plan|record-planner|official-projection|official-serialization|fingerprint|xml-artifacts)\.ts$/u, ["tests/unit/p4-plans-artifacts.test.mjs"]],
+    [
+      /\/domain\/(?:identities|decimal|date-time|context)\.ts$/u,
+      ["tests/unit/p4-values-identities.test.mjs"],
+    ],
+    [
+      /\/domain\/(?:records|corrections)\.ts$/u,
+      ["tests/unit/p4-records-corrections.test.mjs"],
+    ],
+    [
+      /\/domain\/(?:mode-tenure|events|states)\.ts$/u,
+      ["tests/unit/p4-modes-events-states.test.mjs"],
+    ],
+    [
+      /\/domain\/(?:sequences|chains)\.ts$/u,
+      ["tests/unit/p4-sequences-chains.test.mjs"],
+    ],
+    [
+      /\/contracts\/(?:staged-codec|results|limits|configuration)\.ts$/u,
+      ["tests/unit/p4-codecs.test.mjs"],
+    ],
+    [
+      /\/application\/(?:operation-plan|record-planner|official-projection|official-serialization|fingerprint|xml-artifacts)\.ts$/u,
+      ["tests/unit/p4-plans-artifacts.test.mjs"],
+    ],
     [/\/application\/qr\.ts$/u, ["tests/integration/p4-qr-roundtrip.test.mjs"]],
     [/\/verification\/claims\.ts$/u, ["tests/unit/p4-claims.test.mjs"]],
-    [/\/verification\/(?:engine-profile|engine-adapter)\.ts$/u, ["tests/contract/p4-engine-adapter.test.mjs"]],
+    [
+      /\/verification\/(?:engine-profile|engine-adapter)\.ts$/u,
+      ["tests/contract/p4-engine-adapter.test.mjs"],
+    ],
     [/\/editions\//u, ["tests/contract/p4-edition-contract.test.mjs"]],
     [/\/ports\/xml-xsd\.ts$/u, ["tests/unit/p4-xml-model.test.mjs"]],
-    [/^internal\/xml-provider\//u, ["tests/contract/p4-xml-xsd-provider.test.mjs"]],
-    [/^internal\/xades-provider\//u, ["tests/contract/p4-xades-provider.test.mjs"]],
-    [/^internal\/independent-oracles\//u, ["tests/integration/p4-engine-tarball.test.mjs"]],
+    [
+      /^internal\/xml-provider\//u,
+      ["tests/contract/p4-xml-xsd-provider.test.mjs"],
+    ],
+    [
+      /^internal\/xades-provider\//u,
+      ["tests/contract/p4-xades-provider.test.mjs"],
+    ],
+    [
+      /^internal\/independent-oracles\//u,
+      ["tests/integration/p4-engine-tarball.test.mjs"],
+    ],
   ];
-  const direct = rules.find(([pattern]) => pattern.test(mutation.module))?.[1] ?? [];
+  const direct =
+    rules.find(([pattern]) => pattern.test(mutation.module))?.[1] ?? [];
   const criticalEntries = plan.criticalCatalogue.filter(
     (entry) => entry.path === mutation.module,
   );
-  const critical = criticalEntries
-    .map((entry) => entry.test);
+  const critical = criticalEntries.map((entry) => entry.test);
   if (critical.length > 0) {
     const rank = (test) =>
       test.startsWith("tests/unit/")
@@ -294,13 +359,22 @@ function preferredTestPaths(mutation, plan) {
             : test.startsWith("tests/integration/")
               ? 3
               : 4;
-    const mutationIds = [...new Set(criticalEntries.map((entry) => entry.mutant))]
+    const mutationIds = [
+      ...new Set(criticalEntries.map((entry) => entry.mutant)),
+    ]
       .filter((id) => /^P4-MUT-\d{3}$/u.test(id))
       .sort();
-    const controlTest = mutationIds.length > 0
-      ? `tests/mutation/p4-mutation.test.mjs [--test-name-pattern=^(?:${mutationIds.join("|")})]`
-      : undefined;
-    return [...new Set([...critical, ...direct, ...(controlTest ? [controlTest] : [])])].sort(
+    const controlTest =
+      mutationIds.length > 0
+        ? `tests/mutation/p4-mutation.test.mjs [--test-name-pattern=^(?:${mutationIds.join("|")})]`
+        : undefined;
+    return [
+      ...new Set([
+        ...critical,
+        ...direct,
+        ...(controlTest ? [controlTest] : []),
+      ]),
+    ].sort(
       (left, right) => rank(left) - rank(right) || left.localeCompare(right),
     );
   }
@@ -312,7 +386,9 @@ function orderMutationTests(mutation, tests, plan) {
   if (mutation.module === "packages/verifactu/src/application/qr.ts") {
     const candidates = new Set(tests);
     const criticalTests = preferred.filter((test) =>
-      test.startsWith("tests/mutation/p4-mutation.test.mjs [--test-name-pattern="),
+      test.startsWith(
+        "tests/mutation/p4-mutation.test.mjs [--test-name-pattern=",
+      ),
     );
     const contract = "tests/contract/p4-qr-provider.test.mjs";
     const integration = "tests/integration/p4-qr-roundtrip.test.mjs";
@@ -324,7 +400,9 @@ function orderMutationTests(mutation, tests, plan) {
   const focusedProviderTest = focusedProviderMutationTest(mutation);
   if (focusedProviderTest) {
     const criticalTests = preferred.filter((test) =>
-      test.startsWith("tests/mutation/p4-mutation.test.mjs [--test-name-pattern="),
+      test.startsWith(
+        "tests/mutation/p4-mutation.test.mjs [--test-name-pattern=",
+      ),
     );
     return [...new Set([focusedProviderTest, ...criticalTests])];
   }
@@ -343,19 +421,30 @@ function orderMutationTests(mutation, tests, plan) {
                 ? 6
                 : 5;
   const targetedMutationTests = preferred.filter((test) =>
-    test.startsWith("tests/mutation/p4-mutation.test.mjs [--test-name-pattern="),
+    test.startsWith(
+      "tests/mutation/p4-mutation.test.mjs [--test-name-pattern=",
+    ),
   );
-  const direct = preferred.filter((test) => !targetedMutationTests.includes(test));
+  const direct = preferred.filter(
+    (test) => !targetedMutationTests.includes(test),
+  );
   const mapped = tests.filter(
-    (test) => !test.startsWith("tests/mutation/p4-mutation.test.mjs [--test-name-pattern="),
+    (test) =>
+      !test.startsWith(
+        "tests/mutation/p4-mutation.test.mjs [--test-name-pattern=",
+      ),
   );
-  const selected = [...new Set([...direct, ...mapped, ...targetedMutationTests])].sort(
+  const selected = [
+    ...new Set([...direct, ...mapped, ...targetedMutationTests]),
+  ].sort(
     (left, right) => rank(left) - rank(right) || left.localeCompare(right),
   );
   if (selected.length > 0) return selected;
-  return [...tests].sort(
-    (left, right) => rank(left) - rank(right) || left.localeCompare(right),
-  ).slice(0, 1);
+  return [...tests]
+    .sort(
+      (left, right) => rank(left) - rank(right) || left.localeCompare(right),
+    )
+    .slice(0, 1);
 }
 
 function selectedTest(path, pattern) {
@@ -415,7 +504,9 @@ export function mutationCompileFailed(transcript, loaded) {
 }
 
 export async function discoverNodeMutationTests(root, plan, v8Root, mutations) {
-  const files = (await readdir(v8Root)).filter((path) => path.endsWith(".json"));
+  const files = (await readdir(v8Root)).filter((path) =>
+    path.endsWith(".json"),
+  );
   const moduleData = new Map();
   const locationsById = new Map();
   for (const mutation of mutations) {
@@ -453,7 +544,9 @@ export async function discoverNodeMutationTests(root, plan, v8Root, mutations) {
       const location = locationsById.get(mutation.id);
       return {
         ...mutation,
-        runtimeModule: relative(root, location.runtimePath).split(sep).join("/"),
+        runtimeModule: relative(root, location.runtimePath)
+          .split(sep)
+          .join("/"),
         runtimeOffset: location.offset,
         baselineCovered: testsById.get(mutation.id).size > 0,
         tests: orderMutationTests(
@@ -467,7 +560,12 @@ export async function discoverNodeMutationTests(root, plan, v8Root, mutations) {
 
 export async function executeNodeMutation(root, mutation, options = {}) {
   if (mutation.tests.length === 0)
-    return { ...mutation, compile: "passed", covered: false, outcome: "noCoverage" };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: false,
+      outcome: "noCoverage",
+    };
   const temporary = await mkdtemp(resolve(tmpdir(), "verifactu-p4-om-"));
   const configPath = resolve(temporary, "mutation.json");
   const config = {
@@ -508,8 +606,7 @@ export async function executeNodeMutation(root, mutation, options = {}) {
         failedRows: result.stdout
           .split("\n")
           .filter((line) => /^\s*not ok \d+ /u.test(line)),
-        timedOut:
-          result.timedOut === true || /ETIMEDOUT/iu.test(transcript),
+        timedOut: result.timedOut === true || /ETIMEDOUT/iu.test(transcript),
         compileFailure: mutationCompileFailed(
           transcript,
           transcript.includes(`P4_MUTATION_ACTIVE:${mutation.id}:`),
@@ -517,7 +614,9 @@ export async function executeNodeMutation(root, mutation, options = {}) {
       };
     };
     for (const requestedTest of mutation.tests) {
-      const encodedSelection = /^(.*) \[--test-name-pattern=(.*)\]$/u.exec(requestedTest);
+      const encodedSelection = /^(.*) \[--test-name-pattern=(.*)\]$/u.exec(
+        requestedTest,
+      );
       const test = encodedSelection?.[1] ?? requestedTest;
       const requestedPattern = encodedSelection?.[2];
       const patterns = mutationTestPatterns(mutation, test, {
@@ -526,10 +625,18 @@ export async function executeNodeMutation(root, mutation, options = {}) {
         qrPropertyTimeoutMs: options.qrPropertyTimeoutMs,
       });
       for (const { pattern, timeoutMs } of patterns) {
-        const selection = pattern ? `${test} [--test-name-pattern=${pattern}]` : test;
+        const selection = pattern
+          ? `${test} [--test-name-pattern=${pattern}]`
+          : test;
         tests.push(selection);
-        const { result, transcript, loaded, failedRows, timedOut, compileFailure } =
-          await runSelection(test, pattern, timeoutMs);
+        const {
+          result,
+          transcript,
+          loaded,
+          failedRows,
+          timedOut,
+          compileFailure,
+        } = await runSelection(test, pattern, timeoutMs);
         if (
           timedOut ||
           result.outputExceeded ||
@@ -554,11 +661,11 @@ export async function executeNodeMutation(root, mutation, options = {}) {
             ],
           };
         }
-      if (failedRows.length > 0)
-        return {
-          ...mutation,
-          compile: "passed",
-          covered: true,
+        if (failedRows.length > 0)
+          return {
+            ...mutation,
+            compile: "passed",
+            covered: true,
             outcome: "killed",
             killEvidence: tapFailureEvidence(result.stdout, test),
             tests,
@@ -586,58 +693,73 @@ export function mutationTestPatterns(mutation, test, options = {}) {
     mutation.module === "packages/verifactu/src/application/qr.ts";
   if (qrModule && test === "tests/contract/p4-qr-provider.test.mjs") {
     if (mutation.line < 161)
-      return [{
-        pattern:
-          "^(?:P4-E payload binds canonical ordered query and mode endpoint|P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects forged record facts, unsupported QR lexicals and digest failures|P4-E malformed verifier and edition identities fail closed)$",
-        timeoutMs: normalTimeout,
-      }];
+      return [
+        {
+          pattern:
+            "^(?:P4-E payload binds canonical ordered query and mode endpoint|P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects forged record facts, unsupported QR lexicals and digest failures|P4-E malformed verifier and edition identities fail closed)$",
+          timeoutMs: normalTimeout,
+        },
+      ];
     if (mutation.line < 215)
-      return [{
-        pattern:
-          "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E encoder port enforces admitted byte and correction-level input)$",
-        timeoutMs: normalTimeout,
-      }];
+      return [
+        {
+          pattern:
+            "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E encoder port enforces admitted byte and correction-level input)$",
+          timeoutMs: normalTimeout,
+        },
+      ];
     if (mutation.line < 290)
-      return [{
+      return [
+        {
+          pattern:
+            "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+          timeoutMs: normalTimeout,
+        },
+      ];
+    return [
+      {
         pattern:
-          "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+          "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
         timeoutMs: normalTimeout,
-      }];
-    return [{
-      pattern:
-        "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
-      timeoutMs: normalTimeout,
-    }];
+      },
+    ];
   }
   if (qrModule && test === "tests/security/p4-resource-attacks.test.mjs")
     return [];
   if (qrModule && test === "tests/integration/p4-qr-roundtrip.test.mjs") {
     if (mutation.line >= 283)
-      return [{
-        pattern: "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
-        timeoutMs: normalTimeout,
-      }];
+      return [
+        {
+          pattern:
+            "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+          timeoutMs: normalTimeout,
+        },
+      ];
     if (mutation.line >= 215 && mutation.line < 290)
-      return [{
-        pattern:
-          "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
-        timeoutMs: normalTimeout,
-      }];
+      return [
+        {
+          pattern:
+            "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+          timeoutMs: normalTimeout,
+        },
+      ];
     if (mutation.line < 161)
+      return [
+        {
+          pattern:
+            "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+          timeoutMs: normalTimeout,
+        },
+        { pattern: "^P4-PROP-011", timeoutMs: normalTimeout },
+        { pattern: "^P4-FUZZ-005", timeoutMs: normalTimeout },
+      ];
     return [
       {
         pattern:
           "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
         timeoutMs: normalTimeout,
       },
-      { pattern: "^P4-PROP-011", timeoutMs: normalTimeout },
-      { pattern: "^P4-FUZZ-005", timeoutMs: normalTimeout },
     ];
-    return [{
-      pattern:
-        "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
-      timeoutMs: normalTimeout,
-    }];
   }
   if (test === "tests/integration/p4-qr-roundtrip.test.mjs")
     return [{ pattern: "^P4-PROP-011", timeoutMs: normalTimeout }];
@@ -654,7 +776,11 @@ export async function executeNodeMutations(root, mutations, options = {}) {
       const index = cursor;
       cursor += 1;
       if (index >= mutations.length) return;
-      results[index] = await executeNodeMutation(root, mutations[index], options);
+      results[index] = await executeNodeMutation(
+        root,
+        mutations[index],
+        options,
+      );
       completed += 1;
       options.onProgress?.({
         completed,
@@ -677,28 +803,125 @@ const JAVA_MUTATION_TESTS = [
 
 export function javaMutationTestSelections(mutation) {
   const line = mutation.line;
-  if (line < 104) return [[JAVA_MUTATION_TESTS[2], "^Java bridge turns malformed wire data into a bounded defect response$"]];
-  if (line < 113) return [[JAVA_MUTATION_TESTS[2], "^Java bridge installs a policy that denies socket permissions at runtime$"]];
-  if (line < 124) return [[JAVA_MUTATION_TESTS[2], "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$"]];
-  if (line < 140) return [
-    [JAVA_MUTATION_TESTS[0], "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$"],
-    [JAVA_MUTATION_TESTS[2], "^Java bridge fails closed across invalid command, digest, signing and XML request paths$"],
+  if (line < 104)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge turns malformed wire data into a bounded defect response$",
+      ],
+    ];
+  if (line < 113)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge installs a policy that denies socket permissions at runtime$",
+      ],
+    ];
+  if (line < 124)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+      ],
+    ];
+  if (line < 140)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+      ],
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+      ],
+    ];
+  if (line < 157)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+      ],
+    ];
+  if (line < 171)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^Java bridge rejects malformed and excessive certificate/revocation evidence$",
+      ],
+    ];
+  if (line < 239)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^exact DSS bridge verifies official XAdES structure and signature without inventing trust$",
+      ],
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^DSS rejects each altered XAdES profile component before crypto validation$",
+      ],
+    ];
+  if (line < 339)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
+      ],
+    ];
+  if (line < 397)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^certificate policy keeps chain, trust, time, use, identity and authorization distinct$",
+      ],
+    ];
+  if (line < 438)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+      ],
+    ];
+  if (line < 546)
+    return [
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+      ],
+    ];
+  if (line < 578)
+    return [
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+      ],
+    ];
+  if (line < 618)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^certificate policy keeps chain, trust, time, use, identity and authorization distinct$",
+      ],
+    ];
+  if (line < 680)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
+      ],
+    ];
+  if (line < 736)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+      ],
+    ];
+  return [
+    [
+      JAVA_MUTATION_TESTS[2],
+      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+    ],
   ];
-  if (line < 157) return [[JAVA_MUTATION_TESTS[2], "^Java bridge fails closed across invalid command, digest, signing and XML request paths$"]];
-  if (line < 171) return [[JAVA_MUTATION_TESTS[2], "^Java bridge rejects malformed and excessive certificate/revocation evidence$"]];
-  if (line < 239) return [
-    [JAVA_MUTATION_TESTS[0], "^exact DSS bridge verifies official XAdES structure and signature without inventing trust$"],
-    [JAVA_MUTATION_TESTS[1], "^DSS rejects each altered XAdES profile component before crypto validation$"],
-  ];
-  if (line < 339) return [[JAVA_MUTATION_TESTS[0], "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$"]];
-  if (line < 397) return [[JAVA_MUTATION_TESTS[0], "^certificate policy keeps chain, trust, time, use, identity and authorization distinct$"]];
-  if (line < 438) return [[JAVA_MUTATION_TESTS[2], "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$"]];
-  if (line < 546) return [[JAVA_MUTATION_TESTS[1], "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$"]];
-  if (line < 578) return [[JAVA_MUTATION_TESTS[1], "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$"]];
-  if (line < 618) return [[JAVA_MUTATION_TESTS[0], "^certificate policy keeps chain, trust, time, use, identity and authorization distinct$"]];
-  if (line < 680) return [[JAVA_MUTATION_TESTS[0], "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$"]];
-  if (line < 736) return [[JAVA_MUTATION_TESTS[0], "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$"]];
-  return [[JAVA_MUTATION_TESTS[2], "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$"]];
 }
 
 export async function executePythonMutation(root, mutation, options = {}) {
@@ -710,10 +933,23 @@ export async function executePythonMutation(root, mutation, options = {}) {
   const syntax = await runMutationTest(
     python,
     ["-I", "-c", "import ast,sys; ast.parse(sys.stdin.read())"],
-    { cwd: root, env: process.env, input: mutated, timeoutMs: options.compileTimeoutMs ?? 10_000 },
+    {
+      cwd: root,
+      env: process.env,
+      input: mutated,
+      timeoutMs: options.compileTimeoutMs ?? 10_000,
+    },
   );
   if (syntax.timedOut || syntax.code !== 0)
-    return { ...mutation, compile: "failed", covered: true, outcome: syntax.timedOut ? "timeout" : "compileError", tests: [mutation.module], killEvidence: [], diagnostics: [syntax.stderr.slice(0, 3000)] };
+    return {
+      ...mutation,
+      compile: "failed",
+      covered: true,
+      outcome: syntax.timedOut ? "timeout" : "compileError",
+      tests: [mutation.module],
+      killEvidence: [],
+      diagnostics: [syntax.stderr.slice(0, 3000)],
+    };
   const bootstrap = [
     "import sys",
     "path = sys.argv[1]",
@@ -723,30 +959,113 @@ export async function executePythonMutation(root, mutation, options = {}) {
   const result = await runMutationTest(
     python,
     ["-I", "-c", bootstrap, resolve(root, mutation.module)],
-    { cwd: root, env: process.env, input: mutated, timeoutMs: options.timeoutMs ?? 30_000 },
+    {
+      cwd: root,
+      env: process.env,
+      input: mutated,
+      timeoutMs: options.timeoutMs ?? 30_000,
+    },
   );
   const reportLine = result.stdout.trim().split(/\r?\n/u).at(-1);
   let report;
   try {
     report = JSON.parse(reportLine);
   } catch {
-    const sourceFailure = result.stderr.includes(resolve(root, mutation.module));
+    const sourceFailure = result.stderr.includes(
+      resolve(root, mutation.module),
+    );
     if (!result.timedOut && result.code !== 0 && sourceFailure)
-      return { ...mutation, compile: "passed", covered: true, outcome: "killed", tests: [mutation.module], killEvidence: [`${mutation.module}:${mutation.line}: mutated oracle execution raised an exception; baseline oracle is required to complete`], diagnostics: [result.stderr.slice(0, 3000)] };
-    if (!result.timedOut && !result.outputExceeded && result.code === 0 && result.stdout.trim() === "")
-      return { ...mutation, compile: "passed", covered: true, outcome: "killed", tests: [mutation.module], killEvidence: [`${mutation.module}:${mutation.line}: mutated oracle entrypoint emitted no report; the baseline entrypoint must emit one JSON report`], diagnostics: [] };
-    return { ...mutation, compile: "passed", covered: true, outcome: result.timedOut ? "timeout" : "testError", tests: [mutation.module], killEvidence: [], diagnostics: [result.stderr.slice(0, 3000), result.stdout.slice(-1000)] };
+      return {
+        ...mutation,
+        compile: "passed",
+        covered: true,
+        outcome: "killed",
+        tests: [mutation.module],
+        killEvidence: [
+          `${mutation.module}:${mutation.line}: mutated oracle execution raised an exception; baseline oracle is required to complete`,
+        ],
+        diagnostics: [result.stderr.slice(0, 3000)],
+      };
+    if (
+      !result.timedOut &&
+      !result.outputExceeded &&
+      result.code === 0 &&
+      result.stdout.trim() === ""
+    )
+      return {
+        ...mutation,
+        compile: "passed",
+        covered: true,
+        outcome: "killed",
+        tests: [mutation.module],
+        killEvidence: [
+          `${mutation.module}:${mutation.line}: mutated oracle entrypoint emitted no report; the baseline entrypoint must emit one JSON report`,
+        ],
+        diagnostics: [],
+      };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: result.timedOut ? "timeout" : "testError",
+      tests: [mutation.module],
+      killEvidence: [],
+      diagnostics: [result.stderr.slice(0, 3000), result.stdout.slice(-1000)],
+    };
   }
-  const valid = report.executed === report.selected && report.selected === 9 && report.creationAllowed === false;
+  const valid =
+    report.executed === report.selected &&
+    report.selected === 9 &&
+    report.creationAllowed === false;
   if (!valid)
-    return { ...mutation, compile: "passed", covered: true, outcome: "testError", tests: [mutation.module], killEvidence: [], diagnostics: [JSON.stringify(report)] };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: "testError",
+      tests: [mutation.module],
+      killEvidence: [],
+      diagnostics: [JSON.stringify(report)],
+    };
   if (result.timedOut || result.outputExceeded)
-    return { ...mutation, compile: "passed", covered: true, outcome: result.timedOut ? "timeout" : "testError", tests: [mutation.module], killEvidence: [], diagnostics: [result.stderr.slice(0, 3000)] };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: result.timedOut ? "timeout" : "testError",
+      tests: [mutation.module],
+      killEvidence: [],
+      diagnostics: [result.stderr.slice(0, 3000)],
+    };
   if (report.status === "failed" && result.code !== 0)
-    return { ...mutation, compile: "passed", covered: true, outcome: "killed", tests: [mutation.module], killEvidence: report.failed, diagnostics: [] };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: "killed",
+      tests: [mutation.module],
+      killEvidence: report.failed,
+      diagnostics: [],
+    };
   if (report.status === "passed" && result.code === 0)
-    return { ...mutation, compile: "passed", covered: true, outcome: "survived", tests: [mutation.module], killEvidence: [], diagnostics: [] };
-  return { ...mutation, compile: "passed", covered: true, outcome: "testError", tests: [mutation.module], killEvidence: [], diagnostics: [JSON.stringify({ code: result.code, report })] };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: "survived",
+      tests: [mutation.module],
+      killEvidence: [],
+      diagnostics: [],
+    };
+  return {
+    ...mutation,
+    compile: "passed",
+    covered: true,
+    outcome: "testError",
+    tests: [mutation.module],
+    killEvidence: [],
+    diagnostics: [JSON.stringify({ code: result.code, report })],
+  };
 }
 
 export async function executeJavaMutation(root, mutation, options = {}) {
@@ -762,60 +1081,142 @@ export async function executeJavaMutation(root, mutation, options = {}) {
     await writeFile(javaSource, mutatedSource);
     const javaHome = options.javaHome;
     const java = options.java;
-    const javac = resolve(javaHome, "bin", process.platform === "win32" ? "javac.exe" : "javac");
+    const javac = resolve(
+      javaHome,
+      "bin",
+      process.platform === "win32" ? "javac.exe" : "javac",
+    );
     const originalJar = options.dssJar;
     const compile = await runMutationTest(
       javac,
       ["--release", "21", "-cp", originalJar, "-d", classes, javaSource],
-      { cwd: root, env: process.env, timeoutMs: options.compileTimeoutMs ?? 60_000, maxBuffer: 4 * 1024 * 1024 },
+      {
+        cwd: root,
+        env: process.env,
+        timeoutMs: options.compileTimeoutMs ?? 60_000,
+        maxBuffer: 4 * 1024 * 1024,
+      },
     );
-    const selections = options.javaSelections ?? javaMutationTestSelections(mutation);
+    const selections =
+      options.javaSelections ?? javaMutationTestSelections(mutation);
     const selectedTests = selections.map(([test]) => test);
     if (compile.timedOut || compile.outputExceeded)
-      return { ...mutation, compile: "failed", covered: true, outcome: compile.timedOut ? "timeout" : "compileError", tests: selectedTests, killEvidence: [], diagnostics: [compile.stderr.slice(0, 3000)] };
+      return {
+        ...mutation,
+        compile: "failed",
+        covered: true,
+        outcome: compile.timedOut ? "timeout" : "compileError",
+        tests: selectedTests,
+        killEvidence: [],
+        diagnostics: [compile.stderr.slice(0, 3000)],
+      };
     if (compile.code !== 0)
-      return { ...mutation, compile: "failed", covered: true, outcome: "compileError", tests: selectedTests, killEvidence: [], diagnostics: [compile.stderr.slice(0, 3000)] };
+      return {
+        ...mutation,
+        compile: "failed",
+        covered: true,
+        outcome: "compileError",
+        tests: selectedTests,
+        killEvidence: [],
+        diagnostics: [compile.stderr.slice(0, 3000)],
+      };
     const classPath = `${classes}${process.platform === "win32" ? ";" : ":"}${originalJar}`;
     const tests = [];
     for (const [test, pattern] of selections) {
       tests.push(test);
-      const args = ["--test", "--test-concurrency=1", "--test-isolation=none", "--test-reporter=tap"];
+      const args = [
+        "--test",
+        "--test-concurrency=1",
+        "--test-isolation=none",
+        "--test-reporter=tap",
+      ];
       if (pattern) args.push(`--test-name-pattern=${pattern}`);
       args.push(test);
-      const result = await runMutationTest(
-        execPath,
-        args,
-        {
-          cwd: root,
-          env: { ...process.env, VERIFACTU_JAVA: java, VERIFACTU_DSS_JAR: classPath, VERIFACTU_JAVA_MUTATION: "0" },
-          timeoutMs: options.timeoutMs ?? 90_000,
-          maxBuffer: 16 * 1024 * 1024,
+      const result = await runMutationTest(execPath, args, {
+        cwd: root,
+        env: {
+          ...process.env,
+          VERIFACTU_JAVA: java,
+          VERIFACTU_DSS_JAR: classPath,
+          VERIFACTU_JAVA_MUTATION: "0",
         },
-      );
-      const failedRows = result.stdout.split("\n").filter((line) => /^\s*not ok \d+ /u.test(line));
-      if (result.timedOut || result.outputExceeded || (result.code !== 0 && failedRows.length === 0))
-        return { ...mutation, compile: "passed", covered: true, outcome: result.timedOut ? "timeout" : "testError", tests, killEvidence: [], diagnostics: [`${test}\n${result.stderr.slice(0, 3000)}`] };
+        timeoutMs: options.timeoutMs ?? 90_000,
+        maxBuffer: 16 * 1024 * 1024,
+      });
+      const failedRows = result.stdout
+        .split("\n")
+        .filter((line) => /^\s*not ok \d+ /u.test(line));
+      if (
+        result.timedOut ||
+        result.outputExceeded ||
+        (result.code !== 0 && failedRows.length === 0)
+      )
+        return {
+          ...mutation,
+          compile: "passed",
+          covered: true,
+          outcome: result.timedOut ? "timeout" : "testError",
+          tests,
+          killEvidence: [],
+          diagnostics: [`${test}\n${result.stderr.slice(0, 3000)}`],
+        };
       if (failedRows.length > 0)
-        return { ...mutation, compile: "passed", covered: true, outcome: "killed", tests, killEvidence: tapFailureEvidence(result.stdout, test), diagnostics: [] };
+        return {
+          ...mutation,
+          compile: "passed",
+          covered: true,
+          outcome: "killed",
+          tests,
+          killEvidence: tapFailureEvidence(result.stdout, test),
+          diagnostics: [],
+        };
     }
-    return { ...mutation, compile: "passed", covered: true, outcome: "survived", tests, killEvidence: [], diagnostics: [] };
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: "survived",
+      tests,
+      killEvidence: [],
+      diagnostics: [],
+    };
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }
 }
 
-export async function executeOverallMutationCampaign(root, plan, v8Root, catalog, options = {}) {
-  const nodeMutations = await discoverNodeMutationTests(root, plan, v8Root, catalog.mutants);
-  const byId = new Map(nodeMutations.map((mutation) => [mutation.id, mutation]));
+export async function executeOverallMutationCampaign(
+  root,
+  plan,
+  v8Root,
+  catalog,
+  options = {},
+) {
+  const nodeMutations = await discoverNodeMutationTests(
+    root,
+    plan,
+    v8Root,
+    catalog.mutants,
+  );
+  const byId = new Map(
+    nodeMutations.map((mutation) => [mutation.id, mutation]),
+  );
   const mutations = catalog.mutants.map((mutation) => {
-    if (/\.(?:ts|mjs)$/u.test(mutation.module)) return byId.get(mutation.id) ?? { ...mutation, tests: [] };
-    if (mutation.module.endsWith(".py")) return { ...mutation, tests: [mutation.module] };
+    if (/\.(?:ts|mjs)$/u.test(mutation.module))
+      return byId.get(mutation.id) ?? { ...mutation, tests: [] };
+    if (mutation.module.endsWith(".py"))
+      return { ...mutation, tests: [mutation.module] };
     return {
       ...mutation,
-      tests: [...new Set(javaMutationTestSelections(mutation).map(([test]) => test))],
+      tests: [
+        ...new Set(javaMutationTestSelections(mutation).map(([test]) => test)),
+      ],
     };
   });
-  const journalPath = resolve(options.artifactRoot, "overall-mutation-progress.jsonl");
+  const journalPath = resolve(
+    options.artifactRoot,
+    "overall-mutation-progress.jsonl",
+  );
   const verifierInputs = [
     "config/quality/p4-quality-plan.json",
     "package-lock.json",
@@ -826,17 +1227,35 @@ export async function executeOverallMutationCampaign(root, plan, v8Root, catalog
     ...plan.testFiles,
   ];
   const verifierDigests = await Promise.all(
-    verifierInputs.map(async (path) => [path, digestText(await readFile(resolve(root, path)))]),
+    verifierInputs.map(async (path) => [
+      path,
+      digestText(await readFile(resolve(root, path))),
+    ]),
   );
   const journalHeader = {
     schemaVersion: 1,
     subject: options.subject,
     tree: options.tree,
-    catalogSha256: digestText([
-      ...catalog.mutants.map((mutation) => `${mutation.id}\0${mutation.mutatedSha256}`),
-      ...catalog.excludedApplications.map((mutation) => `EXCLUDED\0${mutation.id}\0${mutation.mutatedSha256}\0${digestText(mutation.compilerDiagnostic)}`),
-    ].join("\n")),
-    verifierSha256: digestText(JSON.stringify({ files: verifierDigests, node: process.version, python: options.python, java: options.java, javaHome: options.javaHome })),
+    catalogSha256: digestText(
+      [
+        ...catalog.mutants.map(
+          (mutation) => `${mutation.id}\0${mutation.mutatedSha256}`,
+        ),
+        ...catalog.excludedApplications.map(
+          (mutation) =>
+            `EXCLUDED\0${mutation.id}\0${mutation.mutatedSha256}\0${digestText(mutation.compilerDiagnostic)}`,
+        ),
+      ].join("\n"),
+    ),
+    verifierSha256: digestText(
+      JSON.stringify({
+        files: verifierDigests,
+        node: process.version,
+        python: options.python,
+        java: options.java,
+        javaHome: options.javaHome,
+      }),
+    ),
   };
   let completed = new Map();
   try {
@@ -845,7 +1264,11 @@ export async function executeOverallMutationCampaign(root, plan, v8Root, catalog
     if (JSON.stringify(header) === JSON.stringify(journalHeader)) {
       for (const line of lines.slice(1)) {
         const result = JSON.parse(line);
-        if (byId.has(result.id) || catalog.mutants.some((entry) => entry.id === result.id)) completed.set(result.id, result);
+        if (
+          byId.has(result.id) ||
+          catalog.mutants.some((entry) => entry.id === result.id)
+        )
+          completed.set(result.id, result);
       }
     }
   } catch {}
@@ -863,19 +1286,31 @@ export async function executeOverallMutationCampaign(root, plan, v8Root, catalog
       const mutation = pending[index];
       let result;
       if (mutation.tests.length === 0)
-        result = { ...mutation, compile: "passed", covered: false, outcome: "noCoverage", killEvidence: [], diagnostics: [] };
+        result = {
+          ...mutation,
+          compile: "passed",
+          covered: false,
+          outcome: "noCoverage",
+          killEvidence: [],
+          diagnostics: [],
+        };
       else if (/\.(?:ts|mjs)$/u.test(mutation.module))
         result = await executeNodeMutation(root, mutation, options);
       else if (mutation.module.endsWith(".py"))
         result = await executePythonMutation(root, mutation, options);
-      else
-        result = await executeJavaMutation(root, mutation, options);
+      else result = await executeJavaMutation(root, mutation, options);
       completed.set(result.id, result);
       await appendFile(journalPath, `${JSON.stringify(result)}\n`);
-      options.onProgress?.({ completed: ++progress, total: pending.length, result });
+      options.onProgress?.({
+        completed: ++progress,
+        total: pending.length,
+        result,
+      });
     }
   };
-  await Promise.all(Array.from({ length: Math.min(concurrency, pending.length) }, execute));
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, pending.length) }, execute),
+  );
   return mutations.map((mutation) => completed.get(mutation.id));
 }
 
