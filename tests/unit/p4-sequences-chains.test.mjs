@@ -39,6 +39,15 @@ test("billing sequence rejects duplicate, gap and wrong-scope predecessor", () =
   assert.equal(
     appendSequence(one.value, {
       ...first,
+      id: f.id("record", "r2-same-instant"),
+      predecessorId: first.id,
+    }).status,
+    "ok",
+    "sequence timestamps may be equal while still remaining nondecreasing",
+  );
+  assert.equal(
+    appendSequence(one.value, {
+      ...first,
       id: f.id("record", "r2"),
       predecessorId: null,
     }).status,
