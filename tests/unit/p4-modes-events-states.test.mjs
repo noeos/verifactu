@@ -93,6 +93,11 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     "invalid",
   );
   assert.equal(
+    transitionMode({ ...start, effectiveFrom: "bad" }, pending).status,
+    "invalid",
+    "a transition cannot build on a tenure with an invalid start time",
+  );
+  assert.equal(
     transitionMode({ ...start, effectiveUntil: start.effectiveFrom }, pending)
       .status,
     "invalid",
@@ -101,6 +106,18 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     transitionMode(start, { ...pending, effectiveUntil: pending.effectiveFrom })
       .status,
     "invalid",
+  );
+  const zeroLengthPrevious = {
+    ...start,
+    effectiveFrom: start.effectiveUntil,
+  };
+  assert.equal(
+    transitionMode(zeroLengthPrevious, {
+      ...pending,
+      effectiveFrom: start.effectiveUntil,
+    }).status,
+    "invalid",
+    "a following tenure must begin after the previous tenure started",
   );
   assert.equal(
     transitionMode(start, {
