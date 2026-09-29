@@ -718,7 +718,7 @@ export function mutationTestPatterns(mutation, test, options = {}) {
       return [
         {
           pattern:
-            "^(?:QR encoder rejects non-Uint8Array byte sources|P4-E payload binds canonical ordered query and mode endpoint|P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects forged record facts, unsupported QR lexicals and digest failures|P4-E malformed verifier and edition identities fail closed)$",
+            "^(?:QR encoder rejects non-Uint8Array byte sources|P4-E encoder port enforces admitted byte and correction-level input|P4-E payload binds canonical ordered query and mode endpoint|P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects forged record facts, unsupported QR lexicals and digest failures|P4-E malformed verifier and edition identities fail closed)$",
           timeoutMs: normalTimeout,
         },
       ];
