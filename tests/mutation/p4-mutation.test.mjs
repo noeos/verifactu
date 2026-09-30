@@ -1199,7 +1199,7 @@ test("P4-MUT-022 kills exact artifact byte custody substitution", async () => {
     "P4-MUT-022",
     "P4-CB-022",
     "application/xml-artifacts.js",
-    "Boolean(originalBytes) &&\n        originalBytes !== undefined &&\n        bytesEqual(expectedBytes, originalBytes)",
+    "Boolean(originalBytes) &&\n        originalBytes !== undefined &&\n        originalBytes.byteLength === artifact.length &&\n        bytesEqual(expectedBytes, originalBytes)",
     "true",
     async ({ load }) => {
       const { id, context } = await contextFor(load);
