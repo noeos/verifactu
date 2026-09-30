@@ -451,6 +451,30 @@ function selectedTest(path, pattern) {
 
 export function focusedProviderMutationTest(mutation) {
   const { module, line } = mutation;
+  if (module === "internal/xades-provider/provider.mjs" && line === 621)
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^signer callback receives only the exact remaining operation budget$",
+    );
+  if (module === "internal/xades-provider/provider.mjs" && line === 631)
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^deadline settlement ignores a timer callback after completion$",
+    );
+  if (module === "internal/xades-provider/provider.mjs" && line === 625)
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^XAdES bridge timeout uses the exact monotonic time remaining$",
+    );
+  if (
+    module === "internal/xades-provider/provider.mjs" &&
+    line >= 660 &&
+    line < 666
+  )
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^XAdES bridge timeout uses the exact monotonic time remaining$",
+    );
   if (
     module === "internal/xades-provider/provider.mjs" &&
     line >= 624 &&
@@ -491,6 +515,11 @@ export function focusedProviderMutationTest(mutation) {
           "^(?:revoked is terminal and unknown, absent and malformed never become valid|PKI observation requires evidence and a fresh caller-time interval)$",
         );
   if (module === "internal/xades-provider/worker.mjs") {
+    if (line === 254)
+      return selectedTest(
+        "tests/security/p4-resource-attacks.test.mjs",
+        "^DSS request encoder accepts exactly its declared byte limit$",
+      );
     if (line < 175)
       return selectedTest(
         "tests/security/p4-resource-attacks.test.mjs",
@@ -821,6 +850,7 @@ const JAVA_MUTATION_TESTS = [
   "tests/integration/p4-xades-pki.test.mjs",
   "tests/security/p4-signature-attacks.test.mjs",
   "tests/security/p4-resource-attacks.test.mjs",
+  "tests/integration/p4-xades-pki.test.mjs",
 ];
 
 // The exact macOS P4-G run hit 19 false 90s timeouts in Java/XAdES integration
@@ -829,6 +859,27 @@ export const DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS = 180_000;
 
 export function javaMutationTestSelections(mutation) {
   const line = mutation.line;
+  if (line === 194 || line === 212)
+    return [
+      [
+        JAVA_MUTATION_TESTS[3],
+        "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
+      ],
+    ];
+  if (line === 219)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+      ],
+    ];
+  if (line === 232)
+    return [
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks$",
+      ],
+    ];
   if (line < 104)
     return [
       [
@@ -1152,8 +1203,19 @@ export async function executeJavaMutation(root, mutation, options = {}) {
         maxBuffer: 4 * 1024 * 1024,
       },
     );
+    const plannedSelections = javaMutationTestSelections(mutation);
+    const bridgeProbe = [
+      JAVA_MUTATION_TESTS[3],
+      "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
+    ];
     const selections =
-      options.javaSelections ?? javaMutationTestSelections(mutation);
+      options.javaSelections ??
+      (plannedSelections.some(
+        ([test, pattern]) =>
+          test === bridgeProbe[0] && pattern === bridgeProbe[1],
+      )
+        ? plannedSelections
+        : [bridgeProbe, ...plannedSelections]);
     const selectedTests = selections.map(([test]) => test);
     if (compile.timedOut || compile.outputExceeded)
       return {

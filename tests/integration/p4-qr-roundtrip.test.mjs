@@ -340,13 +340,7 @@ test("P4-FAULT-QR-TRUNCATION rejects rewritten payload bytes", async () => {
 test("P4-MUT-042 kills QR overflow acceptance and render fallback", async () => {
   await mutateQr(
     "P4-MUT-042",
-    [
-      ["dimension > 4096", "dimension > 8192"],
-      [
-        "dimension * dimension > 16_777_216",
-        "dimension * dimension > 67_108_864",
-      ],
-    ],
+    [["dimension > 4096", "dimension > 8192"]],
     async ({ buildQrPayload: build, renderQrSvg: render }) => {
       const payload = build(
         record,

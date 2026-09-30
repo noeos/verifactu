@@ -216,8 +216,8 @@ export function renderQrSvg(
     typeof qr.encode !== "function" ||
     !digestProvider ||
     !Number.isSafeInteger(options?.scale) ||
-    !Number.isFinite(options?.symbolSizeMm) ||
-    !Number.isFinite(options?.quietZoneMm) ||
+    !Number.isFinite(options.symbolSizeMm) ||
+    !Number.isFinite(options.quietZoneMm) ||
     options.scale < 1 ||
     options.scale > 32 ||
     options.symbolSizeMm < 30 ||
@@ -235,8 +235,7 @@ export function renderQrSvg(
   const moduleMm = options.symbolSizeMm / matrix.size;
   const physicalMm = (matrix.size + margin * 2) * moduleMm;
   const dimension = (matrix.size + margin * 2) * options.scale;
-  if (dimension > 4096 || dimension * dimension > 16_777_216)
-    return invalid("DIAG-QR-DIMENSION-LIMIT", "bytes");
+  if (dimension > 4096) return invalid("DIAG-QR-DIMENSION-LIMIT", "bytes");
   let path = "";
   try {
     for (let y = 0; y < matrix.size; y += 1)
@@ -348,8 +347,8 @@ export function renderQrPng(
     typeof qr.encode !== "function" ||
     !digestProvider ||
     !Number.isSafeInteger(options?.scale) ||
-    !Number.isFinite(options?.symbolSizeMm) ||
-    !Number.isFinite(options?.quietZoneMm) ||
+    !Number.isFinite(options.symbolSizeMm) ||
+    !Number.isFinite(options.quietZoneMm) ||
     options.scale < 1 ||
     options.scale > 32 ||
     options.symbolSizeMm < 30 ||
@@ -367,9 +366,7 @@ export function renderQrPng(
   const moduleMm = options.symbolSizeMm / matrix.size;
   const physicalMm = (matrix.size + margin * 2) * moduleMm;
   const dimension = (matrix.size + margin * 2) * options.scale;
-  const pixels = dimension * dimension;
-  if (dimension > 4096 || pixels > 16_777_216)
-    return invalid("DIAG-QR-DIMENSION-LIMIT", "bytes");
+  if (dimension > 4096) return invalid("DIAG-QR-DIMENSION-LIMIT", "bytes");
   const raw = new Uint8Array((dimension + 1) * dimension);
   let offset = 0;
   try {

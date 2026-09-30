@@ -102,22 +102,61 @@ test("request normalization rejects malformed identities, times, certificates, a
       throw new Error("must not run");
     },
   });
-  for (const request of [
-    { ...valid, profileId: "other" },
-    { ...valid, targetName: "Wrapper" },
-    { ...valid, signingTime: "2026-09-27T00:00:00Z" },
-    { ...valid, validationTime: "2026-02-30T00:00:00Z" },
-    { ...valid, maximumRevocationAgeSeconds: 0 },
-    { ...valid, trustAnchorsDer: ["not bytes"] },
-    {
-      ...valid,
-      crlEvidence: Array.from({ length: 17 }, () => new Uint8Array([1])),
-    },
-    { ...valid, ocspEvidence: [new Uint8Array()] },
-    { ...valid, certificateChainDer: [new Uint8Array()] },
-    { ...valid, expectedSignerFingerprintSha256: "not-a-digest" },
+  for (const [request, diagnostic] of [
+    [{ ...valid, profileId: "other" }, "DIAG-XADES-EDITION"],
+    [{ ...valid, targetName: "Wrapper" }, "DIAG-XADES-REQUEST"],
+    [
+      { ...valid, signingTime: "2026-09-27T00:00:00Z" },
+      "DIAG-XADES-REQUEST",
+    ],
+    [
+      { ...valid, signingTime: "2026-02-30T00:00:00Z" },
+      "DIAG-XADES-REQUEST",
+    ],
+    [
+      { ...valid, validationTime: "2026-02-30T00:00:00Z" },
+      "DIAG-XADES-REQUEST",
+    ],
+    [
+      {
+        ...valid,
+        artifactBytes: new Uint8Array(),
+        artifactDigestSha256: createHash("sha256")
+          .update(new Uint8Array())
+          .digest("hex"),
+      },
+      "DIAG-XADES-REQUEST",
+    ],
+    [{ ...valid, maximumRevocationAgeSeconds: 0 }, "DIAG-XADES-EVIDENCE"],
+    [
+      { ...valid, trustAnchorsDer: ["not bytes"] },
+      "DIAG-XADES-EVIDENCE",
+    ],
+    [{ ...valid, trustAnchorsDer: {} }, "DIAG-XADES-EVIDENCE"],
+    [{ ...valid, crlEvidence: ["not bytes"] }, "DIAG-XADES-EVIDENCE"],
+    [{ ...valid, crlEvidence: {} }, "DIAG-XADES-EVIDENCE"],
+    [{ ...valid, ocspEvidence: ["not bytes"] }, "DIAG-XADES-EVIDENCE"],
+    [{ ...valid, ocspEvidence: {} }, "DIAG-XADES-EVIDENCE"],
+    [
+      {
+        ...valid,
+        crlEvidence: Array.from({ length: 17 }, () => new Uint8Array([1])),
+      },
+      "DIAG-XADES-EVIDENCE",
+    ],
+    [{ ...valid, ocspEvidence: [new Uint8Array()] }, "DIAG-XADES-EVIDENCE"],
+    [
+      { ...valid, certificateChainDer: [new Uint8Array()] },
+      "DIAG-XADES-CERTIFICATE",
+    ],
+    [
+      { ...valid, expectedSignerFingerprintSha256: "not-a-digest" },
+      "DIAG-XADES-CERTIFICATE",
+    ],
   ]) {
-    assert.notEqual((await provider.verify(request)).status, "valid");
+    const result = await provider.verify(request);
+    assert.equal(result.status, "defect");
+    assert.deepEqual(result.diagnostics, [diagnostic]);
   }
   const signer = {
     keyHandle: "key",
@@ -451,6 +490,47 @@ test("verification enforces exact artifact, certificate, evidence, and time boun
   assert.equal(signBridgeCalls, 9);
 });
 
+test("provider accepts the exact combined certificate and evidence item ceiling", async () => {
+  const validationTime = Date.parse(valid.validationTime);
+  const report = new TextEncoder().encode(
+    [
+      "VALID",
+      "VALID",
+      ...Array(10).fill("VALID"),
+      "NONE",
+      String(validationTime - 1),
+      String(validationTime + 1_000),
+    ].join("\t"),
+  );
+  let bridgeCalls = 0;
+  const provider = createXadesProvider({
+    execute: async () => {
+      bridgeCalls += 1;
+      return { kind: "VERIFIED", diagnostic: "NONE", payload: report };
+    },
+  });
+  const artifactBytes = new Uint8Array([1]);
+  const result = await provider.verify({
+    ...valid,
+    artifactBytes,
+    artifactDigestSha256: createHash("sha256")
+      .update(artifactBytes)
+      .digest("hex"),
+    certificateChainDer: Array.from(
+      { length: XADES_LIMITS.maximumCertificates },
+      () => new Uint8Array([1]),
+    ),
+    trustAnchorsDer: [],
+    crlEvidence: Array.from(
+      { length: XADES_LIMITS.maximumEvidenceItems },
+      () => new Uint8Array([1]),
+    ),
+    ocspEvidence: [],
+  });
+  assert.equal(result.status, "valid");
+  assert.equal(bridgeCalls, 1);
+});
+
 test("signer shape failures keep their diagnosis and never reach the bridge", async () => {
   let bridgeCalls = 0;
   const provider = createXadesProvider({
@@ -546,6 +626,56 @@ test(
   },
 );
 
+test("signing stops when the opaque callback completes exactly at its deadline", async () => {
+  const originalNow = performance.now;
+  let now = 0;
+  performance.now = () => now;
+  try {
+    const validationTime = Date.parse(valid.validationTime);
+    const report = new TextEncoder().encode(
+      [
+        "VALID",
+        "VALID",
+        ...Array(10).fill("VALID"),
+        "NONE",
+        String(validationTime - 1),
+        String(validationTime + 1_000),
+      ].join("\t"),
+    );
+    const provider = createXadesProvider({
+      execute: async ({ command }) =>
+        command === "SIGN_PREPARE"
+          ? { kind: "TBS", diagnostic: "NONE", payload: new Uint8Array([9]) }
+          : command === "SIGN_COMPLETE"
+            ? {
+                kind: "SIGNED",
+                diagnostic: "NONE",
+                payload: new TextEncoder().encode("<signed/>")
+              }
+            : { kind: "VERIFIED", diagnostic: "NONE", payload: report },
+    });
+    const result = await provider.sign(
+      {
+        ...valid,
+        signer: {
+          keyHandle: "deadline:key",
+          certificateDer: new Uint8Array([1]),
+          certificateChainDer: [],
+          sign: async () => {
+            now = 25;
+            return new Uint8Array(256);
+          },
+        },
+      },
+      { deadlineMs: 25 },
+    );
+    assert.equal(result.status, "limit");
+    assert.deepEqual(result.diagnostics, ["DIAG-XADES-DEADLINE"]);
+  } finally {
+    performance.now = originalNow;
+  }
+});
+
 test("signing accepts only bounded prepared, completed, and self-verified output", async () => {
   const signedBytes = new TextEncoder().encode("<signed/>");
   const validationTime = Date.parse(valid.validationTime);
@@ -616,6 +746,16 @@ test("signing accepts only bounded prepared, completed, and self-verified output
   });
   assert.equal(oversizedSignature.status, "invalid");
   assert.equal(oversizedSignature.diagnostics[0], "DIAG-XADES-SIGNER");
+
+  const undersizedSignature = await provider.sign({
+    ...request,
+    signer: {
+      ...signer,
+      sign: async () => new Uint8Array(127),
+    },
+  });
+  assert.equal(undersizedSignature.status, "invalid");
+  assert.equal(undersizedSignature.diagnostics[0], "DIAG-XADES-SIGNER");
 
   const detachedTbs = new Uint8Array([9]);
   const detachedProvider = createXadesProvider({
@@ -879,13 +1019,16 @@ test("signing treats a callback failure at the operation deadline as a limit", a
 
 test("signing preserves cancellation when an unrelated callback error races abort", async () => {
   let abortedReads = 0;
+  let removedListeners = 0;
   const signal = {
     get aborted() {
       abortedReads += 1;
       return abortedReads >= 4;
     },
     addEventListener() {},
-    removeEventListener() {},
+    removeEventListener() {
+      removedListeners += 1;
+    },
   };
   const provider = createXadesProvider({
     execute: async () => ({
@@ -906,6 +1049,7 @@ test("signing preserves cancellation when an unrelated callback error races abor
   assert.equal(result.status, "cancelled");
   assert.equal(result.diagnostics[0], "DIAG-XADES-CANCELLED");
   assert.equal(abortedReads, 5);
+  assert.equal(removedListeners, 2);
 });
 
 test("signing maps cancellation, deadline, callback errors, and bridge outcomes", async () => {
@@ -1011,6 +1155,123 @@ test("verification bridge invocation is bounded and observes cancellation", asyn
   controller.abort();
   const cancelled = await pending;
   assert.equal(cancelled.status, "cancelled");
+});
+
+test("signer callback receives only the exact remaining operation budget", async () => {
+  const originalNow = performance.now;
+  let now = 0;
+  performance.now = () => now;
+  try {
+    const validationTime = Date.parse(valid.validationTime);
+    const report = new TextEncoder().encode(
+      [
+        "VALID",
+        "VALID",
+        ...Array(10).fill("VALID"),
+        "NONE",
+        String(validationTime - 1),
+        String(validationTime + 1_000),
+      ].join("\t"),
+    );
+    let callbackBudget;
+    const provider = createXadesProvider({
+      execute: async ({ command }) => {
+        if (command === "SIGN_PREPARE") {
+          now = 5;
+          return {
+            kind: "TBS",
+            diagnostic: "NONE",
+            payload: new Uint8Array([9]),
+          };
+        }
+        if (command === "SIGN_COMPLETE")
+          return {
+            kind: "SIGNED",
+            diagnostic: "NONE",
+            payload: new TextEncoder().encode("<signed/>")
+          };
+        return { kind: "VERIFIED", diagnostic: "NONE", payload: report };
+      },
+    });
+    const result = await provider.sign(
+      {
+        ...valid,
+        signer: {
+          keyHandle: "budget:key",
+          certificateDer: new Uint8Array([1]),
+          certificateChainDer: [],
+          sign: async (_bytes, options) => {
+            callbackBudget = options.deadlineMs;
+            return new Uint8Array(256);
+          },
+        },
+      },
+      { deadlineMs: 25 },
+    );
+    assert.equal(result.status, "signed");
+    assert.equal(callbackBudget, 20);
+  } finally {
+    performance.now = originalNow;
+  }
+});
+
+test("XAdES bridge timeout uses the exact monotonic time remaining", async () => {
+  const originalNow = performance.now;
+  const originalSetTimeout = globalThis.setTimeout;
+  const timerDelays = [];
+  performance.now = () => 5;
+  globalThis.setTimeout = (callback, delay, ...args) => {
+    timerDelays.push(delay);
+    return originalSetTimeout(callback, 0, ...args);
+  };
+  try {
+    const provider = createXadesProvider({
+      execute: () => new Promise(() => {}),
+    });
+    const result = await provider.verify(valid, { deadlineMs: 20 });
+    assert.equal(result.status, "limit");
+    assert.deepEqual(timerDelays, [20]);
+  } finally {
+    performance.now = originalNow;
+    globalThis.setTimeout = originalSetTimeout;
+  }
+});
+
+test("deadline settlement ignores a timer callback after completion", async () => {
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  const timerCallbacks = [];
+  let removedListeners = 0;
+  const signal = {
+    aborted: false,
+    addEventListener() {},
+    removeEventListener() {
+      removedListeners += 1;
+    },
+  };
+  globalThis.setTimeout = (callback) => {
+    timerCallbacks.push(callback);
+    return timerCallbacks.length;
+  };
+  globalThis.clearTimeout = () => {};
+  try {
+    const provider = createXadesProvider({
+      execute: async () => ({
+        kind: "UNAVAILABLE",
+        diagnostic: "DIAG-XADES-CASE",
+        payload: new Uint8Array(),
+      }),
+    });
+    const result = await provider.verify(valid, { signal, deadlineMs: 1_000 });
+    assert.equal(result.status, "unavailable");
+    assert.equal(timerCallbacks.length, 1);
+    assert.equal(removedListeners, 1);
+    timerCallbacks[0]();
+    assert.equal(removedListeners, 1);
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
+  }
 });
 
 test("default XAdES provider reaches the admitted Java bridge and fails closed", async () => {
@@ -1232,6 +1493,25 @@ test("provider maps independent XAdES and PKI response dimensions fail closed", 
     ).status,
     "indeterminate",
   );
+  const extendedFields = new TextDecoder().decode(wireFields()).split("\t");
+  extendedFields.push("EXTRA");
+  const extendedResult = await verifyResponse(
+    "VERIFIED",
+    new TextEncoder().encode(extendedFields.join("\t")),
+  );
+  assert.equal(extendedResult.status, "defect");
+  assert.deepEqual(extendedResult.diagnostics, ["DIAG-XADES-REPORT"]);
+  const noncanonicalTimestamp = await verifyResponse(
+    "VERIFIED",
+    wireFields({ 13: `+${validationTime - 1000}` }),
+  );
+  assert.equal(noncanonicalTimestamp.status, "defect");
+  assert.deepEqual(noncanonicalTimestamp.diagnostics, ["DIAG-XADES-REPORT"]);
+  const indeterminateChain = await verifyResponse(
+    "INDETERMINATE",
+    wireFields({ 2: "INDETERMINATE", 3: "INDETERMINATE" }),
+  );
+  assert.equal(indeterminateChain.certificatePolicy.chain, "indeterminate");
   assert.equal(
     (await verifyResponse("VERIFIED", wireFields({ 0: "INVALID" }))).status,
     "defect",
@@ -1264,6 +1544,21 @@ test("provider maps independent XAdES and PKI response dimensions fail closed", 
     }),
   }).verify(valid);
   assert.equal(malformedWorkerValue.status, "defect");
+  assert.deepEqual(malformedWorkerValue.diagnostics, ["DIAG-XADES-PROVIDER"]);
+  for (const response of [null, "not-an-object", {}]) {
+    const malformedResponse = await createXadesProvider({
+      execute: async () => response,
+    }).verify(valid);
+    assert.equal(malformedResponse.status, "defect");
+    assert.deepEqual(malformedResponse.diagnostics, ["DIAG-XADES-PROVIDER"]);
+  }
+  const nullThrown = await createXadesProvider({
+    execute: async () => {
+      throw null;
+    },
+  }).verify(valid);
+  assert.equal(nullThrown.status, "defect");
+  assert.deepEqual(nullThrown.diagnostics, ["DIAG-XADES-PROVIDER"]);
   const malformedDiagnostic = await createXadesProvider({
     execute: async () => ({
       kind: "VERIFIED",

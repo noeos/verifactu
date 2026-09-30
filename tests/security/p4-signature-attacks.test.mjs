@@ -250,6 +250,7 @@ test("signed XML rejects wrapping, duplicate IDs, extra references, and entity a
     });
     assert.equal(timeFailure.profile, "valid", validationTime);
     assert.equal(timeFailure.cryptographic, "valid", validationTime);
+    assert.equal(timeFailure.status, "invalid", validationTime);
     assert.equal(timeFailure.certificate, "invalid", validationTime);
     assert.equal(timeFailure.certificatePolicy.time, "invalid", validationTime);
   }

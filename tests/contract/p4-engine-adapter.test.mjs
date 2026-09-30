@@ -428,6 +428,7 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     { ...linkEvidence, recordDigest: "bad" },
     { ...linkEvidence, position: 1 },
     { ...linkEvidence, previous: undefined },
+    { ...linkEvidence, previous: { kind: "digest" } },
     { ...linkEvidence, previous: { kind: "digest", value: "bad" } },
     { ...linkEvidence, previous: { kind: "none", extra: true } },
     { ...linkEvidence, linkDigest: 1 },
@@ -467,6 +468,76 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
   );
   assert.equal(rejectedHostileLink.status, "ok");
   assert.equal(rejectedHostileLink.value.status, "invalid");
+
+  const linkedPredecessor =
+    linkedProjection.predecessorEvidenceDigest.slice("sha256:".length);
+  const linkedLinkEvidence = {
+    ...linkEvidence,
+    contextId: linkedProjection.contextId,
+    sequenceId: linkedProjection.sequenceId,
+    recordId: linkedProjection.recordId,
+    position: linkedProjection.position,
+    previous: { kind: "digest", value: linkedPredecessor },
+  };
+  const linkedSummary = {
+    ...generated.value.chainSummary,
+    contextId: linkedProjection.contextId,
+    sequenceId: linkedProjection.sequenceId,
+    firstPosition: linkedProjection.position,
+    lastPosition: linkedProjection.position,
+    finalLinkDigest: linkedLinkEvidence.linkDigest,
+  };
+  const linkedEnginePort = {
+    createEngine() {
+      return {
+        verifyChain: () => ({
+          status: "valid",
+          evidence: linkedSummary,
+          diagnostics: [],
+        }),
+        digestEvidence: () => ({
+          ok: true,
+          value: { algorithm: "sha-256", toHex: () => "a".repeat(64) },
+        }),
+      };
+    },
+  };
+  for (const previous of [
+    { kind: "digest", value: "b".repeat(64) },
+    { kind: "digest", value: linkedPredecessor, extra: true },
+  ]) {
+    const rejected = verifyNoeosEngineEvidence(
+      linkedInput,
+      { ...linkedLinkEvidence, previous },
+      linkedEnginePort,
+    );
+    assert.equal(rejected.status, "ok");
+    assert.equal(rejected.value.status, "invalid");
+  }
+  for (const [input, evidence, expectedMode, expectedPrevious, summary] of [
+    [genesisInput, linkEvidence, "complete", { kind: "none" }, generated.value.chainSummary],
+    [linkedInput, linkedLinkEvidence, "fragment", { kind: "digest", value: linkedPredecessor }, linkedSummary],
+  ]) {
+    let observed;
+    const result = verifyNoeosEngineEvidence(input, evidence, {
+      createEngine() {
+        return {
+          verifyChain: (request) => {
+            observed = request;
+            return { status: "valid", evidence: summary, diagnostics: [] };
+          },
+          digestEvidence: () => ({
+            ok: true,
+            value: { algorithm: "sha-256", toHex: () => "a".repeat(64) },
+          }),
+        };
+      },
+    });
+    assert.equal(result.status, "ok");
+    assert.equal(result.value.status, "valid");
+    assert.equal(observed.mode, expectedMode);
+    assert.deepEqual(observed.expectedPrevious, expectedPrevious);
+  }
 
   const invalidClaims = verifyNoeosEngineEvidence(
     { ...genesisInput, claims: [] },
@@ -775,8 +846,13 @@ test("profile refuses fiscal plaintext, extra fields, malformed order and unsafe
 
 test("profile projection validates every identifier, artifact, predecessor, and algorithm boundary", () => {
   const projection = ENGINE_PROFILE_TEST_VECTORS[1].projection;
+  assert.equal(
+    isEngineProfileProjection({ ...projection, position: 1_000_000 }),
+    true,
+  );
   const malformed = [
     { schema: "other" },
+    { artifacts: [42] },
     { contextId: "plain-context" },
     { sequenceId: "plain-sequence" },
     { recordId: "plain-record" },
@@ -823,11 +899,26 @@ test("profile projection validates every identifier, artifact, predecessor, and 
       JSON.stringify(overrides),
     );
   }
+  assert.equal(
+    isEngineProfileProjection(Object.assign([], projection)),
+    false,
+  );
+  assert.equal(
+    isEngineProfileProjection({
+      ...projection,
+      algorithmIds: ["a", "b", "c", "d", "e", "f", "g", "h"],
+    }),
+    true,
+  );
 
   const input = {
     ...projection,
     claims: claimSet,
   };
+  assert.equal(
+    createEngineProfileProjection({ ...input, position: 1_000_000 }).status,
+    "ok",
+  );
   for (const invalidInput of [
     { ...input, unexpected: true },
     { ...input, schema: "unknown" },
@@ -853,6 +944,13 @@ test("profile normalization reports bounded success and rejects invalid canonica
   assert.equal(normalized.ok, true);
   assert.equal(normalized.value.byteLength, written.byteLength);
   assert.ok(written.byteLength > 0);
+  assert.equal(
+    profile.normalize(projection, sink, {
+      ...ENGINE_PROFILE_LIMITS,
+      maxPayloadBytes: written.byteLength,
+    }).ok,
+    true,
+  );
   assert.equal(
     profile.normalize(projection, sink, {
       ...ENGINE_PROFILE_LIMITS,

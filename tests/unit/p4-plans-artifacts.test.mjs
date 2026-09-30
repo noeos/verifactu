@@ -109,6 +109,14 @@ test("P4-CB-017 operation plan is effect-free and rejects undeclared effects", (
     "invalid",
   );
   assert.equal(
+    createOperationPlan({ ...input, expectedHead: "h".repeat(256) }).status,
+    "ok",
+  );
+  assert.equal(
+    createOperationPlan({ ...input, expectedHead: "h".repeat(257) }).status,
+    "invalid",
+  );
+  assert.equal(
     createOperationPlan({ ...input, actions: [] }).status,
     "invalid",
   );
@@ -853,6 +861,15 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     transitionXmlArtifact(
       collisionArtifact.value,
       "bounded-and-digested",
+      collisionArtifact.value.bytes.slice(0, -1),
+      constantDigest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionXmlArtifact(
+      collisionArtifact.value,
+      "bounded-and-digested",
       new TextEncoder().encode("!record/>"),
       constantDigest,
     ).status,
@@ -909,6 +926,15 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
   assert.equal(
     transitionXmlArtifact(
       { ...bounded.value },
+      "validated",
+      bounded.value.bytes,
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionXmlArtifact(
+      "truthy primitive",
       "validated",
       bounded.value.bytes,
       digest,

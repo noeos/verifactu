@@ -172,6 +172,7 @@ test("XML model rejects malformed names, bindings, duplicate expanded attributes
     { ...base, root: { ...base.root, name: name("bad:name") } },
     { ...base, root: { ...base.root, name: name("1starts-with-digit") } },
     { ...base, root: { ...base.root, name: name("contains?invalid") } },
+    { ...base, root: { ...base.root, name: name(new String("r")) } },
     {
       ...base,
       root: {

@@ -633,6 +633,35 @@ test("P4-E compact PNG keeps stored blocks bounded", () => {
   );
 });
 
+test("P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling", () => {
+  const payload = buildQrPayload(
+    record(),
+    { id: editionId, environment: "test", mode: "verifactu" },
+    digest,
+  ).value;
+  const matrix = (size) => ({
+    encode: () => ({
+      status: "ok",
+      value: { size, get: () => false },
+    }),
+  });
+  const options = { scale: 32, symbolSizeMm: 30, quietZoneMm: 2 };
+  const exactSvg = renderQrSvg(payload, matrix(112), options, digest);
+  assert.equal(exactSvg.status, "ok");
+  assert.equal(exactSvg.value.width, 4096);
+  assert.equal(
+    renderQrSvg(payload, matrix(113), options, digest).diagnostics[0].code,
+    "DIAG-QR-DIMENSION-LIMIT",
+  );
+  const exactPng = renderQrPng(payload, matrix(112), options, digest);
+  assert.equal(exactPng.status, "ok");
+  assert.equal(exactPng.value.width, 4096);
+  assert.equal(
+    renderQrPng(payload, matrix(113), options, digest).diagnostics[0].code,
+    "DIAG-QR-DIMENSION-LIMIT",
+  );
+});
+
 test("P4-E PNG encodes exact raster pixels, physical density and chunk checksums", () => {
   const payload = buildQrPayload(
     record(),

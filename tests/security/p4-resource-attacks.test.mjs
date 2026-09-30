@@ -123,6 +123,24 @@ test("bridge encoder serializes a bounded request using strict base64 lines", ()
   );
 });
 
+test("DSS request encoder accepts exactly its declared byte limit", () => {
+  const atLimit = encodeRequest({
+    ...request,
+    certificateChainDer: Array.from({ length: 3 }, () => new Uint8Array()),
+    artifactBytes: new Uint8Array(17_999_847),
+  });
+  assert.ok(atLimit instanceof Uint8Array);
+  assert.equal(atLimit.byteLength, 24_000_000);
+  assert.equal(
+    encodeRequest({
+      ...request,
+      certificateChainDer: Array.from({ length: 3 }, () => new Uint8Array()),
+      artifactBytes: new Uint8Array(17_999_850),
+    }),
+    null,
+  );
+});
+
 test("DSS response decoder rejects malformed framing and validates every field", () => {
   const valid = decodeResponse(
     Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nNONE\nYQ==\n", "ascii"),
@@ -953,7 +971,7 @@ test(
       recursive: true,
     });
     await mkdir(classPath);
-    const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
+    const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("wire-at-limit")) { System.out.print("x".repeat(134_358)); return; } if (mode.equals("wire-over-limit")) { System.out.print("x".repeat(134_359)); return; } if (mode.equals("bounded")) { byte[] payload = new byte[100_000]; System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\n" + java.util.Base64.getEncoder().encodeToString(payload) + "\\n"); return; } if (mode.equals("nonzero")) { System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n"); System.exit(1); return; } if (mode.equals("stderr-wire-over")) { System.err.print("x".repeat(5000)); System.err.flush(); Thread.sleep(5000); return; } if (mode.equals("stderr-wire-at-limit")) { System.err.print("x".repeat(4096)); System.err.flush(); Thread.sleep(5000); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic-at-limit")) System.err.print("x".repeat(256)); if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
     await writeFile(
       source,
       `package eu.noeos.verifactu.bridge; public final class DssBridge { public static void main(String[] args) throws Exception { ${body} } }\n`,
@@ -978,6 +996,61 @@ test(
         },
       );
     assert.equal((await response("valid")).kind, "VERIFIED");
+    const exactLimitRequest = {
+      ...request,
+      certificateChainDer: Array.from(
+        { length: 3 },
+        () => new Uint8Array(),
+      ),
+      artifactBytes: new Uint8Array(17_999_847),
+    };
+    const exactLimitWire = encodeRequest(exactLimitRequest);
+    assert.equal(exactLimitWire.byteLength, 24_000_000);
+    const exactLimitResponse = await spawnDssBridge(exactLimitRequest, {
+      javaExecutable:
+        process.env.VERIFACTU_JAVA ??
+        (process.platform === "win32" ? "java.exe" : "java"),
+      jarPath: classPath,
+    });
+    assert.equal(exactLimitResponse.kind, "VERIFIED");
+    const absentRequest = await spawnDssBridge(null, {
+      javaExecutable:
+        process.env.VERIFACTU_JAVA ??
+        (process.platform === "win32" ? "java.exe" : "java"),
+      jarPath: classPath,
+    });
+    assert.equal(absentRequest.kind, "LIMIT");
+    assert.equal(absentRequest.diagnostic, "DIAG-XADES-REQUEST-BYTES");
+    const boundedResponse = await spawnDssBridge(
+      { ...request, editionId: "bounded" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        maximumOutputBytes: 100_000,
+      },
+    );
+    assert.equal(boundedResponse.kind, "VERIFIED");
+    assert.equal(boundedResponse.payload.byteLength, 100_000);
+    const wireAtLimit = await spawnDssBridge(
+      { ...request, editionId: "wire-at-limit" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        maximumOutputBytes: 100_000,
+      },
+    );
+    assert.equal(wireAtLimit.kind, "DEFECT");
+    assert.equal(wireAtLimit.diagnostic, "DIAG-XADES-PROTOCOL");
+    const wireOverLimit = await spawnDssBridge(
+      { ...request, editionId: "wire-over-limit" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        maximumOutputBytes: 100_000,
+      },
+    );
+    assert.equal(wireOverLimit.kind, "LIMIT");
+    assert.equal(wireOverLimit.diagnostic, "DIAG-XADES-OUTPUT");
     assert.equal(
       (
         await spawnDssBridge(
@@ -994,7 +1067,33 @@ test(
     assert.equal((await response("stdout")).kind, "LIMIT");
     assert.equal((await response("stderr")).kind, "LIMIT");
     assert.equal((await response("diagnostic")).kind, "LIMIT");
+    const diagnosticAtLimit = await response("diagnostic-at-limit");
+    assert.equal(diagnosticAtLimit.kind, "VERIFIED");
+    assert.deepEqual([...diagnosticAtLimit.payload], [97]);
+    const stderrWireOver = await spawnDssBridge(
+      { ...request, editionId: "stderr-wire-over" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        timeoutMs: 1_000,
+      },
+    );
+    assert.equal(stderrWireOver.kind, "LIMIT");
+    assert.equal(stderrWireOver.diagnostic, "DIAG-XADES-OUTPUT");
+    const stderrWireAtLimit = await spawnDssBridge(
+      { ...request, editionId: "stderr-wire-at-limit" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        timeoutMs: 200,
+      },
+    );
+    assert.equal(stderrWireAtLimit.kind, "LIMIT");
+    assert.equal(stderrWireAtLimit.diagnostic, "DIAG-XADES-DEADLINE");
     assert.equal((await response("exit")).kind, "DEFECT");
+    const nonzeroResponse = await response("nonzero");
+    assert.equal(nonzeroResponse.kind, "DEFECT");
+    assert.equal(nonzeroResponse.diagnostic, "DIAG-XADES-PROCESS");
     assert.equal(
       (
         await spawnDssBridge(request, {
@@ -1033,17 +1132,29 @@ test(
     try {
       process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
       process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
-      assert.equal((await spawnDssBridge(request)).kind, "DEFECT");
+      const invalidAgent = await spawnDssBridge(request, {
+        javaExecutable: "/missing/verifactu-java",
+        jarPath: classPath,
+      });
+      assert.equal(invalidAgent.kind, "DEFECT");
+      assert.equal(invalidAgent.diagnostic, "DIAG-XADES-JACOCO");
+
+      delete process.env.VERIFACTU_JACOCO_AGENT;
+      const missingAgent = await spawnDssBridge(request, {
+        javaExecutable: "/missing/verifactu-java",
+        jarPath: classPath,
+      });
+      assert.equal(missingAgent.kind, "DEFECT");
+      assert.equal(missingAgent.diagnostic, "DIAG-XADES-JACOCO");
+
+      process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco.jar";
       delete process.env.VERIFACTU_JACOCO_DESTFILE;
-      assert.equal(
-        (
-          await spawnDssBridge(request, {
-            javaExecutable: "/missing/verifactu-java",
-            jarPath: classPath,
-          })
-        ).kind,
-        "DEFECT",
-      );
+      const missingDestination = await spawnDssBridge(request, {
+        javaExecutable: "/missing/verifactu-java",
+        jarPath: classPath,
+      });
+      assert.equal(missingDestination.kind, "DEFECT");
+      assert.equal(missingDestination.diagnostic, "DIAG-XADES-JACOCO");
     } finally {
       if (previousAgent === undefined)
         delete process.env.VERIFACTU_JACOCO_AGENT;

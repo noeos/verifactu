@@ -158,6 +158,7 @@ test("alta construction rejects mismatched kinds, dates, totals and chain self-l
     // Runtime callers can bypass the TypeScript Decimal type. The public
     // constructor must still reject a truthy primitive before freezing it.
     { ...record, total: "12.50" },
+    { ...record, total: null },
     { ...record, total: { ...record.total, text: 12 } },
     { ...record, total: { ...record.total, coefficient: 1n } },
     { ...record, predecessorId: record.id },
@@ -169,6 +170,26 @@ test("alta construction rejects mismatched kinds, dates, totals and chain self-l
   ];
   for (const input of invalidInputs)
     assert.equal(createAltaRecord(input).status, "invalid");
+});
+
+test("alta records preserve the decimal contract for negative totals", () => {
+  const f = fixture();
+  const record = {
+    kind: "alta",
+    id: f.get("record", "negative-total"),
+    context: f.context,
+    document: f.doc,
+    issueDate: createFiscalDate("2025-01-01").value,
+    generatedAt: f.at,
+    total: createDecimal("-0.01", {
+      maxIntegerDigits: 8,
+      maxScale: 2,
+      allowNegative: true,
+    }).value,
+    predecessorId: null,
+    editionId: f.context.editionId,
+  };
+  assert.equal(createAltaRecord(record).status, "ok");
 });
 
 test("record constructors reject combinations of simultaneous contract faults", () => {
