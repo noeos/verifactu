@@ -101,6 +101,31 @@ test("XML model freezes the tree and emits deterministic UTF-8 with expanded nam
   });
 });
 
+test("XML model sorts attributes deterministically when namespace keys are equal", () => {
+  const render = (attributes) => {
+    const document = defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("r"),
+        namespaces: [],
+        attributes,
+        children: [],
+      },
+    });
+    assert.equal(document.status, "ok");
+    const serialized = serializeXmlDocument(document.value);
+    assert.equal(serialized.status, "ok");
+    return new TextDecoder().decode(serialized.value);
+  };
+  const first = [
+    { name: name("z"), value: "last" },
+    { name: name("a"), value: "first" },
+  ];
+  const reversed = [...first].reverse();
+  assert.equal(render(first), render(reversed));
+  assert.match(render(first), /<r a="first" z="last"\/>/u);
+});
+
 test("P4-PROP-010 XML model serialize-parse preserves supported infoset (4096 executions)", (t) => {
   const seed = 0x50444310;
   const documents = [];
@@ -426,6 +451,50 @@ test("XML model rejects exact one-byte serialized overflows in each markup class
     ).status,
     "invalid",
   );
+
+  const filler = (bytes) =>
+    "&".repeat(Math.floor(bytes / 5)) + "x".repeat(bytes % 5);
+  for (const [child, serializedNode] of [
+    [{ kind: "comment", value: "x" }, "<!--x-->"],
+    [{ kind: "processing-instruction", target: "p", data: "" }, "<?p?>"],
+    [{ kind: "processing-instruction", target: "p", data: "xy" }, "<?p xy?>"],
+  ]) {
+    const fixed = exact(`${declaration}<r>${serializedNode}</r>`);
+    const text = filler(limit + 1 - fixed);
+    assert.equal(
+      exact(
+        `${declaration}<r>${text.replaceAll("&", "&amp;")}${serializedNode}</r>`,
+      ),
+      limit + 1,
+    );
+    assert.equal(
+      defineXmlDocument(
+        makeDocument(element({ children: [leaf(text), child] })),
+      ).status,
+      "invalid",
+    );
+  }
+
+  const namespaceFixed = exact(`${declaration}<p:r xmlns:p=""/>`);
+  const quoteNamespaceCharacters = limit + 1 - namespaceFixed - 5;
+  const quoteNamespaceUri = "n".repeat(quoteNamespaceCharacters - 1) + '"';
+  assert.equal(
+    exact(
+      `${declaration}<p:r xmlns:p="${quoteNamespaceUri.replaceAll('"', "&quot;")}"/>`,
+    ),
+    limit + 1,
+  );
+  assert.equal(
+    defineXmlDocument(
+      makeDocument(
+        element({
+          name: name("r", quoteNamespaceUri, "p"),
+          namespaces: [{ prefix: "p", namespaceUri: quoteNamespaceUri }],
+        }),
+      ),
+    ).status,
+    "invalid",
+  );
 });
 
 test("XML model fails closed across namespace, attribute, node, and text boundaries", () => {
@@ -466,6 +535,7 @@ test("XML model fails closed across namespace, attribute, node, and text boundar
     }),
     document({ namespaces: [{ prefix: "p", namespaceUri: "" }] }),
     document({ name: name("r", "urn:missing", "p") }),
+    document({ name: { ...name("r"), localName: 1 } }),
     document({ attributes: null }),
     document({ attributes: [null] }),
     document({ attributes: [{ name: name("xmlns"), value: "x" }] }),
@@ -481,9 +551,11 @@ test("XML model fails closed across namespace, attribute, node, and text boundar
       ],
     }),
     document({ children: null }),
+    document({ children: [null] }),
     document({ children: [false] }),
     document({ children: [{ kind: "unknown" }] }),
     document({ children: [{ kind: "comment", value: "trailing-" }] }),
+    document({ children: [{ kind: "comment", value: "bad\u0000comment" }] }),
     document({
       children: [
         { kind: "processing-instruction", target: "bad:name", data: "" },
@@ -581,18 +653,16 @@ test("XML model accepts each documented exact capacity", () => {
   });
   const exactNodes = {
     root: documentElement({
-      children: Array.from(
-        { length: XML_LIMITS.maximumNodes - 1 },
-        () => leaf(""),
+      children: Array.from({ length: XML_LIMITS.maximumNodes - 1 }, () =>
+        leaf(""),
       ),
     }),
   };
   assert.equal(defineXmlDocument(exactNodes).status, "ok");
   const exactElementNodes = {
     root: documentElement({
-      children: Array.from(
-        { length: XML_LIMITS.maximumNodes - 1 },
-        () => documentElement(),
+      children: Array.from({ length: XML_LIMITS.maximumNodes - 1 }, () =>
+        documentElement(),
       ),
     }),
   };
@@ -642,9 +712,24 @@ test("XML model accepts each documented exact capacity", () => {
   assert.equal(exactAttribute.status, "ok");
 
   const declaration = '<?xml version="1.0" encoding="UTF-8"?>';
-  const baselineBytes = new TextEncoder().encode(`${declaration}<r></r>`)
-    .byteLength;
+  const baselineBytes = new TextEncoder().encode(
+    `${declaration}<r></r>`,
+  ).byteLength;
   const remainingBytes = XML_LIMITS.maximumXmlBytes - baselineBytes;
+  const exactTextWithUnescapedAttributeOnlyCharacters =
+    "&".repeat(Math.floor((remainingBytes - 3) / 5)) +
+    '"\n\t' +
+    "x".repeat((remainingBytes - 3) % 5);
+  const exactSpecialText = defineXmlDocument({
+    root: documentElement({
+      children: [leaf(exactTextWithUnescapedAttributeOnlyCharacters)],
+    }),
+  });
+  assert.equal(exactSpecialText.status, "ok");
+  assert.equal(
+    serializeXmlDocument(exactSpecialText.value).value.byteLength,
+    XML_LIMITS.maximumXmlBytes,
+  );
   const ampersandCount = Math.floor(remainingBytes / 5);
   const exactMarkupText =
     "&".repeat(ampersandCount) + "x".repeat(remainingBytes % 5);
@@ -658,10 +743,31 @@ test("XML model accepts each documented exact capacity", () => {
   assert.equal(serialized.status, "ok");
   assert.equal(serialized.value.byteLength, XML_LIMITS.maximumXmlBytes);
 
+  const namespaceBase = new TextEncoder().encode(
+    `${declaration}<p:r xmlns:p=""/>`,
+  ).byteLength;
+  const exactNamespaceUri = "n".repeat(
+    XML_LIMITS.maximumXmlBytes - namespaceBase,
+  );
+  const exactNamespaceDocument = defineXmlDocument({
+    root: documentElement({
+      name: name("r", exactNamespaceUri, "p"),
+      namespaces: [{ prefix: "p", namespaceUri: exactNamespaceUri }],
+    }),
+  });
+  assert.equal(exactNamespaceDocument.status, "ok");
+  assert.equal(
+    serializeXmlDocument(exactNamespaceDocument.value).value.byteLength,
+    XML_LIMITS.maximumXmlBytes,
+  );
+
   const encoder = new TextEncoder();
-  for (const point of [0x7f, 0x7ff, 0xd7ff, 0xe000, 0xfffd, 0x10000, 0x10ffff]) {
+  for (const point of [
+    0x7f, 0x7ff, 0xd7ff, 0xe000, 0xfffd, 0x10000, 0x10ffff,
+  ]) {
     const scalar = String.fromCodePoint(point);
-    const remainingScalarBytes = remainingBytes - encoder.encode(scalar).byteLength;
+    const remainingScalarBytes =
+      remainingBytes - encoder.encode(scalar).byteLength;
     const scalarAmpersands = Math.floor(remainingScalarBytes / 5);
     const scalarText =
       "&".repeat(scalarAmpersands) +

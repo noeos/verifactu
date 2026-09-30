@@ -188,6 +188,18 @@ test("claim constructors reject every malformed status, field, and evidence comb
     assert.equal(createVerificationClaim(malformed).status, "invalid");
   }
   assert.equal(createVerificationClaimSet(null).status, "invalid");
+  const iterableClaimSet = {
+    length: CLAIM_KINDS.length,
+    some: () => false,
+    *[Symbol.iterator]() {
+      yield* claimSet().value.claims;
+    },
+  };
+  assert.equal(
+    createVerificationClaimSet(iterableClaimSet).status,
+    "invalid",
+    "an iterable object cannot substitute for the required array",
+  );
   assert.equal(
     createVerificationClaimSet([{}, {}, {}, {}, {}]).status,
     "invalid",
@@ -212,16 +224,16 @@ test("claim constructors reject every malformed status, field, and evidence comb
     undefined,
   );
 
-  const classInstance = Object.assign(
-    new (class ClaimRecord {})(),
-    validBase,
-  );
+  const classInstance = Object.assign(new (class ClaimRecord {})(), validBase);
   assert.equal(createVerificationClaim(classInstance).status, "invalid");
-  const prototypeTrap = new Proxy({ ...validBase }, {
-    getPrototypeOf() {
-      throw new Error("private prototype trap");
+  const prototypeTrap = new Proxy(
+    { ...validBase },
+    {
+      getPrototypeOf() {
+        throw new Error("private prototype trap");
+      },
     },
-  });
+  );
   assert.equal(createVerificationClaim(prototypeTrap).status, "invalid");
   assert.equal(
     createVerificationClaim({

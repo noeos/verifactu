@@ -790,6 +790,14 @@ test("profile projection binds ordered artifact digests and only opaque identiti
   assert.equal(
     createEngineProfileProjection({
       ...vector,
+      claims: { ...claimSet, extra: "not permitted" },
+    }).status,
+    "invalid",
+    "the engine claims wrapper has exactly one permitted property",
+  );
+  assert.equal(
+    createEngineProfileProjection({
+      ...vector,
       schema: vector.schema,
       claims: claimSet,
     }).status,
