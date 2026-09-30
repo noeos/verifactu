@@ -268,6 +268,11 @@ public final class PkiFixtureGenerator {
     KeyPair k=keys(); X509CertificateHolder c=cert(k);
     if(args.length>0 && "xades-fuzz".equals(args[0])) { System.out.println(xadesFuzzReport(c)); return; }
     boolean mutationProbes=args.length>0 && "mutation-probes".equals(args[0]);
+    for(String verifierMethod:List.of("signingPrepareCertificateVerifier","signingCompleteCertificateVerifier")) {
+      Object signingVerifier=dss(verifierMethod,new Class<?>[0]);
+      Object signingAiaSource=signingVerifier.getClass().getMethod("getAIASource").invoke(signingVerifier);
+      if(signingAiaSource!=null) throw new AssertionError(verifierMethod+" must not fetch certificates through AIA");
+    }
     KeyPair purposeKey=keys(); X509CertificateHolder purposeCertificate=certWithEku(purposeKey);
     KeyPair other=keys(); X509CertificateHolder otherCert=cert(other);
     X509Certificate runtimeCertificate=new JcaX509CertificateConverter().setProvider("BC").getCertificate(c);

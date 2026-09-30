@@ -132,7 +132,7 @@ public final class DssBridge {
       } catch (LimitException limit) { throw limit; }
       catch (Exception malformed) { return new Response("INVALID", "DIAG-XADES-XML", new byte[0]); }
       XAdESSignatureParameters parameters = parameters(r);
-      XAdESService service = new XAdESService(new CommonCertificateVerifier(true));
+      XAdESService service = new XAdESService(signingPrepareCertificateVerifier());
       byte[] tbs = service.getDataToSign(new InMemoryDocument(r.artifact, "artifact.xml"), parameters).getBytes();
       return new Response("TBS", "NONE", tbs);
     }
@@ -140,7 +140,7 @@ public final class DssBridge {
       if (r.signerCertificate.length == 0 || r.signature.length < 128 || r.signature.length > 1_024)
         return new Response("INVALID", "DIAG-XADES-SIGNATURE", new byte[0]);
       XAdESSignatureParameters parameters = parameters(r);
-      XAdESService service = new XAdESService(new CommonCertificateVerifier(true));
+      XAdESService service = new XAdESService(signingCompleteCertificateVerifier());
       InMemoryDocument source = new InMemoryDocument(r.artifact, "artifact.xml");
       var signed = service.signDocument(source, parameters,
           new SignatureValue(SignatureAlgorithm.RSA_SHA256, r.signature));
@@ -152,6 +152,14 @@ public final class DssBridge {
       return verify(r);
     }
     return new Response("INVALID", "DIAG-XADES-COMMAND", new byte[0]);
+  }
+
+  private static CommonCertificateVerifier signingPrepareCertificateVerifier() {
+    return new CommonCertificateVerifier(true);
+  }
+
+  private static CommonCertificateVerifier signingCompleteCertificateVerifier() {
+    return new CommonCertificateVerifier(true);
   }
 
   private static boolean boundedEvidence(Request r) {
@@ -199,8 +207,6 @@ public final class DssBridge {
 
     for (Element item : elements(document.getDocumentElement())) {
       if (item.hasAttribute("Id")) item.setIdAttribute("Id", true);
-      if (item.hasAttribute("ID")) item.setIdAttribute("ID", true);
-      if (item.hasAttribute("id")) item.setIdAttribute("id", true);
     }
     boolean cryptoValid;
     try {
@@ -339,7 +345,7 @@ public final class DssBridge {
 
   private static boolean validateWithDss(Request r) {
     try {
-      CommonCertificateVerifier verifier = new CommonCertificateVerifier(true);
+      CommonCertificateVerifier verifier = new CommonCertificateVerifier();
       CommonTrustedCertificateSource trust = new CommonTrustedCertificateSource();
       for (byte[] b : r.anchors) trust.addCertificate(new CertificateToken(certificate(b)));
       CommonCertificateSource adjunct = new CommonCertificateSource();
