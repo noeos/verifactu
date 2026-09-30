@@ -7,7 +7,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { EventEmitter, once } from "node:events";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PassThrough } from "node:stream";
+import { PassThrough, Writable } from "node:stream";
 import { promisify } from "node:util";
 import test from "node:test";
 import {
@@ -414,6 +414,25 @@ test("XML worker process envelope bounds cancellation, request, output, timeout 
     "limit",
   );
 
+  const exactRequest = { payload: "x".repeat(17_999_986) };
+  assert.equal(Buffer.byteLength(JSON.stringify(exactRequest), "utf8"), 18_000_000);
+  let spawnedAtExactRequestLimit = false;
+  const exactLimitSpawner = createXmlWorkerSpawner(() => {
+    spawnedAtExactRequestLimit = true;
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new Writable({ write: (_chunk, _encoding, callback) => callback() });
+    child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
+    setImmediate(() => {
+      child.stdout.end('{"kind":"valid","diagnostics":[]}');
+      child.emit("close", 0, null);
+    });
+    return child;
+  });
+  assert.equal((await exactLimitSpawner(exactRequest)).kind, "valid");
+  assert.equal(spawnedAtExactRequestLimit, true);
+
   assert.equal(
     (
       await spawnXmlWorker(request, {
@@ -595,4 +614,35 @@ test("XML worker normalizes child spawn errors and post-spawn cancellation", asy
   ]);
   assert.notEqual(completed, "still-pending");
   assert.equal(completed.kind, "valid");
+
+  let spawnOptions;
+  const optionsSpawner = createXmlWorkerSpawner((_python, _args, options) => {
+    spawnOptions = options;
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
+    setImmediate(() => {
+      child.stdout.end('{"kind":"valid","diagnostics":[]}');
+      child.emit("close", 0, null);
+    });
+    return child;
+  });
+  assert.equal((await optionsSpawner(fixture("<r/>"))).kind, "valid");
+  assert.equal(spawnOptions.windowsHide, true);
+
+  const interruptedSpawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
+    setImmediate(() => {
+      child.stdout.end('{"kind":"valid","diagnostics":[]}');
+      child.emit("close", null, null);
+    });
+    return child;
+  });
+  assert.equal((await interruptedSpawner(fixture("<r/>"))).kind, "defect");
 });

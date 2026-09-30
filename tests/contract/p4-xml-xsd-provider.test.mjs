@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { access, rm } from "node:fs/promises";
 import test from "node:test";
 import {
   createXmlXsdProvider,
@@ -68,6 +69,23 @@ test("provider accepts only the exact edition schema closure and digest pins", a
   assert.equal(pinMismatch.status, "defect");
   assert.equal(pinMismatch.diagnostics[0], "DIAG-XSD-RESOURCE-MAP");
   assert.equal(calls, 1);
+});
+
+test("provider removes its temporary worker directory after completion", async () => {
+  let workerDirectory;
+  const provider = createXmlXsdProvider({
+    execute: async (_request, options) => {
+      workerDirectory = options.cwd;
+      return { kind: "valid", diagnostics: [] };
+    },
+  });
+  const result = await provider.validate(request());
+  assert.equal(result.status, "valid");
+  try {
+    await assert.rejects(access(workerDirectory), { code: "ENOENT" });
+  } finally {
+    await rm(workerDirectory, { recursive: true, force: true });
+  }
 });
 
 test("provider rejects a foreign edition, malformed request, and pre-aborted operation", async () => {
