@@ -90,8 +90,29 @@ import {
 
   const integration = "tests/integration/p4-qr-roundtrip.test.mjs";
   const qr = "packages/verifactu/src/application/qr.ts";
+  const xmlModel = "packages/verifactu/src/ports/xml-xsd.ts";
+  const xmlUnit = "tests/unit/p4-xml-model.test.mjs";
   const patterns = (module, line, test = integration) =>
     mutationTestPatterns({ module, line }, test).map((entry) => entry.pattern);
+
+  assert.deepEqual(patterns(xmlModel, 182, xmlUnit), [
+    "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model fails closed across namespace, attribute, node, and text boundaries|XML model accounts for serialized bytes in every node class)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 262, xmlUnit), [
+    "^(?:XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model applies a total serialized-byte ceiling before allocating output|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model fails closed across namespace, attribute, node, and text boundaries|XML model stops traversing siblings after serialized bytes overflow|XML model accounts for quotes as text without attribute expansion|XML model stops counting escaped text at the serialized byte ceiling|XML model accepts the complete valid scalar ranges and empty processing instructions|XML model accepts each documented exact capacity)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 330, xmlUnit), [
+    "^(?:XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model rejects maximum-length names before scanning their characters|XML model distinguishes default element namespaces from unprefixed attributes|XML model accepts the complete valid scalar ranges and empty processing instructions)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 395, xmlUnit), [
+    "^(?:XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model stops traversing siblings after serialized bytes overflow|XML model accounts for quotes as text without attribute expansion|XML model stops counting escaped text at the serialized byte ceiling|XML model accepts each documented exact capacity)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 401, xmlUnit), [
+    "^(?:XML model accepts the complete valid scalar ranges and empty processing instructions|XML model enforces the text byte ceiling for three-byte characters|XML model enforces the text byte ceiling for supplementary characters|XML model counts DEL as one UTF-8 text byte|XML model stops counting escaped text at the serialized byte ceiling)$",
+  ]);
+  const xmlSerialization = "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model sorts attributes deterministically when namespace keys are equal|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model accounts for quotes as text without attribute expansion|XML model accepts each documented exact capacity)$";
+  assert.deepEqual(patterns(xmlModel, 430, xmlUnit), [xmlSerialization]);
+  assert.deepEqual(patterns(xmlModel, 478, xmlUnit), [xmlSerialization]);
 
   assert.deepEqual(patterns(qr, 100), [
     "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",

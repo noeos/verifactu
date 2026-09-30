@@ -327,8 +327,7 @@ function nameIsBound(
 function validNcName(value: unknown): value is string {
   if (
     typeof value !== "string" ||
-    value.length === 0 ||
-    value.length > XML_LIMITS.maximumXmlBytes ||
+    value.length >= XML_LIMITS.maximumXmlBytes ||
     value.includes(":")
   )
     return false;
@@ -393,15 +392,15 @@ function escapedLength(value: string, attribute: boolean): number {
       default:
         bytes += codePointUtf8Length(character.codePointAt(0) ?? 0);
     }
-    if (bytes > XML_LIMITS.maximumXmlBytes) return bytes;
+    if (bytes >= XML_LIMITS.maximumXmlBytes) return bytes;
   }
   return bytes;
 }
 
 function codePointUtf8Length(point: number): number {
   if (point <= 0x7f) return 1;
-  if (point <= 0x7ff) return 2;
-  if (point <= 0xffff) return 3;
+  if (point < 0x800) return 2;
+  if (point < 0x10000) return 3;
   return 4;
 }
 

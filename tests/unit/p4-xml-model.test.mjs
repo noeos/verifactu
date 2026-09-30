@@ -195,6 +195,7 @@ test("XML model rejects malformed names, bindings, duplicate expanded attributes
   };
   const variants = [
     { ...base, root: { ...base.root, name: name("bad:name") } },
+    { ...base, root: { ...base.root, name: name("") } },
     { ...base, root: { ...base.root, name: name("1starts-with-digit") } },
     { ...base, root: { ...base.root, name: name("contains?invalid") } },
     { ...base, root: { ...base.root, name: name(new String("r")) } },
@@ -554,6 +555,7 @@ test("XML model fails closed across namespace, attribute, node, and text boundar
     document({ children: [null] }),
     document({ children: [false] }),
     document({ children: [{ kind: "unknown" }] }),
+    document({ children: [{ kind: "comment", value: 1 }] }),
     document({ children: [{ kind: "comment", value: "trailing-" }] }),
     document({ children: [{ kind: "comment", value: "bad\u0000comment" }] }),
     document({
@@ -610,6 +612,163 @@ test("XML model fails closed across namespace, attribute, node, and text boundar
   }
 });
 
+test("XML model stops traversing siblings after serialized bytes overflow", () => {
+  let visited = false;
+  const unvisited = {};
+  Object.defineProperty(unvisited, "kind", {
+    get() {
+      visited = true;
+      throw new Error("XML sibling visited after a fatal byte overflow");
+    },
+  });
+  const result = defineXmlDocument({
+    root: {
+      kind: "element",
+      name: name("r"),
+      namespaces: [],
+      attributes: [],
+      children: [leaf("&".repeat(900_000)), unvisited],
+    },
+  });
+  assert.equal(result.status, "invalid");
+  assert.equal(visited, false);
+});
+
+test("XML model accounts for quotes as text without attribute expansion", () => {
+  const text = '"'.repeat(700_000);
+  const document = defineXmlDocument({
+    root: {
+      kind: "element",
+      name: name("r"),
+      namespaces: [],
+      attributes: [],
+      children: [leaf(text)],
+    },
+  });
+  assert.equal(document.status, "ok");
+  const serialized = serializeXmlDocument(document.value);
+  assert.equal(serialized.status, "ok");
+  assert.equal(
+    serialized.value.byteLength,
+    new TextEncoder().encode(
+      '<?xml version="1.0" encoding="UTF-8"?><r>' + text + "</r>",
+    ).byteLength,
+  );
+});
+
+test("XML model rejects maximum-length names before scanning their characters", () => {
+  const originalTest = RegExp.prototype.test;
+  let regularExpressionCalls = 0;
+  RegExp.prototype.test = function (value) {
+    regularExpressionCalls += 1;
+    return originalTest.call(this, value);
+  };
+  try {
+    const result = defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("a".repeat(XML_LIMITS.maximumXmlBytes)),
+        namespaces: [],
+        attributes: [],
+        children: [],
+      },
+    });
+    assert.equal(result.status, "invalid");
+    assert.equal(regularExpressionCalls, 0);
+  } finally {
+    RegExp.prototype.test = originalTest;
+  }
+});
+
+test("XML model enforces the text byte ceiling for three-byte characters", () => {
+  const text = "ࠀ".repeat(699_051);
+  assert.equal(
+    defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("r"),
+        namespaces: [],
+        attributes: [],
+        children: [leaf(text)],
+      },
+    }).status,
+    "invalid",
+  );
+});
+
+test("XML model enforces the text byte ceiling for supplementary characters", () => {
+  const text = "𐀀".repeat(524_289);
+  assert.equal(
+    defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("r"),
+        namespaces: [],
+        attributes: [],
+        children: [leaf(text)],
+      },
+    }).status,
+    "invalid",
+  );
+});
+
+test("XML model counts DEL as one UTF-8 text byte", () => {
+  const text = "\u007f".repeat(1_048_577);
+  assert.equal(
+    defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("r"),
+        namespaces: [],
+        attributes: [],
+        children: [leaf(text)],
+      },
+    }).status,
+    "ok",
+  );
+});
+
+test("XML model stops counting escaped text at the serialized byte ceiling", () => {
+  const ceiling = XML_LIMITS.maximumXmlBytes;
+  const escapedPrefix = "&".repeat(Math.floor(ceiling / 5));
+  const escapedRemainder = "x".repeat(ceiling % 5);
+  const text = `${escapedPrefix}${escapedRemainder}z`;
+  const originalIterator = String.prototype[Symbol.iterator];
+  let inspectedCharacters = 0;
+  String.prototype[Symbol.iterator] = function () {
+    const iterator = originalIterator.call(this);
+    if (this !== text) return iterator;
+    return {
+      next() {
+        const next = iterator.next();
+        if (!next.done) inspectedCharacters += 1;
+        return next;
+      },
+      [Symbol.iterator]() {
+        return this;
+      },
+    };
+  };
+  try {
+    const result = defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name("r"),
+        namespaces: [],
+        attributes: [],
+        children: [leaf(text)],
+      },
+    });
+    assert.equal(result.status, "invalid");
+    assert.equal(
+      inspectedCharacters,
+      2 * text.length + escapedPrefix.length + escapedRemainder.length,
+    );
+  } finally {
+    String.prototype[Symbol.iterator] = originalIterator;
+  }
+});
+
 test("XML model accepts the complete valid scalar ranges and empty processing instructions", () => {
   const document = {
     root: {
@@ -626,7 +785,7 @@ test("XML model accepts the complete valid scalar ranges and empty processing in
         },
       ],
       children: [
-        leaf('\u007F\u07FF\uD7FF\uE000\uFFFD𐀀􏿿"\n\t'),
+        leaf(' \u007F\u07FF\uD7FF\uE000\uFFFD𐀀􏿿"\n\t'),
         { kind: "processing-instruction", target: "trace", data: "" },
       ],
     },
