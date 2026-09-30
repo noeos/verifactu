@@ -167,7 +167,11 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     { ...recordEvidence, recordDigest: "bad" },
   ];
   for (const malformed of malformedRecords) {
-    const rejected = verifyNoeosEngineEvidence(linkedInput, malformed, recordPort);
+    const rejected = verifyNoeosEngineEvidence(
+      linkedInput,
+      malformed,
+      recordPort,
+    );
     assert.equal(rejected.status, "ok");
     assert.equal(rejected.value.status, "invalid");
   }
@@ -406,7 +410,8 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     "indeterminate",
   );
   assert.equal(
-    verifyNoeosEngineEvidence(genesisInput, linkEvidence, linkPort).value.status,
+    verifyNoeosEngineEvidence(genesisInput, linkEvidence, linkPort).value
+      .status,
     "valid",
   );
   const malformedLinks = [
@@ -435,7 +440,11 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     { ...linkEvidence, linkDigest: "bad" },
   ];
   for (const malformed of malformedLinks) {
-    const rejected = verifyNoeosEngineEvidence(genesisInput, malformed, linkPort);
+    const rejected = verifyNoeosEngineEvidence(
+      genesisInput,
+      malformed,
+      linkPort,
+    );
     assert.equal(rejected.status, "ok");
     assert.equal(rejected.value.status, "invalid");
   }
@@ -444,8 +453,8 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     normalizedByteLength: 65_536,
   };
   assert.equal(
-    verifyNoeosEngineEvidence(genesisInput, exactLinkBoundary, linkPort)
-      .value.status,
+    verifyNoeosEngineEvidence(genesisInput, exactLinkBoundary, linkPort).value
+      .status,
     "valid",
   );
   const arrayShapedLink = Object.assign([], linkEvidence);
@@ -469,8 +478,9 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
   assert.equal(rejectedHostileLink.status, "ok");
   assert.equal(rejectedHostileLink.value.status, "invalid");
 
-  const linkedPredecessor =
-    linkedProjection.predecessorEvidenceDigest.slice("sha256:".length);
+  const linkedPredecessor = linkedProjection.predecessorEvidenceDigest.slice(
+    "sha256:".length,
+  );
   const linkedLinkEvidence = {
     ...linkEvidence,
     contextId: linkedProjection.contextId,
@@ -515,8 +525,20 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     assert.equal(rejected.value.status, "invalid");
   }
   for (const [input, evidence, expectedMode, expectedPrevious, summary] of [
-    [genesisInput, linkEvidence, "complete", { kind: "none" }, generated.value.chainSummary],
-    [linkedInput, linkedLinkEvidence, "fragment", { kind: "digest", value: linkedPredecessor }, linkedSummary],
+    [
+      genesisInput,
+      linkEvidence,
+      "complete",
+      { kind: "none" },
+      generated.value.chainSummary,
+    ],
+    [
+      linkedInput,
+      linkedLinkEvidence,
+      "fragment",
+      { kind: "digest", value: linkedPredecessor },
+      linkedSummary,
+    ],
   ]) {
     let observed;
     const result = verifyNoeosEngineEvidence(input, evidence, {
@@ -665,7 +687,9 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     });
     assert.equal(result.status, "ok");
     assert.equal(result.value.status, claimStatus);
-    assert.deepEqual(result.value.diagnostics, ["DIAG-ENGINE-EVIDENCE_SCHEMA_INVALID"]);
+    assert.deepEqual(result.value.diagnostics, [
+      "DIAG-ENGINE-EVIDENCE_SCHEMA_INVALID",
+    ]);
   }
   const unrecognizedDiagnostic = verifyNoeosEngineEvidence(
     genesisInput,
@@ -739,7 +763,11 @@ test("engine evidence rejects null shaped record and chain summaries", () => {
     const rejected = verifyNoeosEngineEvidence(genesisInput, linkEvidence, {
       createEngine() {
         return {
-          verifyChain: () => ({ status: "valid", evidence: summary, diagnostics: [] }),
+          verifyChain: () => ({
+            status: "valid",
+            evidence: summary,
+            diagnostics: [],
+          }),
           digestEvidence: () => ({
             ok: true,
             value: { algorithm: "sha-256", toHex: () => "a".repeat(64) },
@@ -759,6 +787,24 @@ test("profile projection binds ordered artifact digests and only opaque identiti
   const result = createEngineProfileProjection({ ...vector, claims: claimSet });
   assert.equal(result.status, "ok");
   assert.deepEqual(result.value, vector);
+  assert.equal(
+    createEngineProfileProjection({
+      ...vector,
+      schema: vector.schema,
+      claims: claimSet,
+    }).status,
+    "ok",
+    "an explicitly supplied exact schema remains accepted",
+  );
+  const { schema: _schema, ...projectionWithoutSchema } = vector;
+  assert.equal(
+    createEngineProfileProjection({
+      ...projectionWithoutSchema,
+      claims: claimSet,
+    }).status,
+    "ok",
+    "the schema field remains optional",
+  );
   assert.equal(Object.isFrozen(result.value), true);
   assert.equal(Object.isFrozen(result.value.artifacts), true);
   assert.equal(
@@ -899,10 +945,7 @@ test("profile projection validates every identifier, artifact, predecessor, and 
       JSON.stringify(overrides),
     );
   }
-  assert.equal(
-    isEngineProfileProjection(Object.assign([], projection)),
-    false,
-  );
+  assert.equal(isEngineProfileProjection(Object.assign([], projection)), false);
   assert.equal(
     isEngineProfileProjection({
       ...projection,

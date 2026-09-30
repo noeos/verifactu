@@ -1216,7 +1216,10 @@ export async function executeJavaMutation(root, mutation, options = {}) {
       )
         ? plannedSelections
         : [bridgeProbe, ...plannedSelections]);
-    const selectedTests = selections.map(([test]) => test);
+    // The report schema records selected files, while selections may contain
+    // several name patterns for the same file. Preserve execution order and
+    // every distinct pattern below, but report each selected file once.
+    const selectedTests = [...new Set(selections.map(([test]) => test))];
     if (compile.timedOut || compile.outputExceeded)
       return {
         ...mutation,
@@ -1238,9 +1241,9 @@ export async function executeJavaMutation(root, mutation, options = {}) {
         diagnostics: [compile.stderr.slice(0, 3000)],
       };
     const classPath = `${classes}${process.platform === "win32" ? ";" : ":"}${originalJar}`;
-    const tests = [];
+    const tests = new Set();
     for (const [test, pattern] of selections) {
-      tests.push(test);
+      tests.add(test);
       const args = ["--test", "--test-concurrency=1", "--test-reporter=tap"];
       if (pattern) args.push(`--test-name-pattern=${pattern}`);
       args.push(test);
@@ -1268,7 +1271,7 @@ export async function executeJavaMutation(root, mutation, options = {}) {
           compile: "passed",
           covered: true,
           outcome: result.timedOut ? "timeout" : "testError",
-          tests,
+          tests: [...tests],
           killEvidence: [],
           diagnostics: [`${test}\n${result.stderr.slice(0, 3000)}`],
         };
@@ -1278,7 +1281,7 @@ export async function executeJavaMutation(root, mutation, options = {}) {
           compile: "passed",
           covered: true,
           outcome: "killed",
-          tests,
+          tests: [...tests],
           killEvidence: tapFailureEvidence(result.stdout, test),
           diagnostics: [],
         };
@@ -1288,7 +1291,7 @@ export async function executeJavaMutation(root, mutation, options = {}) {
       compile: "passed",
       covered: true,
       outcome: "survived",
-      tests,
+      tests: [...tests],
       killEvidence: [],
       diagnostics: [],
     };

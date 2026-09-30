@@ -218,6 +218,14 @@ test("regulated events are append-only and separate from billing chain sequencin
   };
   assert.equal(appendEvent(first, second).status, "ok");
   assert.equal(
+    appendEvent(first, {
+      ...second,
+      context: { ...x.context, tenantId: x.id("tenant", "other") },
+    }).status,
+    "invalid",
+    "a valid predecessor does not permit an event from another context",
+  );
+  assert.equal(
     appendEvent(first, { ...second, occurredAt: event.occurredAt }).status,
     "ok",
     "event timestamps may be equal while remaining nondecreasing",
