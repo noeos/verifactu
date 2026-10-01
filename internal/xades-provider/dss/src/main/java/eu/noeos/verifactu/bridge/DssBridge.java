@@ -370,7 +370,9 @@ public final class DssBridge {
       validator.setCertificateVerifier(verifier);
       validator.setValidationTime(new Date(r.validationTime));
       var report = validator.validateDocument().getSimpleReport();
-      return report.getSignatureIdList().size() == 1 && report.isValid(report.getSignatureIdList().get(0));
+      List<String> signatureIds = report.getSignatureIdList();
+      if (signatureIds.size() != 1) throw new IllegalArgumentException("DSS verification requires exactly one signature");
+      return report.isValid(signatureIds.get(0));
     } catch (Exception exception) {
       return false;
     }
@@ -478,8 +480,8 @@ public final class DssBridge {
     if (signedInfoChildren.get(0) != canon) return false;
     if (signedInfoChildren.get(1) != method) return false;
     if (refs.size() != 2) return false;
-    if (signedInfoChildren.get(2) != refs.get(0)) return false;
-    if (signedInfoChildren.get(3) != refs.get(1)) return false;
+    // The same direct-child sequence supplies both lists: after the validated
+    // canonicalization and method children, exactly two references must remain.
     if (!"".equals(refs.get(0).getAttribute("URI"))) return false;
     if (!"http://www.w3.org/2001/04/xmlenc#sha256".equals(digestUri(refs.get(0)))) return false;
     List<Element> transforms0 = children(child(refs.get(0), "http://www.w3.org/2000/09/xmldsig#", "Transforms"), "http://www.w3.org/2000/09/xmldsig#", "Transform");
