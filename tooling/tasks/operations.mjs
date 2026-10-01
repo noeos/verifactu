@@ -2869,7 +2869,8 @@ async function testP4G(context) {
           fault.evidence.length > 0 &&
           passedTestLines.some(
             (line) =>
-              line.startsWith("ok ") && line.includes(` - ${fault.evidence}`),
+              line.trimStart().startsWith("ok ") &&
+              line.includes(` - ${fault.evidence}`),
           ),
       ),
     "P4G_SEEDED_FAULT_CENSUS",
