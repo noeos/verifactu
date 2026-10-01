@@ -200,6 +200,32 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", (t)
     installationId: id("installation", "qr-property-installation"),
     editionId: editionIdentity,
   }).value;
+  const endpoints = {
+    test: {
+      verifactu: "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR",
+      "non-verifactu":
+        "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQRNoVerifactu",
+    },
+    production: {
+      verifactu: "https://www2.agenciatributaria.gob.es/wlpl/TIKE-CONT/ValidarQR",
+      "non-verifactu":
+        "https://www2.agenciatributaria.gob.es/wlpl/TIKE-CONT/ValidarQRNoVerifactu",
+    },
+  };
+  const encodeFormField = (value) =>
+    [...new TextEncoder().encode(value)]
+      .map((byte) => {
+        if (
+          (byte >= 0x41 && byte <= 0x5a) ||
+          (byte >= 0x61 && byte <= 0x7a) ||
+          (byte >= 0x30 && byte <= 0x39) ||
+          [0x2d, 0x2e, 0x5f, 0x7e].includes(byte)
+        )
+          return String.fromCharCode(byte);
+        if (byte === 0x20) return "+";
+        return `%${byte.toString(16).toUpperCase().padStart(2, "0")}`;
+      })
+      .join("");
   for (let index = 0; index < 4096; index += 1) {
     const amount = `${index}.${String((index * 37) % 100).padStart(2, "0")}`;
     const item = createAltaRecord({
@@ -208,7 +234,7 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", (t)
       context: fiscalContext,
       document: createFiscalDocumentIdentity({
         issuer: taxpayer,
-        series: `S${index}-`,
+        series: `S ${index}-!'()*~`,
         number: `${index}`,
         issueDate: "2025-01-01",
       }).value,
@@ -221,21 +247,30 @@ test("P4-PROP-011 QR payload encode-decode preserves exact canonical bytes", (t)
     assert.equal(item.status, "ok", `seed=1346650369 case=${index}`);
     const editionConfig = {
       id: editionId,
-      environment: index % 2 ? "test" : "production",
+      environment: index % 4 < 2 ? "test" : "production",
       mode: index % 2 ? "verifactu" : "non-verifactu",
     };
     const payload = buildQrPayload(item.value, editionConfig, digest);
     assert.equal(payload.status, "ok", `seed=1346650369 case=${index}`);
+    const endpoint = endpoints[editionConfig.environment][editionConfig.mode];
+    const date = `${item.value.issueDate.slice(8, 10)}-${item.value.issueDate.slice(5, 7)}-${item.value.issueDate.slice(0, 4)}`;
+    const expectedText =
+      `${endpoint}?nif=${encodeFormField(item.value.document.issuer.value)}` +
+      `&numserie=${encodeFormField(item.value.document.series + item.value.document.number)}` +
+      `&fecha=${encodeFormField(date)}` +
+      `&importe=${encodeFormField(item.value.total.text)}`;
+    assert.equal(payload.value.text, expectedText, `seed=1346650369 case=${index}`);
     assert.deepEqual(
       payload.value.bytes,
-      new TextEncoder().encode(payload.value.text),
+      new TextEncoder().encode(expectedText),
       `seed=1346650369 case=${index}`,
     );
-    corpus.update(payload.value.bytes);
-    assert.equal(
-      verifyQrPayload(payload.value.text, item.value, editionConfig, digest)
-        .status,
-      "ok",
+    corpus.update(payload.value.bytes).update(expectedText);
+    const verified = verifyQrPayload(expectedText, item.value, editionConfig, digest);
+    assert.equal(verified.status, "ok", `seed=1346650369 case=${index}`);
+    assert.deepEqual(
+      verified.value.bytes,
+      new TextEncoder().encode(expectedText),
       `seed=1346650369 case=${index}`,
     );
   }
