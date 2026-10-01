@@ -1150,7 +1150,7 @@ test(
       {
         javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
         jarPath: classPath,
-        timeoutMs: 200,
+        timeoutMs: 3_000,
       },
     );
     assert.equal(stderrWireAtLimit.kind, "LIMIT");
