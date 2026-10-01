@@ -1757,11 +1757,14 @@ async function testP4C(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: property campaign validation selects its declaration, not references\b/gu,
+    ),
   ];
   assert(
     Number(mutants) - p4cHarnessCases.length === 41 &&
       Number(killed) - p4cHarnessCases.length === 41 &&
-      p4cHarnessCases.length === 1 &&
+      p4cHarnessCases.length === 2 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -3433,11 +3436,14 @@ async function testP4D(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: property campaign validation selects its declaration, not references\b/gu,
+    ),
   ];
   assert(
     Number(mutants) - dHarnessCases.length === 43 &&
       Number(killed) - dHarnessCases.length === 43 &&
-      dHarnessCases.length === 1 &&
+      dHarnessCases.length === 2 &&
       Number(mutationFailures) === 0 &&
       Number(mutationCancelled) === 0 &&
       Number(mutationSkipped) === 0 &&
