@@ -533,6 +533,18 @@ test("Java bridge fails closed across invalid command, digest, signing and XML r
       diagnostic: "DIAG-XADES-XML",
     },
     {
+      name: "signing XML depth limit remains a resource-limit response",
+      request: {
+        command: "SIGN_PREPARE",
+        signerCertificateDer: new Uint8Array([1]),
+        artifactBytes: new TextEncoder().encode(
+          `<RegistroAlta>${"<a>".repeat(65)}${"</a>".repeat(65)}</RegistroAlta>`,
+        ),
+      },
+      kind: "LIMIT",
+      diagnostic: "DIAG-XADES-REQUEST-BYTES",
+    },
+    {
       name: "malformed verification XML",
       request: { artifactBytes: new TextEncoder().encode("<RegistroAlta>") },
       kind: "INVALID",
