@@ -1563,6 +1563,9 @@ async function testP4A(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: property campaign validation selects its declaration, not references\b/gu,
+    ),
   ];
   const p4AFaults = [
     ["codec-stage-skip", "P4-MUT-001"],
@@ -1584,7 +1587,7 @@ async function testP4A(context) {
   assert(
     Number(mutants) - harnessCases.length === 41 &&
       Number(killed) - harnessCases.length === 41 &&
-      harnessCases.length === 1 &&
+      harnessCases.length === 2 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
