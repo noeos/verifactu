@@ -331,12 +331,12 @@ function validNcName(value: unknown): value is string {
     value.includes(":")
   )
     return false;
-  const [first, ...rest] = [...value];
-  return Boolean(
-    first &&
-      XML_NAME_START.test(first) &&
-      rest.every((character) => XML_NAME_CONTINUE.test(character)),
-  );
+  const characters = value[Symbol.iterator]();
+  const first = characters.next().value;
+  if (!first || !XML_NAME_START.test(first)) return false;
+  for (const character of characters)
+    if (!XML_NAME_CONTINUE.test(character)) return false;
+  return true;
 }
 
 function validXmlCharacters(value: string): boolean {

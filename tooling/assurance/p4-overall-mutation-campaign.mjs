@@ -451,6 +451,16 @@ function selectedTest(path, pattern) {
 
 export function focusedProviderMutationTest(mutation) {
   const { module, line } = mutation;
+  if (module === "internal/xades-provider/provider.mjs" && line === 618)
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^deadline settlement ignores a timer callback after completion$",
+    );
+  if (module === "internal/xades-provider/provider.mjs" && line === 620)
+    return selectedTest(
+      "tests/contract/p4-xades-provider.test.mjs",
+      "^deadline settlement ignores a timer callback after completion$",
+    );
   if (module === "internal/xades-provider/provider.mjs" && line === 621)
     return selectedTest(
       "tests/contract/p4-xades-provider.test.mjs",
@@ -623,6 +633,7 @@ export async function executeNodeMutation(root, mutation, options = {}) {
     await writeFile(configPath, `${JSON.stringify(config)}\n`);
     const loader = resolve(root, "tooling/assurance/p4-mutation-loader.mjs");
     const tests = [];
+    const fullyExecuted = new Set();
     const runSelection = async (test, pattern, timeoutMs) => {
       const args = [
         "--import",
@@ -681,6 +692,7 @@ export async function executeNodeMutation(root, mutation, options = {}) {
           timedOut,
           compileFailure,
         } = await runSelection(test, pattern, timeoutMs);
+        if (!pattern) fullyExecuted.add(test);
         if (
           timedOut ||
           result.outputExceeded ||
@@ -717,6 +729,64 @@ export async function executeNodeMutation(root, mutation, options = {}) {
           };
       }
     }
+    // A line-focused selector is a fast first pass, not the final word on a
+    // survivor. Run each covered file in full before recording survival so a
+    // narrower test-name pattern cannot hide an existing behavioral oracle.
+    for (const requestedTest of mutation.tests) {
+      const encodedSelection = /^(.*) \[--test-name-pattern=(.*)\]$/u.exec(
+        requestedTest,
+      );
+      const test = encodedSelection?.[1] ?? requestedTest;
+      if (fullyExecuted.has(test)) continue;
+      fullyExecuted.add(test);
+      tests.push(test);
+      const {
+        result,
+        transcript,
+        loaded,
+        failedRows,
+        timedOut,
+        compileFailure,
+      } = await runSelection(
+        test,
+        undefined,
+        options.fullTestTimeoutMs ?? 300_000,
+      );
+      if (
+        timedOut ||
+        result.outputExceeded ||
+        compileFailure ||
+        (result.code !== 0 && failedRows.length === 0)
+      ) {
+        const outcome = timedOut
+          ? "timeout"
+          : compileFailure
+            ? "compileError"
+            : "testError";
+        return {
+          ...mutation,
+          compile: compileFailure ? "failed" : "passed",
+          covered: loaded,
+          outcome,
+          killEvidence: [],
+          tests,
+          diagnostics: [
+            transcript.trim().slice(0, 4000) ||
+              `P4_MUTATION_FULL_FILE_FALLBACK: ${test} timed out or failed before loading ${mutation.id}`,
+          ],
+        };
+      }
+      if (failedRows.length > 0)
+        return {
+          ...mutation,
+          compile: "passed",
+          covered: true,
+          outcome: "killed",
+          killEvidence: tapFailureEvidence(result.stdout, test),
+          tests,
+          diagnostics: [],
+        };
+    }
     return {
       ...mutation,
       compile: "passed",
@@ -741,7 +811,7 @@ export function mutationTestPatterns(mutation, test, options = {}) {
       return [
         {
           pattern:
-            "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model applies a total serialized-byte ceiling before allocating output|XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text)$",
+            "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model applies a total serialized-byte ceiling before allocating output|XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model accepts each documented exact capacity)$",
           timeoutMs: normalTimeout,
         },
       ];
@@ -749,7 +819,7 @@ export function mutationTestPatterns(mutation, test, options = {}) {
       return [
         {
           pattern:
-            "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model fails closed across namespace, attribute, node, and text boundaries|XML model accounts for serialized bytes in every node class)$",
+            "^(?:XML model accepts each documented exact capacity|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model rejects a valid element name that exceeds the serialized byte ceiling)$",
           timeoutMs: normalTimeout,
         },
       ];
@@ -815,7 +885,8 @@ export function mutationTestPatterns(mutation, test, options = {}) {
     if (mutation.line >= 307 && mutation.line < 310)
       return [
         {
-          pattern: "^P4-E compact PNG keeps stored blocks bounded$",
+          pattern:
+            "^(?:P4-E compact PNG keeps stored blocks bounded|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling)$",
           timeoutMs: normalTimeout,
         },
       ];
@@ -846,7 +917,7 @@ export function mutationTestPatterns(mutation, test, options = {}) {
     return [
       {
         pattern:
-          "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+          "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
         timeoutMs: normalTimeout,
       },
     ];
@@ -1006,7 +1077,7 @@ export function javaMutationTestSelections(mutation) {
         "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
       ],
     ];
-  if (line < 171)
+  if (line < 177)
     return [
       [
         JAVA_MUTATION_TESTS[2],
@@ -1020,6 +1091,10 @@ export function javaMutationTestSelections(mutation) {
         "^exact DSS bridge verifies official XAdES structure and signature without inventing trust$",
       ],
       [
+        JAVA_MUTATION_TESTS[0],
+        "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+      ],
+      [
         JAVA_MUTATION_TESTS[1],
         "^DSS rejects each altered XAdES profile component before crypto validation$",
       ],
@@ -1029,6 +1104,10 @@ export function javaMutationTestSelections(mutation) {
       [
         JAVA_MUTATION_TESTS[0],
         "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
+      ],
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^exact DSS bridge verifies official XAdES structure and signature without inventing trust$",
       ],
     ];
   if (line < 397)
@@ -1049,49 +1128,56 @@ export function javaMutationTestSelections(mutation) {
         "^DSS rejects each altered XAdES profile component before crypto validation$",
       ],
     ];
-  if (line >= 529 && line < 536)
+  if (line >= 438 && line < 450)
+    return [
+      [
+        JAVA_MUTATION_TESTS[2],
+        "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+      ],
+    ];
+  if (line >= 540 && line < 549)
     return [
       [
         JAVA_MUTATION_TESTS[2],
         "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
       ],
     ];
-  if (line < 546)
+  if (line < 553)
     return [
       [
         JAVA_MUTATION_TESTS[1],
         "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
       ],
     ];
-  if (line >= 564 && line < 578)
+  if (line >= 588 && line < 596)
     return [
       [
         JAVA_MUTATION_TESTS[1],
         "^DSS distinguishes optional and malformed embedded KeyValue data$",
       ],
     ];
-  if (line < 578)
+  if (line < 588)
     return [
       [
         JAVA_MUTATION_TESTS[1],
         "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation|DSS distinguishes optional and malformed embedded KeyValue data)$",
       ],
     ];
-  if (line < 618)
+  if (line < 625)
     return [
       [
         JAVA_MUTATION_TESTS[0],
         "^certificate policy keeps chain, trust, time, use, identity and authorization distinct$",
       ],
     ];
-  if (line < 680)
+  if (line < 687)
     return [
       [
         JAVA_MUTATION_TESTS[0],
         "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
       ],
     ];
-  if (line < 736)
+  if (line < 743)
     return [
       [
         JAVA_MUTATION_TESTS[0],
@@ -1101,7 +1187,7 @@ export function javaMutationTestSelections(mutation) {
   return [
     [
       JAVA_MUTATION_TESTS[2],
-      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge accepts exact request and field-count ceilings before parsing semantics|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
     ],
   ];
 }
@@ -1219,6 +1305,27 @@ export async function executePythonMutation(root, mutation, options = {}) {
       killEvidence: [],
       diagnostics: [result.stderr.slice(0, 3000)],
     };
+  const hasSortedKeys = (value) => {
+    if (Array.isArray(value)) return value.every(hasSortedKeys);
+    if (value === null || typeof value !== "object") return true;
+    const keys = Object.keys(value);
+    return (
+      keys.every((key, index) => key === [...keys].sort()[index]) &&
+      keys.every((key) => hasSortedKeys(value[key]))
+    );
+  };
+  if (result.code === 0 && report.status === "passed" && !hasSortedKeys(report))
+    return {
+      ...mutation,
+      compile: "passed",
+      covered: true,
+      outcome: "killed",
+      tests: [mutation.module],
+      killEvidence: [
+        `${mutation.module}:${mutation.line}: the oracle JSON report must retain canonical sorted keys`,
+      ],
+      diagnostics: [],
+    };
   if (report.status === "failed" && result.code !== 0)
     return {
       ...mutation,
@@ -1229,7 +1336,71 @@ export async function executePythonMutation(root, mutation, options = {}) {
       killEvidence: report.failed,
       diagnostics: [],
     };
-  if (report.status === "passed" && result.code === 0)
+  if (report.status === "passed" && result.code === 0) {
+    const baselineDigest =
+      '"14a04c138da532dff4572a52ff8dfc0a2e8313742ec588db4a94a443c35ffc10"';
+    const negativeSource = mutated.replace(
+      baselineDigest,
+      '"0000000000000000000000000000000000000000000000000000000000000000"',
+    );
+    if (negativeSource === mutated)
+      throw new Error("P4_PYTHON_ORACLE_VECTOR_NOT_FOUND");
+    const negative = await runMutationTest(
+      python,
+      ["-I", "-c", bootstrap, resolve(root, mutation.module)],
+      {
+        cwd: root,
+        env: process.env,
+        input: negativeSource,
+        timeoutMs: options.timeoutMs ?? 30_000,
+      },
+    );
+    const negativeLine = negative.stdout.trim().split(/\r?\n/u).at(-1);
+    let negativeReport;
+    try {
+      negativeReport = JSON.parse(negativeLine);
+    } catch {
+      negativeReport = null;
+    }
+    const reportsInjectedFailureWithStableIdentity =
+      !negative.timedOut &&
+      !negative.outputExceeded &&
+      negative.code === 1 &&
+      negativeReport?.status === "failed" &&
+      negativeReport.selected === 9 &&
+      negativeReport.executed === 9 &&
+      JSON.stringify(negativeReport.failed) ===
+        '["independent_sha256_vector"]' &&
+      negativeReport.creationAllowed === false &&
+      hasSortedKeys(negativeReport);
+    if (!reportsInjectedFailureWithStableIdentity)
+      return {
+        ...mutation,
+        compile: "passed",
+        covered: true,
+        outcome: "testError",
+        tests: [mutation.module],
+        killEvidence: [],
+        diagnostics: [
+          JSON.stringify({
+            code: negative.code,
+            report: negativeReport,
+            stderr: negative.stderr.slice(0, 1000),
+          }),
+        ],
+      };
+    if (negativeReport.passed !== 8)
+      return {
+        ...mutation,
+        compile: "passed",
+        covered: true,
+        outcome: "killed",
+        tests: [mutation.module],
+        killEvidence: [
+          `${mutation.module}:${mutation.line}: injected independent-vector failure must report 8 passed checks; observed ${negativeReport.passed}`,
+        ],
+        diagnostics: [],
+      };
     return {
       ...mutation,
       compile: "passed",
@@ -1239,6 +1410,7 @@ export async function executePythonMutation(root, mutation, options = {}) {
       killEvidence: [],
       diagnostics: [],
     };
+  }
   return {
     ...mutation,
     compile: "passed",
@@ -1318,8 +1490,10 @@ export async function executeJavaMutation(root, mutation, options = {}) {
       };
     const classPath = `${classes}${process.platform === "win32" ? ";" : ":"}${originalJar}`;
     const tests = new Set();
+    const fullyExecuted = new Set();
     for (const [test, pattern] of selections) {
       tests.add(test);
+      if (!pattern) fullyExecuted.add(test);
       const args = ["--test", "--test-concurrency=1", "--test-reporter=tap"];
       if (pattern) args.push(`--test-name-pattern=${pattern}`);
       args.push(test);
@@ -1334,6 +1508,55 @@ export async function executeJavaMutation(root, mutation, options = {}) {
         timeoutMs: options.timeoutMs ?? DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS,
         maxBuffer: 16 * 1024 * 1024,
       });
+      const failedRows = result.stdout
+        .split("\n")
+        .filter((line) => /^\s*not ok \d+ /u.test(line));
+      if (
+        result.timedOut ||
+        result.outputExceeded ||
+        (result.code !== 0 && failedRows.length === 0)
+      )
+        return {
+          ...mutation,
+          compile: "passed",
+          covered: true,
+          outcome: result.timedOut ? "timeout" : "testError",
+          tests: [...tests],
+          killEvidence: [],
+          diagnostics: [`${test}\n${result.stderr.slice(0, 3000)}`],
+        };
+      if (failedRows.length > 0)
+        return {
+          ...mutation,
+          compile: "passed",
+          covered: true,
+          outcome: "killed",
+          tests: [...tests],
+          killEvidence: tapFailureEvidence(result.stdout, test),
+          diagnostics: [],
+        };
+    }
+    // Likewise, a surviving Java mutation must face the entire set of
+    // baseline-covered test files before it can be classified as a survivor.
+    for (const test of selectedTests) {
+      if (fullyExecuted.has(test)) continue;
+      fullyExecuted.add(test);
+      tests.add(test);
+      const result = await runMutationTest(
+        execPath,
+        ["--test", "--test-concurrency=1", "--test-reporter=tap", test],
+        {
+          cwd: root,
+          env: {
+            ...process.env,
+            VERIFACTU_JAVA: java,
+            VERIFACTU_DSS_JAR: classPath,
+            VERIFACTU_JAVA_MUTATION: "0",
+          },
+          timeoutMs: options.javaFullTestTimeoutMs ?? 900_000,
+          maxBuffer: 16 * 1024 * 1024,
+        },
+      );
       const failedRows = result.stdout
         .split("\n")
         .filter((line) => /^\s*not ok \d+ /u.test(line));

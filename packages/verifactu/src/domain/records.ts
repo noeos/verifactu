@@ -37,8 +37,9 @@ export interface AnulacionRecord {
 export type BillingRecord = AltaRecord | AnulacionRecord;
 
 function isValidDecimal(value: Decimal): boolean {
-  if (!value || typeof value !== "object" || typeof value.text !== "string")
-    return false;
+  if (!value) return false;
+  if (typeof value !== "object") return false;
+  if (typeof value.text !== "string") return false;
   const parsed = createDecimal(value.text, {
     maxIntegerDigits: 64,
     maxScale: 18,
@@ -49,6 +50,13 @@ function isValidDecimal(value: Decimal): boolean {
     parsed.value.coefficient === value.coefficient &&
     parsed.value.scale === value.scale
   );
+}
+
+function matchesDocumentIssueDate(
+  value: unknown,
+  documentDate: unknown,
+): boolean {
+  return value === documentDate;
 }
 
 export function createAltaRecord(input: AltaRecord): Result<AltaRecord> {
@@ -66,9 +74,7 @@ export function createAltaRecord(input: AltaRecord): Result<AltaRecord> {
       !isIdentity(input.predecessorId, "record")) ||
     context?.status !== "ok" ||
     document?.status !== "ok" ||
-    typeof input.issueDate !== "string" ||
-    createFiscalDate(input.issueDate).status !== "ok" ||
-    input.issueDate !== input.document.issueDate ||
+    !matchesDocumentIssueDate(input.issueDate, input.document.issueDate) ||
     typeof input.generatedAt !== "string" ||
     createFiscalInstant(input.generatedAt).status !== "ok" ||
     !isValidDecimal(input.total) ||

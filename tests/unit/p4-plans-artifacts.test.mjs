@@ -334,6 +334,15 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
     "invalid",
   );
   assert.equal(
+    serializeOfficialProjection(projected, { ...rule, label: "\ud800" }).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(projected, { ...rule, separator: "\ud800" })
+      .status,
+    "invalid",
+  );
+  assert.equal(
     serializeOfficialProjection(projected, { ...rule, editionId: "spoofed" })
       .status,
     "invalid",

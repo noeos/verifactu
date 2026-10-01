@@ -103,8 +103,6 @@ function buildQrPayloadInternal(
       .replace(/%20/gu, "+");
   const text = `${ENDPOINTS[edition.environment][edition.mode]}?nif=${formEncode(facts.document.issuer.value)}&numserie=${formEncode(invoiceId)}&fecha=${formEncode(date)}&importe=${formEncode(amount)}`;
   const bytes = encoder.encode(text);
-  if (bytes.length > 1_048_576)
-    return invalid("DIAG-QR-PAYLOAD-LIMIT", "bytes");
   const payloadDigest = digest(digestProvider, bytes);
   if (!payloadDigest) return invalid("DIAG-QR-DIGEST", "domain");
   const view = Object.freeze({
@@ -223,8 +221,7 @@ export function renderQrSvg(
     options.symbolSizeMm < 30 ||
     options.symbolSizeMm > 40 ||
     options.quietZoneMm < 2 ||
-    options.quietZoneMm > 6 ||
-    canonical.length > 1_048_576
+    options.quietZoneMm > 6
   )
     return invalid("DIAG-QR-RENDER-INPUT", "domain");
   const matrix = encodeMatrix(qr, canonical);
@@ -247,8 +244,6 @@ export function renderQrSvg(
   }
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="qr-title" width="${physicalMm.toFixed(3)}mm" height="${physicalMm.toFixed(3)}mm" viewBox="0 0 ${matrix.size + margin * 2} ${matrix.size + margin * 2}" shape-rendering="crispEdges"><title id="qr-title">QR tributario</title><path fill="#fff" d="M0 0h${matrix.size + margin * 2}v${matrix.size + margin * 2}H0z"/><path fill="#000" d="${path}"/></svg>`;
   const bytes = encoder.encode(svg);
-  if (bytes.length > 67_108_864)
-    return invalid("DIAG-QR-OUTPUT-LIMIT", "bytes");
   const artifactDigest = digest(digestProvider, bytes);
   const payloadDigest = digest(digestProvider, canonical);
   if (!artifactDigest || !payloadDigest)
@@ -292,9 +287,9 @@ function pngChunk(name: string, data: Uint8Array): Uint8Array {
   const chunk = new Uint8Array(data.length + 12);
   const view = new DataView(chunk.buffer);
   view.setUint32(0, data.length, false);
+  chunk.set(data, 8);
   for (let index = 0; index < 4; index += 1)
     chunk[index + 4] = name.charCodeAt(index);
-  chunk.set(data, 8);
   view.setUint32(
     8 + data.length,
     crc32(chunk.subarray(4, 8 + data.length)),
@@ -305,7 +300,20 @@ function pngChunk(name: string, data: Uint8Array): Uint8Array {
 
 function storedZlib(bytes: Uint8Array): Uint8Array {
   const blocks = Math.ceil(bytes.length / 65_535);
-  const output = new Uint8Array(2 + bytes.length + blocks * 5 + 4);
+  const maximumRawBytes = 4_096 * 4_097;
+  const maximumBlocks = 257;
+  const outputLength = 2 + bytes.length + blocks * 5 + 4;
+  if (bytes.length > maximumRawBytes)
+    throw new RangeError("QR PNG compressed data exceeds the raster limit");
+  if (!Number.isSafeInteger(blocks))
+    throw new RangeError("QR PNG compressed data has an unsafe block count");
+  if (blocks > maximumBlocks)
+    throw new RangeError("QR PNG compressed data exceeds the block limit");
+  if (!Number.isSafeInteger(outputLength))
+    throw new RangeError("QR PNG compressed data has an unsafe output length");
+  if (outputLength > 16_782_603)
+    throw new RangeError("QR PNG compressed data exceeds the raster limit");
+  const output = new Uint8Array(outputLength);
   output[0] = 0x78;
   output[1] = 0x01;
   let sourceOffset = 0;
@@ -354,8 +362,7 @@ export function renderQrPng(
     options.symbolSizeMm < 30 ||
     options.symbolSizeMm > 40 ||
     options.quietZoneMm < 2 ||
-    options.quietZoneMm > 6 ||
-    canonical.length > 1_048_576
+    options.quietZoneMm > 6
   )
     return invalid("DIAG-QR-RENDER-INPUT", "domain");
   const matrix = encodeMatrix(qr, canonical);
@@ -371,6 +378,8 @@ export function renderQrPng(
   let offset = 0;
   try {
     for (let y = 0; y < dimension; y += 1) {
+      if (offset >= raw.length)
+        return invalid("DIAG-QR-DIMENSION-LIMIT", "bytes");
       raw[offset++] = 0;
       const moduleY = Math.floor(y / options.scale) - margin;
       for (let x = 0; x < dimension; x += 1) {
@@ -386,7 +395,12 @@ export function renderQrPng(
   } catch {
     return invalid("DIAG-QR-ENCODER", "domain");
   }
-  const compressed = storedZlib(raw);
+  let compressed: Uint8Array;
+  try {
+    compressed = storedZlib(raw);
+  } catch {
+    return invalid("DIAG-QR-OUTPUT-LIMIT", "bytes");
+  }
   const header = new Uint8Array(13);
   const headerView = new DataView(header.buffer);
   headerView.setUint32(0, dimension, false);
@@ -406,7 +420,6 @@ export function renderQrPng(
     pngChunk("IEND", new Uint8Array()),
   ];
   const length = 8 + chunks.reduce((total, chunk) => total + chunk.length, 0);
-  if (length > 67_108_864) return invalid("DIAG-QR-OUTPUT-LIMIT", "bytes");
   const bytes = new Uint8Array(length);
   bytes.set([137, 80, 78, 71, 13, 10, 26, 10], 0);
   offset = 8;

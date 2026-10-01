@@ -102,6 +102,12 @@ test("closed object schema rejects duplicate, unknown and missing members", () =
   );
   assert.equal(memoWithSpaces.status, "ok");
   assert.equal(memoWithSpaces.value.memo, "with spaces");
+  const memoWithEscape = decodeJson(
+    bytes('{"id":"a","kind":"alta","memo":"line\\nbreak"}'),
+    schema,
+  );
+  assert.equal(memoWithEscape.status, "ok");
+  assert.equal(memoWithEscape.value.memo, "line\nbreak");
   const good = bytes('{"id":"a","kind":"alta"}');
   assert.equal(
     decodeJson(good, { ...schema, validateStructure: () => false })
@@ -271,14 +277,10 @@ test("edition configuration cannot enable record creation", () => {
   assert.equal(configure({ ...base, maxInputBytes: 0 }).status, "invalid");
   assert.equal(configure({ ...base, maxInputBytes: 1.5 }).status, "invalid");
   assert.equal(
-    configure({ ...base, editionId: "e".repeat(128), maxInputBytes: 1 })
-      .status,
+    configure({ ...base, editionId: "e".repeat(128), maxInputBytes: 1 }).status,
     "ok",
   );
-  assert.equal(
-    configure({ ...base, maxInputBytes: 16_777_216 }).status,
-    "ok",
-  );
+  assert.equal(configure({ ...base, maxInputBytes: 16_777_216 }).status, "ok");
   assert.equal(
     configure({ ...base, editionId: "e".repeat(129) }).status,
     "invalid",

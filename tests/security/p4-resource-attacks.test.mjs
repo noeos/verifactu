@@ -26,10 +26,20 @@ import { createAltaRecord } from "../../evidence/runs/artifacts/build/verifactu/
 import {
   encodeRequest,
   decodeResponse,
+  dssChildOptions,
   DSS_JVM_OPTIONS,
   minimalEnvironment,
   spawnDssBridge,
 } from "../../internal/xades-provider/worker.mjs";
+
+test("DSS child process options disable shell execution and hide console windows", () => {
+  const options = dssChildOptions("/tmp/verifactu-dss", { PATH: "/bin" });
+  assert.equal(options.cwd, "/tmp/verifactu-dss");
+  assert.deepEqual(options.env, { PATH: "/bin" });
+  assert.equal(options.shell, false);
+  assert.deepEqual(options.stdio, ["pipe", "pipe", "pipe"]);
+  assert.equal(options.windowsHide, true);
+});
 
 const request = {
   command: "VERIFY",
@@ -141,6 +151,52 @@ test("DSS request encoder accepts exactly its declared byte limit", () => {
   );
 });
 
+test("Java bridge accepts exact request and field-count ceilings before parsing semantics", () => {
+  const base = rawWireRequest();
+  const baseFieldBytes = base
+    .toString("ascii")
+    .trimEnd()
+    .split("\n")
+    .reduce((total, line) => total + line.length, 0);
+  const remaining = 24_000_000 - baseFieldBytes;
+  assert.ok(remaining > 0 && remaining % 4 === 0);
+  const exactByteRequest = Buffer.concat([
+    base,
+    Buffer.from(`${"A".repeat(remaining)}\n`, "ascii"),
+  ]);
+  const exactBytes = runRawBridge(exactByteRequest, 30_000);
+  assert.equal(exactBytes.status, 0, exactBytes.stderr);
+  assert.match(
+    exactBytes.stdout,
+    /^VERIFACTU-DSS-1\nDEFECT\nDIAG-XADES-BRIDGE\n/u,
+  );
+
+  // The protocol request has 17 fields. Empty extension fields are decoded
+  // and rejected as trailing data, while exactly 128 total fields remain
+  // within the bridge's parser ceiling.
+  const exactFieldRequest = Buffer.concat([
+    base,
+    Buffer.from("\n".repeat(111), "ascii"),
+  ]);
+  const exactFields = runRawBridge(exactFieldRequest);
+  assert.equal(exactFields.status, 0, exactFields.stderr);
+  assert.match(
+    exactFields.stdout,
+    /^VERIFACTU-DSS-1\nDEFECT\nDIAG-XADES-BRIDGE\n/u,
+  );
+
+  const exactEvidenceCount = runRawBridge(
+    rawWireRequest({
+      certificateChainDer: Array.from({ length: 32 }, () => new Uint8Array()),
+    }),
+  );
+  assert.equal(exactEvidenceCount.status, 0, exactEvidenceCount.stderr);
+  assert.match(
+    exactEvidenceCount.stdout,
+    /^VERIFACTU-DSS-1\nLIMIT\nDIAG-XADES-EVIDENCE-BYTES\n/u,
+  );
+});
+
 test("DSS response decoder rejects malformed framing and validates every field", () => {
   const valid = decodeResponse(
     Buffer.from("VERIFACTU-DSS-1\nVERIFIED\nNONE\nYQ==\n", "ascii"),
@@ -219,7 +275,7 @@ test("DSS JVM enables the process network-deny policy", () => {
   assert.ok(DSS_JVM_OPTIONS.includes("-Djava.net.useSystemProxies=false"));
 });
 
-function runRawBridge(input) {
+function runRawBridge(input, timeout = 10_000) {
   const javaExecutable =
     process.env.VERIFACTU_JAVA ??
     (process.platform === "win32" ? "java.exe" : "java");
@@ -238,7 +294,7 @@ function runRawBridge(input) {
       jarPath,
       "eu.noeos.verifactu.bridge.DssBridge",
     ],
-    { input, encoding: "utf8", timeout: 10_000, maxBuffer: 4_096 },
+    { input, encoding: "utf8", timeout, maxBuffer: 4_096 },
   );
 }
 
@@ -998,10 +1054,7 @@ test(
     assert.equal((await response("valid")).kind, "VERIFIED");
     const exactLimitRequest = {
       ...request,
-      certificateChainDer: Array.from(
-        { length: 3 },
-        () => new Uint8Array(),
-      ),
+      certificateChainDer: Array.from({ length: 3 }, () => new Uint8Array()),
       artifactBytes: new Uint8Array(17_999_847),
     };
     const exactLimitWire = encodeRequest(exactLimitRequest);
@@ -1103,6 +1156,27 @@ test(
       ).kind,
       "UNAVAILABLE",
     );
+    const abortListenerOptions = [];
+    const abortListenerRemovals = [];
+    const observationSignal = {
+      aborted: false,
+      addEventListener(type, listener, options) {
+        assert.equal(type, "abort");
+        abortListenerOptions.push(options);
+      },
+      removeEventListener(type, listener) {
+        assert.equal(type, "abort");
+        abortListenerRemovals.push(listener);
+      },
+    };
+    const missingJava = await spawnDssBridge(request, {
+      javaExecutable: "/missing/verifactu-java",
+      jarPath: classPath,
+      signal: observationSignal,
+    });
+    assert.equal(missingJava.kind, "UNAVAILABLE");
+    assert.deepEqual(abortListenerOptions, [{ once: true }]);
+    assert.equal(abortListenerRemovals.length, 1);
     assert.equal(
       (
         await spawnDssBridge(request, {

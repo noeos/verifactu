@@ -314,7 +314,11 @@ except Exception:
     write_result("defect", "DIAG-XSD-PROVIDER")
 `;
 
-export function exceedsXmlOutputLimit(accumulatedBytes, chunkBytes, maximumBytes) {
+export function exceedsXmlOutputLimit(
+  accumulatedBytes,
+  chunkBytes,
+  maximumBytes,
+) {
   return accumulatedBytes + chunkBytes > maximumBytes;
 }
 
@@ -367,49 +371,42 @@ async function spawnXmlWorkerWith(processSpawner, request, options) {
 
   return new Promise((resolve) => {
     let child;
-    let settled = false;
     let stoppedAs = null;
     let stdout = Buffer.alloc(0);
     let stderrBytes = 0;
     const cleanup = () => {
       clearTimeout(timer);
-      options.signal?.removeEventListener("abort", abort);
+      if (options.signal) options.signal.removeEventListener("abort", abort);
     };
     const finish = (result) => {
-      if (settled) return;
-      settled = true;
       cleanup();
       resolve(result);
     };
     const stop = (reason) => {
-      if (settled) return;
       stoppedAs = reason;
-      child?.kill();
+      if (child) child.kill();
     };
     const abort = () => stop("cancelled");
     const timer = setTimeout(() => stop("timeout"), timeoutMs);
     timer.unref?.();
-    options.signal?.addEventListener("abort", abort, { once: true });
+    if (options.signal) options.signal.addEventListener("abort", abort);
     try {
       const env = minimalXmlEnvironment();
       child = processSpawner(
         pythonExecutable,
         ["-I", "-c", XML_WORKER_SOURCE],
         {
-        cwd: options.cwd ?? process.cwd(),
-        env,
-        shell: false,
-        stdio: ["pipe", "pipe", "pipe"],
-        windowsHide: true,
+          cwd: options.cwd ?? process.cwd(),
+          env,
+          shell: false,
+          stdio: ["pipe", "pipe", "pipe"],
+          windowsHide: true,
         },
       );
+      if (stoppedAs !== null) child.kill();
       child.stdout.on("data", (chunk) => {
         if (
-          exceedsXmlOutputLimit(
-            stdout.length,
-            chunk.length,
-            maximumOutputBytes,
-          )
+          exceedsXmlOutputLimit(stdout.length, chunk.length, maximumOutputBytes)
         ) {
           stop("output");
           return;
@@ -458,9 +455,15 @@ async function spawnXmlWorkerWith(processSpawner, request, options) {
 export function parseXmlWorkerOutput(stdout) {
   try {
     const result = JSON.parse(stdout.toString("utf8"));
+    if (result === null) throw new TypeError("invalid worker result");
+    if (typeof result !== "object")
+      throw new TypeError("invalid worker result");
+    if (Array.isArray(result)) throw new TypeError("invalid worker result");
+    if (!VALID_WORKER_KINDS.has(result.kind))
+      throw new TypeError("invalid worker result");
+    if (!Array.isArray(result.diagnostics))
+      throw new TypeError("invalid worker result");
     if (
-      !VALID_WORKER_KINDS.has(result?.kind) ||
-      !Array.isArray(result.diagnostics) ||
       result.diagnostics.some(
         (item) => typeof item !== "string" || !/^DIAG-[A-Z0-9-]+$/u.test(item),
       )

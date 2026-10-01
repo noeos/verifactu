@@ -904,6 +904,16 @@ test("profile projection validates every identifier, artifact, predecessor, and 
     isEngineProfileProjection({ ...projection, position: 1_000_000 }),
     true,
   );
+  const exactArtifactCapacity = ["xml", "xades", "qr", "record", "chain"].map(
+    (kind, order) => ({ order, kind, digest: artifactDigest }),
+  );
+  assert.equal(
+    isEngineProfileProjection({
+      ...projection,
+      artifacts: exactArtifactCapacity,
+    }),
+    true,
+  );
   const malformed = [
     { schema: "other" },
     { artifacts: [42] },
@@ -970,10 +980,21 @@ test("profile projection validates every identifier, artifact, predecessor, and 
     createEngineProfileProjection({ ...input, position: 1_000_000 }).status,
     "ok",
   );
+  const {
+    schema: _optionalSchema,
+    position: _optionalPosition,
+    ...withoutOptionalFields
+  } = input;
+  assert.equal(
+    createEngineProfileProjection(withoutOptionalFields).status,
+    "ok",
+  );
   for (const invalidInput of [
     { ...input, unexpected: true },
     { ...input, schema: "unknown" },
     { ...input, position: -1 },
+    { ...input, position: Number.NaN },
+    { ...input, position: 1_000_001 },
     { ...input, claims: [] },
     { ...input, claims: { claims: "not-an-array" } },
   ]) {

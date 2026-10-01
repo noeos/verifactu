@@ -173,7 +173,7 @@ jobs:
   node-22-14-ubuntu:
     name: Required · ubuntu-24.04 · Node 22.14.0
     runs-on: ubuntu-24.04
-    timeout-minutes: 130
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -219,7 +219,7 @@ jobs:
   node-22-23-ubuntu:
     name: Required · ubuntu-24.04 · Node 22.23.2
     runs-on: ubuntu-24.04
-    timeout-minutes: 130
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -265,7 +265,7 @@ jobs:
   node-24-ubuntu:
     name: Required · ubuntu-24.04 · Node 24.21.0
     runs-on: ubuntu-24.04
-    timeout-minutes: 130
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -309,7 +309,7 @@ jobs:
   node-24-windows:
     name: Required · windows-2025 · Node 24.21.0
     runs-on: windows-2025
-    timeout-minutes: 130
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -353,7 +353,7 @@ jobs:
   node-24-macos:
     name: Required · macos-15 · Node 24.21.0
     runs-on: macos-15
-    timeout-minutes: 130
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:

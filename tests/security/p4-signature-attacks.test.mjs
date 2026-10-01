@@ -119,6 +119,45 @@ function moveSignatureValueBeforeSignedInfo(xml) {
   );
 }
 
+function swapSignedInfoMethods(xml) {
+  const start = xml.indexOf("<ds:SignedInfo");
+  const end = xml.indexOf("</ds:SignedInfo>", start);
+  assert.ok(start >= 0 && end > start);
+  const signedInfo = xml.slice(start, end);
+  const pair =
+    /(<ds:CanonicalizationMethod\b[^>]*\/>)(\s*)(<ds:SignatureMethod\b[^>]*\/>)/u;
+  const match = pair.exec(signedInfo);
+  assert.ok(
+    match,
+    "SignedInfo includes adjacent canonicalization and signature methods",
+  );
+  return `${xml.slice(0, start)}${signedInfo.replace(pair, `${match[3]}${match[2]}${match[1]}`)}${xml.slice(end)}`;
+}
+
+function swapSignedInfoReferences(xml) {
+  const signedInfoStart = xml.indexOf("<ds:SignedInfo");
+  const signedInfoEnd = xml.indexOf("</ds:SignedInfo>", signedInfoStart);
+  assert.ok(signedInfoStart >= 0 && signedInfoEnd > signedInfoStart);
+  const signedInfo = xml.slice(signedInfoStart, signedInfoEnd);
+  const referencePattern = /<ds:Reference\b[^>]*>[\s\S]*?<\/ds:Reference>/gu;
+  const references = [...signedInfo.matchAll(referencePattern)];
+  assert.equal(references.length, 2, "SignedInfo includes two references");
+  const [first, second] = references;
+  const firstBlock = first[0];
+  const secondBlock = second[0];
+  const between = signedInfo.slice(
+    first.index + firstBlock.length,
+    second.index,
+  );
+  const reordered =
+    signedInfo.slice(0, first.index) +
+    secondBlock +
+    between +
+    firstBlock +
+    signedInfo.slice(second.index + secondBlock.length);
+  return xml.slice(0, signedInfoStart) + reordered + xml.slice(signedInfoEnd);
+}
+
 test("signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks", async () => {
   const archive = readFileSync(
     "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/AnexosEjemplosFirmaRegFact.zip",
@@ -297,6 +336,8 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "SuministroInformacion-wrong.xsd",
     ],
     ["signature child order", moveSignatureValueBeforeSignedInfo],
+    ["SignedInfo method order", swapSignedInfoMethods],
+    ["SignedInfo reference order", swapSignedInfoReferences],
     [
       "extra signature child",
       "</ds:Signature>",
@@ -500,6 +541,13 @@ test("DSS rejects each altered XAdES profile component before crypto validation"
       "x509 data child namespace",
       (xml) =>
         xml.replace("<ds:X509Data>", '<ds:X509Data xmlns:ds="urn:wrong">'),
+    ],
+    [
+      "missing embedded signing certificate",
+      (xml) =>
+        xml
+          .replaceAll("<ds:X509Certificate>", "<ds:OtherCertificate>")
+          .replaceAll("</ds:X509Certificate>", "</ds:OtherCertificate>"),
     ],
     [
       "key info with three children",

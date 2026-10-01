@@ -25,9 +25,11 @@ export function appendEvent(
   event: EventRecord,
 ): Result<EventSequence> {
   const previous = sequence.events.at(-1);
+  if (createFiscalContext(sequence.context).status !== "ok")
+    return invalid("DIAG-EVENT-SEQUENCE", "domain");
+  if (createFiscalContext(event.context).status !== "ok")
+    return invalid("DIAG-EVENT-SEQUENCE", "domain");
   if (
-    createFiscalContext(sequence.context).status !== "ok" ||
-    createFiscalContext(event.context).status !== "ok" ||
     !isIdentity(event.id, "event") ||
     (event.previousEventId !== null &&
       !isIdentity(event.previousEventId, "event")) ||

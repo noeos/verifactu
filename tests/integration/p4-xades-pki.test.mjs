@@ -209,10 +209,13 @@ public final class PkiFixtureGenerator {
     keyValue.appendChild(rsa); return keyValue;
   }
   static byte[] crl(KeyPair k,X509CertificateHolder cert,boolean revoked,long next) throws Exception {
-    return crl(k,cert,new javax.security.auth.x500.X500Principal(cert.getSubject().getEncoded()),revoked,next);
+    return crlAt(k,cert,new javax.security.auth.x500.X500Principal(cert.getSubject().getEncoded()),revoked,BASE-3600000,next);
   }
   static byte[] crl(KeyPair k,X509CertificateHolder cert,javax.security.auth.x500.X500Principal issuer,boolean revoked,long next) throws Exception {
-    var b=new JcaX509v2CRLBuilder(issuer,date(BASE-3600000));
+    return crlAt(k,cert,issuer,revoked,BASE-3600000,next);
+  }
+  static byte[] crlAt(KeyPair k,X509CertificateHolder cert,javax.security.auth.x500.X500Principal issuer,boolean revoked,long thisUpdate,long next) throws Exception {
+    var b=new JcaX509v2CRLBuilder(issuer,date(thisUpdate));
     b.setNextUpdate(date(next));
     if(revoked)b.addCRLEntry(BigInteger.valueOf(42),date(BASE-1800000),CRLReason.keyCompromise);
     return b.build(new JcaContentSignerBuilder("SHA256withRSA").setProvider("BC").build(k.getPrivate())).getEncoded();
@@ -299,6 +302,17 @@ public final class PkiFixtureGenerator {
     boolean validKeyValueAccepted=(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
     rsaKeySignature.replaceChild(rsaKeyValue(rsaKeyXml,new byte[]{1},rsaExponent,true),rsaKeySignature.getFirstChild());
     boolean wrongModulusRejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
+    Element extraRsaChild=rsaKeyValue(rsaKeyXml,rsaModulus,rsaExponent,true);
+    extraRsaChild.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#","RSAKeyValue").item(0).appendChild(rsaKeyXml.createElementNS("http://www.w3.org/2000/09/xmldsig#","ds:KeyName"));
+    rsaKeySignature.replaceChild(extraRsaChild,rsaKeySignature.getFirstChild());
+    boolean extraRsaChildRejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
+    Element wrongRsaOrder=rsaKeyXml.createElementNS("http://www.w3.org/2000/09/xmldsig#","ds:KeyValue");
+    Element wrongRsaValue=rsaKeyXml.createElementNS("http://www.w3.org/2000/09/xmldsig#","ds:RSAKeyValue");
+    Element wrongModulus=rsaKeyXml.createElementNS("http://www.w3.org/2000/09/xmldsig#","ds:KeyName"); wrongModulus.setTextContent(Base64.getEncoder().encodeToString(rsaModulus));
+    Element rightExponent=rsaKeyXml.createElementNS("http://www.w3.org/2000/09/xmldsig#","ds:Exponent"); rightExponent.setTextContent(Base64.getEncoder().encodeToString(rsaExponent));
+    wrongRsaValue.appendChild(wrongModulus); wrongRsaValue.appendChild(rightExponent); wrongRsaOrder.appendChild(wrongRsaValue);
+    rsaKeySignature.replaceChild(wrongRsaOrder,rsaKeySignature.getFirstChild());
+    boolean wrongRsaChildOrderRejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
     rsaKeySignature.replaceChild(rsaKeyValue(rsaKeyXml,rsaModulus,new byte[]{1},true),rsaKeySignature.getFirstChild());
     boolean wrongExponentRejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
     rsaKeySignature.replaceChild(rsaKeyValue(rsaKeyXml,rsaModulus,rsaExponent,false),rsaKeySignature.getFirstChild());
@@ -307,7 +321,16 @@ public final class PkiFixtureGenerator {
     ((Element)malformedBase64Key.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#","Modulus").item(0)).setTextContent("A===");
     rsaKeySignature.replaceChild(malformedBase64Key,rsaKeySignature.getFirstChild());
     boolean malformedKeyValueBase64Rejected=!(Boolean)dss("keyValueMatches",new Class<?>[]{Element.class,X509Certificate.class},rsaKeySignature,runtimeCertificate);
-    if(!(validKeyValueAccepted&&wrongModulusRejected&&wrongExponentRejected&&incompleteRsaKeyValueRejected&&duplicateKeyValuesRejected&&malformedKeyValueBase64Rejected)) throw new AssertionError("RSA KeyValue structure and value probes");
+    if(!(validKeyValueAccepted&&wrongModulusRejected&&extraRsaChildRejected&&wrongRsaChildOrderRejected&&wrongExponentRejected&&incompleteRsaKeyValueRejected&&duplicateKeyValuesRejected&&malformedKeyValueBase64Rejected)) throw new AssertionError("RSA KeyValue structure and value probes");
+    Object malformedDssRequest=request(c,List.of(),List.of(),BASE);
+    setRequest(malformedDssRequest,"artifact",new byte[]{(byte)0xff});
+    boolean malformedDssRejected=!(Boolean)dss("validateWithDss",new Class<?>[]{malformedDssRequest.getClass()},malformedDssRequest);
+    KeyPair noSigningUsageKey=keys();
+    X509CertificateHolder noSigningUsageCertificate=delegatedCert(k,c,noSigningUsageKey,false,KeyPurposeId.id_kp_serverAuth,BASE-3600000,BASE+86400000);
+    Object noSigningUsageRequest=request(noSigningUsageCertificate,List.of(c.getEncoded()),List.of(c.getEncoded()),BASE);
+    boolean noSigningUsageRejected=false;
+    try { dss("parameters",new Class<?>[]{noSigningUsageRequest.getClass()},noSigningUsageRequest); }
+    catch(java.lang.reflect.InvocationTargetException expected) { noSigningUsageRejected=true; }
     Object noIssuer=dss("issuerFor",new Class<?>[]{X509Certificate.class,List.class,List.class,List.class},runtimeCertificate,List.of(),List.of(),List.of());
     Object uniqueIssuer=dss("issuerFor",new Class<?>[]{X509Certificate.class,List.class,List.class,List.class},runtimeCertificate,List.of(runtimeCertificate),List.of(),List.of());
     Object ambiguousIssuerProbe=dss("issuerFor",new Class<?>[]{X509Certificate.class,List.class,List.class,List.class},runtimeCertificate,List.of(runtimeCertificate,new JcaX509CertificateConverter().setProvider("BC").getCertificate(otherCert)),List.of(),List.of());
@@ -487,13 +510,19 @@ public final class PkiFixtureGenerator {
     }
     String json="{\"certificate\":\""+b64(c.getEncoded())+"\",\"otherCertificate\":\""+b64(otherCert.getEncoded())+"\",\"privateKey\":\""+b64(k.getPrivate().getEncoded())+"\",\"purposeCertificate\":\""+b64(purposeCertificate.getEncoded())+"\",\"purposePrivateKey\":\""+b64(purposeKey.getPrivate().getEncoded())+"\",\"crlGood\":\""+b64(crl(k,c,false,BASE+86400000))+"\",\"crlRevoked\":\""+b64(crl(k,c,true,BASE+86400000))+"\",\"crlStale\":\""+b64(crl(k,c,false,BASE-1))+"\",\"crlWrongIssuer\":\""+b64(crl(other,otherCert,false,BASE+86400000))+"\",\"ocspGood\":\""+b64(ocsp(k,c,CertificateStatus.GOOD,BASE+3600000))+"\",\"ocspStale\":\""+b64(ocsp(k,c,CertificateStatus.GOOD,BASE+3600000))+"\",\"ocspDelegated\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspFuture\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE+1000,BASE+3600000))+"\",\"ocspNoNextUpdate\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE-1000,0))+"\",\"ocspWrongResponder\":\""+b64(ocspSignedBy(other,otherCert,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspWrongResponderRevoked\":\""+b64(ocspSignedBy(other,otherCert,c,new RevokedStatus(date(BASE-1800000),CRLReason.keyCompromise),BASE-1000,BASE+3600000))+"\",\"ocspUnknown\":\""+b64(ocsp(k,c,new UnknownStatus(),BASE+3600000))+"\",\"ocspRevoked\":\""+b64(ocsp(k,c,new RevokedStatus(date(BASE-1800000),CRLReason.keyCompromise),BASE+3600000))+"\"}";
     String extra=",\"probeDirectSignatureAbsent\":"+directSignatureAbsent+",\"probeChildNull\":"+childNull+",\"probeChildrenNull\":"+childrenNull+",\"probeOptionalKeyValue\":"+keyValueOptional+",\"probeMalformedKeyValueRejected\":"+malformedKeyValueRejected+",\"probeNoIssuer\":"+(noIssuer==null)+",\"probeUniqueIssuer\":"+(uniqueIssuer!=null)+",\"probeAmbiguousIssuer\":"+(ambiguousIssuerProbe==null)+",\"probeChain\":\""+chainProbe+"\",\"probeChainDuplicateRejected\":"+chainDuplicateRejected+",\"probeChainAmbiguityRejected\":"+chainAmbiguityRejected+",\"probeTrust\":\""+trustProbe+"\",\"probeNoAnchorTrust\":\""+noAnchorTrust+"\",\"probeTime\":\""+timeProbe+"\",\"probeExpiredTime\":\""+expiredTime+"\",\"probeZeroLengthXmlRejected\":"+zeroLengthXmlRejected+",\"probeOverLimitXmlRejected\":"+overLimitXmlRejected+",\"probeNoEkuAssessment\":\""+assessmentProbe+"\",\"probeExplicitEkuAssessment\":\""+purposeAssessment+"\",\"probeParameters\":"+(parametersProbe!=null)+",\"probeNonemptyParameterChain\":"+nonemptyParameterChain+",\"crlWrongIssuerName\":\""+b64(mismatchedCrl)+"\",\"authCrlIssuerMismatchRejected\":"+crlAuthorityRejects+",\"authOcspBadSignatureRejected\":"+ocspSignatureRejects+",\"authUnsupportedTokenRejected\":"+unsupportedTokenRejects+",\"ocspDelegatedByName\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000,true,true))+"\",\"ocspDelegatedNoEku\":\""+b64(ocspSignedBy(noEkuKey,noEku,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedWrongEku\":\""+b64(ocspSignedBy(wrongEkuKey,wrongEku,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedNoDigitalSignature\":\""+b64(ocspSignedBy(noDigitalKey,noDigital,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedNoKeyUsage\":\""+b64(ocspSignedBy(noKeyUsageKey,noKeyUsage,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedFuture\":\""+b64(ocspSignedBy(futureKey,future,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedWrongIssuer\":\""+b64(ocspSignedBy(wrongIssuerKey,wrongIssuer,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedWrongIssuerName\":\""+b64(ocspSignedBy(wrongIssuerNameKey,wrongIssuerName,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000))+"\",\"ocspDelegatedNoCertificate\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000,false,false))+"\",\"ocspDelegatedMismatchedResponderId\":\""+b64(ocspSignedBy(delegatedKey,delegated,c,CertificateStatus.GOOD,BASE-1000,BASE+3600000,true,true,new X500Name("CN=Unmatched responder")))+"\",\"ocspDelegatedBadSignature\":\""+b64(badSignature)+"\",\"ocspNoThisUpdate\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,0,BASE+3600000))+"\""; json=json.substring(0,json.length()-1)+extra+"}";
-    json=json.substring(0,json.length()-1)+",\"ocspAtMaximumAge\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE-86400000,BASE+3600000))+"\",\"ocspThisUpdateAtValidation\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE,BASE+3600000))+"\",\"ocspNextUpdateAtValidation\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE-1000,BASE))+"\"}";
+    json=json.substring(0,json.length()-1)+",\"ocspAtMaximumAge\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE-86400000,BASE+3600000))+"\",\"ocspThisUpdateAtValidation\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE,BASE+3600000))+"\",\"ocspNextUpdateAtValidation\":\""+b64(ocspSignedBy(k,c,c,CertificateStatus.GOOD,BASE-1000,BASE))+"\",\"ocspRevokedStale\":\""+b64(ocsp(k,c,new RevokedStatus(date(BASE-1800000),CRLReason.keyCompromise),BASE-1))+"\"}";
     Object staleEvidenceRequest=request(c,List.of(),List.of(c.getEncoded()),BASE); setRequest(staleEvidenceRequest,"crls",List.of(crl(k,c,false,BASE-1))); String staleEvidenceStatus=recordString(dss("validateRevocation",new Class<?>[]{X509Certificate.class,List.class,staleEvidenceRequest.getClass()},runtimeCertificate,List.of(runtimeCertificate),staleEvidenceRequest),"status"); if(mutationProbes&& !"STALE".equals(staleEvidenceStatus)) throw new AssertionError("stale revocation evidence must remain distinct from unknown");
+    Object zeroEpochEvidenceRequest=request(c,List.of(),List.of(c.getEncoded()),0); setRequest(zeroEpochEvidenceRequest,"crls",List.of(crlAt(k,c,new javax.security.auth.x500.X500Principal(c.getSubject().getEncoded()),false,0,86400000))); String zeroEpochEvidenceStatus=recordString(dss("validateRevocation",new Class<?>[]{X509Certificate.class,List.class,zeroEpochEvidenceRequest.getClass()},runtimeCertificate,List.of(runtimeCertificate),zeroEpochEvidenceRequest),"status"); if(mutationProbes&& !"STALE".equals(zeroEpochEvidenceStatus)) throw new AssertionError("zero-epoch revocation time must remain stale");
+    Object freshnessVerifierProbe=dss("revocationFreshnessVerifier",new Class<?>[]{staleEvidenceRequest.getClass()},staleEvidenceRequest);
+    var nextUpdatePolicy=freshnessVerifierProbe.getClass().getDeclaredField("checkRevocationFreshnessNextUpdate"); nextUpdatePolicy.setAccessible(true);
+    var maximumFreshnessPolicy=freshnessVerifierProbe.getClass().getDeclaredField("signatureMaximumRevocationFreshness"); maximumFreshnessPolicy.setAccessible(true);
+    boolean revocationNextUpdateRequired=nextUpdatePolicy.getBoolean(freshnessVerifierProbe);
+    long revocationMaximumFreshness=(Long)maximumFreshnessPolicy.get(freshnessVerifierProbe);
     if(mutationProbes)
       { boolean weakRsaAlgorithmRejected=false; String weakRsaPayload=""; boolean boundaryRsaAccepted=false; boolean malformedSignatureRejected=false; String boundaryRsaPayload=""; String malformedSignaturePayload=""; if(args.length>1) { byte[] official=Base64.getDecoder().decode(args[1]); String original=new String(official,StandardCharsets.UTF_8); String weak=original.replaceAll("(?s)(<ds:X509Certificate>).*?(</ds:X509Certificate>)","$1"+b64(weakRsaProbeCertificate)+"$2"); if(weak.equals(original)) throw new AssertionError("weak RSA certificate insertion probe"); String weakDigest=b64(MessageDigest.getInstance("SHA-1").digest(weakRsaProbeCertificate)); weak=weak.replaceFirst("(?s)(<xades:SigningCertificate>.*?<ds:DigestValue>).*?(</ds:DigestValue>)","$1"+weakDigest+"$2"); weak=weak.replaceAll("(?s)<ds:KeyValue>.*?</ds:KeyValue>",""); byte[] artifact=weak.getBytes(StandardCharsets.UTF_8); Object weakRequest=request(c,List.of(),List.of(),BASE); setRequest(weakRequest,"artifact",artifact); setRequest(weakRequest,"digest",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(artifact))); Object weakResponse=dss("verify",new Class<?>[]{weakRequest.getClass()},weakRequest); weakRsaPayload=responsePayload(weakResponse); weakRsaAlgorithmRejected=weakRsaPayload.contains("DIAG-XADES-ALGORITHM");
           String malformedSignature=original.replaceFirst("(?s)(<ds:SignatureValue[^>]*>).*?(</ds:SignatureValue>)","$1!$2"); if(malformedSignature.equals(original)) throw new AssertionError("malformed signature value fixture"); byte[] malformedBytes=malformedSignature.getBytes(StandardCharsets.UTF_8); Object malformedRequest=request(c,List.of(),List.of(),BASE); setRequest(malformedRequest,"artifact",malformedBytes); setRequest(malformedRequest,"digest",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(malformedBytes))); Object malformedResponse=dss("verify",new Class<?>[]{malformedRequest.getClass()},malformedRequest); malformedSignaturePayload=responsePayload(malformedResponse); String[] malformedFields=malformedSignaturePayload.split("\\t",-1); malformedSignatureRejected="INVALID".equals(responseKind(malformedResponse))&&malformedFields.length==15&&"VALID".equals(malformedFields[0])&&"INVALID".equals(malformedFields[1])&&"DIAG-XADES-CRYPTO".equals(malformedFields[12]);
           KeyPair boundaryKey=rsaKeys(1024); X509CertificateHolder boundaryCertificate=certForPolicy(boundaryKey,true,true); byte[] unsigned="<sum1:RegistroAlta xmlns:sum1=\"https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroInformacion.xsd\"><sum1:IDVersion>1.0</sum1:IDVersion></sum1:RegistroAlta>".getBytes(StandardCharsets.UTF_8); Object boundaryRequest=request(boundaryCertificate,List.of(),List.of(),BASE); setRequest(boundaryRequest,"artifact",unsigned); setRequest(boundaryRequest,"digest",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(unsigned))); setRequest(boundaryRequest,"command","SIGN_PREPARE"); byte[] toBeSigned=responseBytes(dss("dispatch",new Class<?>[]{boundaryRequest.getClass()},boundaryRequest)); java.security.Signature rsaSigner=java.security.Signature.getInstance("SHA256withRSA"); rsaSigner.initSign(boundaryKey.getPrivate()); rsaSigner.update(toBeSigned); setRequest(boundaryRequest,"signature",rsaSigner.sign()); setRequest(boundaryRequest,"command","SIGN_COMPLETE"); byte[] signedBoundary=responseBytes(dss("dispatch",new Class<?>[]{boundaryRequest.getClass()},boundaryRequest)); setRequest(boundaryRequest,"command","VERIFY"); setRequest(boundaryRequest,"artifact",signedBoundary); setRequest(boundaryRequest,"digest",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(signedBoundary))); setRequest(boundaryRequest,"signature",new byte[0]); Object boundaryResponse=dss("dispatch",new Class<?>[]{boundaryRequest.getClass()},boundaryRequest); boundaryRsaPayload=responsePayload(boundaryResponse); String[] boundaryFields=boundaryRsaPayload.split("\\t",-1); boundaryRsaAccepted="INDETERMINATE".equals(responseKind(boundaryResponse))&&boundaryFields.length==15&&"VALID".equals(boundaryFields[0])&&"VALID".equals(boundaryFields[1])&&"VALID".equals(boundaryFields[10]); }
-        json=json.substring(0,json.length()-1)+",\"mutationProbesPassed\":"+(malformedKeyValueBase64Rejected&&"INDETERMINATE".equals(malformedTime)&&"INDETERMINATE".equals(boundedChainOutcome)&&weakRsaAlgorithmRejected&&boundaryRsaAccepted&&malformedSignatureRejected)+",\"probeMalformedKeyValueBase64Rejected\":"+malformedKeyValueBase64Rejected+",\"probeMalformedTime\":\""+malformedTime+"\",\"probeBoundedChain\":\""+boundedChainOutcome+"\",\"probeWeakRsaAlgorithmRejected\":"+weakRsaAlgorithmRejected+",\"probeWeakRsaPayloadBase64\":\""+b64(weakRsaPayload.getBytes(StandardCharsets.UTF_8))+"\",\"probeBoundaryRsaAccepted\":"+boundaryRsaAccepted+",\"probeBoundaryRsaPayloadBase64\":\""+b64(boundaryRsaPayload.getBytes(StandardCharsets.UTF_8))+"\",\"probeMalformedSignatureRejected\":"+malformedSignatureRejected+",\"probeMalformedSignaturePayloadBase64\":\""+b64(malformedSignaturePayload.getBytes(StandardCharsets.UTF_8))+"\"}"; }
+        json=json.substring(0,json.length()-1)+",\"mutationProbesPassed\":"+(malformedKeyValueBase64Rejected&&"INDETERMINATE".equals(malformedTime)&&"INDETERMINATE".equals(boundedChainOutcome)&&weakRsaAlgorithmRejected&&boundaryRsaAccepted&&malformedSignatureRejected&&malformedDssRejected&&noSigningUsageRejected&&revocationNextUpdateRequired&&revocationMaximumFreshness==86400000L)+",\"probeMalformedDssRejected\":"+malformedDssRejected+",\"probeNoSigningUsageRejected\":"+noSigningUsageRejected+",\"probeRevocationNextUpdateRequired\":"+revocationNextUpdateRequired+",\"probeRevocationMaximumFreshnessMs\":"+revocationMaximumFreshness+",\"probeMalformedKeyValueBase64Rejected\":"+malformedKeyValueBase64Rejected+",\"probeMalformedTime\":\""+malformedTime+"\",\"probeBoundedChain\":\""+boundedChainOutcome+"\",\"probeWeakRsaAlgorithmRejected\":"+weakRsaAlgorithmRejected+",\"probeWeakRsaPayloadBase64\":\""+b64(weakRsaPayload.getBytes(StandardCharsets.UTF_8))+"\",\"probeBoundaryRsaAccepted\":"+boundaryRsaAccepted+",\"probeBoundaryRsaPayloadBase64\":\""+b64(boundaryRsaPayload.getBytes(StandardCharsets.UTF_8))+"\",\"probeMalformedSignatureRejected\":"+malformedSignatureRejected+",\"probeMalformedSignaturePayloadBase64\":\""+b64(malformedSignaturePayload.getBytes(StandardCharsets.UTF_8))+"\"}"; }
     else
       json=json.substring(0,json.length()-1)+",\"p4Fuzz007Cases\":"+fuzzCount+",\"p4Fuzz007Seed\":"+pkiFuzzSeed+",\"p4Fuzz007CorpusSha256\":\""+java.util.HexFormat.of().formatHex(pkiCorpus.digest())+"\",\"p4Fuzz008Cases\":"+fuzzCount+",\"p4Fuzz008Seed\":"+protocolFuzzSeed+",\"p4Fuzz008CorpusSha256\":\""+java.util.HexFormat.of().formatHex(protocolCorpus.digest())+"\"}";
     System.out.println(json);
@@ -1212,6 +1241,9 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
     "indeterminate",
   );
   assert.equal(explicitPurpose.verification.certificate, "indeterminate");
+  assert.deepEqual(explicitPurpose.verification.diagnostics, [
+    "DIAG-XADES-CERTIFICATE-INDETERMINATE",
+  ]);
 
   const verifyBase = {
     editionId: XADES_EDITION_ID,
@@ -1261,15 +1293,25 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
 
   for (const [name, evidence] of [
     ["maximum permitted OCSP age", fixture.ocspAtMaximumAge],
-    ["OCSP thisUpdate equal to caller time", fixture.ocspThisUpdateAtValidation],
-    ["OCSP nextUpdate equal to caller time", fixture.ocspNextUpdateAtValidation],
+    [
+      "OCSP thisUpdate equal to caller time",
+      fixture.ocspThisUpdateAtValidation,
+    ],
+    [
+      "OCSP nextUpdate equal to caller time",
+      fixture.ocspNextUpdateAtValidation,
+    ],
   ]) {
     const boundary = await provider.verify({
       ...verifyBase,
       crlEvidence: [],
       ocspEvidence: [new Uint8Array(Buffer.from(evidence, "base64"))],
     });
-    assert.equal(boundary.status, "valid", `${name}: ${JSON.stringify(boundary)}`);
+    assert.equal(
+      boundary.status,
+      "valid",
+      `${name}: ${JSON.stringify(boundary)}`,
+    );
     assert.equal(boundary.revocation, "valid", name);
   }
 
@@ -1477,6 +1519,11 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
       ocspEvidence: [],
     });
     assert.equal(uncertain.status, "indeterminate", JSON.stringify(uncertain));
+    assert.equal(
+      uncertain.certificatePolicy.trust,
+      "valid",
+      JSON.stringify(uncertain),
+    );
     assert.ok(["stale", "unknown"].includes(uncertain.revocation));
   }
 
@@ -1487,6 +1534,20 @@ test("DSS signs through the opaque callback and validates explicit fresh CRL/OCS
   });
   assert.equal(ocspRevoked.status, "invalid", JSON.stringify(ocspRevoked));
   assert.equal(ocspRevoked.revocation, "revoked");
+
+  const staleOcspRevoked = await provider.verify({
+    ...verifyBase,
+    crlEvidence: [],
+    ocspEvidence: [
+      new Uint8Array(Buffer.from(fixture.ocspRevokedStale, "base64")),
+    ],
+  });
+  assert.equal(
+    staleOcspRevoked.status,
+    "invalid",
+    JSON.stringify(staleOcspRevoked),
+  );
+  assert.equal(staleOcspRevoked.revocation, "revoked");
 
   const malformed = await provider.verify({
     ...verifyBase,
@@ -1548,6 +1609,14 @@ test("P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors",
   });
   assert.equal(probe.probeBoundaryRsaAccepted, true, probeSummary);
   assert.equal(probe.probeMalformedSignatureRejected, true, probeSummary);
+  assert.equal(probe.probeMalformedDssRejected, true, probeSummary);
+  assert.equal(probe.probeNoSigningUsageRejected, true, probeSummary);
+  assert.equal(probe.probeRevocationNextUpdateRequired, true, probeSummary);
+  assert.equal(
+    probe.probeRevocationMaximumFreshnessMs,
+    86_400_000,
+    probeSummary,
+  );
   assert.equal(probe.mutationProbesPassed, true, probeSummary);
   assert.equal(probe.probeDirectSignatureAbsent, true);
   assert.equal(probe.probeChildNull, true);

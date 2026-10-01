@@ -5,6 +5,7 @@ declare const instantBrand: unique symbol;
 export type FiscalDate = string & { readonly [dateBrand]: true };
 export type FiscalInstant = string & { readonly [instantBrand]: true };
 export function createFiscalDate(value: string): Result<FiscalDate> {
+  if (typeof value !== "string") return invalid("DIAG-DATE-LEXICAL", "domain");
   if (!/^\d{4}-\d{2}-\d{2}$/u.test(value))
     return invalid("DIAG-DATE-LEXICAL", "domain");
   const [year, month, day] = value.split("-").map(Number) as [
@@ -38,6 +39,8 @@ export function createFiscalDate(value: string): Result<FiscalDate> {
   return ok(value as FiscalDate);
 }
 export function createFiscalInstant(value: string): Result<FiscalInstant> {
+  if (typeof value !== "string")
+    return invalid("DIAG-INSTANT-INVALID", "domain");
   const match =
     /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(Z|[+-]\d{2}:(\d{2}))$/u.exec(
       value,
@@ -57,10 +60,10 @@ export function createFiscalInstant(value: string): Result<FiscalInstant> {
     number,
     number,
   ];
+  if (hour > 23) return invalid("DIAG-INSTANT-INVALID", "domain");
+  if (minute > 59) return invalid("DIAG-INSTANT-INVALID", "domain");
+  if (second > 59) return invalid("DIAG-INSTANT-INVALID", "domain");
   if (
-    hour > 23 ||
-    minute > 59 ||
-    second > 59 ||
     offsetHour > 14 ||
     offsetMinute > 59 ||
     (offsetHour === 14 && offsetMinute !== 0) ||

@@ -36,6 +36,10 @@ import {
       "tests/integration/p4-xades-pki.test.mjs",
       "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
     ],
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^exact DSS bridge verifies official XAdES structure and signature without inventing trust$",
+    ],
   ]);
   assert.deepEqual(javaMutationTestSelections({ line: 420 }), [
     [
@@ -47,19 +51,43 @@ import {
       "^DSS rejects each altered XAdES profile component before crypto validation$",
     ],
   ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 439 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+    ],
+  ]);
   assert.deepEqual(javaMutationTestSelections({ line: 455 }), [
     [
       "tests/security/p4-signature-attacks.test.mjs",
       "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
     ],
   ]);
-  assert.deepEqual(javaMutationTestSelections({ line: 530 }), [
+  assert.deepEqual(javaMutationTestSelections({ line: 535 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 542 }), [
     [
       "tests/security/p4-resource-attacks.test.mjs",
       "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
     ],
   ]);
   assert.deepEqual(javaMutationTestSelections({ line: 569 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation|DSS distinguishes optional and malformed embedded KeyValue data)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 578 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation|DSS distinguishes optional and malformed embedded KeyValue data)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 590 }), [
     [
       "tests/security/p4-signature-attacks.test.mjs",
       "^DSS distinguishes optional and malformed embedded KeyValue data$",
@@ -84,7 +112,7 @@ import {
   assert.deepEqual(javaMutationTestSelections({ line: 760 }), [
     [
       "tests/security/p4-resource-attacks.test.mjs",
-      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge accepts exact request and field-count ceilings before parsing semantics|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
     ],
   ]);
 
@@ -96,7 +124,7 @@ import {
     mutationTestPatterns({ module, line }, test).map((entry) => entry.pattern);
 
   assert.deepEqual(patterns(xmlModel, 182, xmlUnit), [
-    "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model fails closed across namespace, attribute, node, and text boundaries|XML model accounts for serialized bytes in every node class)$",
+    "^(?:XML model accepts each documented exact capacity|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model rejects a valid element name that exceeds the serialized byte ceiling)$",
   ]);
   assert.deepEqual(patterns(xmlModel, 262, xmlUnit), [
     "^(?:XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model applies a total serialized-byte ceiling before allocating output|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model fails closed across namespace, attribute, node, and text boundaries|XML model stops traversing siblings after serialized bytes overflow|XML model accounts for quotes as text without attribute expansion|XML model stops counting escaped text at the serialized byte ceiling|XML model accepts the complete valid scalar ranges and empty processing instructions|XML model accepts each documented exact capacity)$",
@@ -110,7 +138,8 @@ import {
   assert.deepEqual(patterns(xmlModel, 401, xmlUnit), [
     "^(?:XML model accepts the complete valid scalar ranges and empty processing instructions|XML model enforces the text byte ceiling for three-byte characters|XML model enforces the text byte ceiling for supplementary characters|XML model counts DEL as one UTF-8 text byte|XML model stops counting escaped text at the serialized byte ceiling)$",
   ]);
-  const xmlSerialization = "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model sorts attributes deterministically when namespace keys are equal|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model accounts for quotes as text without attribute expansion|XML model accepts each documented exact capacity)$";
+  const xmlSerialization =
+    "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model sorts attributes deterministically when namespace keys are equal|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model accounts for quotes as text without attribute expansion|XML model accepts each documented exact capacity)$";
   assert.deepEqual(patterns(xmlModel, 430, xmlUnit), [xmlSerialization]);
   assert.deepEqual(patterns(xmlModel, 478, xmlUnit), [xmlSerialization]);
 
@@ -148,12 +177,14 @@ import {
   );
   assert.deepEqual(
     patterns(qr, 308, "tests/contract/p4-qr-provider.test.mjs"),
-    ["^P4-E compact PNG keeps stored blocks bounded$"],
+    [
+      "^(?:P4-E compact PNG keeps stored blocks bounded|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling)$",
+    ],
   );
   assert.deepEqual(
     patterns(qr, 320, "tests/contract/p4-qr-provider.test.mjs"),
     [
-      "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+      "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
     ],
   );
   assert.deepEqual(
@@ -182,6 +213,13 @@ import {
       line: 96,
     }),
     "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 618,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs [--test-name-pattern=^deadline settlement ignores a timer callback after completion$]",
   );
   assert.equal(
     focusedProviderMutationTest({

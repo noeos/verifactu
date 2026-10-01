@@ -61,8 +61,10 @@ class Parser {
   }
   private string(): string {
     const start = this.i++;
-    while (this.i < this.s.length) {
-      const c = this.s[this.i++];
+    while (true) {
+      const c = this.s[this.i];
+      if (c === undefined) throw new Error("string");
+      this.i++;
       if (c === '"') {
         const value = JSON.parse(this.s.slice(start, this.i)) as string;
         if (value.length > this.limits.maxStringLength)
@@ -76,11 +78,11 @@ class Parser {
         return value;
       }
       if (c === "\\") {
-        if (this.i >= this.s.length) throw new Error("escape");
+        const escaped = this.s[this.i];
+        if (escaped === undefined) throw new Error("escape");
         this.i++;
-      } else if ((c?.codePointAt(0) ?? 0) < 0x20) throw new Error("control");
+      } else if (c.charCodeAt(0) < 0x20) throw new Error("control");
     }
-    throw new Error("string");
   }
   private object(depth: number): { [key: string]: JsonValue } {
     this.i++;

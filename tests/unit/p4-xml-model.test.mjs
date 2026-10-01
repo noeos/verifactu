@@ -680,6 +680,30 @@ test("XML model rejects maximum-length names before scanning their characters", 
   }
 });
 
+test("XML model rejects a valid element name that exceeds the serialized byte ceiling", () => {
+  const declarationBytes = new TextEncoder().encode(
+    '<?xml version="1.0" encoding="UTF-8"?>',
+  ).byteLength;
+  for (const remainingBytes of [0, 2]) {
+    const result = defineXmlDocument({
+      root: {
+        kind: "element",
+        name: name(
+          "a".repeat(
+            XML_LIMITS.maximumXmlBytes - declarationBytes - remainingBytes,
+          ),
+        ),
+        namespaces: [],
+        attributes: [],
+        children: [],
+      },
+    });
+    assert.equal(result.status, "invalid");
+    assert.equal(result.diagnostics[0].code, "DIAG-XML-MODEL");
+    assert.doesNotMatch(JSON.stringify(result), /aaaa/u);
+  }
+});
+
 test("XML model enforces the text byte ceiling for three-byte characters", () => {
   const text = "ࠀ".repeat(699_051);
   assert.equal(

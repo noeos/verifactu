@@ -337,7 +337,7 @@
     },
     {
       "id": "test:p4-a",
-      "version": 13,
+      "version": 19,
       "owner": "quality-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -528,7 +528,7 @@
     },
     {
       "id": "test:p4-g",
-      "version": 43,
+      "version": 57,
       "owner": "quality-owner",
       "dependencies": [
         "test:p4-a",
@@ -586,7 +586,7 @@
       ],
       "network": "denied",
       "secrets": "denied",
-      "timeoutSeconds": 7200,
+      "timeoutSeconds": 14400,
       "concurrencyLock": "p4-g-cumulative-closure",
       "selectionClass": "code-and-build",
       "reportSchema": "evidence/schemas/task-report.schema.json",

@@ -1500,6 +1500,7 @@ async function testP4A(context) {
     process.execPath,
     [
       "--experimental-test-coverage",
+      "--test-coverage-include=**/artifacts/build/verifactu/dist/**/*.js",
       "--test-coverage-exclude=**/verification/*.js",
       "--test",
       "--test-reporter=tap",
@@ -1526,6 +1527,11 @@ async function testP4A(context) {
       Number(skipped) === 0,
     "P4A_TEST_COMPLETENESS",
     `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  assert(
+    files.every((path) => !result.stdout.includes(path.split("/").at(-1))),
+    "P4A_COVERAGE_INCLUDES_TEST_CODE",
+    "coverage denominator must contain production modules only",
   );
   const mutationResult = await run(
     process.execPath,

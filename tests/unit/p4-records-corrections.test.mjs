@@ -73,6 +73,15 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
   const alta = createAltaRecord(record);
   assert.equal(alta.status, "ok");
   assert.equal(recordsShareContext(alta.value, alta.value), true);
+  const coercibleIssueDate = { toString: () => "2025-01-01" };
+  assert.equal(
+    createAltaRecord({
+      ...record,
+      issueDate: coercibleIssueDate,
+      document: { ...record.document, issueDate: coercibleIssueDate },
+    }).status,
+    "invalid",
+  );
   assert.equal(
     recordsShareContext(alta.value, {
       ...alta.value,

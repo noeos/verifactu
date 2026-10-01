@@ -80,8 +80,8 @@ import org.xml.sax.SAXParseException;
 
 /** Private bounded stdin/stdout bridge. The process receives no private key material. */
 public final class DssBridge {
-  private static final int MAX_LINE = 32_000_000;
   private static final long MAX_REQUEST = 24_000_000L;
+  private static final int MAX_REQUEST_FIELDS = 128;
   private static final byte[] POLICY_DIGEST = Base64.getDecoder().decode("G7roucf600+f03r/o0bAOQ6WAs0=");
   private static final String C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 
@@ -253,9 +253,7 @@ public final class DssBridge {
       for (X509Certificate cert : embedded) chain.add(new CertificateToken(cert));
       for (byte[] cert : r.chain) chain.add(new CertificateToken(certificate(cert)));
       for (byte[] cert : r.anchors) chain.add(new CertificateToken(certificate(cert)));
-      RevocationDataVerifier verifier = RevocationDataVerifier.createDefaultRevocationDataVerifier();
-      verifier.setSignatureMaximumRevocationFreshness(Math.multiplyExact((long) r.maximumAge, 1000L));
-      verifier.setCheckRevocationFreshnessNextUpdate(true);
+      RevocationDataVerifier verifier = revocationFreshnessVerifier(r);
       boolean freshGood = false;
       boolean stale = false;
       long latestThisUpdate = 0, earliestNextUpdate = Long.MAX_VALUE;
@@ -288,6 +286,13 @@ public final class DssBridge {
     }
   }
 
+  private static RevocationDataVerifier revocationFreshnessVerifier(Request r) {
+    RevocationDataVerifier verifier = RevocationDataVerifier.createDefaultRevocationDataVerifier();
+    verifier.setSignatureMaximumRevocationFreshness(Math.multiplyExact((long) r.maximumAge, 1000L));
+    verifier.setCheckRevocationFreshnessNextUpdate(true);
+    return verifier;
+  }
+
   private static long[] inspectToken(RevocationToken<?> revocationEvidence, RevocationDataVerifier verifier,
       CertificateToken certificate, CertificateToken issuer, List<CertificateToken> chain,
       long validationTime, int maximumAgeSeconds) {
@@ -295,7 +300,7 @@ public final class DssBridge {
     long nextUpdate = revocationEvidence.getNextUpdate() == null ? 0 : revocationEvidence.getNextUpdate().getTime();
     boolean acceptable = verifier.isAcceptable(revocationEvidence, certificate, chain, new Date(validationTime))
         && authorizedRevocationToken(revocationEvidence, issuer.getCertificate(), validationTime);
-    boolean fresh = thisUpdate > 0 && nextUpdate > 0 && thisUpdate <= validationTime
+    boolean fresh = thisUpdate > 0 && thisUpdate <= validationTime
         && nextUpdate >= validationTime
         && validationTime - thisUpdate <= Math.multiplyExact((long) maximumAgeSeconds, 1_000L);
     CertificateStatus status = revocationEvidence.getStatus();
@@ -354,12 +359,13 @@ public final class DssBridge {
       verifier.setAdjunctCertSources(adjunct);
       verifier.setAIASource(null);
       verifier.setRevocationFallback(false);
+      if (verifier.getAIASource() != null)
+        throw new IllegalStateException("DSS AIA source must remain offline");
+      if (verifier.isRevocationFallback())
+        throw new IllegalStateException("DSS revocation fallback must remain offline");
       if (!r.crls.isEmpty()) verifier.setCrlSource(new ExternalResourcesCRLSource(r.crls.stream().map(java.io.ByteArrayInputStream::new).toArray(java.io.InputStream[]::new)));
       if (!r.ocsps.isEmpty()) verifier.setOcspSource(new ExternalResourcesOCSPSource(r.ocsps.stream().map(java.io.ByteArrayInputStream::new).toArray(java.io.InputStream[]::new)));
-      RevocationDataVerifier freshness = RevocationDataVerifier.createDefaultRevocationDataVerifier();
-      freshness.setSignatureMaximumRevocationFreshness(Math.multiplyExact((long) r.maximumAge, 1000L));
-      freshness.setCheckRevocationFreshnessNextUpdate(true);
-      verifier.setRevocationDataVerifier(freshness);
+      verifier.setRevocationDataVerifier(revocationFreshnessVerifier(r));
       SignedDocumentValidator validator = SignedDocumentValidator.fromDocument(new InMemoryDocument(r.artifact, "signed.xml"));
       validator.setCertificateVerifier(verifier);
       validator.setValidationTime(new Date(r.validationTime));
@@ -401,7 +407,7 @@ public final class DssBridge {
   }
 
   private static Document parseXml(byte[] bytes) throws Exception {
-    if (bytes.length == 0 || bytes.length > 8_388_608) throw new LimitException();
+    if (bytes.length > 8_388_608) throw new LimitException();
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     factory.setXIncludeAware(false);
@@ -409,6 +415,16 @@ public final class DssBridge {
     factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
     factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
     factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    if (factory.isXIncludeAware())
+      throw new IllegalStateException("XInclude must remain disabled");
+    if (factory.isExpandEntityReferences())
+      throw new IllegalStateException("entity expansion must remain disabled");
+    if (!factory.getFeature("http://apache.org/xml/features/disallow-doctype-decl"))
+      throw new IllegalStateException("DOCTYPE must remain disabled");
+    if (factory.getFeature("http://xml.org/sax/features/external-general-entities"))
+      throw new IllegalStateException("external general entities must remain disabled");
+    if (factory.getFeature("http://xml.org/sax/features/external-parameter-entities"))
+      throw new IllegalStateException("external parameter entities must remain disabled");
     factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
@@ -431,7 +447,7 @@ public final class DssBridge {
       attributes += element.getAttributes().getLength();
       if (attributes > 4_096) throw new LimitException();
       for (Node child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
-        if (child instanceof Element nested) pending.push(new NodeDepth(nested, item.depth + 1));
+        if (child instanceof Element nested) pending.push(new NodeDepth(nested, Math.incrementExact(item.depth)));
         else if (child.getNodeType() == Node.TEXT_NODE || child.getNodeType() == Node.CDATA_SECTION_NODE) {
           textBytes += child.getNodeValue().getBytes(StandardCharsets.UTF_8).length;
           if (textBytes > 2_097_152) throw new LimitException();
@@ -450,8 +466,7 @@ public final class DssBridge {
     List<Element> sigChildren = childElements(sig);
     if (sigChildren.size() != 4 || !"SignedInfo".equals(sigChildren.get(0).getLocalName())
         || !"SignatureValue".equals(sigChildren.get(1).getLocalName())
-        || !"KeyInfo".equals(sigChildren.get(2).getLocalName())
-        || !"Object".equals(sigChildren.get(3).getLocalName())) return false;
+        || !"KeyInfo".equals(sigChildren.get(2).getLocalName())) return false;
     Element signedInfo = child(sig, "http://www.w3.org/2000/09/xmldsig#", "SignedInfo");
     if (signedInfo == null) return false;
     Element canon = child(signedInfo, "http://www.w3.org/2000/09/xmldsig#", "CanonicalizationMethod");
@@ -459,10 +474,13 @@ public final class DssBridge {
     if (canon == null || !C14N.equals(canon.getAttribute("Algorithm")) || method == null || !"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256".equals(method.getAttribute("Algorithm"))) return false;
     List<Element> refs = children(signedInfo, "http://www.w3.org/2000/09/xmldsig#", "Reference");
     List<Element> signedInfoChildren = childElements(signedInfo);
-    if (signedInfoChildren.size() != 4 || !"CanonicalizationMethod".equals(signedInfoChildren.get(0).getLocalName())
-        || !"SignatureMethod".equals(signedInfoChildren.get(1).getLocalName())
-        || refs.size() != 2 || signedInfoChildren.get(2) != refs.get(0) || signedInfoChildren.get(3) != refs.get(1)
-        || !"".equals(refs.get(0).getAttribute("URI"))) return false;
+    if (signedInfoChildren.size() != 4) return false;
+    if (signedInfoChildren.get(0) != canon) return false;
+    if (signedInfoChildren.get(1) != method) return false;
+    if (refs.size() != 2) return false;
+    if (signedInfoChildren.get(2) != refs.get(0)) return false;
+    if (signedInfoChildren.get(3) != refs.get(1)) return false;
+    if (!"".equals(refs.get(0).getAttribute("URI"))) return false;
     if (!"http://www.w3.org/2001/04/xmlenc#sha256".equals(digestUri(refs.get(0)))) return false;
     List<Element> transforms0 = children(child(refs.get(0), "http://www.w3.org/2000/09/xmldsig#", "Transforms"), "http://www.w3.org/2000/09/xmldsig#", "Transform");
     if (transforms0.size() != 1 || !"http://www.w3.org/2000/09/xmldsig#enveloped-signature".equals(transforms0.get(0).getAttribute("Algorithm"))) return false;
@@ -501,15 +519,14 @@ public final class DssBridge {
     List<Element> spuris = elementsByName(d, "http://uri.etsi.org/01903/v1.3.2#", "SPURI");
     if (spuris.size() != 1 || !"https://sede.administracion.gob.es/politica_de_firma_anexo_1.pdf".equals(spuris.get(0).getTextContent().trim())) return false;
     List<Element> qualifying = elementsByName(d, "http://uri.etsi.org/01903/v1.3.2#", "QualifyingProperties");
+    List<Element> objects = children(sig, "http://www.w3.org/2000/09/xmldsig#", "Object");
     if (qualifying.size() != 1 || !qualifying.get(0).getAttribute("Target").startsWith("#")
         || qualifying.get(0).getParentNode() == null
         || !(qualifying.get(0).getParentNode() instanceof Element qualifyingParent)
-        || !"Object".equals(qualifyingParent.getLocalName())
-        || !"http://www.w3.org/2000/09/xmldsig#".equals(qualifyingParent.getNamespaceURI())) return false;
+        || objects.size() != 1 || qualifyingParent != objects.get(0)) return false;
     if (!qualifying.get(0).getAttribute("Target").substring(1).equals(sig.getAttribute("Id"))) return false;
     List<Element> qualifyingChildren = childElements(qualifying.get(0));
     if (qualifyingChildren.size() != 1 || qualifyingChildren.get(0) != props.get(0)) return false;
-    List<Element> objects = children(sig, "http://www.w3.org/2000/09/xmldsig#", "Object");
     if (objects.size() != 1 || childElements(objects.get(0)).size() != 1 || childElements(objects.get(0)).get(0) != qualifying.get(0)) return false;
     List<Element> propertiesChildren = childElements(props.get(0));
     if (propertiesChildren.size() != 2 || !"SignedSignatureProperties".equals(propertiesChildren.get(0).getLocalName())
@@ -520,7 +537,6 @@ public final class DssBridge {
     List<Element> certDigestValues = elementsByName(signingCertificateChildren.get(0), "http://www.w3.org/2000/09/xmldsig#", "DigestValue");
     if (certDigestMethods.isEmpty() || certDigestValues.isEmpty() || !"http://www.w3.org/2000/09/xmldsig#sha1".equals(certDigestMethods.get(0).getAttribute("Algorithm"))) return false;
     List<X509Certificate> embedded = certificates(sig);
-    if (embedded.isEmpty()) return false;
     byte[] certificateDigest = MessageDigest.getInstance("SHA-1").digest(embedded.get(0).getEncoded());
     if (!MessageDigest.isEqual(certificateDigest, Base64.getMimeDecoder().decode(certDigestValues.get(0).getTextContent()))) return false;
     org.w3c.dom.Attr rootReferenceId = refs.get(0).getAttributeNode("Id");
@@ -595,7 +611,7 @@ public final class DssBridge {
     String trust = validatePath(leaf, embedded, r);
     String time = validateTime(leaf, embedded, r);
     boolean[] keyUsage = leaf.getKeyUsage();
-    String usage = keyUsage != null && keyUsage.length > 0 && keyUsage[0] ? "VALID" : "INVALID";
+    String usage = keyUsage != null && keyUsage.length != 0 && keyUsage[0] ? "VALID" : "INVALID";
     String extendedKeyUsage;
     try {
       // No accepted signer EKU allowlist is established by the selected edition yet.
@@ -636,13 +652,11 @@ public final class DssBridge {
         for (byte[] anchor : r.anchors)
           if (MessageDigest.isEqual(certificate(anchor).getEncoded(), current.getEncoded())) return "VALID";
         List<X509Certificate> issuers = new ArrayList<>();
+        Set<String> issuerDigests = new HashSet<>();
         for (X509Certificate candidate : all) {
           if (current.getIssuerX500Principal().equals(candidate.getSubjectX500Principal())) {
             String digest = Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(candidate.getEncoded()));
-            boolean duplicate = false;
-            for (X509Certificate existing : issuers)
-              if (MessageDigest.isEqual(existing.getEncoded(), candidate.getEncoded())) duplicate = true;
-            if (!digest.equals(currentDigest) && !duplicate) issuers.add(candidate);
+            if (!digest.equals(currentDigest) && issuerDigests.add(digest)) issuers.add(candidate);
           }
         }
         if (issuers.isEmpty()) {
@@ -670,6 +684,8 @@ public final class DssBridge {
       X509CertSelector selector = new X509CertSelector(); selector.setCertificate(leaf);
       PKIXBuilderParameters params = new PKIXBuilderParameters(anchors, selector); params.setDate(at); params.setRevocationEnabled(false);
       params.addCertStore(CertStore.getInstance("Collection", new CollectionCertStoreParameters(pathCerts)));
+      if (params.isRevocationEnabled())
+        throw new IllegalStateException("PKIX revocation must use caller-supplied evidence only");
       CertPathBuilder.getInstance("PKIX").build(params);
       return "VALID";
     } catch (Exception e) { return "INDETERMINATE"; }
@@ -689,7 +705,9 @@ public final class DssBridge {
     if (!(leaf.getPublicKey() instanceof java.security.interfaces.RSAKey rsa) || rsa.getModulus().bitLength() < 1024)
       throw new IllegalArgumentException("RSA key policy");
     boolean[] usage = leaf.getKeyUsage();
-    if (usage == null || usage.length == 0 || !usage[0]) throw new IllegalArgumentException("key usage");
+    if (usage == null) throw new IllegalArgumentException("key usage");
+    if (usage.length == 0) throw new IllegalArgumentException("key usage");
+    if (!usage[0]) throw new IllegalArgumentException("key usage");
     CertificateToken token = new CertificateToken(leaf);
     List<CertificateToken> chain = new ArrayList<>();
     chain.add(token);
@@ -734,7 +752,7 @@ public final class DssBridge {
   }
 
   private static String hex(byte[] bytes) {
-    StringBuilder value = new StringBuilder(bytes.length * 2);
+    StringBuilder value = new StringBuilder();
     for (byte item : bytes) value.append(String.format("%02x", item & 0xff));
     return value.toString();
   }
@@ -750,12 +768,12 @@ public final class DssBridge {
       List<byte[]> f = new ArrayList<>();
       long total = 0;
       while (true) {
-        byte[] line = readLine(input);
-        if (line == null) break;
-        total += line.length;
-        if (total > MAX_REQUEST) throw new LimitException();
-        f.add(line.length == 0 ? new byte[0] : Base64.getDecoder().decode(line));
-        if (f.size() > 128) throw new LimitException();
+      byte[] line = readLine(input, Math.subtractExact(MAX_REQUEST, total));
+      if (line == null) break;
+      total += line.length;
+      if (total > MAX_REQUEST) throw new LimitException();
+      f.add(line.length == 0 ? new byte[0] : Base64.getDecoder().decode(line));
+      if (f.size() > MAX_REQUEST_FIELDS) throw new LimitException();
       }
       Cursor c = new Cursor(f);
       protocol = c.string(); command = c.string(); edition = c.string(); profile = c.string();
@@ -766,11 +784,11 @@ public final class DssBridge {
     }
 
     static Request read(InputStream input) throws Exception { return new Request(input); }
-    private static byte[] readLine(InputStream in) throws Exception {
+    private static byte[] readLine(InputStream in, long remainingRequestBytes) throws Exception {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       int b;
       while ((b = in.read()) != -1 && b != '\n') {
-        if (out.size() >= MAX_LINE) throw new LimitException();
+        if (out.size() >= remainingRequestBytes) throw new LimitException();
         out.write(b);
       }
       if (b == -1 && out.size() == 0) return null;
@@ -781,7 +799,7 @@ public final class DssBridge {
   private static final class Cursor {
     private final List<byte[]> values; private int index;
     Cursor(List<byte[]> values) { this.values = values; }
-    byte[] bytes() { if (index >= values.size()) throw new IllegalArgumentException("short request"); return values.get(index++); }
+      byte[] bytes() { if (index == values.size()) throw new IllegalArgumentException("short request"); return values.get(index++); }
     String string() { return new String(bytes(), StandardCharsets.UTF_8); }
     long number() { return Long.parseLong(string()); }
     List<byte[]> list() { int count = Math.toIntExact(number()); if (count < 0 || count > 32) throw new IllegalArgumentException("bad list"); List<byte[]> out = new ArrayList<>(); for (int i=0;i<count;i++) out.add(bytes()); return out; }

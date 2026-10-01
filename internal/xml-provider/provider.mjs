@@ -80,7 +80,10 @@ export const PINNED_SCHEMA_CLOSURES = Object.freeze({
     "xsd-suministro-informacion",
     "xmldsig-schema",
   ],
-  "xsd-suministro-informacion": ["xsd-suministro-informacion", "xmldsig-schema"],
+  "xsd-suministro-informacion": [
+    "xsd-suministro-informacion",
+    "xmldsig-schema",
+  ],
   "xsd-eventos-sif": ["xsd-eventos-sif", "xmldsig-schema"],
   "xsd-respuesta-validacion-no-verifactu": [
     "xsd-respuesta-validacion-no-verifactu",
@@ -92,8 +95,9 @@ export const PINNED_SCHEMA_CLOSURES = Object.freeze({
 
 export function createXmlXsdProvider(options = {}) {
   const execute = options.execute ?? spawnXmlWorker;
-  return Object.freeze({ validate: (request, callOptions) =>
-    validateXmlXsd(request, { ...options, ...callOptions, execute }),
+  return Object.freeze({
+    validate: (request, callOptions) =>
+      validateXmlXsd(request, { ...options, ...callOptions, execute }),
   });
 }
 
@@ -102,7 +106,9 @@ export async function validateXmlXsd(request, options = {}) {
     ? request.semanticStatus
     : "not-evaluated";
   if (options.signal?.aborted)
-    return outcome("cancelled", "not-evaluated", semantic, ["DIAG-XML-CANCELLED"]);
+    return outcome("cancelled", "not-evaluated", semantic, [
+      "DIAG-XML-CANCELLED",
+    ]);
 
   let limits;
   try {
@@ -124,12 +130,13 @@ export async function validateXmlXsd(request, options = {}) {
   );
   if (
     request.schemas.length > limits.maximumSchemas ||
-    schemaBytes > limits.maximumSchemaBytes ||
-    request.schemas.some((schema) => schema.bytes.byteLength > limits.maximumSchemaBytes)
+    schemaBytes > limits.maximumSchemaBytes
   )
     return outcome("limit", "not-evaluated", semantic, ["DIAG-XSD-RESOURCES"]);
   if (request.editionId !== XML_EDITION_ID)
-    return outcome("unavailable", "not-evaluated", semantic, ["DIAG-XML-EDITION"]);
+    return outcome("unavailable", "not-evaluated", semantic, [
+      "DIAG-XML-EDITION",
+    ]);
 
   const expectedClosure = PINNED_SCHEMA_CLOSURES[request.rootSchemaId];
   const ids = request.schemas.map((schema) => schema.id).sort();
@@ -138,7 +145,9 @@ export async function validateXmlXsd(request, options = {}) {
     JSON.stringify(ids) !== JSON.stringify([...expectedClosure].sort()) ||
     !request.schemas.every((schema) => schemaMatchesPin(schema))
   )
-    return outcome("defect", "not-evaluated", semantic, ["DIAG-XSD-RESOURCE-MAP"]);
+    return outcome("defect", "not-evaluated", semantic, [
+      "DIAG-XSD-RESOURCE-MAP",
+    ]);
 
   const execute = options.execute ?? spawnXmlWorker;
   const work = async () => {
@@ -166,24 +175,32 @@ export async function validateXmlXsd(request, options = {}) {
         },
       );
     } finally {
-      await rm(directory, { recursive: true, force: true }).catch(() => undefined);
+      await rm(directory, { recursive: true }).catch(() => undefined);
     }
   };
 
   try {
     const result = await work();
     if (!validWorkerResult(result))
-      return outcome("defect", "not-evaluated", semantic, ["DIAG-XSD-PROVIDER"]);
-    if (result.kind === "valid")
-      return outcome("valid", "valid", semantic, []);
+      return outcome("defect", "not-evaluated", semantic, [
+        "DIAG-XSD-PROVIDER",
+      ]);
+    if (result.kind === "valid") return outcome("valid", "valid", semantic, []);
     if (result.kind === "invalid")
       return outcome("invalid", "invalid", semantic, result.diagnostics);
     if (result.kind === "limit")
       return outcome("limit", "not-evaluated", semantic, result.diagnostics);
     if (result.kind === "cancelled")
-      return outcome("cancelled", "not-evaluated", semantic, ["DIAG-XML-CANCELLED"]);
+      return outcome("cancelled", "not-evaluated", semantic, [
+        "DIAG-XML-CANCELLED",
+      ]);
     if (result.kind === "unavailable")
-      return outcome("unavailable", "not-evaluated", semantic, result.diagnostics);
+      return outcome(
+        "unavailable",
+        "not-evaluated",
+        semantic,
+        result.diagnostics,
+      );
     return outcome("defect", "not-evaluated", semantic, result.diagnostics);
   } catch {
     return outcome("defect", "not-evaluated", semantic, ["DIAG-XSD-PROVIDER"]);
@@ -209,8 +226,7 @@ function validRequest(request) {
 
 function schemaMatchesPin(schema) {
   const pin = PINNED_SCHEMAS[schema.id];
-  if (!pin || schema.sha256 !== pin.sha256 || schema.bytes.byteLength > XML_LIMITS.maximumSchemaBytes)
-    return false;
+  if (!pin || schema.sha256 !== pin.sha256) return false;
   const actual = createHash("sha256").update(schema.bytes).digest();
   const expected = Buffer.from(pin.sha256, "hex");
   return actual.length === expected.length && timingSafeEqual(actual, expected);
@@ -220,9 +236,14 @@ function validWorkerResult(result) {
   return Boolean(
     result &&
       typeof result === "object" &&
-      ["valid", "invalid", "limit", "cancelled", "unavailable", "defect"].includes(
-        result.kind,
-      ) &&
+      [
+        "valid",
+        "invalid",
+        "limit",
+        "cancelled",
+        "unavailable",
+        "defect",
+      ].includes(result.kind) &&
       Array.isArray(result.diagnostics) &&
       result.diagnostics.length <= 8 &&
       result.diagnostics.every(

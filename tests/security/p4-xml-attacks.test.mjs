@@ -415,14 +415,19 @@ test("XML worker process envelope bounds cancellation, request, output, timeout 
   );
 
   const exactRequest = { payload: "x".repeat(17_999_986) };
-  assert.equal(Buffer.byteLength(JSON.stringify(exactRequest), "utf8"), 18_000_000);
+  assert.equal(
+    Buffer.byteLength(JSON.stringify(exactRequest), "utf8"),
+    18_000_000,
+  );
   let spawnedAtExactRequestLimit = false;
   const exactLimitSpawner = createXmlWorkerSpawner(() => {
     spawnedAtExactRequestLimit = true;
     const child = new EventEmitter();
     child.stdout = new PassThrough();
     child.stderr = new PassThrough();
-    child.stdin = new Writable({ write: (_chunk, _encoding, callback) => callback() });
+    child.stdin = new Writable({
+      write: (_chunk, _encoding, callback) => callback(),
+    });
     child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
     setImmediate(() => {
       child.stdout.end('{"kind":"valid","diagnostics":[]}');
@@ -484,6 +489,8 @@ test("XML worker parser rejects malformed structured output", () => {
   assert.equal(parse(`{"kind":"valid","diagnostics":[]}`).kind, "valid");
   for (const output of [
     "not-json",
+    "null",
+    "[]",
     `{"kind":"unknown","diagnostics":[]}`,
     `{"kind":"invalid","diagnostics":["private detail"]}`,
   ]) {
@@ -544,9 +551,7 @@ test("XML worker normalizes child spawn errors and post-spawn cancellation", asy
     });
     const completed = await Promise.race([
       completeSpawner(fixture("<r/>")),
-      new Promise((resolve) =>
-        setTimeout(() => resolve("still-pending"), 25),
-      ),
+      new Promise((resolve) => setTimeout(() => resolve("still-pending"), 25)),
     ]);
     assert.notEqual(completed, "still-pending");
     assert.equal(completed.kind, "valid");
@@ -574,27 +579,51 @@ test("XML worker normalizes child spawn errors and post-spawn cancellation", asy
   });
   const failedSpawn = await Promise.race([
     failedSpawner(fixture("<r/>")),
-    new Promise((resolve) =>
-      setTimeout(() => resolve("still-pending"), 100),
-    ),
+    new Promise((resolve) => setTimeout(() => resolve("still-pending"), 100)),
   ]);
   assert.notEqual(failedSpawn, "still-pending");
   assert.equal(failedSpawn.kind, "defect");
 
   const controller = new AbortController();
+  let cancellationKillCount = 0;
   const cancelledSpawner = createXmlWorkerSpawner(() => {
     const child = new EventEmitter();
     child.stdout = new PassThrough();
     child.stderr = new PassThrough();
     child.stdin = new PassThrough();
-    child.kill = () => setImmediate(() => child.emit("close", null, "SIGTERM"));
+    child.kill = () => {
+      cancellationKillCount++;
+      setImmediate(() => child.emit("close", null, "SIGTERM"));
+    };
     return child;
   });
   const pending = cancelledSpawner(fixture("<r/>"), {
     signal: controller.signal,
   });
   controller.abort();
+  controller.abort();
+  assert.equal(cancellationKillCount, 1);
   assert.equal((await pending).kind, "cancelled");
+
+  const synchronousAbortController = new AbortController();
+  let synchronousAbortKillCount = 0;
+  const synchronousAbortSpawner = createXmlWorkerSpawner(() => {
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => {
+      synchronousAbortKillCount++;
+      setImmediate(() => child.emit("close", null, "SIGTERM"));
+    };
+    synchronousAbortController.abort();
+    return child;
+  });
+  const synchronousAbort = await synchronousAbortSpawner(fixture("<r/>"), {
+    signal: synchronousAbortController.signal,
+  });
+  assert.equal(synchronousAbort.kind, "cancelled");
+  assert.equal(synchronousAbortKillCount, 1);
 
   const completeSpawner = createXmlWorkerSpawner(() => {
     const child = new EventEmitter();

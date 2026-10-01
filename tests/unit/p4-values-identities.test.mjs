@@ -175,6 +175,14 @@ test("digest port validates every input, provider failure, and output form", () 
   const bytes = new Uint8Array([1, 2, 3]);
   const valid = { providerId: "test:digest", digest: () => "a".repeat(64) };
   assert.equal(digestBytes(valid, "sha256", bytes).status, "ok");
+  assert.equal(
+    digestBytes(
+      { providerId: "x".repeat(128), digest: () => "a".repeat(64) },
+      "sha256",
+      bytes,
+    ).status,
+    "ok",
+  );
   for (const [provider, algorithm, payload] of [
     [null, "sha256", bytes],
     [{ providerId: "", digest: () => "a".repeat(64) }, "sha256", bytes],
@@ -268,6 +276,10 @@ test("fiscal contexts require all four correctly typed identities", () => {
 
 test("date and instant constructors reject impossible and implicit-time values", () => {
   assert.equal(createFiscalDate("2024-02-29").status, "ok");
+  assert.equal(
+    createFiscalDate({ toString: () => "2024-02-29" }).status,
+    "invalid",
+  );
   assert.equal(createFiscalDate("2023-02-29").status, "invalid");
   assert.equal(createFiscalDate("2000-02-29").status, "ok");
   assert.equal(createFiscalDate("1900-02-29").status, "invalid");
@@ -279,6 +291,10 @@ test("date and instant constructors reject impossible and implicit-time values",
   assert.equal(createFiscalDate("0000-01-01").status, "invalid");
   assert.equal(createFiscalDate("2024-2-09").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T03:04:05+01:00").status, "ok");
+  assert.equal(
+    createFiscalInstant({ toString: () => "2025-01-02T03:04:05Z" }).status,
+    "invalid",
+  );
   assert.equal(createFiscalInstant("2025-01-02T03:04:05Z").status, "ok");
   assert.equal(createFiscalInstant("2025-01-02T03:04:05.1-14:00").status, "ok");
   assert.equal(
@@ -300,6 +316,7 @@ test("date and instant constructors reject impossible and implicit-time values",
   assert.equal(createFiscalInstant("2025-01-02T03:04:05").status, "invalid");
   assert.equal(createFiscalInstant("2025-02-31T03:04:05Z").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T24:00:00Z").status, "invalid");
+  assert.equal(createFiscalInstant("2025-01-02T24:60:00Z").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T03:60:00Z").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T03:04:60Z").status, "invalid");
   assert.equal(
