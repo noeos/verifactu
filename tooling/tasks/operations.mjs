@@ -2055,6 +2055,22 @@ function outcomeCountFrom(mutants, outcome) {
   return mutants.filter((mutant) => mutant.outcome === outcome).length;
 }
 
+export function propertyCampaignTestBody(source, campaignId) {
+  const declarations = [
+    ...source.matchAll(
+      /^[ \t]*test\([ \t]*(?:"([^"\n]*)"|'([^'\n]*)'|`([^`\n]*)`)/gmu,
+    ),
+  ];
+  const matches = declarations.filter((declaration) => {
+    const title = declaration[1] ?? declaration[2] ?? declaration[3];
+    return title === campaignId || title.startsWith(`${campaignId} `);
+  });
+  if (matches.length !== 1) return null;
+  const start = matches[0].index;
+  const next = declarations.find((declaration) => declaration.index > start);
+  return source.slice(start, next?.index ?? source.length);
+}
+
 async function testP4G(context) {
   const plan = await readJson(
     resolve(context.root, "config/quality/p4-quality-plan.json"),
@@ -2599,30 +2615,21 @@ async function testP4G(context) {
       "P4G_PROPERTY_CAMPAIGN_MISSING",
       campaign.id,
     );
-    let propertySource;
+    const propertyTestBodies = [];
     for (const path of files) {
       const candidate = await readFile(join(context.root, path), "utf8");
-      if (candidate.includes(campaign.id)) {
-        propertySource = candidate;
-        break;
-      }
+      const body = propertyCampaignTestBody(candidate, campaign.id);
+      if (body !== null) propertyTestBodies.push(body);
     }
-    assert(propertySource, "P4G_PROPERTY_SOURCE_MISSING", campaign.id);
-    const marker = propertySource.indexOf(campaign.id);
-    const testStart = propertySource.lastIndexOf("\ntest(", marker);
-    const nextTest = propertySource.indexOf(
-      "\ntest(",
-      marker + campaign.id.length,
-    );
-    const testBody = propertySource.slice(
-      testStart < 0 ? 0 : testStart,
-      nextTest < 0 ? propertySource.length : nextTest,
+    assert(
+      propertyTestBodies.length === 1,
+      "P4G_PROPERTY_SOURCE_MISSING",
+      `${campaign.id}: found ${propertyTestBodies.length} declared test bodies`,
     );
     assert(
-      marker >= 0 &&
-        /for\s*\(\s*let\s+\w+\s*=\s*0;\s*\w+\s*<\s*4096;\s*\w+\s*\+=\s*1\s*\)/u.test(
-          testBody,
-        ),
+      /for\s*\(\s*let\s+\w+\s*=\s*0;\s*\w+\s*<\s*4096;\s*\w+\s*\+=\s*1\s*\)/u.test(
+        propertyTestBodies[0],
+      ),
       "P4G_PROPERTY_EXECUTION_COUNT",
       `${campaign.id} must contain exactly 4,096 deterministic iterations`,
     );

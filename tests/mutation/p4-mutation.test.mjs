@@ -10,6 +10,7 @@ import { inflateRawSync } from "node:zlib";
 import { promisify } from "node:util";
 import { spawnDssBridge } from "../../internal/xades-provider/worker.mjs";
 import test from "node:test";
+import { propertyCampaignTestBody } from "../../tooling/tasks/operations.mjs";
 import {
   focusedProviderMutationTest,
   mutationTestPatterns,
@@ -301,6 +302,24 @@ test("overall mutation loader intercepts only its exact runtime module", async (
 });
 
 const built = resolve("evidence/runs/artifacts/build/verifactu/dist");
+
+test("property campaign validation selects its declaration, not references", () => {
+  const campaignId = "P4-PROP-011";
+  const selector = `test("mutation selector", () => {
+    assert.match(pattern, /^P4-PROP-011/);
+  });`;
+  const property = `test("P4-PROP-011 QR bytes remain exact", (t) => {
+    for (let index = 0; index < 4096; index += 1) runCase(index);
+    t.diagnostic("P4-PROP-011 executions=4096");
+  });`;
+
+  assert.equal(propertyCampaignTestBody(selector, campaignId), null);
+  assert.match(
+    propertyCampaignTestBody(`${selector}\n${property}`, campaignId),
+    /for \(let index = 0; index < 4096; index \+= 1\)/u,
+  );
+});
+
 const xmlSchemaSourceRoot = resolve(
   "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources",
 );
