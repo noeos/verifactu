@@ -184,7 +184,7 @@ import {
   assert.deepEqual(
     patterns(qr, 320, "tests/contract/p4-qr-provider.test.mjs"),
     [
-      "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+      "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling|P4-E PNG fails closed when its raster allocation ends at a row boundary|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
     ],
   );
   assert.deepEqual(

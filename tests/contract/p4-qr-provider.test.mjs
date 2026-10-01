@@ -662,6 +662,45 @@ test("P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling", () => {
   );
 });
 
+test("P4-E PNG fails closed when its raster allocation ends at a row boundary", () => {
+  const payload = buildQrPayload(
+    record(),
+    { id: editionId, environment: "test", mode: "verifactu" },
+    digest,
+  ).value;
+  const matrix = {
+    encode: () => ({ status: "ok", value: { size: 21, get: () => false } }),
+  };
+  const NativeUint8Array = globalThis.Uint8Array;
+  let truncatedRasterAllocation = false;
+  globalThis.Uint8Array = class extends NativeUint8Array {
+    static [Symbol.hasInstance](value) {
+      return value instanceof NativeUint8Array;
+    }
+
+    constructor(length, ...rest) {
+      if (length === 650) {
+        truncatedRasterAllocation = true;
+        return new NativeUint8Array(624);
+      }
+      super(length, ...rest);
+    }
+  };
+  try {
+    const result = renderQrPng(
+      payload,
+      matrix,
+      { scale: 1, symbolSizeMm: 30, quietZoneMm: 2 },
+      digest,
+    );
+    assert.equal(truncatedRasterAllocation, true);
+    assert.equal(result.status, "invalid");
+    assert.equal(result.diagnostics[0].code, "DIAG-QR-DIMENSION-LIMIT");
+  } finally {
+    globalThis.Uint8Array = NativeUint8Array;
+  }
+});
+
 test("P4-E PNG encodes exact raster pixels, physical density and chunk checksums", () => {
   const payload = buildQrPayload(
     record(),
