@@ -233,13 +233,36 @@ test(`P4-PROP-005 submission transition table is total and closed (seed=${SEED})
     "retryableFailure",
     "indeterminateOutcome",
   ];
+  const allowedTransitions = {
+    notEligible: ["queued"],
+    queued: ["attempting"],
+    attempting: [
+      "accepted",
+      "acceptedWithQualification",
+      "rejected",
+      "retryableFailure",
+      "indeterminateOutcome",
+    ],
+    accepted: [],
+    acceptedWithQualification: [],
+    rejected: [],
+    retryableFailure: ["queued"],
+    indeterminateOutcome: ["queued", "accepted", "rejected"],
+  };
+  let pairOffset = 0;
   for (let index = 0; index < 4096; index += 1) {
-    const from = states[Math.floor(next() * states.length)];
-    const to = states[Math.floor(next() * states.length)];
+    if (index % (states.length * states.length) === 0) {
+      pairOffset = Math.floor(next() * states.length * states.length);
+    }
+    const pairIndex =
+      (pairOffset + (index % (states.length * states.length))) %
+      (states.length * states.length);
+    const from = states[Math.floor(pairIndex / states.length)];
+    const to = states[pairIndex % states.length];
     corpus.update(`${from}\0${to}`);
     assert.equal(
-      typeof canTransitionSubmission(from, to),
-      "boolean",
+      canTransitionSubmission(from, to),
+      allowedTransitions[from].includes(to),
       `seed=${SEED} case=${index}`,
     );
   }
