@@ -1192,6 +1192,25 @@ export function javaMutationTestSelections(mutation) {
   ];
 }
 
+export function combineJavaMutationTestSelections(selections) {
+  const patternsByTest = new Map();
+  for (const [test, pattern] of selections) {
+    const current = patternsByTest.get(test) ?? { patterns: [], full: false };
+    if (pattern === undefined) current.full = true;
+    else if (!current.patterns.includes(pattern))
+      current.patterns.push(pattern);
+    patternsByTest.set(test, current);
+  }
+  return [...patternsByTest].map(([test, selection]) => [
+    test,
+    selection.full || selection.patterns.length === 0
+      ? undefined
+      : selection.patterns.length === 1
+        ? selection.patterns[0]
+        : `^(?:${selection.patterns.map((pattern) => `(?:${pattern})`).join("|")})$`,
+  ]);
+}
+
 export async function executePythonMutation(root, mutation, options = {}) {
   const source = await readFile(resolve(root, mutation.module), "utf8");
   const mutated = `${source.slice(0, mutation.start)}${mutation.after}${source.slice(mutation.end)}`;
@@ -1456,14 +1475,15 @@ export async function executeJavaMutation(root, mutation, options = {}) {
       JAVA_MUTATION_TESTS[3],
       "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
     ];
-    const selections =
+    const selections = combineJavaMutationTestSelections(
       options.javaSelections ??
-      (plannedSelections.some(
-        ([test, pattern]) =>
-          test === bridgeProbe[0] && pattern === bridgeProbe[1],
-      )
-        ? plannedSelections
-        : [bridgeProbe, ...plannedSelections]);
+        (plannedSelections.some(
+          ([test, pattern]) =>
+            test === bridgeProbe[0] && pattern === bridgeProbe[1],
+        )
+          ? plannedSelections
+          : [bridgeProbe, ...plannedSelections]),
+    );
     // The report schema records selected files, while selections may contain
     // several name patterns for the same file. Preserve execution order and
     // every distinct pattern below, but report each selected file once.

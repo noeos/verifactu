@@ -16,12 +16,46 @@ import {
   mutationTestPatterns,
   mutationCompileFailed,
   javaMutationTestSelections,
+  combineJavaMutationTestSelections,
   DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS,
 } from "../../tooling/assurance/p4-overall-mutation-campaign.mjs";
 import {
   initialize as initializeMutationHooks,
   load as loadMutationHooks,
 } from "../../tooling/assurance/p4-mutation-hooks.mjs";
+import { pythonMutations } from "../../tooling/assurance/p4-mutation-catalog.mjs";
+
+test("Python mutation spans stay aligned across UTF-8 and UTF-16 text", () => {
+  const source =
+    'label = "😀 é €"\ndef decide(left, right):\n    return left == right\n';
+  const mutations = pythonMutations("fixture.py", source);
+  const equality = mutations.find((mutation) => mutation.before === "==");
+  assert.ok(equality);
+  assert.equal(source.slice(equality.start, equality.end), "==");
+  const changed = `${source.slice(0, equality.start)}${equality.after}${source.slice(equality.end)}`;
+  assert.match(changed, /return left != right/u);
+});
+
+test("Java mutation selections share one worker per test file", () => {
+  const selected = combineJavaMutationTestSelections([
+    ["pki.test.mjs", "^certificate time policy$"],
+    ["pki.test.mjs", "^revocation remains indeterminate$"],
+    ["attacks.test.mjs", "^signature wrapping rejects$"],
+  ]);
+  assert.equal(selected.length, 2);
+  assert.equal(selected[0][0], "pki.test.mjs");
+  assert.match(selected[0][1], /certificate time policy/u);
+  assert.match(selected[0][1], /revocation remains indeterminate/u);
+  assert.equal(selected[1][0], "attacks.test.mjs");
+  assert.equal(selected[1][1], "^signature wrapping rejects$");
+  assert.deepEqual(
+    combineJavaMutationTestSelections([
+      ["pki.test.mjs", "^certificate time policy$"],
+      ["pki.test.mjs", undefined],
+    ]),
+    [["pki.test.mjs", undefined]],
+  );
+});
 
 {
   assert.equal(DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS, 180_000);

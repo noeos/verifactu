@@ -1566,6 +1566,12 @@ async function testP4A(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: property campaign validation selects its declaration, not references\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Python mutation spans stay aligned across UTF-8 and UTF-16 text\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java mutation selections share one worker per test file\b/gu,
+    ),
   ];
   const p4AFaults = [
     ["codec-stage-skip", "P4-MUT-001"],
@@ -1587,7 +1593,7 @@ async function testP4A(context) {
   assert(
     Number(mutants) - harnessCases.length === 41 &&
       Number(killed) - harnessCases.length === 41 &&
-      harnessCases.length === 2 &&
+      harnessCases.length === 4 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1760,11 +1766,17 @@ async function testP4C(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: property campaign validation selects its declaration, not references\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Python mutation spans stay aligned across UTF-8 and UTF-16 text\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java mutation selections share one worker per test file\b/gu,
+    ),
   ];
   assert(
     Number(mutants) - p4cHarnessCases.length === 41 &&
       Number(killed) - p4cHarnessCases.length === 41 &&
-      p4cHarnessCases.length === 2 &&
+      p4cHarnessCases.length === 4 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -2858,21 +2870,24 @@ async function testP4G(context) {
     (fault, index) => observedFaultNames.indexOf(fault) !== index,
   );
   const passedTestLines = result.stdout.split("\n");
+  const evidenceMismatches = seededFaultEvidence
+    .filter(
+      (fault) =>
+        fault.evidence.length === 0 ||
+        !passedTestLines.some(
+          (line) =>
+            line.trimStart().startsWith("ok ") &&
+            line.includes(` - ${fault.evidence}`),
+        ),
+    )
+    .map((fault) => ({ name: fault.name, evidence: fault.evidence }));
   assert(
     seededFaultEvidence.length === plan.seededFaults.length &&
       observedFaults.size === plan.seededFaults.length &&
       missingFaults.length === 0 &&
       unexpectedFaults.length === 0 &&
       duplicateFaults.length === 0 &&
-      seededFaultEvidence.every(
-        (fault) =>
-          fault.evidence.length > 0 &&
-          passedTestLines.some(
-            (line) =>
-              line.trimStart().startsWith("ok ") &&
-              line.includes(` - ${fault.evidence}`),
-          ),
-      ),
+      evidenceMismatches.length === 0,
     "P4G_SEEDED_FAULT_CENSUS",
     JSON.stringify({
       expected: plan.seededFaults.length,
@@ -2880,6 +2895,7 @@ async function testP4G(context) {
       missingFaults,
       unexpectedFaults,
       duplicateFaults,
+      evidenceMismatches,
     }),
   );
   await writeJsonAtomic(resolve(artifactRoot, "seeded-fault-report.json"), {
@@ -3440,11 +3456,17 @@ async function testP4D(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: property campaign validation selects its declaration, not references\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Python mutation spans stay aligned across UTF-8 and UTF-16 text\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java mutation selections share one worker per test file\b/gu,
+    ),
   ];
   assert(
     Number(mutants) - dHarnessCases.length === 43 &&
       Number(killed) - dHarnessCases.length === 43 &&
-      dHarnessCases.length === 2 &&
+      dHarnessCases.length === 4 &&
       Number(mutationFailures) === 0 &&
       Number(mutationCancelled) === 0 &&
       Number(mutationSkipped) === 0 &&

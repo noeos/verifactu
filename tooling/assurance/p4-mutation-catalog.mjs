@@ -231,32 +231,43 @@ function tokenMutations(path, source) {
 function pythonTokens(path, source) {
   const tokenize = String.raw`
 import io, json, sys, tokenize
-source = sys.stdin.read()
+source = sys.stdin.buffer.read().decode("utf-8")
+lines = source.splitlines(keepends=True)
 starts = [0]
-for line in source.splitlines(keepends=True): starts.append(starts[-1] + len(line))
+for line in lines: starts.append(starts[-1] + len(line.encode('utf-16-le')) // 2)
 tokens = []
 for item in tokenize.generate_tokens(io.StringIO(source).readline):
     if item.type in (tokenize.OP, tokenize.NAME, tokenize.NUMBER, tokenize.STRING):
-        start = starts[item.start[0] - 1] + item.start[1]
-        end = starts[item.end[0] - 1] + item.end[1]
+        start_line = lines[item.start[0] - 1]
+        end_line = lines[item.end[0] - 1]
+        start = starts[item.start[0] - 1] + len(start_line[:item.start[1]].encode('utf-16-le')) // 2
+        end = starts[item.end[0] - 1] + len(end_line[:item.end[1]].encode('utf-16-le')) // 2
         tokens.append({"text": item.string, "type": tokenize.tok_name[item.type], "start": start, "end": end})
-sys.stdout.write(json.dumps(tokens, separators=(",", ":")))
+sys.stdout.buffer.write(json.dumps(tokens, separators=(",", ":")).encode("ascii"))
 `;
   const result = spawnSync(
     process.env.VERIFACTU_PYTHON ?? "python3",
     ["-I", "-c", tokenize],
-    { input: source, encoding: "utf8", maxBuffer: 4 * 1024 * 1024 },
+    {
+      input: source,
+      encoding: "utf8",
+      maxBuffer: 4 * 1024 * 1024,
+    },
   );
   if (result.status !== 0)
     throw new Error(`P4_MUTATION_PYTHON_TOKENIZE: ${path}: ${result.stderr}`);
   return JSON.parse(result.stdout);
 }
 
-function pythonMutations(path, source) {
+export function pythonMutations(path, source) {
   const tokens = pythonTokens(path, source);
   const output = [];
   for (let index = 0; index < tokens.length; index += 1) {
     const token = tokens[index];
+    if (source.slice(token.start, token.end) !== token.text)
+      throw new Error(
+        `P4_MUTATION_PYTHON_TOKEN_SPAN: ${path}:${token.start}-${token.end}`,
+      );
     const operator = operatorForToken(token.text);
     if (
       operator &&
