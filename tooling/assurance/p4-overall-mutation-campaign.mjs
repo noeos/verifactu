@@ -507,6 +507,11 @@ export function focusedProviderMutationTest(mutation) {
       "tests/security/p4-xml-attacks.test.mjs",
       "^XML worker normalizes child spawn errors and post-spawn cancellation$",
     );
+  if (module === "internal/xml-provider/worker.mjs" && line === 441)
+    return selectedTest(
+      "tests/security/p4-xml-attacks.test.mjs",
+      "^XML worker normalizes child spawn errors and post-spawn cancellation$",
+    );
   if (module === "internal/xml-provider/worker.mjs")
     return "tests/security/p4-xml-attacks.test.mjs";
   if (module === "packages/verifactu/src/verification/engine-adapter.ts")
