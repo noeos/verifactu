@@ -1211,6 +1211,23 @@ export function combineJavaMutationTestSelections(selections) {
   ]);
 }
 
+export function planJavaMutationTestRuns(selections, bridgeProbe) {
+  const hasBridgeProbe = selections.some(
+    ([test, pattern]) => test === bridgeProbe[0] && pattern === bridgeProbe[1],
+  );
+  const groupedSelections = combineJavaMutationTestSelections(selections);
+  return {
+    selections: groupedSelections,
+    supplementalProbe: hasBridgeProbe ? null : bridgeProbe,
+    selectedTests: [
+      ...new Set([
+        ...groupedSelections.map(([test]) => test),
+        ...(hasBridgeProbe ? [] : [bridgeProbe[0]]),
+      ]),
+    ],
+  };
+}
+
 export async function executePythonMutation(root, mutation, options = {}) {
   const source = await readFile(resolve(root, mutation.module), "utf8");
   const mutated = `${source.slice(0, mutation.start)}${mutation.after}${source.slice(mutation.end)}`;
@@ -1449,8 +1466,9 @@ export async function executeJavaMutation(root, mutation, options = {}) {
       throw new Error(`P4_MUTATION_SOURCE_DRIFT: ${mutation.id}`);
     const mutatedSource = `${source.slice(0, mutation.start)}${mutation.after}${source.slice(mutation.end)}`;
     const javaSource = resolve(temporary, "DssBridge.java");
-    const classes = resolve(temporary, "classes");
-    await mkdir(classes, { recursive: true });
+    const precompiledClasses = options.precompiledJavaClasses?.get(mutation.id);
+    const classes = precompiledClasses ?? resolve(temporary, "classes");
+    if (!precompiledClasses) await mkdir(classes, { recursive: true });
     await writeFile(javaSource, mutatedSource);
     const javaHome = options.javaHome;
     const java = options.java;
@@ -1460,34 +1478,31 @@ export async function executeJavaMutation(root, mutation, options = {}) {
       process.platform === "win32" ? "javac.exe" : "javac",
     );
     const originalJar = options.dssJar;
-    const compile = await runMutationTest(
-      javac,
-      ["--release", "21", "-cp", originalJar, "-d", classes, javaSource],
-      {
-        cwd: root,
-        env: process.env,
-        timeoutMs: options.compileTimeoutMs ?? 60_000,
-        maxBuffer: 4 * 1024 * 1024,
-      },
-    );
+    const compile = precompiledClasses
+      ? { code: 0, stderr: "" }
+      : await runMutationTest(
+          javac,
+          ["--release", "21", "-cp", originalJar, "-d", classes, javaSource],
+          {
+            cwd: root,
+            env: process.env,
+            timeoutMs: options.compileTimeoutMs ?? 60_000,
+            maxBuffer: 4 * 1024 * 1024,
+          },
+        );
     const plannedSelections = javaMutationTestSelections(mutation);
     const bridgeProbe = [
       JAVA_MUTATION_TESTS[3],
       "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
     ];
-    const selections = combineJavaMutationTestSelections(
-      options.javaSelections ??
-        (plannedSelections.some(
-          ([test, pattern]) =>
-            test === bridgeProbe[0] && pattern === bridgeProbe[1],
-        )
-          ? plannedSelections
-          : [bridgeProbe, ...plannedSelections]),
-    );
-    // The report schema records selected files, while selections may contain
-    // several name patterns for the same file. Preserve execution order and
-    // every distinct pattern below, but report each selected file once.
-    const selectedTests = [...new Set(selections.map(([test]) => test))];
+    const { selections, supplementalProbe, selectedTests } =
+      planJavaMutationTestRuns(
+        options.javaSelections ?? plannedSelections,
+        bridgeProbe,
+      );
+    // Keep the supplemental probe separate from exact mutation oracles. Both
+    // can be slow on hosted runners, and combining them would make unrelated
+    // tests share one timeout budget. The report schema records selected files.
     if (compile.timedOut || compile.outputExceeded)
       return {
         ...mutation,
@@ -1511,7 +1526,7 @@ export async function executeJavaMutation(root, mutation, options = {}) {
     const classPath = `${classes}${process.platform === "win32" ? ";" : ":"}${originalJar}`;
     const tests = new Set();
     const fullyExecuted = new Set();
-    for (const [test, pattern] of selections) {
+    const runSelection = async (test, pattern) => {
       tests.add(test);
       if (!pattern) fullyExecuted.add(test);
       const args = ["--test", "--test-concurrency=1", "--test-reporter=tap"];
@@ -1555,6 +1570,15 @@ export async function executeJavaMutation(root, mutation, options = {}) {
           killEvidence: tapFailureEvidence(result.stdout, test),
           diagnostics: [],
         };
+      return null;
+    };
+    if (supplementalProbe) {
+      const result = await runSelection(...supplementalProbe);
+      if (result) return result;
+    }
+    for (const [test, pattern] of selections) {
+      const result = await runSelection(test, pattern);
+      if (result) return result;
     }
     // Likewise, a surviving Java mutation must face the entire set of
     // baseline-covered test files before it can be classified as a survivor.
@@ -1733,7 +1757,11 @@ export async function executeOverallMutationCampaign(
         result = await executeNodeMutation(root, mutation, options);
       else if (mutation.module.endsWith(".py"))
         result = await executePythonMutation(root, mutation, options);
-      else result = await executeJavaMutation(root, mutation, options);
+      else
+        result = await executeJavaMutation(root, mutation, {
+          ...options,
+          precompiledJavaClasses: options.precompiledJavaClasses,
+        });
       completed.set(result.id, result);
       await appendFile(journalPath, `${JSON.stringify(result)}\n`);
       options.onProgress?.({

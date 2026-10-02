@@ -17,6 +17,7 @@ import {
   mutationCompileFailed,
   javaMutationTestSelections,
   combineJavaMutationTestSelections,
+  planJavaMutationTestRuns,
   DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS,
 } from "../../tooling/assurance/p4-overall-mutation-campaign.mjs";
 import {
@@ -55,6 +56,24 @@ test("Java mutation selections share one worker per test file", () => {
     ]),
     [["pki.test.mjs", undefined]],
   );
+});
+
+test("Java bridge probe keeps an independent timeout from mutation oracles", () => {
+  const planned = [
+    ["pki.test.mjs", "^certificate time policy$"],
+    ["pki.test.mjs", "^revocation remains indeterminate$"],
+  ];
+  const probe = ["pki.test.mjs", "^bridge probe$"];
+  const runs = planJavaMutationTestRuns(planned, probe);
+  assert.equal(runs.selections.length, 1);
+  assert.match(runs.selections[0][1], /certificate time policy/u);
+  assert.match(runs.selections[0][1], /revocation remains indeterminate/u);
+  assert.deepEqual(runs.supplementalProbe, probe);
+  assert.deepEqual(runs.selectedTests, ["pki.test.mjs"]);
+
+  const included = planJavaMutationTestRuns([...planned, probe], probe);
+  assert.equal(included.selections.length, 1);
+  assert.equal(included.supplementalProbe, null);
 });
 
 {

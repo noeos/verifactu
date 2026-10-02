@@ -1572,6 +1572,9 @@ async function testP4A(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: Java mutation selections share one worker per test file\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java bridge probe keeps an independent timeout from mutation oracles\b/gu,
+    ),
   ];
   const p4AFaults = [
     ["codec-stage-skip", "P4-MUT-001"],
@@ -1593,7 +1596,7 @@ async function testP4A(context) {
   assert(
     Number(mutants) - harnessCases.length === 41 &&
       Number(killed) - harnessCases.length === 41 &&
-      harnessCases.length === 4 &&
+      harnessCases.length === 5 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1772,11 +1775,14 @@ async function testP4C(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: Java mutation selections share one worker per test file\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java bridge probe keeps an independent timeout from mutation oracles\b/gu,
+    ),
   ];
   assert(
     Number(mutants) - p4cHarnessCases.length === 41 &&
       Number(killed) - p4cHarnessCases.length === 41 &&
-      p4cHarnessCases.length === 4 &&
+      p4cHarnessCases.length === 5 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -2253,36 +2259,42 @@ async function testP4G(context) {
     context.root,
     plan,
   );
-  const mutationResults = await executeOverallMutationCampaign(
-    context.root,
-    plan,
-    v8Root,
-    mutationCatalog,
-    {
-      artifactRoot,
-      subject: context.identity.subject,
-      tree: context.identity.tree,
-      concurrency: 4,
-      javaHome,
-      java,
-      javac: resolve(
+  let mutationResults;
+  try {
+    mutationResults = await executeOverallMutationCampaign(
+      context.root,
+      plan,
+      v8Root,
+      mutationCatalog,
+      {
+        artifactRoot,
+        subject: context.identity.subject,
+        tree: context.identity.tree,
+        concurrency: 4,
+        precompiledJavaClasses: mutationCatalog.precompiledJavaClasses,
         javaHome,
-        "bin",
-        process.platform === "win32" ? "javac.exe" : "javac",
-      ),
-      python: process.env.VERIFACTU_PYTHON ?? "python3",
-      dssJar: resolve(
-        context.root,
-        "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
-      ),
-      onProgress: ({ completed, total, result: mutant }) => {
-        if (completed === 1 || completed % 10 === 0 || completed === total)
-          process.stderr.write(
-            `P4 overall mutation ${completed}/${total}: ${mutant.id} ${mutant.outcome}\n`,
-          );
+        java,
+        javac: resolve(
+          javaHome,
+          "bin",
+          process.platform === "win32" ? "javac.exe" : "javac",
+        ),
+        python: process.env.VERIFACTU_PYTHON ?? "python3",
+        dssJar: resolve(
+          context.root,
+          "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
+        ),
+        onProgress: ({ completed, total, result: mutant }) => {
+          if (completed === 1 || completed % 10 === 0 || completed === total)
+            process.stderr.write(
+              `P4 overall mutation ${completed}/${total}: ${mutant.id} ${mutant.outcome}\n`,
+            );
+        },
       },
-    },
-  );
+    );
+  } finally {
+    await mutationCatalog.cleanup();
+  }
   const outcomeCount = (outcome) =>
     mutationResults.filter((mutation) => mutation.outcome === outcome).length;
   const campaignMutationDenominator =
@@ -3462,11 +3474,14 @@ async function testP4D(context) {
     ...mutationResult.stdout.matchAll(
       /# Subtest: Java mutation selections share one worker per test file\b/gu,
     ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java bridge probe keeps an independent timeout from mutation oracles\b/gu,
+    ),
   ];
   assert(
     Number(mutants) - dHarnessCases.length === 43 &&
       Number(killed) - dHarnessCases.length === 43 &&
-      dHarnessCases.length === 4 &&
+      dHarnessCases.length === 5 &&
       Number(mutationFailures) === 0 &&
       Number(mutationCancelled) === 0 &&
       Number(mutationSkipped) === 0 &&

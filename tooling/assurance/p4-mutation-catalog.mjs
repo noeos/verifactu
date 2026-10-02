@@ -328,6 +328,7 @@ export function pythonMutations(path, source) {
 
 async function javaAstMutations(root, path, source) {
   const temporary = await mkdtemp(join(tmpdir(), "verifactu-p4-javacatalog-"));
+  const retainedCandidateDirs = new Set();
   try {
     const helperPath = resolve(
       root,
@@ -394,6 +395,7 @@ async function javaAstMutations(root, path, source) {
     });
     const exclusions = [];
     const compilable = [];
+    const compiledClasses = new Map();
     for (const mutation of mutations) {
       const candidateDir = await mkdtemp(
         join(tmpdir(), "verifactu-p4-java-preflight-"),
@@ -436,6 +438,8 @@ async function javaAstMutations(root, path, source) {
           );
         if (preflight.status === 0) {
           compilable.push(mutation);
+          compiledClasses.set(mutation.id, classes);
+          retainedCandidateDirs.add(candidateDir);
           continue;
         }
         const diagnostic = preflight.stderr
@@ -452,10 +456,29 @@ async function javaAstMutations(root, path, source) {
           compilerDiagnostic: diagnostic.slice(0, 3000),
         });
       } finally {
-        await rm(candidateDir, { recursive: true, force: true });
+        if (!retainedCandidateDirs.has(candidateDir))
+          await rm(candidateDir, { recursive: true, force: true });
       }
     }
-    return { mutations: compilable, exclusions };
+    return {
+      mutations: compilable,
+      exclusions,
+      compiledClasses,
+      cleanup: async () => {
+        await Promise.all(
+          [...retainedCandidateDirs].map((directory) =>
+            rm(directory, { recursive: true, force: true }),
+          ),
+        );
+      },
+    };
+  } catch (error) {
+    await Promise.all(
+      [...retainedCandidateDirs].map((directory) =>
+        rm(directory, { recursive: true, force: true }),
+      ),
+    );
+    throw error;
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }
@@ -466,6 +489,8 @@ export async function discoverOverallMutationCatalog(root, plan) {
   const excludedApplications = [];
   const modulePopulation = [];
   const sourceDigests = new Map();
+  const precompiledJavaClasses = new Map();
+  const cleanupJavaPreflights = [];
   for (const module of plan.productionModules) {
     const source = await readFile(resolve(root, module), "utf8");
     const digestValue = digest(source);
@@ -478,6 +503,9 @@ export async function discoverOverallMutationCatalog(root, plan) {
       const javaCatalog = await javaAstMutations(root, module, source);
       mutations = javaCatalog.mutations;
       excludedApplications.push(...javaCatalog.exclusions);
+      for (const [id, classes] of javaCatalog.compiledClasses)
+        precompiledJavaClasses.set(id, classes);
+      cleanupJavaPreflights.push(javaCatalog.cleanup);
     } else mutations = tokenMutations(module, source);
     const unique = new Map(
       mutations.map((mutation) => [mutation.id, mutation]),
@@ -507,6 +535,10 @@ export async function discoverOverallMutationCatalog(root, plan) {
     excludedApplications,
     mutants: catalog,
     sourceDigests,
+    precompiledJavaClasses,
+    cleanup: async () => {
+      await Promise.all(cleanupJavaPreflights.map((cleanup) => cleanup()));
+    },
   };
 }
 
