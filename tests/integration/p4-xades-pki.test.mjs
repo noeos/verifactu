@@ -181,6 +181,37 @@ public final class PkiFixtureGenerator {
     var constructor=type.getDeclaredConstructor(java.io.InputStream.class); constructor.setAccessible(true);
     return constructor.newInstance(new ByteArrayInputStream(input));
   }
+  static Object guardRequest(String command,long signingTime,long validationTime,int maximumAge,int certificateBytes,int signatureBytes) throws Exception {
+    byte[] artifact="<RegistroAlta/>".getBytes(StandardCharsets.UTF_8);
+    List<byte[]> fields=new ArrayList<>();
+    for(String value:List.of("VERIFACTU-DSS-1",command,"rrsif-2026-09-21-authoritative-candidate","AEAT-XADES-EPES-v0.1.5","RegistroAlta",java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(artifact)),Long.toString(signingTime),Long.toString(validationTime),Integer.toString(maximumAge),"")) fields.add(value.getBytes(StandardCharsets.UTF_8));
+    fields.add(artifact); fields.add(new byte[certificateBytes]); fields.add("0".getBytes(StandardCharsets.UTF_8)); fields.add(new byte[signatureBytes]); fields.add("0".getBytes(StandardCharsets.UTF_8)); fields.add("0".getBytes(StandardCharsets.UTF_8)); fields.add("0".getBytes(StandardCharsets.UTF_8));
+    return parsedRequest(encodeFields(fields));
+  }
+  static String dispatchGuardDiagnostic(Object request) throws Exception {
+    return responseDiagnostic(dss("dispatch",new Class<?>[]{request.getClass()},request));
+  }
+  static boolean rejectedWithGuard(Object request,String diagnostic) throws Exception {
+    try { return diagnostic.equals(dispatchGuardDiagnostic(request)); }
+    catch(java.lang.reflect.InvocationTargetException passedGuard) { return false; }
+  }
+  static boolean passedGuard(Object request,String diagnostic) throws Exception {
+    try { return !diagnostic.equals(dispatchGuardDiagnostic(request)); }
+    catch(java.lang.reflect.InvocationTargetException passedGuard) { return true; }
+  }
+  static String mutationGuardProbes() throws Exception {
+    long base=BASE;
+    return "{\"prepareLaterTimeRejected\":"+rejectedWithGuard(guardRequest("SIGN_PREPARE",base+1,base,86400,1,0),"DIAG-XADES-REQUEST")
+      +",\"prepareZeroAgeRejected\":"+rejectedWithGuard(guardRequest("SIGN_PREPARE",base,base,0,1,0),"DIAG-XADES-REQUEST")
+      +",\"prepareExcessiveAgeRejected\":"+rejectedWithGuard(guardRequest("SIGN_PREPARE",base,base,172801,1,0),"DIAG-XADES-REQUEST")
+      +",\"prepareEqualTimeAccepted\":"+passedGuard(guardRequest("SIGN_PREPARE",base,base,86400,1,0),"DIAG-XADES-REQUEST")
+      +",\"prepareMaximumAgeAccepted\":"+passedGuard(guardRequest("SIGN_PREPARE",base,base,172800,1,0),"DIAG-XADES-REQUEST")
+      +",\"completeEmptyCertificateRejected\":"+rejectedWithGuard(guardRequest("SIGN_COMPLETE",base,base,86400,0,128),"DIAG-XADES-SIGNATURE")
+      +",\"completeShortSignatureRejected\":"+rejectedWithGuard(guardRequest("SIGN_COMPLETE",base,base,86400,1,127),"DIAG-XADES-SIGNATURE")
+      +",\"completeLongSignatureRejected\":"+rejectedWithGuard(guardRequest("SIGN_COMPLETE",base,base,86400,1,1025),"DIAG-XADES-SIGNATURE")
+      +",\"completeMinimumSignatureAccepted\":"+passedGuard(guardRequest("SIGN_COMPLETE",base,base,86400,1,128),"DIAG-XADES-SIGNATURE")
+      +",\"completeMaximumSignatureAccepted\":"+passedGuard(guardRequest("SIGN_COMPLETE",base,base,86400,1,1024),"DIAG-XADES-SIGNATURE")+"}";
+  }
   static Object cursor(List<byte[]> values) throws Exception {
     Class<?> type=Class.forName("eu.noeos.verifactu.bridge.DssBridge$Cursor");
     var constructor=type.getDeclaredConstructor(List.class); constructor.setAccessible(true);
@@ -269,6 +300,7 @@ public final class PkiFixtureGenerator {
   }
   public static void main(String[] args) throws Exception {
     Security.addProvider(new BouncyCastleProvider());
+    if(args.length>0 && "mutation-guard-probes".equals(args[0])) { System.out.println(mutationGuardProbes()); return; }
     KeyPair k=keys(); X509CertificateHolder c=cert(k);
     if(args.length>0 && "xades-fuzz".equals(args[0])) { System.out.println(xadesFuzzReport(c)); return; }
     boolean mutationProbes=args.length>0 && "mutation-probes".equals(args[0]);
@@ -1671,4 +1703,21 @@ test("P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors",
   t.diagnostic(
     "P4-OVERALL-MUTATION-JAVA-PROBE deterministic DSS bridge probes passed",
   );
+});
+
+test("P4-OVERALL-MUTATION-JAVA-GUARD-PROBE enforces DSS signing request boundaries", async () => {
+  const probes = await generatePkiFixtures(["mutation-guard-probes"]);
+  for (const [name, expected] of Object.entries({
+    prepareLaterTimeRejected: true,
+    prepareZeroAgeRejected: true,
+    prepareExcessiveAgeRejected: true,
+    prepareEqualTimeAccepted: true,
+    prepareMaximumAgeAccepted: true,
+    completeEmptyCertificateRejected: true,
+    completeShortSignatureRejected: true,
+    completeLongSignatureRejected: true,
+    completeMinimumSignatureAccepted: true,
+    completeMaximumSignatureAccepted: true,
+  }))
+    assert.equal(probes[name], expected, `${name}: ${JSON.stringify(probes)}`);
 });

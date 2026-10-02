@@ -85,6 +85,20 @@ test("Java bridge probe keeps an independent timeout from mutation oracles", () 
       "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
     ],
   ]);
+  const signingGuardProbe = [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^P4-OVERALL-MUTATION-JAVA-GUARD-PROBE enforces DSS signing request boundaries$",
+    ],
+  ];
+  assert.deepEqual(
+    javaMutationTestSelections({ line: 127 }),
+    signingGuardProbe,
+  );
+  assert.deepEqual(
+    javaMutationTestSelections({ line: 140 }),
+    signingGuardProbe,
+  );
   assert.deepEqual(javaMutationTestSelections({ line: 250 }), [
     [
       "tests/integration/p4-xades-pki.test.mjs",

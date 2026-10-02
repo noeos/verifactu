@@ -1006,6 +1006,13 @@ export const DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS = 180_000;
 
 export function javaMutationTestSelections(mutation) {
   const line = mutation.line;
+  if (line === 127 || line === 140)
+    return [
+      [
+        JAVA_MUTATION_TESTS[0],
+        "^P4-OVERALL-MUTATION-JAVA-GUARD-PROBE enforces DSS signing request boundaries$",
+      ],
+    ];
   if (line === 194 || line === 212)
     return [
       [
