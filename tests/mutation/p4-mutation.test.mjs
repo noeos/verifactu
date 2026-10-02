@@ -329,7 +329,7 @@ test("Java bridge probe keeps an independent timeout from mutation oracles", () 
       module: "internal/xml-provider/worker.mjs",
       line: 370,
     }),
-      "tests/security/p4-xml-attacks.test.mjs [--test-name-pattern=^XML worker normalizes child spawn errors and post-spawn cancellation$]",
+    "tests/security/p4-xml-attacks.test.mjs [--test-name-pattern=^XML worker normalizes child spawn errors and post-spawn cancellation$]",
   );
   assert.equal(
     focusedProviderMutationTest({
