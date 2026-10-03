@@ -295,6 +295,25 @@ test("signed XML rejects wrapping, duplicate IDs, extra references, and entity a
   }
 });
 
+test("DSS rejects a qualifying-properties target without its fragment marker", () => {
+  const archive = readFileSync(
+    "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/AnexosEjemplosFirmaRegFact.zip",
+  );
+  const source = zipEntry(
+    archive,
+    "ejemploRegistro-firmado-epes-xades4j.xml",
+  ).toString("utf8");
+  const malformedTarget = source.replace(
+    /(<xades:QualifyingProperties\b[^>]*\bTarget=")#([^"]+)"/u,
+    '$1x$2"',
+  );
+  assert.notEqual(malformedTarget, source);
+  assertJavaRejectsBeforeCrypto(
+    new TextEncoder().encode(malformedTarget),
+    "qualifying-properties target without fragment marker",
+  );
+});
+
 test("DSS rejects each altered XAdES profile component before crypto validation", async () => {
   const archive = readFileSync(
     "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources/aeat/AnexosEjemplosFirmaRegFact.zip",

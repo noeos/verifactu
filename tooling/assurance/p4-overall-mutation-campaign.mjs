@@ -1018,6 +1018,20 @@ export function javaMutationTestSelections(mutation) {
         "^P4-OVERALL-MUTATION-JAVA-GUARD-PROBE enforces DSS signing request boundaries$",
       ],
     ];
+  if (line === 279)
+    return [
+      [
+        JAVA_MUTATION_TESTS[3],
+        "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
+      ],
+    ];
+  if (line === 525 || line === 526)
+    return [
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^DSS rejects a qualifying-properties target without its fragment marker$",
+      ],
+    ];
   if (line === 194 || line === 212)
     return [
       [
@@ -1147,7 +1161,14 @@ export function javaMutationTestSelections(mutation) {
         "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
       ],
     ];
-  if (line >= 540 && line < 549)
+  if (line >= 540 && line < 550)
+    return [
+      [
+        JAVA_MUTATION_TESTS[1],
+        "^DSS rejects each altered XAdES profile component before crypto validation$",
+      ],
+    ];
+  if (line >= 551 && line < 560)
     return [
       [
         JAVA_MUTATION_TESTS[2],

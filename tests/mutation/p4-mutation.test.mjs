@@ -99,6 +99,24 @@ test("Java bridge probe keeps an independent timeout from mutation oracles", () 
     javaMutationTestSelections({ line: 140 }),
     signingGuardProbe,
   );
+  assert.deepEqual(javaMutationTestSelections({ line: 279 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 525 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects a qualifying-properties target without its fragment marker$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 526 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects a qualifying-properties target without its fragment marker$",
+    ],
+  ]);
   assert.deepEqual(javaMutationTestSelections({ line: 250 }), [
     [
       "tests/integration/p4-xades-pki.test.mjs",
@@ -138,6 +156,18 @@ test("Java bridge probe keeps an independent timeout from mutation oracles", () 
     ],
   ]);
   assert.deepEqual(javaMutationTestSelections({ line: 542 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects each altered XAdES profile component before crypto validation$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 553 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 557 }), [
     [
       "tests/security/p4-resource-attacks.test.mjs",
       "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
