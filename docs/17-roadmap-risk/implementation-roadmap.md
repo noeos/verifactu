@@ -5,9 +5,9 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-25
+last-reviewed: 2026-10-03
 dependencies: [DOCS-INDEX, ROADMAP-DOC-0002, ROADMAP-DOC-0003, ROADMAP-DOC-0005, ROADMAP-DOC-0006, ROADMAP-DOC-0007, ROADMAP-DOC-0013, ROADMAP-DOC-0014, REPO-DOC-0022]
-decisions: [ADR-0001, ADR-0002, ADR-0015, ADR-0026, ADR-0030, ADR-0031, ADR-0033, ADR-0038, ADR-0040, ADR-0051, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
+decisions: [ADR-0001, ADR-0002, ADR-0015, ADR-0026, ADR-0030, ADR-0031, ADR-0033, ADR-0038, ADR-0040, ADR-0051, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 historical-inputs: [REV-001, REV-063, REV-065, REV-066, REV-067, REV-071, REV-072, REV-073, REV-074, REV-075, REV-076, REV-077, REV-078, REV-079, REV-080, REV-081, REV-082, REV-083, REV-084]
 ---
 
@@ -129,7 +129,14 @@ P1 protected bootstrap
 ```
 
 A successor starts only after its mandatory predecessor is `evidence-complete`
-on protected `main` and its inputs remain current.
+on protected `main` and its inputs remain current, except for the explicit P4
+to P5 implementation authorization in
+[ADR-0060](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md).
+That authorization applies to the P5-A through P5-G implementation work on
+issue #113's named branch, including continuation of work already underway; it
+is not consumed by the initial start. It does not close P4, authorize a P5 merge
+to `main`, waive required checks or allow P5 closure while P4's applicable
+closure rows remain unresolved.
 
 ## Long-lead lane
 
@@ -336,7 +343,26 @@ state. Each row must pass on the exact final protected head.
 reconcile AEAT through edition-bound authenticated protocols.
 
 **Authorities:** [`08-persistence-consistency`](../08-persistence-consistency/),
-[`09-aeat-integration`](../09-aeat-integration/) and relevant contracts/security.
+[`09-aeat-integration`](../09-aeat-integration/), relevant contracts/security
+and the frozen [`P5 quality plan`](p5-quality-plan.md).
+
+**Start and continuation authorization:** P5-A through P5-G implementation is
+authorized on issue #113's
+`work/p5-implementation` branch under
+[`ADR-0060`](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md),
+even while P4 phase closure remains blocked. This authorization covers
+continuing P5-A through P5-G work on the named branch, so a resumed session must
+inspect and continue existing work rather than treating the already-used start
+authorization as expired. A P5 session must not treat unresolved P4 closure
+rows as a reason to refuse P5 branch development. This scoped authorization
+does not mark P4 complete, waive any required check, authorize merging to
+protected `main`, or allow P5 phase closure while applicable P4 closure rows
+remain unresolved.
+
+Before the first P5 production module, freeze and validate the complete P5 source
+and test populations, critical decisions, mutation IDs, property/fault campaigns,
+runtime matrix and resource bounds in `p5-quality-plan.md` and its machine
+manifest. P5 changes remain counted separately from P4's immutable denominator.
 
 | Wave               | Required implementation                                                                                                     |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------- |

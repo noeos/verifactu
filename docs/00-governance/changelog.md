@@ -5,7 +5,7 @@ status: active
 authority: normative
 owner: project-owner
 created: 2026-09-21
-last-reviewed: 2026-09-21
+last-reviewed: 2026-10-04
 dependencies: [ROADMAP-DOC-0017, ROADMAP-DOC-0020]
 decisions: [ADR-0026, ADR-0053]
 ---
@@ -14,6 +14,47 @@ decisions: [ADR-0026, ADR-0053]
 
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
+
+## 2026-10-03 — P5 assurance population frozen
+
+- Before P5 product modules, the P5-specific quality plan declares 25 production
+  modules, one shared identity module, 23 test files, 24 critical decisions,
+  40 mutations, 12 seeded property campaigns, 56 fault injections and five
+  OS/runtime cells. The strict coverage and mutation thresholds remain aligned
+  with the approved quality policy.
+- The plan requires `creationAllowed=false` for the current candidate, keeps P4's
+  frozen denominator separate and declares no external AEAT acceptance,
+  production durability or deployment SLO claim.
+- The machine inventory and fail-closed validator are in
+  `config/quality/p5-quality-plan.json` and
+  `tooling/assurance/p5-quality-plan.mjs`; `p5:quality-plan` is included in the
+  P2 and platform task closures before P5-A starts.
+- The signed+DCO baseline identity, clean reports, package hashes, current PR
+  check state and exact public-source read-back are recorded in Amendment
+  P5-003 of `docs/17-roadmap-risk/handoff.md`.
+
+## 2026-10-03 — Scoped P5 implementation start authorized
+
+- Project owner `ddavid07` authorized ADR-0060 to begin P5-A…P5-G implementation
+  on issue #113 / branch `work/p5-implementation`, based on protected main
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`, while P4 phase closure remains
+  incomplete.
+- This is a one-time start authorization only. P4 is not `evidence-complete`;
+  PR #109's OSV and npm audit/signature/licence contexts failed and required-check
+  closure failed as a consequence. The protected-main ruleset remains restored
+  with all 17 required contexts. No check has been waived for P5 work.
+- At 2026-10-03 14:46 UTC, protected-push runs `37125943358`, `37125943364` and
+  `37125943420` were still in progress. Regulatory observation
+  `37125943378` and Security `37125943357` had succeeded. Re-read the exact runs
+  before relying on these states; none of the in-progress results is a pass.
+
+- The current repository handoff capsule, roadmap index, definition of ready and
+  P5 prompt point to ADR-0060 so a resumed Codex session applies this scoped
+  authorization. P4's protected closure matrix itself remains unchanged.
+- The roadmap and P5 execution prompt now explicitly direct the next session to
+  start P5-A on the authorized branch while P4 remains phase-unclosed. P4
+  evidence, protected-check requirements and P5 phase-exit dependencies remain
+  unchanged.
 
 ## 2026-09-21 — P3-B pre-P4 assurance
 
@@ -178,3 +219,17 @@ changelog and makes no compliance, publication or support claim.
   final handoff PR and protected-push read-back. `creationAllowed=false`; no
   compliance, AEAT acceptance, certification, publication or release claim is
   made.
+
+## 2026-10-04 — Clarify continued P5 implementation authorization
+
+- Clarified that ADR-0060's one-time start authorization covers the P5-A…P5-G
+  implementation work on the named branch, including its continuation after the
+  initial start. This corrects any reading of the earlier changelog shorthand
+  as permission that expires once work begins. A resumed session must continue
+  existing P5 work while preserving P4's blocked status.
+- The roadmap, definition of ready and phase-exit criteria now state this scope
+  directly; the P5 prompt and current handoff already tell sessions to continue
+  existing branch work.
+- Protected P5 merges still require every normal required context, and P5 phase
+  closure still requires applicable P4 closure rows to be resolved. No check,
+  denominator, or phase-exit criterion was waived.
