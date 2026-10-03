@@ -12,7 +12,7 @@ historical-inputs: [REV-001, REV-084]
 
 # Roadmap and risk
 
-Status: all 21 substantive specifications are approved as design authority under
+Status: all 22 substantive specifications are approved as design authority under
 `PLAN-L4`; P1–P3-B and the zero-code P4-readiness gate are evidence-complete at
 their recorded protected subjects. P4-A…P4-G implementation is merged on
 protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4 phase closure
@@ -23,7 +23,7 @@ merges and P5 closure remain gated.
 Authority for dependency-driven execution, readiness, completion and visible
 risk. Phases order work; they do not reduce final scope.
 
-Substantive documents (21):
+Substantive documents (22):
 
 - `delivery-principles.md`
 - `dependency-map.md`
@@ -42,6 +42,7 @@ Substantive documents (21):
 - `phase-exit-criteria.md`
 - `p3b-pre-p4-assurance.md`
 - `p4-quality-plan.md`
+- `p5-quality-plan.md`
 - `phase-close-control-matrix.md`
 - `release-1.0.0-criteria.md`
 - `scope-change-policy.md`

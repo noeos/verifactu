@@ -5315,6 +5315,50 @@ async function p4QualityPlan(context) {
   return outcome;
 }
 
+async function p5QualityPlan(context) {
+  const result = await run("node", ["tooling/assurance/p5-quality-plan.mjs"], {
+    cwd: context.root,
+    timeoutMs: 60000,
+  });
+  assert(
+    result.code === 0,
+    "P5_QUALITY_PLAN_EXECUTION",
+    result.stderr || result.stdout,
+  );
+  const outcome = JSON.parse(result.stdout.trim().split(/\r?\n/u).at(-1));
+  assert(
+    outcome.status === "passed" &&
+      outcome.productionModules === 25 &&
+      outcome.testFiles === 23 &&
+      outcome.criticalBranches === 24 &&
+      outcome.criticalMutants === 24 &&
+      outcome.otherMutants === 16 &&
+      outcome.propertyExecutions === 49152 &&
+      outcome.faultInjections === 56 &&
+      outcome.compatibilityCells === 5 &&
+      outcome.seededPlanDefectsKilled === 5,
+    "P5_QUALITY_PLAN_CENSUS",
+    JSON.stringify(outcome),
+  );
+  return {
+    selected: 10,
+    executed: 10,
+    passed: 10,
+    outputDigest: outcome.planSha256,
+    diagnostics: [
+      `stage=${outcome.stage}`,
+      `production-modules=${outcome.productionModules}`,
+      `test-files=${outcome.testFiles}`,
+      `critical-mutants=${outcome.criticalMutants}/${outcome.criticalMutants}`,
+      `other-mutants=${outcome.otherMutants}`,
+      `property-executions=${outcome.propertyExecutions}`,
+      `fault-injections=${outcome.faultInjections}`,
+      `platform-cells=${outcome.compatibilityCells}`,
+      `seeded-plan-defects-killed=${outcome.seededPlanDefectsKilled}`,
+    ],
+  };
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -5381,6 +5425,7 @@ export const operations = {
   gateP3,
   p3bAssurance,
   p4QualityPlan,
+  p5QualityPlan,
   gate,
 };
 
@@ -5430,5 +5475,6 @@ export const operationCapabilities = Object.freeze({
   gateP3: { tools: [], network: "denied" },
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
   p4QualityPlan: { tools: ["git", "node", "python"], network: "denied" },
+  p5QualityPlan: { tools: ["node"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });

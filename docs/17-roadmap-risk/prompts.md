@@ -291,11 +291,17 @@ describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
 the normal protected required checks, or close P5 while applicable P4 closure
 rows remain unresolved. Verify the current handoff, exact main/branch identities,
 restored ruleset and current status of every outstanding P4 workflow before
-implementation. Read all documentation; verify the handoff and deterministic-core package bytes.
+implementation. Read all documentation; verify the handoff and deterministic-
+core package bytes.
 Prioritize all 08-persistence-consistency and 09-aeat-integration documents plus
 host/provider contracts, concurrency, security/privacy, quality, performance and
 historical findings. Re-observe authorized AEAT/certificate access without
 exposing credentials or taxpayer data.
+
+Before P5 production code, validate and freeze
+`docs/17-roadmap-risk/p5-quality-plan.md` and its machine manifest on the named
+branch. Preserve P4's separate denominator, and make the P4 plan validator
+recognize only those exact P5 paths assigned to the P5 population.
 
 Implement waves P5-A through P5-G with signed+DCO vertical PRs. Complete durable
 record/artifact/event/evidence/outbox ports, identity/idempotency and schema rules;

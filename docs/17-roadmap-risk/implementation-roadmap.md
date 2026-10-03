@@ -340,7 +340,13 @@ state. Each row must pass on the exact final protected head.
 reconcile AEAT through edition-bound authenticated protocols.
 
 **Authorities:** [`08-persistence-consistency`](../08-persistence-consistency/),
-[`09-aeat-integration`](../09-aeat-integration/) and relevant contracts/security.
+[`09-aeat-integration`](../09-aeat-integration/), relevant contracts/security
+and the frozen [`P5 quality plan`](p5-quality-plan.md).
+
+Before the first P5 production module, freeze and validate the complete P5 source
+and test populations, critical decisions, mutation IDs, property/fault campaigns,
+runtime matrix and resource bounds in `p5-quality-plan.md` and its machine
+manifest. P5 changes remain counted separately from P4's immutable denominator.
 
 | Wave               | Required implementation                                                                                                     |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------- |

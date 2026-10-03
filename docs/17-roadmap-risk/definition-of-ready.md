@@ -33,6 +33,10 @@ owner authorization for starting work; it does not make P4 `evidence-complete`,
 establish P5 readiness for protected merge, waive any P5 control or permit P5
 closure while applicable P4 closure rows remain unresolved. Re-observe P4's
 current checks and preserve their exact status before implementation.
+Before product code, freeze the P5-specific source/test population, critical
+catalogue, seeds, faults, budgets and compatibility cells in
+[`p5-quality-plan.md`](p5-quality-plan.md); its validator must pass and no
+undeclared P5 production path may be introduced.
 The required readiness gate and its seeded-negative tests must exist and pass
 on protected main before the first P4 implementation commit. A future bridge
 module or dependency not in that manifest blocks implementation until a

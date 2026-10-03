@@ -6,7 +6,8 @@
     "gate:platform",
     "gate:p3b",
     "gate:p4-readiness",
-    "gate:p4"
+    "gate:p4",
+    "p5:quality-plan"
   ],
   "tasks": [
     {
@@ -969,7 +970,7 @@
     },
     {
       "id": "gate:platform",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": [
         "policy:tree",
@@ -984,7 +985,8 @@
         "test:p4-d",
         "test:p4-e",
         "test:p4-f",
-        "gate:p4"
+        "gate:p4",
+        "p5:quality-plan"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -1003,7 +1005,7 @@
     },
     {
       "id": "gate:p2",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": [
         "gate:foundation",
@@ -1016,7 +1018,8 @@
         "test:p4-d",
         "test:p4-e",
         "test:p4-f",
-        "gate:p4"
+        "gate:p4",
+        "p5:quality-plan"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],
@@ -1106,12 +1109,46 @@
       "tools": []
     },
     {
+      "id": "p5:quality-plan",
+      "version": 1,
+      "owner": "assurance-owner",
+      "dependencies": [],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "docs/17-roadmap-risk/p5-quality-plan.md",
+        "tooling/assurance/p5-quality-plan.mjs",
+        "packages/verifactu/src/persistence/**",
+        "packages/verifactu/src/aeat/**",
+        "packages/verifactu/src/operations/**",
+        "tests/**/p5-*.test.mjs"
+      ],
+      "outputs": ["evidence/runs/p5--quality-plan.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 60,
+      "concurrencyLock": "assurance",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "p5QualityPlan",
+      "tools": ["node"]
+    },
+    {
       "id": "p4:quality-plan",
-      "version": 6,
+      "version": 7,
       "owner": "assurance-owner",
       "dependencies": [],
       "inputs": [
         "config/quality/p4-quality-plan.json",
+        "config/quality/p5-quality-plan.json",
         "config/quality/p3b-baseline.json",
         "config/ci/required-checks.json",
         "config/toolchain/toolchain.json",
@@ -1151,7 +1188,7 @@
     },
     {
       "id": "gate:p4-readiness",
-      "version": 1,
+      "version": 2,
       "owner": "assurance-owner",
       "dependencies": ["gate:p3b", "p4:quality-plan"],
       "inputs": ["**"],
@@ -1171,7 +1208,7 @@
     },
     {
       "id": "gate:p4",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": ["test:p4-g"],
       "inputs": [

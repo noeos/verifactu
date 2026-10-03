@@ -15,6 +15,21 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-03 — P5 assurance population frozen
+
+- Before P5 product modules, the P5-specific quality plan declares 25 production
+  modules, one shared identity module, 23 test files, 24 critical decisions,
+  40 mutations, 12 seeded property campaigns, 56 fault injections and five
+  OS/runtime cells. The strict coverage and mutation thresholds remain aligned
+  with the approved quality policy.
+- The plan requires `creationAllowed=false` for the current candidate, keeps P4's
+  frozen denominator separate and declares no external AEAT acceptance,
+  production durability or deployment SLO claim.
+- The machine inventory and fail-closed validator are in
+  `config/quality/p5-quality-plan.json` and
+  `tooling/assurance/p5-quality-plan.mjs`; `p5:quality-plan` is included in the
+  P2 and platform task closures before P5-A starts.
+
 ## 2026-10-03 — Scoped P5 implementation start authorized
 
 - Project owner `ddavid07` authorized ADR-0060 to begin P5-A…P5-G implementation
