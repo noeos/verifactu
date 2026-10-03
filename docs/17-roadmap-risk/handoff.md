@@ -38,7 +38,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The current state is amended by Amendment P5-002 in this file and ADR-0060.
+The current state is amended by Amendment P5-003 in this file and ADR-0060.
 P4-A–P4-F have protected final read-backs. P4-G implementation
 PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4 phase closure is blocked by
@@ -3767,3 +3767,96 @@ current terminal state of every run above. Begin P5 branch implementation under
 the named authorization even if P4 phase closure remains incomplete. Preserve
 all P4 failures and resolve P4 closure under a separate exact-subject protected
 read-back. Do not merge P5 changes without every normal required context passing.
+
+## Amendment P5-003 — 2026-10-03 frozen P5 assurance baseline
+
+This amendment records the current intake for the authorized P5 branch and
+supersedes older P5 status statements for this repository incarnation. Older
+P5 implementation/closure sections in this append-only file identify different
+historical SHAs; the current P4 tree has no P5 persistence or AEAT production
+modules, so those historical sections are not current implementation evidence.
+
+### Exact subject and protected state
+
+- Protected `main` and P5 base remain
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`. The P5 authorization is ADR-0060,
+  issue [#113](https://github.com/noeos/verifactu/issues/113), branch
+  `work/p5-implementation`.
+- Post-merge workflows on that exact protected-main SHA are now terminal:
+  Engineering CI `37125943364` (`gate:p2`), Conformance `37125943420`,
+  Regulatory observation `37125943378`, Security `37125943357`, all five
+  platform cells, quality/policy and the other non-audit contexts succeeded.
+  Required engineering foundation `37125943358` failed on OSV and npm audit;
+  `Required · required-check closure` consequently failed. This confirms P4's
+  current phase-close blocker; the earlier 14:46 pending snapshot in Amendment
+  P5-002 is historical and must not be reused as current evidence.
+- P5 assurance baseline commit is
+  `12be191026bd7161e36368eba8e575354c452bce`, tree
+  `dca88f2513e297ba300c0f9b2098d88bcd466b0e`. It is SSH-signed by the admitted
+  `ddcandales@gmail.com` key (`SHA256:65VbGskWghAQAXDbJ3/1hrWuYegZNLs/+S96BbNQCzI`)
+  and contains `Signed-off-by: Daniel David <ddcandales@gmail.com>`. It freezes
+  assurance populations only; no P5 production module is present yet.
+- P5 baseline PR [#114](https://github.com/noeos/verifactu/pull/114) is open on
+  exact head `12be191026bd7161e36368eba8e575354c452bce`, targeting the protected
+  P4 main SHA. At the 2026-10-03 17:38 UTC read-back it was `blocked`: OSV and
+  npm audit/signatures/licences had failed; documentation, governance/DCO,
+  secret scan, dependency review, package reproducibility, integration
+  conformance, packed consumers, source observation and performance smoke had
+  succeeded; platform, P2, quality/policy, regulatory-contract and remaining
+  checks were pending or in progress. The derived closure had no successful
+  terminal result. Refresh every exact-head check before making a later decision.
+- Effective ruleset `protected-main` (ruleset ID `23705155`) was active, strict,
+  required all 17 contexts and reported `current_user_can_bypass=never`. No
+  branch protection change or exception was made for P5.
+
+### Frozen P5 quality population and exact local evidence
+
+- `config/quality/p5-quality-plan.json` and
+  [`p5-quality-plan.md`](p5-quality-plan.md) declare 25 P5 production modules,
+  one shared P4 identity module, 23 test files, 24 critical decisions, 24
+  critical and 16 other mutants, 12 property campaigns (49,152 executions), 56
+  fault injections and five OS/Node/npm cells. Thresholds are 98% statements,
+  lines and functions; 95% branches; 100% critical branches and mutations; 95%
+  other valid mutations; zero unreviewed security/regulatory survivors.
+- Clean exact-subject `p5:quality-plan` passed 10/10 with no skips on the
+  baseline SHA. Plan digest:
+  `779a4c91e4cacd35c3d2cd230f2e65424951a648323eedcbaf3ee543e41e33b6`; all five
+  seeded plan defects were rejected. Clean `p4:quality-plan` passed 84/84 and
+  retained P4's independent 44-module/26-test population. Clean
+  `gate:foundation` passed 11/11. The report subjects are all the exact baseline
+  commit/tree above.
+- Clean `package:reproducibility` passed six subchecks. The private development
+  shell tarball digest was
+  `2cca962b46224817da9296da6fd8d45bfc2bd1bbd953e38cf2786704022023c6`; it is a
+  shell with no P5 runtime or public product exports. The admitted
+  `@noeos/verification-engine@1.0.1` tarball was independently packed from the
+  registry and matched SHA-256
+  `74e2449b5bab61ee62bdedc0355567461b33eadf15338f7d3265207bd28395f8` and the
+  package-lock integrity. These exact-byte checks do not turn the private shell
+  into a published product.
+- The canonical `npm ci --ignore-scripts --omit=optional` restored 94 packages;
+  npm reported 24 advisories in the full dependency tree. The P4-required OSV
+  and npm audit contexts remain failed and are not waived by the P5 baseline.
+
+### Mutable sources and external capability observation
+
+- On 2026-10-03 17:39 UTC, the official AEAT WSDL information page
+  `SRC-0019` was retrieved from its recorded URL and matched the retained
+  13,925-byte snapshot exactly (SHA-256
+  `ea5b23eaf18185c881425f4cf155453a03662451cf8e5c9d209652bf4812251f`). The
+  linked 8,780-byte `SistemaFacturacion.wsdl` also matched exactly (SHA-256
+  `05919120708ff7650612fa6683c9336eaf919335d9a4db10e86759190af48602`). This
+  verifies no drift for these two protocol inputs at that observation; it does
+  not activate the candidate edition.
+- The installed edition remains
+  `rrsif-2026-09-21-authoritative-candidate` with `creationAllowed=false`.
+  No AEAT/certificate credential variable or named test certificate was
+  available in the checked runner/config locations. No credential was read and
+  no external portal submission was attempted. Authorized external AEAT and
+  certificate observation remains a separate open gate; the local peer must be
+  labelled synthetic.
+- No P5 production code or test file exists at this baseline. The immediate
+  implementation step is P5-A on `work/p5-implementation`, using this exact
+  frozen plan. P5 work remains branch-only until every ordinary protected
+  required context passes; P4 remains phase-unclosed and cannot be represented
+  as corrected by P5 work.

@@ -29,6 +29,9 @@ changelog and makes no compliance, publication or support claim.
   `config/quality/p5-quality-plan.json` and
   `tooling/assurance/p5-quality-plan.mjs`; `p5:quality-plan` is included in the
   P2 and platform task closures before P5-A starts.
+- The signed+DCO baseline identity, clean reports, package hashes, current PR
+  check state and exact public-source read-back are recorded in Amendment
+  P5-003 of `docs/17-roadmap-risk/handoff.md`.
 
 ## 2026-10-03 — Scoped P5 implementation start authorized
 
@@ -48,6 +51,10 @@ changelog and makes no compliance, publication or support claim.
 - The current repository handoff capsule, roadmap index, definition of ready and
   P5 prompt point to ADR-0060 so a resumed Codex session applies this scoped
   authorization. P4's protected closure matrix itself remains unchanged.
+- The roadmap and P5 execution prompt now explicitly direct the next session to
+  start P5-A on the authorized branch while P4 remains phase-unclosed. P4
+  evidence, protected-check requirements and P5 phase-exit dependencies remain
+  unchanged.
 
 ## 2026-09-21 — P3-B pre-P4 assurance
 

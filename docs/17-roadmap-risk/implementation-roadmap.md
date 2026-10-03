@@ -343,6 +343,16 @@ reconcile AEAT through edition-bound authenticated protocols.
 [`09-aeat-integration`](../09-aeat-integration/), relevant contracts/security
 and the frozen [`P5 quality plan`](p5-quality-plan.md).
 
+**Start authorization:** P5 implementation is authorized on issue #113's
+`work/p5-implementation` branch under
+[`ADR-0060`](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md),
+even while P4 phase closure remains blocked. A P5 session must proceed with
+P5-A from the current authorized branch and must not treat unresolved P4
+closure rows as a reason to refuse P5 branch development. This scoped start
+does not mark P4 complete, waive any required check, authorize merging to
+protected `main`, or allow P5 phase closure while applicable P4 closure rows
+remain unresolved.
+
 Before the first P5 production module, freeze and validate the complete P5 source
 and test populations, critical decisions, mutation IDs, property/fault campaigns,
 runtime matrix and resource bounds in `p5-quality-plan.md` and its machine
