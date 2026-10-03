@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-10-03
+last-reviewed: 2026-10-04
 decisions: [ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 ---
 
@@ -27,12 +27,14 @@ provider, QR and claim boundaries; and the ready state in
 every production/test path, critical branch/mutant, campaign, exact OS/runtime/
 JDK/Maven/DSS and package identity, performance budget and canonical task.
 
-For P5 only, ADR-0060 authorizes the start of implementation on issue #113's
-named branch while P4 phase closure remains incomplete. This satisfies the
-owner authorization for starting work; it does not make P4 `evidence-complete`,
-establish P5 readiness for protected merge, waive any P5 control or permit P5
-closure while applicable P4 closure rows remain unresolved. Re-observe P4's
-current checks and preserve their exact status before implementation.
+For P5 only, ADR-0060 authorizes P5-A through P5-G implementation on issue
+#113's named branch while P4 phase closure remains incomplete. This authorization
+continues to cover work already underway; a resumed session must inspect and
+continue that work rather than treating the initial start as a consumed or
+expired permission. It does not make P4 `evidence-complete`, establish P5
+readiness for protected merge, waive any P5 control or permit P5 closure while
+applicable P4 closure rows remain unresolved. Re-observe P4's current checks
+and preserve their exact status before continuing.
 Before product code, freeze the P5-specific source/test population, critical
 catalogue, seeds, faults, budgets and compatibility cells in
 [`p5-quality-plan.md`](p5-quality-plan.md); its validator must pass and no

@@ -129,11 +129,14 @@ P1 protected bootstrap
 ```
 
 A successor starts only after its mandatory predecessor is `evidence-complete`
-on protected `main` and its inputs remain current, except for the one-time P4 to
-P5 implementation-start authorization in [ADR-0060](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md).
-That authorization permits development on issue #113's named branch only. It
-does not close P4, authorize a P5 merge to `main`, waive required checks or allow
-P5 closure while P4's applicable closure rows remain unresolved.
+on protected `main` and its inputs remain current, except for the explicit P4
+to P5 implementation authorization in
+[ADR-0060](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md).
+That authorization applies to the P5-A through P5-G implementation work on
+issue #113's named branch, including continuation of work already underway; it
+is not consumed by the initial start. It does not close P4, authorize a P5 merge
+to `main`, waive required checks or allow P5 closure while P4's applicable
+closure rows remain unresolved.
 
 ## Long-lead lane
 
@@ -343,12 +346,15 @@ reconcile AEAT through edition-bound authenticated protocols.
 [`09-aeat-integration`](../09-aeat-integration/), relevant contracts/security
 and the frozen [`P5 quality plan`](p5-quality-plan.md).
 
-**Start authorization:** P5 implementation is authorized on issue #113's
+**Start and continuation authorization:** P5-A through P5-G implementation is
+authorized on issue #113's
 `work/p5-implementation` branch under
 [`ADR-0060`](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md),
-even while P4 phase closure remains blocked. A P5 session must proceed with
-P5-A from the current authorized branch and must not treat unresolved P4
-closure rows as a reason to refuse P5 branch development. This scoped start
+even while P4 phase closure remains blocked. This authorization covers
+continuing P5-A through P5-G work on the named branch, so a resumed session must
+inspect and continue existing work rather than treating the already-used start
+authorization as expired. A P5 session must not treat unresolved P4 closure
+rows as a reason to refuse P5 branch development. This scoped authorization
 does not mark P4 complete, waive any required check, authorize merging to
 protected `main`, or allow P5 phase closure while applicable P4 closure rows
 remain unresolved.

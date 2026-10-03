@@ -26,10 +26,11 @@ cannot edit underlying status or hide blocked work.
 P1, P2, P3, P3-B and the zero-code P4-readiness gate remain evidence-complete
 at their recorded protected subjects. P4-A through P4-G implementation is
 merged at protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4
-phase closure is blocked: the PR head's OSV, npm audit/signature/licence and
-derived required-check closure contexts failed, and protected-push checks on
-the merge SHA were still in progress at the latest recorded read-back. ADR-0060
-marks P5 ready to start on issue #113's named branch only. P5 protected
-merge and phase closure remain gated; P6–P8 are planned. `creationAllowed=false`
-and no fiscal-compliance, AEAT-acceptance, publication or release claim is
-made.
+phase closure is blocked: its exact PR-head OSV, npm audit/signature/licence and
+derived required-check closure contexts failed. ADR-0060 authorizes P5 branch
+implementation on issue #113, and that work is active on
+`work/p5-implementation`; open P4 closure rows do not block development there.
+P5 protected merges still require their normal passing checks, and P5 phase
+closure remains gated until applicable P4 closure rows are resolved. P6–P8 are
+planned. `creationAllowed=false` and no fiscal-compliance, AEAT-acceptance,
+publication or release claim is made.

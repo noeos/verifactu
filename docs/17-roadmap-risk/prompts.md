@@ -289,8 +289,10 @@ branch `work/p5-implementation`, despite P4 remaining phase-unclosed. Do not
 block P5 branch development solely because P4 is not `evidence-complete`; do not
 describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
 the normal protected required checks, or close P5 while applicable P4 closure
-rows remain unresolved. Start with P5-A on the authorized branch; do not stop
-after repeating the P4 closure analysis. Verify the current handoff, exact
+rows remain unresolved. Read the latest active-state amendment in `handoff.md`
+(currently P5-004), inspect the worktree before changing it, and continue any
+P5 work already present. Start with P5-A only if it has not already started; do
+not stop after repeating the P4 closure analysis. Verify the current handoff, exact
 main/branch identities, restored ruleset and current status of every outstanding
 P4 workflow before implementation. Read all documentation; verify the handoff
 and deterministic-core package bytes.

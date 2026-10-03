@@ -5,7 +5,7 @@ status: active
 authority: normative
 owner: project-owner
 created: 2026-09-21
-last-reviewed: 2026-09-21
+last-reviewed: 2026-10-04
 dependencies: [ROADMAP-DOC-0017, ROADMAP-DOC-0020]
 decisions: [ADR-0026, ADR-0053]
 ---
@@ -219,3 +219,17 @@ changelog and makes no compliance, publication or support claim.
   final handoff PR and protected-push read-back. `creationAllowed=false`; no
   compliance, AEAT acceptance, certification, publication or release claim is
   made.
+
+## 2026-10-04 — Clarify continued P5 implementation authorization
+
+- Clarified that ADR-0060's one-time start authorization covers the P5-A…P5-G
+  implementation work on the named branch, including its continuation after the
+  initial start. This corrects any reading of the earlier changelog shorthand
+  as permission that expires once work begins. A resumed session must continue
+  existing P5 work while preserving P4's blocked status.
+- The roadmap, definition of ready and phase-exit criteria now state this scope
+  directly; the P5 prompt and current handoff already tell sessions to continue
+  existing branch work.
+- Protected P5 merges still require every normal required context, and P5 phase
+  closure still requires applicable P4 closure rows to be resolved. No check,
+  denominator, or phase-exit criterion was waived.
