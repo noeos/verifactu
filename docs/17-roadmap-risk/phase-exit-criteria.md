@@ -5,8 +5,8 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-25
-decisions: [ADR-0051, ADR-0052, ADR-0058]
+last-reviewed: 2026-10-03
+decisions: [ADR-0051, ADR-0052, ADR-0058, ADR-0060]
 historical-inputs: [REV-063, REV-074]
 ---
 
@@ -40,6 +40,10 @@ P4 has an additional zero-code readiness gate defined by ADR-0058 and
 P4-A, P4-B, P4-C, P4-D, P4-E, P4-F, P4-G order; a later wave cannot start from
 an unmerged or stale predecessor. Every wave includes its own tests and
 evidence, and P4-G is a cumulative rerun/closure rather than first measurement.
+The one-time P4-to-P5 implementation-start authorization in ADR-0060 permits
+work on the named P5 branch while P4 remains unclosed; it is not a P4 exit,
+does not authorize protected P5 merges, and does not permit P5 phase closure
+while P4's applicable closure rows are unresolved.
 
 The detailed rows are maintained in
 [`phase-close-control-matrix.md`](phase-close-control-matrix.md).

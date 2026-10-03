@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-09-26
+last-reviewed: 2026-10-03
 dependencies:
   [ROADMAP-DOC-0004, ROADMAP-DOC-0005, ROADMAP-DOC-0007, ROADMAP-DOC-0013]
 decisions:
@@ -18,6 +18,7 @@ decisions:
     ADR-0056,
     ADR-0057,
     ADR-0058,
+    ADR-0060,
   ]
 historical-inputs: [REV-063, REV-074, REV-079, REV-080, REV-084]
 ---
@@ -37,11 +38,14 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The append-only P4 protected read-backs below supersede the stale restart
-capsule and earlier current-state statements where they conflict. P4-A–P4-F
-have protected final read-backs. P4-G implementation PR `#103` is merged on
-protected `main` at `35c886b31ca6d94dcd19bde889046b5a092cdaba`; its dedicated
-final read-back is in progress under issue `#102`. `creationAllowed=false`.
+The current state is amended by Amendment P5-002 in this file and ADR-0060.
+P4-A–P4-F have protected final read-backs. P4-G implementation
+PR #109 is merged at protected `main`
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4 phase closure is blocked by
+the documented check failures and pending protected-push workflows. The project
+owner authorized P5 implementation on issue #113 / branch
+`work/p5-implementation`; this does not close P4 or authorize a P5 protected
+merge. `creationAllowed=false`.
 
 ## Historical initial baseline control — retained
 
@@ -92,18 +96,18 @@ Historical detail belongs in phase records below.
 | Field                        | Current value                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                     |
-| Current phase                | P4-G implementation final protected read-back, issue `#102`.                                                                      |
-| Phase status                 | P1–P4-F have final read-backs. P4-G implementation PR `#103` is merged and its 25 exact-head and 25 protected-push check-runs succeeded; dedicated handoff is pending. `creationAllowed=false`. |
-| Last evidence-complete wave  | P4-F final protected read-back; P4-G implementation is protected but not phase-closed until issue `#102` read-back merges.                                               |
-| Local repository             | Protected `main` includes the P4-G cumulative implementation. This read-back branch contains only the handoff update.                               |
-| Protected `main` SHA         | P4-G implementation squash `35c886b31ca6d94dcd19bde889046b5a092cdaba`, tree `afe9ef71b64c81f238a208f9185bce9939c2afc3`, parent `aba0b5f2f9362120131c83773ae1536f5cefc1e3`. |
-| GitHub effective state       | PR #103 exact head passed 25/25 check-runs; protected squash passed 25/25 check-runs including required-check closure. Five protected push workflows succeeded on the exact SHA.        |
+| Current phase                | P5 implementation start, issue `#113`, branch `work/p5-implementation`, under ADR-0060. |
+| Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 is `ready` to start under ADR-0060; P5 protected merge and phase closure are not authorized by ADR-0060. `creationAllowed=false`. |
+| Last evidence-complete wave  | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding. |
+| Local repository             | One canonical checkout, clean at read-back; P5 branch is based on protected `main`. |
+| Protected `main` SHA         | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`. |
+| GitHub effective state       | EXC-0001 / issue #112 allowed only the one-time merge of PR #109 and is closed. `protected-main` is restored with all 17 required contexts. On the PR head, OSV and npm audit/signature/licence failed, and required-check closure failed as a consequence. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
 | Public packages              | Three `0.0.0-development` package shells; not published. P4-D provider and its new internal interfaces are not re-exported from `packages/verifactu/src/index.ts`.                |
 | External gates               | Legal, AEAT, stable-performance, independent-assurance and publication gates remain downstream; none is claimed.                                                                |
-| Immediate instruction        | Complete issue `#102` through this dedicated signed+DCO handoff PR and verify its exact-head and protected-push checks; then close P4-G and preserve downstream P5 prerequisites.     |
+| Immediate instruction        | Begin P5 implementation under ADR-0060 on issue #113; re-read P4 push runs before relying on them, preserve P4's blocked closure status, and do not merge P5 to protected `main` without every normal required check passing. |
 
 ## Phase ledger
 
@@ -113,8 +117,8 @@ Historical detail belongs in phase records below.
 | P2    | evidence-complete | `93d92ca131be93f9430ae13ddc384e471c74cdaa`                       | `5d71bec40a62fce3adbea13c79f23600fd1eca4a` | `#25`              | W1–W8, protected squash, branch deletion, 23/23 PR check-runs, 22/22 protected-push check-runs and 86/86 audit complete. |
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
-| P4    | active            | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | —                                          | readiness + A–G    | P4-A–F have final read-backs; P4-G implementation is merged at `35c886b`, with dedicated final handoff issue `#102` in progress. |
-| P5    | planned           | P4 closure required                                              | —                                          | —                  | Persistence, atomicity, AEAT protocol boundaries and recovery.                                                           |
+| P4    | blocked           | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | implementation merge `1f66da46e21127d1d82018cfdf093f595e1c08ae` | PR `#109`; EXC-0001 `#112` | P4-A–G implementation is merged; phase closure is incomplete because exact PR required contexts OSV, npm audit/signature/licence and derived required-check closure failed; protected-push runs are recorded below. |
+| P5    | ready             | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation` | P5 implementation may begin on the named branch only. P5 protected merges and evidence-complete closure remain subject to their normal gates and P4 closure disposition. |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
 | P8    | planned           | P7 closure required                                              | —                                          | —                  | Stable publication, verification and support.                                                                            |
@@ -3696,3 +3700,70 @@ stable-performance, publication and release gates remain downstream and are
 not claimed here.
 
 Refs #102 and #103
+
+## Amendment P5-002 — 2026-10-03 scoped P5 start authorization
+
+This amendment supersedes earlier current-state instructions in this file that
+say P4-G final handoff must merge before P5 may start. It does not rewrite those
+historical records or claim P4 phase closure. The decision authority is
+[ADR-0060](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md).
+
+### Authorization and exact subject
+
+- Project owner `ddavid07` explicitly authorized this documentation change and
+  the scoped P5 implementation start on 2026-10-03. P5 scope is the seven
+  roadmap waves P5-A through P5-G, issue [#113](https://github.com/noeos/verifactu/issues/113),
+  branch `work/p5-implementation`, based on protected `main` at
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`.
+- P4 PR [#109](https://github.com/noeos/verifactu/pull/109) was squash-merged
+  from exact head `2396d87a3748e20a1a02f66a5b4ab21337f758ce` to merge SHA
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae` on 2026-10-03. EXC-0001 / issue
+  [#112](https://github.com/noeos/verifactu/issues/112) authorized only that
+  one-time merge. It is closed; `protected-main` was restored with all 17
+  required contexts.
+- This allows P5 implementation branch work only. It does not allow bypassing
+  P5 checks, merging P5 code into protected `main`, closing P4, or claiming P4
+  `evidence-complete`. P5 cannot be declared `evidence-complete` while P4's
+  applicable phase-close rows remain unresolved. P5 work is not P4 corrective
+  evidence.
+
+### Verified P4 results at the authorization read-back
+
+- P4 PR #109 exact-head checks passed the P2 cumulative gate, each of the five
+  platform gates, regulatory and conformance gates, quality/policy and the
+  remaining required checks except the three listed below.
+- The exact PR-head contexts `Required · OSV` and
+  `Required · npm audit signatures and licenses` failed. The derived
+  `Required · required-check closure` also failed. EXC-0001 allowed merge with
+  those findings visible; none is represented as a pass.
+- Protected-push workflow status at 2026-10-03 14:46 UTC, exact merge SHA:
+  - Required engineering foundation run
+    [37125943358](https://github.com/noeos/verifactu/actions/runs/37125943358):
+    documentation, DCO, secret scan, package reproducibility, dependency review,
+    CodeQL, integration conformance and regulatory-source/generated-contract
+    job had succeeded; OSV and npm audit failed; five platform jobs and
+    quality/policy were still in progress.
+  - Engineering CI run
+    [37125943364](https://github.com/noeos/verifactu/actions/runs/37125943364):
+    `gate:p2` was still in progress.
+  - Conformance run
+    [37125943420](https://github.com/noeos/verifactu/actions/runs/37125943420):
+    packed consumers had succeeded; regulatory-source/generated-contract
+    conformance was still in progress.
+  - Regulatory source observation run
+    [37125943378](https://github.com/noeos/verifactu/actions/runs/37125943378)
+    and Security run
+    [37125943357](https://github.com/noeos/verifactu/actions/runs/37125943357)
+    had succeeded.
+- These are timestamped observations, not final protected-push closure.
+  Re-fetch all runs and the effective ruleset before relying on them. Pending,
+  absent or cancelled jobs are not passes.
+
+### Entry instructions for the next Codex session
+
+Read ADR-0060, this amendment, issue #113 and the P5 prompt. Verify local and
+remote `main`, P5 branch, merge SHA, the effective 17-context ruleset and the
+current terminal state of every run above. Begin P5 branch implementation under
+the named authorization even if P4 phase closure remains incomplete. Preserve
+all P4 failures and resolve P4 closure under a separate exact-subject protected
+read-back. Do not merge P5 changes without every normal required context passing.

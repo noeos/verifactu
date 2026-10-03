@@ -5,9 +5,9 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-25
+last-reviewed: 2026-10-03
 dependencies: [DOCS-INDEX, ROADMAP-DOC-0002, ROADMAP-DOC-0003, ROADMAP-DOC-0005, ROADMAP-DOC-0006, ROADMAP-DOC-0007, ROADMAP-DOC-0013, ROADMAP-DOC-0014, REPO-DOC-0022]
-decisions: [ADR-0001, ADR-0002, ADR-0015, ADR-0026, ADR-0030, ADR-0031, ADR-0033, ADR-0038, ADR-0040, ADR-0051, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
+decisions: [ADR-0001, ADR-0002, ADR-0015, ADR-0026, ADR-0030, ADR-0031, ADR-0033, ADR-0038, ADR-0040, ADR-0051, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 historical-inputs: [REV-001, REV-063, REV-065, REV-066, REV-067, REV-071, REV-072, REV-073, REV-074, REV-075, REV-076, REV-077, REV-078, REV-079, REV-080, REV-081, REV-082, REV-083, REV-084]
 ---
 
@@ -129,7 +129,11 @@ P1 protected bootstrap
 ```
 
 A successor starts only after its mandatory predecessor is `evidence-complete`
-on protected `main` and its inputs remain current.
+on protected `main` and its inputs remain current, except for the one-time P4 to
+P5 implementation-start authorization in [ADR-0060](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md).
+That authorization permits development on issue #113's named branch only. It
+does not close P4, authorize a P5 merge to `main`, waive required checks or allow
+P5 closure while P4's applicable closure rows remain unresolved.
 
 ## Long-lead lane
 

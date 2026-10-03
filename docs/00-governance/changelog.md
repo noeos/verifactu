@@ -15,6 +15,25 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-03 — Scoped P5 implementation start authorized
+
+- Project owner `ddavid07` authorized ADR-0060 to begin P5-A…P5-G implementation
+  on issue #113 / branch `work/p5-implementation`, based on protected main
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`, while P4 phase closure remains
+  incomplete.
+- This is a one-time start authorization only. P4 is not `evidence-complete`;
+  PR #109's OSV and npm audit/signature/licence contexts failed and required-check
+  closure failed as a consequence. The protected-main ruleset remains restored
+  with all 17 required contexts. No check has been waived for P5 work.
+- At 2026-10-03 14:46 UTC, protected-push runs `37125943358`, `37125943364` and
+  `37125943420` were still in progress. Regulatory observation
+  `37125943378` and Security `37125943357` had succeeded. Re-read the exact runs
+  before relying on these states; none of the in-progress results is a pass.
+
+- The current repository handoff capsule, roadmap index, definition of ready and
+  P5 prompt point to ADR-0060 so a resumed Codex session applies this scoped
+  authorization. P4's protected closure matrix itself remains unchanged.
+
 ## 2026-09-21 — P3-B pre-P4 assurance
 
 - Protected prerequisite observation PR `#31` added bounded normal-TLS source
