@@ -1,0 +1,171 @@
+{
+  "$id": "https://noeos.dev/schemas/p4-overall-mutation-report-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "subject": { "type": "string", "minLength": 1 },
+    "tree": { "type": "string", "minLength": 1 },
+    "operators": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 6,
+      "uniqueItems": true
+    },
+    "discoveredModules": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 44,
+      "uniqueItems": true
+    },
+    "modulePopulation": {
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "module": { "type": "string", "minLength": 1 },
+          "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "applications": { "type": "integer", "minimum": 0 },
+          "discoveredApplications": { "type": "integer", "minimum": 0 },
+          "excludedApplications": { "type": "integer", "minimum": 0 }
+        },
+        "required": ["module", "sourceSha256", "applications", "discoveredApplications", "excludedApplications"],
+        "type": "object"
+      },
+      "minItems": 44
+    },
+    "excludedApplications": {
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "operator": { "type": "string", "minLength": 1 },
+          "module": { "type": "string", "minLength": 1 },
+          "line": { "type": "integer", "minimum": 1 },
+          "start": { "type": "integer", "minimum": 0 },
+          "end": { "type": "integer", "minimum": 1 },
+          "before": { "type": "string", "minLength": 1 },
+          "after": { "type": "string", "minLength": 1 },
+          "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "mutatedSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "reason": { "type": "string", "minLength": 1 },
+          "compilerDiagnostic": { "type": "string", "minLength": 1 }
+        },
+        "required": ["id", "operator", "module", "line", "start", "end", "before", "after", "sourceSha256", "mutatedSha256", "reason", "compilerDiagnostic"],
+        "type": "object"
+      }
+    },
+    "population": {
+      "additionalProperties": false,
+      "properties": {
+        "generated": { "type": "integer", "minimum": 1 },
+        "killed": { "type": "integer", "minimum": 0 },
+        "survived": { "type": "integer", "minimum": 0 },
+        "equivalent": { "type": "integer", "minimum": 0 },
+        "compileErrors": { "type": "integer", "minimum": 0 },
+        "testErrors": { "type": "integer", "minimum": 0 },
+        "noCoverage": { "type": "integer", "minimum": 0 },
+        "timeouts": { "type": "integer", "minimum": 0 },
+        "killedPercent": { "type": "number", "minimum": 0, "maximum": 100 }
+      },
+      "required": [
+        "generated",
+        "killed",
+        "survived",
+        "equivalent",
+        "compileErrors",
+        "testErrors",
+        "noCoverage",
+        "timeouts",
+        "killedPercent"
+      ],
+      "type": "object"
+    },
+    "mutants": {
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "operator": { "type": "string", "minLength": 1 },
+          "module": { "type": "string", "minLength": 1 },
+          "line": { "type": "integer", "minimum": 1 },
+          "start": { "type": "integer", "minimum": 0 },
+          "end": { "type": "integer", "minimum": 1 },
+          "before": { "type": "string", "minLength": 1 },
+          "after": { "type": "string", "minLength": 1 },
+          "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "mutatedSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "compile": { "enum": ["passed", "failed"] },
+          "covered": { "type": "boolean" },
+          "baselineCovered": { "type": "boolean" },
+          "runtimeModule": { "type": "string", "minLength": 1 },
+          "runtimeOffset": { "type": "integer", "minimum": 0 },
+          "tests": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "outcome": {
+            "enum": [
+              "killed",
+              "survived",
+              "equivalent",
+              "compileError",
+              "testError",
+              "noCoverage",
+              "timeout"
+            ]
+          },
+          "killEvidence": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "risk": { "enum": ["security", "regulatory", "ordinary"] },
+          "rationale": { "type": "string" },
+          "reviews": {
+            "type": "array",
+            "items": { "enum": ["quality-owner", "project-owner"] },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "operator",
+          "module",
+          "line",
+          "start",
+          "end",
+          "before",
+          "after",
+          "sourceSha256",
+          "mutatedSha256",
+          "compile",
+          "covered",
+          "tests",
+          "outcome",
+          "risk"
+        ],
+        "type": "object"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "subject",
+    "tree",
+    "operators",
+    "discoveredModules",
+    "modulePopulation",
+    "excludedApplications",
+    "population",
+    "mutants"
+  ],
+  "type": "object"
+}

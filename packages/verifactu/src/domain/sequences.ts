@@ -23,9 +23,11 @@ export function appendSequence(
   item: SequenceItem,
 ): Result<BillingSequence> {
   const previous = sequence.records.at(-1);
+  if (createFiscalContext(sequence.context).status !== "ok")
+    return invalid("DIAG-SEQUENCE-CONFLICT", "domain");
+  if (createFiscalContext(item.context).status !== "ok")
+    return invalid("DIAG-SEQUENCE-CONFLICT", "domain");
   if (
-    createFiscalContext(sequence.context).status !== "ok" ||
-    createFiscalContext(item.context).status !== "ok" ||
     !isIdentity(item.id, "record") ||
     (item.predecessorId !== null &&
       !isIdentity(item.predecessorId, "record")) ||

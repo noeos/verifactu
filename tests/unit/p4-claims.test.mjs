@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import {
   CLAIM_KINDS,
@@ -26,6 +27,11 @@ function claimSet() {
 }
 
 test("P4-CB-032 preserves each claim outcome without a global valid flag", () => {
+  const nullPrototypeClaim = Object.assign(
+    Object.create(null),
+    claim("official-format", "valid"),
+  );
+  assert.equal(createVerificationClaim(nullPrototypeClaim).status, "ok");
   const result = claimSet();
   assert.equal(result.status, "ok");
   assert.deepEqual(
@@ -112,6 +118,22 @@ test("claim diagnostics are bounded, code-only, unique and deterministic", () =>
     }).status,
     "invalid",
   );
+  assert.deepEqual(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "invalid",
+      diagnostics: [],
+    }).diagnostics,
+    [
+      {
+        code: "DIAG-CLAIM-EVIDENCE",
+        stage: "domain",
+        path: "",
+        severity: "error",
+        retryable: false,
+      },
+    ],
+  );
 });
 
 test("engine evidence digest shape is required only for verified claims", () => {
@@ -143,6 +165,7 @@ test("claim constructors reject every malformed status, field, and evidence comb
   };
   for (const malformed of [
     null,
+    Object.setPrototypeOf(Object.assign([], validBase), null),
     { ...validBase, extra: true },
     { ...validBase, kind: "unknown" },
     { ...validBase, status: "pending" },
@@ -165,6 +188,18 @@ test("claim constructors reject every malformed status, field, and evidence comb
     assert.equal(createVerificationClaim(malformed).status, "invalid");
   }
   assert.equal(createVerificationClaimSet(null).status, "invalid");
+  const iterableClaimSet = {
+    length: CLAIM_KINDS.length,
+    some: () => false,
+    *[Symbol.iterator]() {
+      yield* claimSet().value.claims;
+    },
+  };
+  assert.equal(
+    createVerificationClaimSet(iterableClaimSet).status,
+    "invalid",
+    "an iterable object cannot substitute for the required array",
+  );
   assert.equal(
     createVerificationClaimSet([{}, {}, {}, {}, {}]).status,
     "invalid",
@@ -181,6 +216,64 @@ test("claim constructors reject every malformed status, field, and evidence comb
     ).status,
     "invalid",
   );
+  assert.equal(
+    getVerificationClaim(
+      { claims: { find: () => claim("aeat", "invalid") } },
+      "aeat",
+    ),
+    undefined,
+  );
+
+  const classInstance = Object.assign(new (class ClaimRecord {})(), validBase);
+  assert.equal(createVerificationClaim(classInstance).status, "invalid");
+  const prototypeTrap = new Proxy(
+    { ...validBase },
+    {
+      getPrototypeOf() {
+        throw new Error("private prototype trap");
+      },
+    },
+  );
+  assert.equal(createVerificationClaim(prototypeTrap).status, "invalid");
+  assert.equal(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "invalid",
+      diagnostics: ["DIAG-CLAIM"],
+      unexpected: true,
+    }).status,
+    "invalid",
+  );
+  assert.equal(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "pending",
+      diagnostics: ["DIAG-CLAIM"],
+    }).status,
+    "invalid",
+  );
+  const hiddenDiagnostics = { kind: "cryptographic", status: "invalid" };
+  Object.defineProperty(hiddenDiagnostics, "diagnostics", {
+    value: ["DIAG-CLAIM"],
+  });
+  assert.equal(createVerificationClaim(hiddenDiagnostics).status, "invalid");
+  assert.equal(
+    createVerificationClaim({
+      kind: "cryptographic",
+      status: "indeterminate",
+      diagnostics: Array.from({ length: 32 }, (_, index) => `DIAG-${index}`),
+    }).status,
+    "ok",
+  );
+
+  const arrayLikeClaimSet = {
+    length: CLAIM_KINDS.length,
+    some: () => false,
+    *[Symbol.iterator]() {
+      yield* claimSet().value.claims;
+    },
+  };
+  assert.equal(createVerificationClaimSet(arrayLikeClaimSet).status, "invalid");
 });
 
 test("claim boundaries contain throwing proxies without echoing their data", () => {
@@ -241,7 +334,7 @@ test("claim boundaries contain throwing proxies without echoing their data", () 
   );
 });
 
-test("P4-PROP-012 claim aggregation preserves every component status (seed=1346650369)", () => {
+test("P4-PROP-012 claim aggregation preserves every component status (seed=1346650369)", (t) => {
   const kinds = [
     "official-format",
     "cryptographic",
@@ -250,10 +343,14 @@ test("P4-PROP-012 claim aggregation preserves every component status (seed=13466
     "noeos-evidence",
   ];
   const statuses = ["valid", "invalid", "indeterminate", "unsupported"];
+  const corpus = createHash("sha256");
+  const histogram = Object.fromEntries(statuses.map((status) => [status, 0]));
   for (let index = 0; index < 4096; index += 1) {
     const expected = kinds.map(
       (_, component) => statuses[(index + component * 3) % statuses.length],
     );
+    corpus.update(expected.join(","));
+    for (const status of expected) histogram[status] += 1;
     const result = createVerificationClaimSet(
       kinds.map((kind, component) => {
         const status = expected[component];
@@ -278,4 +375,7 @@ test("P4-PROP-012 claim aggregation preserves every component status (seed=13466
     assert.equal(Object.hasOwn(result.value, "status"), false);
     assert.equal(Object.hasOwn(result.value, "valid"), false);
   }
+  t.diagnostic(
+    `P4-PROP-012 executions=4096 seed=1346650369 discards=0 corpusSha256=${corpus.digest("hex")} statusHistogram=${JSON.stringify(histogram)}`,
+  );
 });

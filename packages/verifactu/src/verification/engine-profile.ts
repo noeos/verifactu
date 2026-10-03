@@ -47,6 +47,7 @@ const operationKinds = new Set([
   "substitution",
 ]);
 const artifactKinds = new Set(["xml", "xades", "qr", "record", "chain"]);
+const MAX_PROFILE_ARTIFACTS = artifactKinds.size;
 
 export interface EngineArtifactDigest {
   readonly order: number;
@@ -142,8 +143,6 @@ const projectionKeys = Object.freeze([
 ]);
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  if (value === null || typeof value !== "object" || Array.isArray(value))
-    return false;
   try {
     const prototype = Object.getPrototypeOf(value);
     return prototype === Object.prototype || prototype === null;
@@ -182,8 +181,8 @@ export function isEngineProfileProjection(
     if (!isPlainRecord(value)) return false;
     const algorithmIds = value.algorithmIds;
     const keys = Object.keys(value).sort();
+    if (keys.length !== projectionKeys.length) return false;
     if (
-      keys.length !== projectionKeys.length ||
       keys.some((key, index) => key !== projectionKeys[index]) ||
       value.schema !== ENGINE_PROFILE_SCHEMA ||
       typeof value.contextId !== "string" ||
@@ -201,7 +200,7 @@ export function isEngineProfileProjection(
       (value.position as number) > 1_000_000 ||
       !Array.isArray(value.artifacts) ||
       value.artifacts.length < 1 ||
-      value.artifacts.length > 16 ||
+      value.artifacts.length > MAX_PROFILE_ARTIFACTS ||
       value.artifacts.some(
         (artifact, index) => !validArtifact(artifact, index),
       ) ||
@@ -212,11 +211,12 @@ export function isEngineProfileProjection(
       algorithmIds.length < 1 ||
       algorithmIds.length > 8 ||
       algorithmIds.some(
-        (algorithm, index) =>
-          typeof algorithm !== "string" ||
-          !algorithmPattern.test(algorithm) ||
-          (index > 0 && algorithmIds[index - 1] >= algorithm),
-      )
+        (algorithm) =>
+          typeof algorithm !== "string" || !algorithmPattern.test(algorithm),
+      ) ||
+      algorithmIds
+        .slice(1)
+        .some((algorithm, index) => algorithmIds[index] >= algorithm)
     )
       return false;
     const artifactKindsSeen = new Set(
@@ -248,18 +248,21 @@ export function createEngineProfileProjection(
       "schema",
       "sequenceId",
     ];
-    const requiredInputKeys = allowedInputKeys.filter(
-      (key) => key !== "position" && key !== "schema",
-    );
+    const requiredInputKeys = [
+      "algorithmIds",
+      "artifacts",
+      "claims",
+      "contextId",
+      "editionId",
+      "operationKind",
+      "predecessorEvidenceDigest",
+      "recordId",
+      "sequenceId",
+    ];
     if (
       inputKeys.some((key) => !allowedInputKeys.includes(key)) ||
       requiredInputKeys.some((key) => !inputKeys.includes(key)) ||
-      (inputKeys.includes("schema") &&
-        input.schema !== ENGINE_PROFILE_SCHEMA) ||
-      (inputKeys.includes("position") &&
-        (!Number.isSafeInteger(input.position) ||
-          (input.position as number) < 0 ||
-          (input.position as number) > 1_000_000))
+      (inputKeys.includes("schema") && input.schema !== ENGINE_PROFILE_SCHEMA)
     )
       return invalid("DIAG-ENGINE-PROJECTION", "domain");
     const rawClaims = input.claims as VerificationClaimSet | undefined;
@@ -321,8 +324,7 @@ export function createEngineProfileProjection(
   }
 }
 
-function canonicalJson(value: unknown, depth = 0): string {
-  if (depth > 16) throw new TypeError("depth");
+function canonicalJson(value: unknown): string {
   if (value === null || typeof value === "boolean" || typeof value === "string")
     return JSON.stringify(value);
   if (typeof value === "number") {
@@ -330,10 +332,10 @@ function canonicalJson(value: unknown, depth = 0): string {
     return JSON.stringify(Object.is(value, -0) ? 0 : value);
   }
   if (Array.isArray(value))
-    return `[${value.map((item) => canonicalJson(item, depth + 1)).join(",")}]`;
+    return `[${value.map((item) => canonicalJson(item)).join(",")}]`;
   if (!isPlainRecord(value)) throw new TypeError("object");
   const keys = Object.keys(value).sort();
-  return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key], depth + 1)}`).join(",")}}`;
+  return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
 }
 
 export function canonicalEngineProfileJson(
@@ -382,11 +384,11 @@ export function createEngineNormalizationProfile(): NormalizationProfile<EngineP
         const canonical = canonicalEngineProfileJson(input);
         if (canonical.status !== "ok") return engineFailure();
         const bytes = new TextEncoder().encode(canonical.value);
-        if (
-          bytes.byteLength > limits.maxPayloadBytes ||
-          bytes.byteLength > ENGINE_PROFILE_LIMITS.maxPayloadBytes
-        )
-          return engineFailure();
+        const maximumPayloadBytes = Math.min(
+          limits.maxPayloadBytes,
+          ENGINE_PROFILE_LIMITS.maxPayloadBytes,
+        );
+        if (bytes.byteLength > maximumPayloadBytes) return engineFailure();
         sink.write(bytes);
         return {
           ok: true,

@@ -43,6 +43,22 @@ function fixture() {
 
 test("alta and anulacion enforce exhaustive kind-specific identity fields", () => {
   const f = fixture();
+  assert.equal(
+    createFiscalDocumentIdentity({
+      ...f.doc,
+      series: "s".repeat(60),
+      number: "n".repeat(60),
+    }).status,
+    "ok",
+  );
+  assert.equal(
+    createFiscalDocumentIdentity({ ...f.doc, series: "s".repeat(61) }).status,
+    "invalid",
+  );
+  assert.equal(
+    createFiscalDocumentIdentity({ ...f.doc, number: "n".repeat(61) }).status,
+    "invalid",
+  );
   const record = {
     kind: "alta",
     id: f.get("record", "r1"),
@@ -57,6 +73,15 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
   const alta = createAltaRecord(record);
   assert.equal(alta.status, "ok");
   assert.equal(recordsShareContext(alta.value, alta.value), true);
+  const coercibleIssueDate = { toString: () => "2025-01-01" };
+  assert.equal(
+    createAltaRecord({
+      ...record,
+      issueDate: coercibleIssueDate,
+      document: { ...record.document, issueDate: coercibleIssueDate },
+    }).status,
+    "invalid",
+  );
   assert.equal(
     recordsShareContext(alta.value, {
       ...alta.value,
@@ -82,12 +107,21 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
     editionId: f.context.editionId,
   };
   assert.equal(createAnulacionRecord(cancel).status, "ok");
+  assert.equal(createAnulacionRecord(null).status, "invalid");
+  assert.equal(
+    createAnulacionRecord({ ...cancel, cause: "x".repeat(256) }).status,
+    "ok",
+  );
   assert.equal(
     createAnulacionRecord({ ...cancel, kind: "alta" }).status,
     "invalid",
   );
   assert.equal(
     createAnulacionRecord({ ...cancel, cause: "" }).status,
+    "invalid",
+  );
+  assert.equal(
+    createAnulacionRecord({ ...cancel, cause: null }).status,
     "invalid",
   );
   assert.equal(
@@ -110,6 +144,7 @@ test("alta and anulacion enforce exhaustive kind-specific identity fields", () =
 
 test("alta construction rejects mismatched kinds, dates, totals and chain self-links", () => {
   const f = fixture();
+  assert.equal(createAltaRecord(null).status, "invalid");
   const record = {
     kind: "alta",
     id: f.get("record", "r1"),
@@ -129,6 +164,11 @@ test("alta construction rejects mismatched kinds, dates, totals and chain self-l
     { ...record, document: null },
     { ...record, issueDate: createFiscalDate("2025-01-02").value },
     { ...record, generatedAt: "no-time" },
+    // Runtime callers can bypass the TypeScript Decimal type. The public
+    // constructor must still reject a truthy primitive before freezing it.
+    { ...record, total: "12.50" },
+    { ...record, total: null },
+    { ...record, total: { ...record.total, text: 12 } },
     { ...record, total: { ...record.total, coefficient: 1n } },
     { ...record, predecessorId: record.id },
     { ...record, editionId: f.get("edition", "different") },
@@ -139,6 +179,144 @@ test("alta construction rejects mismatched kinds, dates, totals and chain self-l
   ];
   for (const input of invalidInputs)
     assert.equal(createAltaRecord(input).status, "invalid");
+});
+
+test("alta records preserve the decimal contract for negative totals", () => {
+  const f = fixture();
+  const record = {
+    kind: "alta",
+    id: f.get("record", "negative-total"),
+    context: f.context,
+    document: f.doc,
+    issueDate: createFiscalDate("2025-01-01").value,
+    generatedAt: f.at,
+    total: createDecimal("-0.01", {
+      maxIntegerDigits: 8,
+      maxScale: 2,
+      allowNegative: true,
+    }).value,
+    predecessorId: null,
+    editionId: f.context.editionId,
+  };
+  assert.equal(createAltaRecord(record).status, "ok");
+});
+
+test("record constructors reject combinations of simultaneous contract faults", () => {
+  const f = fixture();
+  const alta = {
+    kind: "alta",
+    id: f.get("record", "r1"),
+    context: f.context,
+    document: f.doc,
+    issueDate: createFiscalDate("2025-01-01").value,
+    generatedAt: f.at,
+    total: createDecimal("12.50", { maxIntegerDigits: 8, maxScale: 2 }).value,
+    predecessorId: null,
+    editionId: f.context.editionId,
+  };
+  const altaFaults = [
+    ["kind", (record) => ({ ...record, kind: "anulacion" })],
+    ["id", (record) => ({ ...record, id: null })],
+    ["context", (record) => ({ ...record, context: null })],
+    ["document", (record) => ({ ...record, document: null })],
+    ["total", (record) => ({ ...record, total: null })],
+    ["generatedAt", (record) => ({ ...record, generatedAt: null })],
+    ["editionId", (record) => ({ ...record, editionId: null })],
+    ["id kind", (record) => ({ ...record, id: f.get("tenant", "wrong") })],
+    [
+      "edition kind",
+      (record) => ({ ...record, editionId: f.get("record", "wrong") }),
+    ],
+    ["issueDate", (record) => ({ ...record, issueDate: f.at })],
+    ["self predecessor", (record) => ({ ...record, predecessorId: record.id })],
+    [
+      "context edition",
+      (record) => ({
+        ...record,
+        context: { ...record.context, editionId: f.get("edition", "other") },
+      }),
+    ],
+    [
+      "document issuer",
+      (record) => ({
+        ...record,
+        document: { ...record.document, issuer: f.get("taxpayer", "other") },
+      }),
+    ],
+  ];
+  for (const [name, fault] of altaFaults)
+    assert.equal(
+      createAltaRecord(fault(alta)).status,
+      "invalid",
+      `alta rejects ${name}`,
+    );
+  for (let left = 0; left < altaFaults.length; left++)
+    for (let right = left + 1; right < altaFaults.length; right++) {
+      const [leftName, leftFault] = altaFaults[left];
+      const [rightName, rightFault] = altaFaults[right];
+      assert.equal(
+        createAltaRecord(rightFault(leftFault(alta))).status,
+        "invalid",
+        `alta rejects ${leftName} with ${rightName}`,
+      );
+    }
+
+  const anulacion = {
+    kind: "anulacion",
+    id: f.get("record", "r2"),
+    context: f.context,
+    target: f.doc,
+    cause: "duplicate",
+    generatedAt: f.at,
+    predecessorId: null,
+    editionId: f.context.editionId,
+  };
+  const anulacionFaults = [
+    ["kind", (record) => ({ ...record, kind: "alta" })],
+    ["id", (record) => ({ ...record, id: null })],
+    ["context", (record) => ({ ...record, context: null })],
+    ["target", (record) => ({ ...record, target: null })],
+    ["empty cause", (record) => ({ ...record, cause: "" })],
+    ["long cause", (record) => ({ ...record, cause: "x".repeat(257) })],
+    ["generatedAt", (record) => ({ ...record, generatedAt: null })],
+    ["editionId", (record) => ({ ...record, editionId: null })],
+    ["id kind", (record) => ({ ...record, id: f.get("tenant", "wrong") })],
+    [
+      "edition kind",
+      (record) => ({ ...record, editionId: f.get("record", "wrong") }),
+    ],
+    ["self predecessor", (record) => ({ ...record, predecessorId: record.id })],
+    [
+      "context edition",
+      (record) => ({
+        ...record,
+        context: { ...record.context, editionId: f.get("edition", "other") },
+      }),
+    ],
+    [
+      "target issuer",
+      (record) => ({
+        ...record,
+        target: { ...record.target, issuer: f.get("taxpayer", "other") },
+      }),
+    ],
+  ];
+  for (const [name, fault] of anulacionFaults)
+    assert.equal(
+      createAnulacionRecord(fault(anulacion)).status,
+      "invalid",
+      `anulacion rejects ${name}`,
+    );
+  for (let left = 0; left < anulacionFaults.length; left++)
+    for (let right = left + 1; right < anulacionFaults.length; right++) {
+      const [leftName, leftFault] = anulacionFaults[left];
+      const [rightName, rightFault] = anulacionFaults[right];
+      assert.equal(
+        createAnulacionRecord(rightFault(leftFault(anulacion))).status,
+        "invalid",
+        `anulacion rejects ${leftName} with ${rightName}`,
+      );
+    }
 });
 
 test("correction and substitution append immutable history and reject self-links/cycles", () => {
@@ -156,6 +334,18 @@ test("correction and substitution append immutable history and reject self-links
   const first = addCorrection(empty, edge);
   assert.equal(first.status, "ok");
   assert.equal(empty.relations.length, 0);
+  const selfLink = addCorrection(empty, {
+    ...edge,
+    source: second,
+    target: second,
+  });
+  assert.equal(selfLink.status, "invalid");
+  assert.equal(selfLink.diagnostics[0].code, "DIAG-CORRECTION-CONFLICT");
+  assert.equal(
+    addCorrection(empty, { ...edge, evidenceId: "" }).status,
+    "invalid",
+    "an otherwise valid unique correction still requires evidence",
+  );
   const foreignContext = {
     ...f.context,
     tenantId: f.get("tenant", "foreign-tenant"),
@@ -227,11 +417,29 @@ test("correction and substitution append immutable history and reject self-links
     ).status,
     "invalid",
   );
+  const belowLimit = Array.from({ length: 99_999 }, (_, index) => ({
+    ...edge,
+    source: { ...second, number: `limit-${index}` },
+  }));
+  const nextRelation = {
+    ...edge,
+    source: { ...second, number: "limit-next" },
+  };
+  assert.equal(
+    addCorrection({ relations: belowLimit }, nextRelation).status,
+    "ok",
+    "99,999 existing relations permit the 100,000th relation",
+  );
+  const atLimit = [...belowLimit, nextRelation];
   assert.equal(
     addCorrection(
-      { relations: Array.from({ length: 100_000 }, () => edge) },
-      edge,
+      { relations: atLimit },
+      {
+        ...nextRelation,
+        source: { ...second, number: "limit-after-next" },
+      },
     ).status,
     "invalid",
+    "a graph already containing 100,000 relations rejects another",
   );
 });

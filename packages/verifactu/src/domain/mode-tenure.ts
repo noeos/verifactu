@@ -66,11 +66,11 @@ export function transitionMode(
     return invalid("DIAG-MODE-ROLLBACK", "domain");
   if (
     previous &&
-    (previous.effectiveUntil === null ||
-      !Number.isFinite(Date.parse(next.effectiveFrom)) ||
+    (!Number.isFinite(Date.parse(next.effectiveFrom)) ||
       !Number.isFinite(Date.parse(previous.effectiveFrom)) ||
       Date.parse(next.effectiveFrom) <= Date.parse(previous.effectiveFrom) ||
-      Date.parse(previous.effectiveUntil) !== Date.parse(next.effectiveFrom))
+      Date.parse(previous.effectiveUntil ?? "") !==
+        Date.parse(next.effectiveFrom))
   )
     return invalid("DIAG-MODE-CHRONOLOGY", "domain");
   if (

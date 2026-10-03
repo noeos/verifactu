@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { isAscii } from "node:buffer";
 import { fileURLToPath } from "node:url";
 
 const PROTOCOL = "VERIFACTU-DSS-1";
@@ -43,6 +44,16 @@ export const DSS_JVM_OPTIONS = Object.freeze([
   "-Duser.timezone=UTC",
 ]);
 
+export function dssChildOptions(cwd, env = minimalEnvironment()) {
+  return {
+    cwd,
+    env,
+    shell: false,
+    stdio: ["pipe", "pipe", "pipe"],
+    windowsHide: true,
+  };
+}
+
 export async function spawnDssBridge(request, options = {}) {
   if (options.signal?.aborted)
     return result("CANCELLED", "DIAG-XADES-CANCELLED");
@@ -82,38 +93,32 @@ export async function spawnDssBridge(request, options = {}) {
 
   return new Promise((resolve) => {
     let child;
-    let settled = false;
+    let settlement;
     let stopReason = null;
     let stdout = Buffer.alloc(0);
     let stderr = Buffer.alloc(0);
     const finish = (value) => {
-      if (settled) return;
-      settled = true;
+      if (settlement !== undefined) return;
+      settlement = value;
       clearTimeout(timer);
       options.signal?.removeEventListener("abort", abort);
       resolve(value);
     };
     const stop = (reason) => {
-      if (settled) return;
+      if (settlement !== undefined) return;
       stopReason = reason;
-      child?.kill();
+      if (child !== undefined) child.kill();
     };
     const abort = () => stop("cancelled");
     const timer = setTimeout(() => stop("timeout"), timeoutMs);
-    timer.unref?.();
+    timer.unref();
     options.signal?.addEventListener("abort", abort, { once: true });
 
     try {
       child = spawn(
         javaExecutable,
         [...javaOptions, "-cp", jarPath, "eu.noeos.verifactu.bridge.DssBridge"],
-        {
-          cwd: options.cwd ?? process.cwd(),
-          env: minimalEnvironment(),
-          shell: false,
-          stdio: ["pipe", "pipe", "pipe"],
-          windowsHide: true,
-        },
+        dssChildOptions(options.cwd ?? process.cwd()),
       );
       child.stdout.on("data", (chunk) => {
         if (stdout.byteLength + chunk.byteLength > maximumWireBytes) {
@@ -264,7 +269,10 @@ function listFields(value) {
 
 export function decodeResponse(stdout) {
   try {
-    const text = new TextDecoder("utf-8", { fatal: true }).decode(stdout);
+    if (!(stdout instanceof Uint8Array))
+      return result("DEFECT", "DIAG-XADES-PROTOCOL");
+    if (!isAscii(stdout)) return result("DEFECT", "DIAG-XADES-PROTOCOL");
+    const text = new TextDecoder("utf-8").decode(stdout);
     const lines = text.split("\n");
     if (lines.at(-1) === "") lines.pop();
     if (
@@ -285,7 +293,6 @@ export function decodeResponse(stdout) {
 
 function decodeBase64(value) {
   if (
-    typeof value !== "string" ||
     !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u.test(
       value,
     )

@@ -1,4 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import { isAscii } from "node:buffer";
 import {
   normalizeCertificateAssessment,
   normalizePkiObservation,
@@ -322,8 +323,6 @@ function normalizeValidationPolicy(request) {
     request.profileId !== XADES_PROFILE_ID
   )
     return { ok: false, diagnostic: DIAGNOSTICS.edition };
-  if (!TARGETS.has(request.targetName))
-    return { ok: false, diagnostic: DIAGNOSTICS.request };
   const signingTimeMs =
     request.signingTime === undefined
       ? 0
@@ -348,13 +347,7 @@ function normalizeValidationPolicy(request) {
   const allEvidence = [...trustAnchorsDer, ...crlEvidence, ...ocspEvidence];
   if (
     allEvidence.length > XADES_LIMITS.maximumEvidenceItems ||
-    allEvidence.some(
-      (item) =>
-        item.byteLength === 0 ||
-        item.byteLength > XADES_LIMITS.maximumEvidenceBytes,
-    ) ||
-    allEvidence.reduce((sum, item) => sum + item.byteLength, 0) >
-      XADES_LIMITS.maximumEvidenceBytes
+    allEvidence.some((item) => item.byteLength === 0)
   )
     return { ok: false, diagnostic: DIAGNOSTICS.evidence };
   return {
@@ -376,11 +369,9 @@ function normalizeValidationPolicy(request) {
 
 function withinCombinedByteLimit(artifactBytes, evidence) {
   return (
-    evidence.length <=
-      XADES_LIMITS.maximumEvidenceItems + XADES_LIMITS.maximumCertificates &&
     artifactBytes.byteLength +
       evidence.reduce((sum, item) => sum + item.byteLength, 0) <=
-      XADES_LIMITS.maximumEvidenceBytes
+    XADES_LIMITS.maximumEvidenceBytes
   );
 }
 
@@ -404,8 +395,6 @@ function bridgeFields(request) {
 }
 
 function mapVerificationResponse(response, policy) {
-  if (!response || typeof response !== "object")
-    return notEvaluated(DIAGNOSTICS.provider, "defect");
   if (["CANCELLED", "LIMIT", "UNAVAILABLE", "DEFECT"].includes(response.kind))
     return notEvaluated(
       response.diagnostic || DIAGNOSTICS.provider,
@@ -415,9 +404,11 @@ function mapVerificationResponse(response, policy) {
     return notEvaluated("DIAG-XADES-REPORT", "defect");
   let data;
   try {
-    data = new TextDecoder("utf-8", { fatal: true })
-      .decode(response.payload)
-      .split("\t");
+    if (!(response.payload instanceof Uint8Array))
+      throw new TypeError("XAdES report is not bytes");
+    if (!isAscii(response.payload))
+      throw new TypeError("XAdES report is not ASCII");
+    data = new TextDecoder("utf-8").decode(response.payload).split("\t");
   } catch {
     return notEvaluated("DIAG-XADES-REPORT", "defect");
   }
@@ -555,12 +546,7 @@ function validBaseRequest(request) {
 }
 
 function validateDigest(bytes, supplied) {
-  if (
-    !(bytes instanceof Uint8Array) ||
-    typeof supplied !== "string" ||
-    !/^[0-9a-f]{64}$/u.test(supplied)
-  )
-    return false;
+  if (!/^[0-9a-f]{64}$/u.test(supplied)) return false;
   const actual = createHash("sha256").update(bytes).digest();
   const expected = Buffer.from(supplied, "hex");
   return (
@@ -626,13 +612,15 @@ function remainingMs(deadlineAt) {
 function untilDeadline(operation, deadlineAt, signal) {
   const duration = Math.max(1, deadlineAt - performance.now());
   return new Promise((resolve, reject) => {
-    let settled = false;
-    const finish = (error, value) => {
-      if (settled) return;
-      settled = true;
+    let settlement;
+    const finish = (...outcome) => {
+      const [error, value] = outcome;
+      if (settlement !== undefined) return;
+      settlement = Object.freeze({ error, value });
       clearTimeout(timer);
       signal?.removeEventListener("abort", abort);
-      error ? reject(error) : resolve(value);
+      if (outcome.length === 1) reject(error);
+      else resolve(value);
     };
     const abort = () =>
       finish(Object.assign(new Error("aborted"), { code: "CANCELLED" }));

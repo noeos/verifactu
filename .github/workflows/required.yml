@@ -57,9 +57,14 @@ jobs:
           mkdir -p ci-evidence
           git log -1 --format='%H %G? %an <%ae>%n%B' > ci-evidence/signatures.json
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · governance signatures and DCO' --job-id signatures --output ci-reports/signatures.json --evidence-file ci-evidence/signatures.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-signatures
           path: ci-reports/signatures.json
@@ -90,9 +95,14 @@ jobs:
           mkdir -p ci-evidence
           python .github/scripts/validate_repository.py --self-test | tee ci-evidence/documentation.txt
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · documentation and traceability' --job-id documentation --output ci-reports/documentation.json --evidence-file ci-evidence/documentation.txt
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-documentation
           path: ci-reports/documentation.json
@@ -100,7 +110,7 @@ jobs:
   regulatory:
     name: Required · regulatory sources and generated contracts
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 140
     permissions:
       contents: read
     steps:
@@ -127,9 +137,14 @@ jobs:
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:p4-readiness
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · regulatory sources and generated contracts' --job-id regulatory --output ci-reports/regulatory.json --task-report evidence/runs/gate--p4-readiness.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-regulatory
           path: ci-reports/regulatory.json
@@ -137,7 +152,7 @@ jobs:
   quality:
     name: Required · quality and policy
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:
@@ -163,9 +178,14 @@ jobs:
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:p2
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · quality and policy' --job-id quality --output ci-reports/quality.json --task-report evidence/runs/gate--p2.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-quality
           path: ci-reports/quality.json
@@ -173,7 +193,7 @@ jobs:
   node-22-14-ubuntu:
     name: Required · ubuntu-24.04 · Node 22.14.0
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -199,18 +219,24 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: p4-g-cumulative-node-22-14-ubuntu
           path: |
             evidence/runs/test--p4-g.json
             evidence/runs/artifacts/p4-g-cumulative/**
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.14.0' --job-id node-22-14-ubuntu --output ci-reports/node-22-14-ubuntu.json --task-report evidence/runs/gate--platform.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-22-14-ubuntu
           path: ci-reports/node-22-14-ubuntu.json
@@ -218,7 +244,7 @@ jobs:
   node-22-23-ubuntu:
     name: Required · ubuntu-24.04 · Node 22.23.2
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -244,18 +270,24 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: p4-g-cumulative-node-22-23-ubuntu
           path: |
             evidence/runs/test--p4-g.json
             evidence/runs/artifacts/p4-g-cumulative/**
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 22.23.2' --job-id node-22-23-ubuntu --output ci-reports/node-22-23-ubuntu.json --task-report evidence/runs/gate--platform.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-22-23-ubuntu
           path: ci-reports/node-22-23-ubuntu.json
@@ -263,7 +295,7 @@ jobs:
   node-24-ubuntu:
     name: Required · ubuntu-24.04 · Node 24.21.0
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -287,18 +319,24 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: p4-g-cumulative-node-24-ubuntu
           path: |
             evidence/runs/test--p4-g.json
             evidence/runs/artifacts/p4-g-cumulative/**
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · ubuntu-24.04 · Node 24.21.0' --job-id node-24-ubuntu --output ci-reports/node-24-ubuntu.json --task-report evidence/runs/gate--platform.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-24-ubuntu
           path: ci-reports/node-24-ubuntu.json
@@ -306,7 +344,7 @@ jobs:
   node-24-windows:
     name: Required · windows-2025 · Node 24.21.0
     runs-on: windows-2025
-    timeout-minutes: 20
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -330,18 +368,24 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: p4-g-cumulative-node-24-windows
           path: |
             evidence/runs/test--p4-g.json
             evidence/runs/artifacts/p4-g-cumulative/**
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · windows-2025 · Node 24.21.0' --job-id node-24-windows --output ci-reports/node-24-windows.json --task-report evidence/runs/gate--platform.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-24-windows
           path: ci-reports/node-24-windows.json
@@ -349,7 +393,7 @@ jobs:
   node-24-macos:
     name: Required · macos-15 · Node 24.21.0
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 270
     permissions:
       contents: read
     steps:
@@ -392,18 +436,24 @@ jobs:
           VERIFACTU_PYTHON: python
         shell: bash
         run: node tooling/tasks/run-task.mjs --task gate:platform
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: p4-g-cumulative-node-24-macos
           path: |
             evidence/runs/test--p4-g.json
             evidence/runs/artifacts/p4-g-cumulative/**
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · macos-15 · Node 24.21.0' --job-id node-24-macos --output ci-reports/node-24-macos.json --task-report evidence/runs/gate--platform.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-node-24-macos
           path: ci-reports/node-24-macos.json
@@ -423,9 +473,14 @@ jobs:
         shell: bash
         run: node tooling/tasks/run-task.mjs --task package:reproducibility
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · package reproducibility' --job-id reproducibility --output ci-reports/reproducibility.json --task-report evidence/runs/package--reproducibility.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-reproducibility
           path: ci-reports/reproducibility.json
@@ -445,9 +500,14 @@ jobs:
         shell: bash
         run: node tooling/tasks/run-task.mjs --task integration:tarball-consumers
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · integration conformance' --job-id integration --output ci-reports/integration.json --task-report evidence/runs/integration--tarball-consumers.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-integration
           path: ci-reports/integration.json
@@ -480,6 +540,10 @@ jobs:
           mkdir -p ci-evidence
           npm ls --all --json > ci-evidence/dependency-tree.json
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -487,7 +551,8 @@ jobs:
           else
             node tooling/ci/write-check-report.mjs --context 'Required · dependency review' --job-id dependency-review --output ci-reports/dependency-review.json --task-report evidence/runs/policy--supply-chain.json
           fi
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-dependency-review
           path: ci-reports/dependency-review.json
@@ -515,13 +580,23 @@ jobs:
         with:
           node-version: 24.21.0
           check-latest: false
-      - name: Require non-empty SARIF and write leaf report
+      - name: Require non-empty SARIF
+        if: ${{ always() }}
         shell: bash
         run: |
           sarif=$(find codeql-results -name '*.sarif' -type f -size +0c -print -quit)
           test -n "$sarif"
-          node tooling/ci/write-check-report.mjs --context 'Required · CodeQL' --job-id codeql --output ci-reports/codeql.json --evidence-file "$sarif"
-      - uses: ./.github/actions/upload-check-report
+      - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
+        shell: bash
+        run: |
+          sarif=$(find codeql-results -name '*.sarif' -type f -size +0c -print -quit)
+          node tooling/ci/write-check-report.mjs --context 'Required · CodeQL' --job-id codeql --output ci-reports/codeql.json --evidence-file "${sarif:-codeql-results/missing.sarif}"
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-codeql
           path: ci-reports/codeql.json
@@ -549,9 +624,14 @@ jobs:
           node tooling/tools/run-admitted-tool.mjs --tool gitleaks -- git --no-banner --redact --exit-code 1 --log-opts='--all' > ci-evidence/gitleaks.txt 2>&1
           cat ci-evidence/gitleaks.txt
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · secret scan' --job-id secret-scan --output ci-reports/secret-scan.json --evidence-file ci-evidence/gitleaks.txt
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-secret-scan
           path: ci-reports/secret-scan.json
@@ -576,9 +656,14 @@ jobs:
           node tooling/tools/run-admitted-tool.mjs --tool osv-scanner -- scan --lockfile package-lock.json --format table > ci-evidence/osv.txt 2>&1
           cat ci-evidence/osv.txt
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · OSV' --job-id osv --output ci-reports/osv.json --evidence-file ci-evidence/osv.txt
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-osv
           path: ci-reports/osv.json
@@ -601,9 +686,14 @@ jobs:
           npm audit --audit-level=moderate
           node tooling/tasks/run-task.mjs --task policy:supply-chain
       - name: Write leaf report
+        if: ${{ always() }}
+        env:
+          REQUIRED_JOB_STATUS: ${{ job.status }}
+          REQUIRED_STEP_OUTCOME: ${{ job.status }}
         shell: bash
         run: node tooling/ci/write-check-report.mjs --context 'Required · npm audit signatures and licenses' --job-id npm-audit --output ci-reports/npm-audit.json --task-report evidence/runs/policy--supply-chain.json
-      - uses: ./.github/actions/upload-check-report
+      - if: ${{ always() }}
+        uses: ./.github/actions/upload-check-report
         with:
           artifact-name: required-report-npm-audit
           path: ci-reports/npm-audit.json

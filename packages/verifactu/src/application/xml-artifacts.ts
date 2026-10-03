@@ -112,6 +112,7 @@ export function transitionXmlArtifact(
     expectedBytes instanceof Uint8Array &&
     Boolean(originalBytes) &&
     originalBytes !== undefined &&
+    originalBytes.byteLength === artifact.length &&
     bytesEqual(expectedBytes, originalBytes);
   const sha256 =
     expectedBytes instanceof Uint8Array
@@ -123,11 +124,10 @@ export function transitionXmlArtifact(
       : null;
   if (
     !artifact ||
-    !custodyMatches ||
     !(expectedBytes instanceof Uint8Array) ||
+    !custodyMatches ||
     !sequence.includes(artifact.state) ||
     sequence.indexOf(next) !== sequence.indexOf(artifact.state) + 1 ||
-    expectedBytes.byteLength !== artifact.length ||
     !bytesEqual(expectedBytes, artifact.bytes) ||
     sha256?.status !== "ok" ||
     sha512?.status !== "ok" ||

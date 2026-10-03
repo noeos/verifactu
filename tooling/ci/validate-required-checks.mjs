@@ -29,6 +29,7 @@ assert(
 );
 const subject = process.env.VERIFACTU_SUBJECT_SHA;
 const observed = new Map();
+const reportFailures = [];
 for (const entry of entries) {
   const report = await readJson(entry.path);
   const leaf = leaves.find((candidate) => candidate.report === entry.relative);
@@ -39,14 +40,20 @@ for (const entry of entries) {
     "CLOSURE_REPORT_PRODUCER",
     entry.relative,
   );
-  assert(report.status === "passed", "CLOSURE_REPORT_STATUS", report.context);
+  assert(
+    ["passed", "failed", "blocked"].includes(report.status),
+    "CLOSURE_REPORT_STATUS",
+    report.context,
+  );
   assert(
     report.subject === subject,
     "CLOSURE_REPORT_SUBJECT",
     `${report.context}: ${report.subject}`,
   );
   assert(
-    Number.isInteger(report.executed) && report.executed > 0,
+    Number.isInteger(report.executed) &&
+      report.executed >= 0 &&
+      (report.status !== "passed" || report.executed > 0),
     "CLOSURE_REPORT_EMPTY",
     report.context,
   );
@@ -82,6 +89,8 @@ for (const entry of entries) {
     report.context,
   );
   observed.set(report.context, report);
+  if (report.status !== "passed")
+    reportFailures.push({ context: report.context, status: report.status });
 }
 for (const leaf of leaves) {
   const report = observed.get(leaf.context);
@@ -89,13 +98,24 @@ for (const leaf of leaves) {
   assert(report.jobId === leaf.jobId, "CLOSURE_PRODUCER", leaf.context);
 }
 const needs = JSON.parse(process.env.REQUIRED_NEEDS_JSON ?? "{}");
+const failedJobs = [];
 for (const leaf of leaves) {
-  assert(
-    needs[leaf.jobId]?.result === "success",
-    "CLOSURE_JOB_RESULT",
-    `${leaf.jobId}: ${needs[leaf.jobId]?.result ?? "absent"}`,
-  );
+  if (needs[leaf.jobId]?.result !== "success")
+    failedJobs.push({
+      jobId: leaf.jobId,
+      result: needs[leaf.jobId]?.result ?? "absent",
+    });
 }
+assert(
+  reportFailures.length === 0,
+  "CLOSURE_REPORT_FAILURES",
+  JSON.stringify(reportFailures),
+);
+assert(
+  failedJobs.length === 0,
+  "CLOSURE_JOB_FAILURES",
+  JSON.stringify(failedJobs),
+);
 const report = {
   schemaVersion: 1,
   context: "Required · required-check closure",

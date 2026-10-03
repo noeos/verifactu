@@ -92,6 +92,10 @@ test("P4-CB-017 operation plan is effect-free and rejects undeclared effects", (
     "invalid",
   );
   assert.equal(
+    createOperationPlan({ ...input, context: null }).status,
+    "invalid",
+  );
+  assert.equal(
     createOperationPlan({ ...input, operationId: id("tenant", "wrong-kind") })
       .status,
     "invalid",
@@ -102,6 +106,14 @@ test("P4-CB-017 operation plan is effect-free and rejects undeclared effects", (
   );
   assert.equal(
     createOperationPlan({ ...input, expectedHead: "" }).status,
+    "invalid",
+  );
+  assert.equal(
+    createOperationPlan({ ...input, expectedHead: "h".repeat(256) }).status,
+    "ok",
+  );
+  assert.equal(
+    createOperationPlan({ ...input, expectedHead: "h".repeat(257) }).status,
     "invalid",
   );
   assert.equal(
@@ -145,6 +157,10 @@ test("record planning validates input and returns a deterministic immutable plan
   assert.equal(first.status, "ok");
   assert.deepEqual(first.value, second.value);
   assert.match(first.value.semanticDigest, /^sha256:[0-9a-f]{64}$/u);
+  assert.equal(
+    first.value.semanticDigest,
+    "sha256:c593a88b5a67c543f3300bdaa540f3cdf59a3689fffc3511045709681351775c",
+  );
   assert.equal(Object.isFrozen(first.value), true);
   assert.equal(Object.isFrozen(first.value.context), true);
   assert.equal(Object.isFrozen(first.value.actions), true);
@@ -197,6 +213,14 @@ test("record planning validates input and returns a deterministic immutable plan
     planRecord({ ...input, digest, record: anulacion.value }).value.recordKind,
     "anulacion",
   );
+  assert.equal(
+    planRecord({
+      ...input,
+      digest,
+      record: { ...anulacion.value, kind: "unknown" },
+    }).status,
+    "invalid",
+  );
   for (const rejected of [
     planRecord(null),
     planRecord({ ...input, digest, record: null }),
@@ -235,6 +259,12 @@ test("official projection preserves absence, empty, zero, nil and declared field
       { name: "NilValue", presence: "nil", value: null },
     ],
   );
+  const firstField = projectOfficialFields([
+    { name: "First", order: 0, value: { presence: "empty" } },
+  ]);
+  assert.equal(firstField.status, "ok");
+  assert.equal(firstField.value[0].order, 0);
+  assert.equal(projectOfficialFields([null]).status, "invalid");
   assert.equal(
     projectOfficialFields([
       { name: "Optional", order: 0, value: { presence: "absent" } },
@@ -304,6 +334,15 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
     "invalid",
   );
   assert.equal(
+    serializeOfficialProjection(projected, { ...rule, label: "\ud800" }).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(projected, { ...rule, separator: "\ud800" })
+      .status,
+    "invalid",
+  );
+  assert.equal(
     serializeOfficialProjection(projected, { ...rule, editionId: "spoofed" })
       .status,
     "invalid",
@@ -324,7 +363,35 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   );
   assert.equal(
     serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\udfff" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\ud800A" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
       [{ name: "A", order: 0, presence: "value", value: "😀" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\ud800\udc00" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "\udbff\udfff" }],
       { ...rule, fields: ["A"] },
     ).status,
     "ok",
@@ -341,6 +408,24 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
     "invalid",
   );
   assert.equal(
+    serializeOfficialProjection(null, { ...rule, fields: [] }).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "future-state", value: "x" }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: null }],
+      { ...rule, fields: ["A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
     serializeOfficialProjection(
       [{ name: "A", order: 0, presence: "value", value: "x" }],
       { ...rule, label: "\ud800", fields: ["A"] },
@@ -353,6 +438,26 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
     "invalid",
   );
   assert.equal(
+    serializeOfficialProjection(projected, { ...rule, separator: "12345678" })
+      .status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(projected, { ...rule, separator: "123456789" })
+      .status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [
+        { name: "A", order: 0, presence: "empty", value: "" },
+        { name: "A", order: 1, presence: "empty", value: "" },
+      ],
+      { ...rule, fields: ["A", "A"] },
+    ).status,
+    "invalid",
+  );
+  assert.equal(
     serializeOfficialProjection(projected, {
       ...rule,
       fields: [...rule.fields, "Extra"],
@@ -362,6 +467,27 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   assert.equal(
     serializeOfficialProjection(projected, { ...rule, nilToken: undefined })
       .status,
+    "invalid",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "value", value: "x" }],
+      { ...rule, fields: ["A"], nilToken: undefined },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "nil", value: null }],
+      { ...rule, fields: ["A"], nilToken: "x".repeat(64) },
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    serializeOfficialProjection(
+      [{ name: "A", order: 0, presence: "nil", value: null }],
+      { ...rule, fields: ["A"], nilToken: "x".repeat(65) },
+    ).status,
     "invalid",
   );
   assert.equal(
@@ -382,8 +508,20 @@ test("official serialization fixes UTF-8, label, separator and lexical order", (
   );
 });
 test("fingerprint recomputes only supported edition-bound digest", () => {
+  assert.equal(createFingerprint(null).status, "invalid");
   const projected = projectOfficialFields(fields).value.filter((field) =>
     rule.fields.includes(field.name),
+  );
+  assert.equal(
+    createFingerprint({
+      editionId: id("tenant", editionId.value),
+      expectedEditionId: editionId,
+      algorithm: "sha256",
+      fields: projected,
+      rule,
+      digest,
+    }).status,
+    "invalid",
   );
   const result = createFingerprint({
     editionId,
@@ -520,6 +658,17 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     digest,
   );
   assert.equal(artifact.status, "ok");
+  const validInput = {
+    artifactId: "artifact-2",
+    context,
+    editionId,
+    kind: "xml",
+    mediaType: "application/xml",
+    bytes: new TextEncoder().encode("<record/>").slice(),
+    parentIds: [],
+    transform: "serialize",
+    state: "produced",
+  };
   source[0] = 0;
   assert.equal(new TextDecoder().decode(artifact.value.bytes), "<record/>");
   const exposed = artifact.value.bytes;
@@ -546,6 +695,15 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
       bounded.value,
       "validated",
       new TextEncoder().encode("<changed/>"),
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionXmlArtifact(
+      bounded.value,
+      "validated",
+      new TextEncoder().encode("!record/>"),
       digest,
     ).status,
     "invalid",
@@ -601,6 +759,23 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
   assert.equal(
     createXmlArtifact(
       {
+        artifactId: "x".repeat(256),
+        context,
+        editionId,
+        kind: "xml",
+        mediaType: "application/xml",
+        bytes: artifact.value.bytes,
+        parentIds: [],
+        transform: "copy",
+        state: "produced",
+      },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
         artifactId: "bad",
         context,
         editionId,
@@ -614,6 +789,39 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
       digest,
     ).status,
     "invalid",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
+        ...validInput,
+        artifactId: "artifact-max-bytes",
+        bytes: new Uint8Array(8 * 1024 * 1024),
+      },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
+        ...validInput,
+        artifactId: "artifact-first-product-boundary",
+        bytes: new Uint8Array(1024 * 1024 + 8 + 1),
+      },
+      digest,
+    ).status,
+    "ok",
+  );
+  assert.equal(
+    createXmlArtifact(
+      {
+        ...validInput,
+        artifactId: "artifact-second-product-boundary",
+        bytes: new Uint8Array(8 * 1024 + 1024 + 1),
+      },
+      digest,
+    ).status,
+    "ok",
   );
   assert.equal(
     createXmlArtifact(
@@ -649,17 +857,45 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     ).status,
     "invalid",
   );
-  const validInput = {
-    artifactId: "artifact-2",
-    context,
-    editionId,
-    kind: "xml",
-    mediaType: "application/xml",
-    bytes: new TextEncoder().encode("<record/>").slice(),
-    parentIds: [],
-    transform: "serialize",
-    state: "produced",
+  const constantDigest = {
+    providerId: "test:constant-digest",
+    digest: (algorithm) => "a".repeat(algorithm === "sha256" ? 64 : 128),
   };
+  const collisionArtifact = createXmlArtifact(
+    { ...validInput, artifactId: "artifact-collision" },
+    constantDigest,
+  );
+  assert.equal(collisionArtifact.status, "ok");
+  assert.equal(
+    transitionXmlArtifact(
+      collisionArtifact.value,
+      "bounded-and-digested",
+      collisionArtifact.value.bytes.slice(0, -1),
+      constantDigest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionXmlArtifact(
+      collisionArtifact.value,
+      "bounded-and-digested",
+      new TextEncoder().encode("!record/>"),
+      constantDigest,
+    ).status,
+    "invalid",
+  );
+  for (const mismatchedAlgorithm of ["sha256", "sha512"]) {
+    assert.equal(
+      transitionXmlArtifact(bounded.value, "validated", bounded.value.bytes, {
+        providerId: `test:mismatched-${mismatchedAlgorithm}`,
+        digest: (algorithm, bytes) =>
+          algorithm === mismatchedAlgorithm
+            ? "f".repeat(algorithm === "sha256" ? 64 : 128)
+            : createHash(algorithm).update(bytes).digest("hex"),
+      }).status,
+      "invalid",
+    );
+  }
   for (const malformed of [
     null,
     { ...validInput, artifactId: "" },
@@ -675,6 +911,8 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     { ...validInput, bytes: "not-bytes" },
     { ...validInput, parentIds: null },
     { ...validInput, parentIds: [""] },
+    { ...validInput, parentIds: [42] },
+    { ...validInput, parentIds: [null] },
     { ...validInput, transform: "" },
   ]) {
     assert.equal(createXmlArtifact(malformed, digest).status, "invalid");
@@ -685,8 +923,27 @@ test("byte artifact custody snapshots bytes and permits only exact monotonic tra
     "invalid",
   );
   assert.equal(
+    createXmlArtifact(validInput, {
+      providerId: "test:sha512-failure",
+      digest: (algorithm, bytes) =>
+        algorithm === "sha512"
+          ? "invalid"
+          : createHash("sha256").update(bytes).digest("hex"),
+    }).status,
+    "invalid",
+  );
+  assert.equal(
     transitionXmlArtifact(
       { ...bounded.value },
+      "validated",
+      bounded.value.bytes,
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionXmlArtifact(
+      "truthy primitive",
       "validated",
       bounded.value.bytes,
       digest,

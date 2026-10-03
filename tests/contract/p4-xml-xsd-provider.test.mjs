@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { access, rm } from "node:fs/promises";
 import test from "node:test";
 import {
   createXmlXsdProvider,
@@ -38,6 +39,12 @@ test("provider accepts only the exact edition schema closure and digest pins", a
   assert.equal(good.status, "valid");
   assert.equal(calls, 1);
 
+  const unknownRoot = await provider.validate(
+    request({ rootSchemaId: "unlisted-root" }),
+  );
+  assert.equal(unknownRoot.status, "defect");
+  assert.equal(unknownRoot.diagnostics[0], "DIAG-XSD-RESOURCE-MAP");
+
   const extra = request({
     schemas: [
       ...request().schemas,
@@ -55,6 +62,30 @@ test("provider accepts only the exact edition schema closure and digest pins", a
   assert.equal(digestMismatch.status, "defect");
   assert.equal(digestMismatch.diagnostics[0], "DIAG-XSD-RESOURCE-MAP");
   assert.equal(calls, 1);
+
+  const wrongPin = request();
+  wrongPin.schemas[0].sha256 = "0".repeat(64);
+  const pinMismatch = await provider.validate(wrongPin);
+  assert.equal(pinMismatch.status, "defect");
+  assert.equal(pinMismatch.diagnostics[0], "DIAG-XSD-RESOURCE-MAP");
+  assert.equal(calls, 1);
+});
+
+test("provider removes its temporary worker directory after completion", async () => {
+  let workerDirectory;
+  const provider = createXmlXsdProvider({
+    execute: async (_request, options) => {
+      workerDirectory = options.cwd;
+      return { kind: "valid", diagnostics: [] };
+    },
+  });
+  const result = await provider.validate(request());
+  assert.equal(result.status, "valid");
+  try {
+    await assert.rejects(access(workerDirectory), { code: "ENOENT" });
+  } finally {
+    await rm(workerDirectory, { recursive: true, force: true });
+  }
 });
 
 test("provider rejects a foreign edition, malformed request, and pre-aborted operation", async () => {
@@ -122,12 +153,41 @@ test("schema resource and input byte ceilings fail before process creation", asy
   });
   assert.equal(lowBudget.status, "limit");
   assert.equal(lowBudget.diagnostics[0], "DIAG-XSD-RESOURCES");
+  const validRequest = request();
+  const schemaSizes = validRequest.schemas.map(
+    (schema) => schema.bytes.byteLength,
+  );
+  const schemaTotal = schemaSizes.reduce((total, size) => total + size, 0);
+  const exactXmlLimit = await provider.validate(validRequest, {
+    limits: { maximumXmlBytes: validRequest.xml.byteLength },
+  });
+  assert.equal(exactXmlLimit.status, "valid");
+  const exactSchemaCount = await provider.validate(validRequest, {
+    limits: { maximumSchemas: validRequest.schemas.length },
+  });
+  assert.equal(exactSchemaCount.status, "valid");
+  const exactSchemaByteLimit = await provider.validate(validRequest, {
+    limits: { maximumSchemaBytes: schemaTotal },
+  });
+  assert.equal(exactSchemaByteLimit.status, "valid");
+  const fractionalSchemaLimit = await provider.validate(validRequest, {
+    limits: { maximumSchemaBytes: schemaTotal + 0.5 },
+  });
+  assert.equal(fractionalSchemaLimit.diagnostics[0], "DIAG-XML-LIMITS");
+  const zeroSchemaLimit = await provider.validate(validRequest, {
+    limits: { maximumSchemaBytes: 0 },
+  });
+  assert.equal(zeroSchemaLimit.diagnostics[0], "DIAG-XML-LIMITS");
+  const aggregateSchemaLimit = await provider.validate(validRequest, {
+    limits: { maximumSchemaBytes: Math.max(...schemaSizes) },
+  });
+  assert.equal(aggregateSchemaLimit.diagnostics[0], "DIAG-XSD-RESOURCES");
   const unknownBudget = await provider.validate(request(), {
     limits: { maxBytes: 1 },
   });
   assert.equal(unknownBudget.status, "limit");
   assert.equal(unknownBudget.diagnostics[0], "DIAG-XML-LIMITS");
-  assert.equal(calls, 0);
+  assert.equal(calls, 3);
 });
 
 test("worker statuses, exceptions, and diagnostic bounds map to stable outcomes", async () => {
@@ -156,6 +216,16 @@ test("worker statuses, exceptions, and diagnostic bounds map to stable outcomes"
   assert.deepEqual((await throwing.validate(request())).diagnostics, [
     "DIAG-XSD-PROVIDER",
   ]);
+  const exactDiagnosticBoundary = createXmlXsdProvider({
+    execute: async () => ({
+      kind: "valid",
+      diagnostics: Array.from({ length: 8 }, () => `DIAG-${"A".repeat(75)}`),
+    }),
+  });
+  assert.equal(
+    (await exactDiagnosticBoundary.validate(request())).status,
+    "valid",
+  );
   for (const diagnostics of [
     Array.from({ length: 9 }, () => "DIAG-XSD-TOO-MANY"),
     ["DIAG-XSD-" + "A".repeat(80)],

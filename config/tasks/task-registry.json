@@ -337,7 +337,7 @@
     },
     {
       "id": "test:p4-a",
-      "version": 13,
+      "version": 19,
       "owner": "quality-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -404,7 +404,7 @@
     },
     {
       "id": "test:p4-d",
-      "version": 87,
+      "version": 88,
       "owner": "cryptography-owner",
       "dependencies": ["build:packages"],
       "inputs": [
@@ -528,7 +528,7 @@
     },
     {
       "id": "test:p4-g",
-      "version": 1,
+      "version": 59,
       "owner": "quality-owner",
       "dependencies": [
         "test:p4-a",
@@ -546,13 +546,20 @@
       ],
       "inputs": [
         "config/quality/p4-quality-plan.json",
+        "evidence/schemas/p4-overall-mutation-report.schema.json",
         "config/tasks/task-registry.json",
         "packages/verifactu/src/**",
         "internal/xml-provider/**",
         "internal/xades-provider/**",
         "internal/independent-oracles/**",
         "tests/**/p4-*.test.mjs",
+        "tooling/assurance/p4-mutation-catalog.mjs",
+        "tooling/assurance/P4JavaMutationCatalog.java",
+        "tooling/assurance/p4-mutation-loader.mjs",
+        "tooling/assurance/p4-mutation-hooks.mjs",
+        "tooling/assurance/p4-overall-mutation-campaign.mjs",
         "tooling/tasks/operations.mjs",
+        "tooling/lib/core.mjs",
         "package-lock.json"
       ],
       "outputs": [
@@ -579,7 +586,7 @@
       ],
       "network": "denied",
       "secrets": "denied",
-      "timeoutSeconds": 1200,
+      "timeoutSeconds": 14400,
       "concurrencyLock": "p4-g-cumulative-closure",
       "selectionClass": "code-and-build",
       "reportSchema": "evidence/schemas/task-report.schema.json",

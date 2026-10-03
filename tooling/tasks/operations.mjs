@@ -33,6 +33,8 @@ import {
   walk,
   writeJsonAtomic,
 } from "../lib/core.mjs";
+import { discoverOverallMutationCatalog } from "../assurance/p4-mutation-catalog.mjs";
+import { executeOverallMutationCampaign } from "../assurance/p4-overall-mutation-campaign.mjs";
 
 const PACKAGE_ROOTS = [
   "packages/verifactu",
@@ -1498,6 +1500,7 @@ async function testP4A(context) {
     process.execPath,
     [
       "--experimental-test-coverage",
+      "--test-coverage-include=**/artifacts/build/verifactu/dist/**/*.js",
       "--test-coverage-exclude=**/verification/*.js",
       "--test",
       "--test-reporter=tap",
@@ -1525,6 +1528,11 @@ async function testP4A(context) {
     "P4A_TEST_COMPLETENESS",
     `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
   );
+  assert(
+    files.every((path) => !result.stdout.includes(path.split("/").at(-1))),
+    "P4A_COVERAGE_INCLUDES_TEST_CODE",
+    "coverage denominator must contain production modules only",
+  );
   const mutationResult = await run(
     process.execPath,
     ["--test", "--test-reporter=tap", "tests/mutation/p4-mutation.test.mjs"],
@@ -1551,6 +1559,23 @@ async function testP4A(context) {
       /# Subtest: P4-MUT-(?:00[1-9]|01\d|02[0-5]|029|03[7-9]|04[01])\b/gu,
     ),
   ];
+  const harnessCases = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: property campaign validation selects its declaration, not references\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Python mutation spans stay aligned across UTF-8 and UTF-16 text\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java mutation selections share one worker per test file\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java bridge probe keeps an independent timeout from mutation oracles\b/gu,
+    ),
+  ];
   const p4AFaults = [
     ["codec-stage-skip", "P4-MUT-001"],
     ["duplicate-member-accept", "P4-MUT-002"],
@@ -1564,10 +1589,14 @@ async function testP4A(context) {
     ["event-chain-mixing", "P4-MUT-011"],
     ["indeterminate-to-success", "P4-MUT-013"],
     ["chain-field-swap", "P4-MUT-015"],
+    ["encoding-change", "P4-FAULT-ENCODING"],
+    ["separator-change", "P4-MUT-020"],
+    ["artifact-byte-copy-loss", "P4-MUT-022"],
   ];
   assert(
-    Number(mutants) === 37 &&
-      Number(killed) === 37 &&
+    Number(mutants) - harnessCases.length === 41 &&
+      Number(killed) - harnessCases.length === 41 &&
+      harnessCases.length === 5 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1645,7 +1674,7 @@ async function testP4A(context) {
       `coverage.branch=${branches}`,
       `coverage.function=${functions}`,
       "criticalMutants=31/43 non-Java mappings; P4-D Java-only mutations run in test:p4-d",
-      `seededFaults=${p4AFaults.length}/${p4AFaults.length} ${p4AFaults.map(([fault]) => fault).join(",")}`,
+      `seededFaults=${p4AFaults.length}/${p4AFaults.length} ${p4AFaults.map(([fault, evidence]) => `${fault}:${evidence}`).join(",")}`,
       "properties=9x4096 seed=1346650369 retries=0 discards=0",
       "fuzz=P4-FUZZ-001x4096 seed=1346651649 retries=0 discards=0",
       `subject=${context.identity.subject}`,
@@ -1686,6 +1715,27 @@ async function testP4C(context) {
     "P4C_TEST_COMPLETENESS",
     `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
   );
+  for (const campaign of [
+    "P4-PROP-010 XML model serialize-parse preserves supported infoset (4096 executions)",
+    "P4-FUZZ-002 XML worker parser is total over its 4096-case replay corpus",
+    "P4-FUZZ-003 offline XSD resolver and validator process 4096 bounded cases",
+  ])
+    assert(
+      result.stdout.includes(campaign),
+      "P4C_CUMULATIVE_CAMPAIGN_MISSING",
+      campaign,
+    );
+  const xmlPropertySource = await readFile(
+    join(context.root, "tests/unit/p4-xml-model.test.mjs"),
+    "utf8",
+  );
+  assert(
+    /P4-PROP-010[\s\S]*?for \(let index = 0; index < 4096; index \+= 1\)/u.test(
+      xmlPropertySource,
+    ),
+    "P4C_PROPERTY_EXECUTION_COUNT",
+    "P4-PROP-010 must execute exactly 4,096 deterministic cases",
+  );
   const mutationResult = await run(
     process.execPath,
     ["--test", "--test-reporter=tap", "tests/mutation/p4-mutation.test.mjs"],
@@ -1712,9 +1762,27 @@ async function testP4C(context) {
       /# Subtest: P4-MUT-(?:00[1-9]|01\d|02[0-5]|029|03[7-9]|04[01])\b/gu,
     ),
   ];
+  const p4cHarnessCases = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: property campaign validation selects its declaration, not references\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Python mutation spans stay aligned across UTF-8 and UTF-16 text\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java mutation selections share one worker per test file\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java bridge probe keeps an independent timeout from mutation oracles\b/gu,
+    ),
+  ];
   assert(
-    Number(mutants) === 37 &&
-      Number(killed) === 37 &&
+    Number(mutants) - p4cHarnessCases.length === 41 &&
+      Number(killed) - p4cHarnessCases.length === 41 &&
+      p4cHarnessCases.length === 5 &&
       Number(mutantFailures) === 0 &&
       Number(mutantCancelled) === 0 &&
       Number(mutantSkipped) === 0 &&
@@ -1728,6 +1796,17 @@ async function testP4C(context) {
       "P4C_MUTATION_MISSING",
       evidence,
     );
+  const p4CSeededFaults = [
+    ["xsd-network-resolution", "P4-FAULT-XSD-NETWORK"],
+    ["xsd-provider-crash-valid", "P4-FAULT-XSD-CRASH-VALID"],
+  ];
+  for (const [fault, evidence] of p4CSeededFaults)
+    assert(
+      result.stdout.includes(evidence) ||
+        mutationResult.stdout.includes(`# Subtest: ${evidence}`),
+      "P4C_SEEDED_FAULT_MISSING",
+      `${fault} -> ${evidence}`,
+    );
   return {
     selected: files.length + 1,
     executed: files.length + 1,
@@ -1739,7 +1818,7 @@ async function testP4C(context) {
       `testCases=${tests}`,
       `skipped=${skipped}`,
       "criticalMutants=31/43 non-Java mappings; P4-D Java-only mutations run in test:p4-d",
-      "seededP4CFaults=3/3 P4-MUT-023..025",
+      `seededFaults=${p4CSeededFaults.length}/${p4CSeededFaults.length} ${p4CSeededFaults.map(([fault, evidence]) => `${fault}:${evidence}`).join(",")}`,
       "independentOracle=xmlschema@4.3.2/elementpath@5.1.4",
       "schemaClosure=8 exact digest-pinned AEAT/W3C sources",
       `subject=${context.identity.subject}`,
@@ -1782,11 +1861,23 @@ async function testP4E(context) {
     "P4-MUT-031",
     "P4-MUT-042",
     "P4-MUT-043",
+    "P4-FAULT-QR-ENVIRONMENT",
     "P4-PROP-011",
     "P4-PROP-014",
     "P4-FUZZ-005",
   ])
     assert(result.stdout.includes(required), "P4E_CAMPAIGN_MISSING", required);
+  const p4ESeededFaults = [
+    ["qr-environment-swap", "P4-FAULT-QR-ENVIRONMENT"],
+    ["qr-payload-truncated-or-rewritten", "P4-FAULT-QR-TRUNCATION"],
+    ["qr-oracle-uses-production-decoder", "P4-MUT-043"],
+  ];
+  for (const [fault, evidence] of p4ESeededFaults)
+    assert(
+      result.stdout.includes(evidence),
+      "P4E_SEEDED_FAULT_MISSING",
+      `${fault} -> ${evidence}`,
+    );
   return {
     selected: files.length,
     executed: files.length,
@@ -1800,6 +1891,7 @@ async function testP4E(context) {
       "fuzz=P4-FUZZ-005x4096 seed=1346650369 retries=0 discards=0",
       "encoder=@nuintun/qrcode@5.0.3",
       "decoder=qr@0.7.0/qr/decode.js",
+      `seededFaults=${p4ESeededFaults.length}/${p4ESeededFaults.length} ${p4ESeededFaults.map(([fault, evidence]) => `${fault}:${evidence}`).join(",")}`,
       `subject=${context.identity.subject}`,
     ],
   };
@@ -1857,11 +1949,21 @@ async function testP4F(context) {
     "P4-CB-035",
     "P4-CB-036",
     "P4-PROP-012",
+    "P4-FUZZ-006 Engine evidence adapter is total on 4096 malformed variants",
   ])
     assert(result.stdout.includes(required), "P4F_CAMPAIGN_MISSING", required);
   const propertySource = await readFile(
     join(context.root, "tests/unit/p4-claims.test.mjs"),
     "utf8",
+  );
+  const engineFuzzSource = await readFile(
+    join(context.root, "tests/contract/p4-engine-adapter.test.mjs"),
+    "utf8",
+  );
+  assert(
+    /P4-FUZZ-006[\s\S]*?index < 4096; index \+= 1/u.test(engineFuzzSource),
+    "P4F_FUZZ_EXECUTION_COUNT",
+    "P4-FUZZ-006 must execute exactly 4,096 deterministic cases",
   );
   assert(
     /P4-PROP-012 claim aggregation[\s\S]*?for \(let index = 0; index < 4096; index \+= 1\)/u.test(
@@ -1902,11 +2004,34 @@ async function testP4F(context) {
     "P4F_MUTATION_COMPLETENESS",
     `${mutationPass}/${mutationCount}, fail=${mutationFail}, skipped=${mutationSkipped}`,
   );
-  for (const mutant of ["P4-MUT-033", "P4-MUT-034", "P4-MUT-035", "P4-MUT-036"])
+  for (const mutant of [
+    "P4-MUT-032",
+    "P4-MUT-033",
+    "P4-MUT-034",
+    "P4-MUT-035",
+    "P4-MUT-036",
+  ])
     assert(
       mutations.stdout.includes(`# Subtest: ${mutant}`),
       "P4F_MUTANT_MISSING",
       mutant,
+    );
+  assert(
+    mutations.stdout.includes("# Subtest: P4-FAULT-ENGINE-VERSION"),
+    "P4F_ENGINE_PROFILE_VERSION_FAULT_MISSING",
+    "engine-profile-version-swap",
+  );
+  const p4FSeededFaults = [
+    ["claim-global-boolean", "P4-MUT-032"],
+    ["engine-profile-version-swap", "P4-FAULT-ENGINE-VERSION"],
+    ["engine-malformed-evidence-valid", "P4-MUT-034"],
+    ["field-order-swap", "P4-MUT-033"],
+  ];
+  for (const [fault, evidence] of p4FSeededFaults)
+    assert(
+      mutations.stdout.includes(`# Subtest: ${evidence}`),
+      "P4F_SEEDED_FAULT_MISSING",
+      `${fault} -> ${evidence}`,
     );
   return {
     selected: files.length + 1,
@@ -1922,11 +2047,52 @@ async function testP4F(context) {
       `coverage.branch=${coverageBranchesText}`,
       `coverage.function=${coverageFunctionsText}`,
       "P4-PROP-012x4096 seed=1346650369 retries=0 discards=0",
-      "criticalMutants=4/4 P4-MUT-033..036",
+      "fuzz=P4-FUZZ-006x4096 seed=1346651654 retries=0 discards=0",
+      "criticalMutants=5/5 P4-MUT-032..036",
+      `seededFaults=${p4FSeededFaults.length}/${p4FSeededFaults.length} ${p4FSeededFaults.map(([fault, evidence]) => `${fault}:${evidence}`).join(",")}`,
       `mutationTests=${mutationPass}/${mutationCount}`,
       `subject=${context.identity.subject}`,
     ],
   };
+}
+
+function mutationRisk(module) {
+  if (
+    module.startsWith("internal/") ||
+    module.includes("/application/qr.") ||
+    module.includes("/application/xades.") ||
+    module.includes("/contracts/staged-codec.") ||
+    module.includes("/ports/")
+  )
+    return "security";
+  if (
+    module.includes("/editions/") ||
+    module.includes("/domain/") ||
+    module.includes("/application/official-") ||
+    module.includes("/application/fingerprint.")
+  )
+    return "regulatory";
+  return "ordinary";
+}
+
+function outcomeCountFrom(mutants, outcome) {
+  return mutants.filter((mutant) => mutant.outcome === outcome).length;
+}
+
+export function propertyCampaignTestBody(source, campaignId) {
+  const declarations = [
+    ...source.matchAll(
+      /^[ \t]*test\([ \t]*(?:"([^"\n]*)"|'([^'\n]*)'|`([^`\n]*)`)/gmu,
+    ),
+  ];
+  const matches = declarations.filter((declaration) => {
+    const title = declaration[1] ?? declaration[2] ?? declaration[3];
+    return title === campaignId || title.startsWith(`${campaignId} `);
+  });
+  if (matches.length !== 1) return null;
+  const start = matches[0].index;
+  const next = declarations.find((declaration) => declaration.index > start);
+  return source.slice(start, next?.index ?? source.length);
 }
 
 async function testP4G(context) {
@@ -2024,6 +2190,525 @@ async function testP4G(context) {
       Number(skipped) === 0,
     "P4G_CUMULATIVE_TEST_COMPLETENESS",
     `${tests}/${passed}, failed=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  const propertyIds = Array.from(
+    { length: 14 },
+    (_, index) => `P4-PROP-${String(index + 1).padStart(3, "0")}`,
+  );
+  const propertyReports = result.stdout
+    .split("\n")
+    .filter((line) => line.startsWith("# P4-PROP-"));
+  const tapLines = result.stdout.split("\n");
+  const propertyReportIds = propertyReports.map(
+    (line) => /^# (P4-PROP-\d{3}) /u.exec(line)?.[1],
+  );
+  const missingProperties = propertyIds.filter(
+    (id) =>
+      propertyReportIds.filter((observed) => observed === id).length !== 1 ||
+      !propertyReports.some(
+        (line) =>
+          line.startsWith(`# ${id} `) &&
+          /(?:executions|cases)=4096 seed=\d+ discards=\d+ corpusSha256=[a-f0-9]{64}(?:\s|$)/u.test(
+            line,
+          ),
+      ) ||
+      !tapLines.some((line) =>
+        new RegExp(`^\\s*ok \\d+ - ${id}(?:\\s|$)`, "u").test(line),
+      ),
+  );
+  const fuzzIds = Array.from(
+    { length: 8 },
+    (_, index) => `P4-FUZZ-${String(index + 1).padStart(3, "0")}`,
+  );
+  const fuzzReports = result.stdout
+    .split("\n")
+    .filter((line) => line.startsWith("# P4-FUZZ-"));
+  const missingFuzz = fuzzIds.filter(
+    (id) =>
+      fuzzReports.filter((line) => line.startsWith(`# ${id} `)).length !== 1 ||
+      !fuzzReports.some(
+        (line) =>
+          line.startsWith(`# ${id} `) &&
+          /(?:executions|cases)=4096 seed=\d+ discards=0 .*corpusSha256=[a-f0-9]{64}/u.test(
+            line,
+          ),
+      ) ||
+      !tapLines.some((line) =>
+        new RegExp(`^\\s*ok \\d+ - ${id}(?:\\s|$)`, "u").test(line),
+      ),
+  );
+  assert(
+    missingProperties.length === 0 && missingFuzz.length === 0,
+    "P4G_PROPERTY_FUZZ_POPULATION",
+    JSON.stringify({
+      expectedProperties: propertyIds.length,
+      observedProperties: propertyReportIds,
+      missingProperties,
+      expectedFuzz: fuzzIds.length,
+      observedFuzz: fuzzReports.map(
+        (line) => /^# (P4-FUZZ-\d{3}) /u.exec(line)?.[1],
+      ),
+      missingFuzz,
+    }),
+  );
+  const overallMutationReportPath = resolve(
+    artifactRoot,
+    "overall-mutation-report.json",
+  );
+  const mutationCatalog = await discoverOverallMutationCatalog(
+    context.root,
+    plan,
+  );
+  let mutationResults;
+  try {
+    mutationResults = await executeOverallMutationCampaign(
+      context.root,
+      plan,
+      v8Root,
+      mutationCatalog,
+      {
+        artifactRoot,
+        subject: context.identity.subject,
+        tree: context.identity.tree,
+        concurrency: 4,
+        precompiledJavaClasses: mutationCatalog.precompiledJavaClasses,
+        javaHome,
+        java,
+        javac: resolve(
+          javaHome,
+          "bin",
+          process.platform === "win32" ? "javac.exe" : "javac",
+        ),
+        python: process.env.VERIFACTU_PYTHON ?? "python3",
+        dssJar: resolve(
+          context.root,
+          "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
+        ),
+        onProgress: ({ completed, total, result: mutant }) => {
+          if (completed === 1 || completed % 10 === 0 || completed === total)
+            process.stderr.write(
+              `P4 overall mutation ${completed}/${total}: ${mutant.id} ${mutant.outcome}\n`,
+            );
+        },
+      },
+    );
+  } finally {
+    await mutationCatalog.cleanup();
+  }
+  const outcomeCount = (outcome) =>
+    mutationResults.filter((mutation) => mutation.outcome === outcome).length;
+  const campaignMutationDenominator =
+    outcomeCount("killed") + outcomeCount("survived");
+  const mutationReport = {
+    schemaVersion: 1,
+    subject: context.identity.subject,
+    tree: context.identity.tree,
+    operators: mutationCatalog.operators,
+    discoveredModules: mutationCatalog.discoveredModules,
+    modulePopulation: mutationCatalog.modulePopulation,
+    excludedApplications: mutationCatalog.excludedApplications,
+    population: {
+      generated: mutationResults.length,
+      killed: outcomeCount("killed"),
+      survived: outcomeCount("survived"),
+      equivalent: outcomeCount("equivalent"),
+      compileErrors: outcomeCount("compileError"),
+      testErrors: outcomeCount("testError"),
+      noCoverage: outcomeCount("noCoverage"),
+      timeouts: outcomeCount("timeout"),
+      killedPercent:
+        campaignMutationDenominator === 0
+          ? 0
+          : (100 * outcomeCount("killed")) / campaignMutationDenominator,
+    },
+    mutants: mutationResults.map((mutation) => ({
+      ...mutation,
+      risk: mutationRisk(mutation.module),
+    })),
+  };
+  await writeJsonAtomic(overallMutationReportPath, mutationReport);
+  assert(
+    existsSync(overallMutationReportPath),
+    "P4G_OVERALL_MUTATION_REPORT_MISSING",
+    "the frozen six-operator production mutation campaign has no raw report",
+  );
+  const overallMutation = JSON.parse(
+    await readFile(overallMutationReportPath, "utf8"),
+  );
+  const mutationSchema = await readJson(
+    resolve(
+      context.root,
+      "evidence/schemas/p4-overall-mutation-report.schema.json",
+    ),
+  );
+  const validateMutationReport = new Ajv2020({
+    allErrors: true,
+    strict: true,
+  }).compile(mutationSchema);
+  assert(
+    validateMutationReport(overallMutation),
+    "P4G_OVERALL_MUTATION_SCHEMA",
+    JSON.stringify(validateMutationReport.errors),
+  );
+  const frozenModules = [...plan.productionModules].sort();
+  const catalogById = new Map(
+    mutationCatalog.mutants.map((mutation) => [mutation.id, mutation]),
+  );
+  const expectedExclusions = new Map(
+    mutationCatalog.excludedApplications.map((mutation) => [
+      mutation.id,
+      mutation,
+    ]),
+  );
+  const observedExclusions = overallMutation.excludedApplications;
+  const invalidExclusions = !Array.isArray(observedExclusions)
+    ? [{ id: null }]
+    : observedExclusions.filter((mutation) => {
+        const expected = expectedExclusions.get(mutation?.id);
+        return !expected || canonicalJson(mutation) !== canonicalJson(expected);
+      });
+  const discoveredModules = [
+    ...(overallMutation.discoveredModules ?? []),
+  ].sort();
+  const frozenOperators = [...plan.mutation.operators].sort();
+  const observedOperators = [...(overallMutation.operators ?? [])].sort();
+  const mutants = overallMutation.mutants;
+  const modulePopulation = overallMutation.modulePopulation;
+  const sourceDigests = new Map(
+    await Promise.all(
+      plan.productionModules.map(async (module) => [
+        module,
+        sha256(await readFile(resolve(context.root, module))),
+      ]),
+    ),
+  );
+  const modulePopulationByPath = new Map(
+    Array.isArray(modulePopulation)
+      ? modulePopulation.map((entry) => [entry.module, entry])
+      : [],
+  );
+  assert(
+    overallMutation.schemaVersion === 1 &&
+      overallMutation.subject === context.identity.subject &&
+      overallMutation.tree === context.identity.tree &&
+      Array.isArray(mutants) &&
+      mutants.length > 0 &&
+      Array.isArray(modulePopulation) &&
+      Array.isArray(observedExclusions) &&
+      observedExclusions.length === expectedExclusions.size &&
+      invalidExclusions.length === 0 &&
+      modulePopulation.length === frozenModules.length &&
+      modulePopulationByPath.size === frozenModules.length &&
+      mutants.length === mutationCatalog.mutants.length &&
+      JSON.stringify(discoveredModules) === JSON.stringify(frozenModules) &&
+      JSON.stringify(observedOperators) === JSON.stringify(frozenOperators) &&
+      frozenModules.every((module) => {
+        const entry = modulePopulationByPath.get(module);
+        return (
+          entry?.sourceSha256 === sourceDigests.get(module) &&
+          Number.isSafeInteger(entry?.applications) &&
+          Number.isSafeInteger(entry?.discoveredApplications) &&
+          Number.isSafeInteger(entry?.excludedApplications) &&
+          entry.applications ===
+            mutationCatalog.modulePopulation.find(
+              (candidate) => candidate.module === module,
+            )?.applications &&
+          entry.discoveredApplications ===
+            mutationCatalog.modulePopulation.find(
+              (candidate) => candidate.module === module,
+            )?.discoveredApplications &&
+          entry.excludedApplications ===
+            mutationCatalog.modulePopulation.find(
+              (candidate) => candidate.module === module,
+            )?.excludedApplications
+        );
+      }),
+    "P4G_OVERALL_MUTATION_IDENTITY",
+    JSON.stringify({
+      schemaVersion: overallMutation.schemaVersion,
+      subject: overallMutation.subject,
+      tree: overallMutation.tree,
+      expectedModules: frozenModules.length,
+      discoveredModules: discoveredModules.length,
+      expectedOperators: frozenOperators,
+      observedOperators,
+    }),
+  );
+  const mutantIds = mutants.map((mutant) => mutant?.id);
+  const mutantCountsByModule = new Map(
+    frozenModules.map((module) => [
+      module,
+      mutants.filter((mutant) => mutant?.module === module).length,
+    ]),
+  );
+  const mutantCountsByOperator = new Map(
+    frozenOperators.map((operator) => [
+      operator,
+      mutants.filter((mutant) => mutant?.operator === operator).length,
+    ]),
+  );
+  const killedMutants = mutants.filter((mutant) => mutant.outcome === "killed");
+  const survivedMutants = mutants.filter(
+    (mutant) => mutant.outcome === "survived",
+  );
+  const equivalentMutants = mutants.filter(
+    (mutant) => mutant.outcome === "equivalent",
+  );
+  const invalidMutants = mutants.filter(
+    (mutant) =>
+      !mutant ||
+      typeof mutant.id !== "string" ||
+      !frozenOperators.includes(mutant.operator) ||
+      !frozenModules.includes(mutant.module) ||
+      mutant.sourceSha256 !== sourceDigests.get(mutant.module) ||
+      !catalogById.has(mutant.id) ||
+      mutant.line !== catalogById.get(mutant.id)?.line ||
+      mutant.start !== catalogById.get(mutant.id)?.start ||
+      mutant.end !== catalogById.get(mutant.id)?.end ||
+      mutant.before !== catalogById.get(mutant.id)?.before ||
+      mutant.after !== catalogById.get(mutant.id)?.after ||
+      mutant.mutatedSha256 !== catalogById.get(mutant.id)?.mutatedSha256 ||
+      !/^[a-f0-9]{64}$/u.test(mutant.sourceSha256 ?? "") ||
+      !/^[a-f0-9]{64}$/u.test(mutant.mutatedSha256 ?? "") ||
+      !["passed", "failed"].includes(mutant.compile) ||
+      typeof mutant.covered !== "boolean" ||
+      !Array.isArray(mutant.tests) ||
+      new Set(mutant.tests).size !== mutant.tests.length ||
+      ![
+        "killed",
+        "survived",
+        "equivalent",
+        "compileError",
+        "testError",
+        "noCoverage",
+        "timeout",
+      ].includes(mutant.outcome) ||
+      (["killed", "survived", "equivalent", "testError"].includes(
+        mutant.outcome,
+      ) &&
+        (mutant.compile !== "passed" ||
+          mutant.covered !== true ||
+          mutant.tests.length === 0)) ||
+      (mutant.outcome === "timeout" && mutant.tests.length === 0) ||
+      (mutant.outcome === "compileError" && mutant.compile !== "failed") ||
+      (mutant.outcome === "noCoverage" &&
+        (mutant.compile !== "passed" || mutant.covered !== false)) ||
+      (mutant.outcome === "killed" &&
+        (!Array.isArray(mutant.killEvidence) ||
+          mutant.killEvidence.length === 0)) ||
+      (mutant.outcome === "equivalent" &&
+        (typeof mutant.rationale !== "string" ||
+          mutant.rationale.length === 0 ||
+          !mutant.reviews?.includes("quality-owner") ||
+          !mutant.reviews?.includes("project-owner"))) ||
+      (["security", "regulatory"].includes(mutant.risk) &&
+        mutant.outcome === "survived" &&
+        !mutant.reviews?.includes("quality-owner")),
+  );
+  const mutationDenominator = killedMutants.length + survivedMutants.length;
+  const population = overallMutation.population;
+  assert(
+    new Set(mutantIds).size === mutants.length &&
+      invalidMutants.length === 0 &&
+      mutationDenominator > 0 &&
+      killedMutants.length / mutationDenominator >=
+        plan.mutation.thresholds.overallKilledPercent / 100 &&
+      population?.generated === mutants.length &&
+      frozenModules.every(
+        (module) =>
+          modulePopulationByPath.get(module).applications ===
+          mutantCountsByModule.get(module),
+      ) &&
+      frozenOperators.every(
+        (operator) => mutantCountsByOperator.get(operator) > 0,
+      ) &&
+      population?.killed === killedMutants.length &&
+      population?.survived === survivedMutants.length &&
+      population?.equivalent === equivalentMutants.length &&
+      population?.compileErrors ===
+        mutants.filter((mutant) => mutant.outcome === "compileError").length &&
+      population?.testErrors ===
+        mutants.filter((mutant) => mutant.outcome === "testError").length &&
+      population?.compileErrors === 0 &&
+      population?.testErrors === 0 &&
+      population?.noCoverage === 0 &&
+      population?.timeouts === 0 &&
+      outcomeCountFrom(mutants, "timeout") === population?.timeouts &&
+      outcomeCountFrom(mutants, "noCoverage") === population?.noCoverage &&
+      mutants.length ===
+        killedMutants.length +
+          survivedMutants.length +
+          equivalentMutants.length +
+          population?.compileErrors +
+          population?.testErrors +
+          population?.noCoverage +
+          population?.timeouts &&
+      modulePopulation.reduce(
+        (sum, entry) => sum + entry.discoveredApplications,
+        0,
+      ) ===
+        mutants.length + observedExclusions.length &&
+      population?.killedPercent ===
+        (100 * killedMutants.length) / mutationDenominator,
+    "P4G_OVERALL_MUTATION_COMPLETENESS",
+    JSON.stringify({
+      generated: mutants.length,
+      killed: killedMutants.length,
+      survived: survivedMutants.length,
+      equivalent: equivalentMutants.length,
+      compileErrors: population?.compileErrors,
+      testErrors: population?.testErrors,
+      noCoverage: population?.noCoverage,
+      timeouts: population?.timeouts,
+      invalidMutants: invalidMutants.map((mutant) => mutant?.id ?? null),
+      excludedApplications: observedExclusions?.length,
+      invalidExclusions: invalidExclusions.map(
+        (mutation) => mutation?.id ?? null,
+      ),
+    }),
+  );
+  const mutationTestSource = await readFile(
+    resolve(context.root, "tests/mutation/p4-mutation.test.mjs"),
+    "utf8",
+  );
+  const criticalControls = [];
+  for (const entry of plan.criticalCatalogue) {
+    const testSource = await readFile(
+      resolve(context.root, entry.test),
+      "utf8",
+    );
+    let mutantStart = mutationTestSource.indexOf(`test("${entry.mutant}`);
+    if (mutantStart < 0)
+      mutantStart = mutationTestSource.indexOf(`test(\`${entry.mutant}`);
+    let mutantEnd =
+      mutantStart < 0
+        ? -1
+        : mutationTestSource.indexOf("\ntest(", mutantStart + 1);
+    const indentedMutantEnd =
+      mutantStart < 0
+        ? -1
+        : mutationTestSource.indexOf("\n  test(", mutantStart + 1);
+    if (
+      indentedMutantEnd >= 0 &&
+      (mutantEnd < 0 || indentedMutantEnd < mutantEnd)
+    )
+      mutantEnd = indentedMutantEnd;
+    const mutantBlock =
+      mutantStart < 0
+        ? ""
+        : mutationTestSource.slice(
+            mutantStart,
+            mutantEnd < 0 ? mutationTestSource.length : mutantEnd,
+          );
+    const assertionMapped =
+      testSource.includes(entry.id) || mutantBlock.includes(entry.id);
+    assert(
+      assertionMapped,
+      "P4G_CRITICAL_CONTROL_TEST_MAPPING",
+      `${entry.id} is absent from its frozen test ${entry.test} and its mutation oracle`,
+    );
+    assert(
+      result.stdout
+        .split("\n")
+        .some(
+          (line) =>
+            line.startsWith("ok ") && line.includes(` - ${entry.mutant}`),
+        ),
+      "P4G_CRITICAL_MUTANT_NOT_KILLED",
+      `${entry.id} (${entry.mutant}) must have a passing exact-mutant test`,
+    );
+    criticalControls.push({
+      id: entry.id,
+      productionPath: entry.path,
+      decision: entry.decision,
+      test: entry.test,
+      testSourceSha256: sha256(testSource),
+      mutant: entry.mutant,
+      mutantKilled: true,
+      assertionMapped,
+    });
+  }
+  await writeJsonAtomic(resolve(artifactRoot, "critical-control-report.json"), {
+    schemaVersion: 1,
+    subject: context.identity.subject,
+    tree: context.identity.tree,
+    expected: plan.criticalCatalogue.length,
+    executed: criticalControls.length,
+    passed: criticalControls.filter(
+      (control) => control.mutantKilled && control.assertionMapped,
+    ).length,
+    controls: criticalControls,
+  });
+  for (const campaign of plan.propertyCampaigns) {
+    assert(
+      result.stdout.includes(campaign.id),
+      "P4G_PROPERTY_CAMPAIGN_MISSING",
+      campaign.id,
+    );
+    const propertyTestBodies = [];
+    for (const path of files) {
+      const candidate = await readFile(join(context.root, path), "utf8");
+      const body = propertyCampaignTestBody(candidate, campaign.id);
+      if (body !== null) propertyTestBodies.push(body);
+    }
+    assert(
+      propertyTestBodies.length === 1,
+      "P4G_PROPERTY_SOURCE_MISSING",
+      `${campaign.id}: found ${propertyTestBodies.length} declared test bodies`,
+    );
+    assert(
+      /for\s*\(\s*let\s+\w+\s*=\s*0;\s*\w+\s*<\s*4096;\s*\w+\s*\+=\s*1\s*\)/u.test(
+        propertyTestBodies[0],
+      ),
+      "P4G_PROPERTY_EXECUTION_COUNT",
+      `${campaign.id} must contain exactly 4,096 deterministic iterations`,
+    );
+  }
+  for (const campaign of plan.fuzzCampaigns) {
+    assert(
+      result.stdout.includes(campaign.id),
+      "P4G_FUZZ_CAMPAIGN_MISSING",
+      campaign.id,
+    );
+    let fuzzSource;
+    for (const path of files) {
+      const candidate = await readFile(join(context.root, path), "utf8");
+      if (candidate.includes(campaign.id)) {
+        fuzzSource = candidate;
+        break;
+      }
+    }
+    assert(fuzzSource, "P4G_FUZZ_SOURCE_MISSING", campaign.id);
+    const hasJavaLoop =
+      /fuzzCount\s*=\s*4096[\s\S]*?for\s*\(\s*int\s+\w+\s*=\s*0;\s*\w+\s*<\s*fuzzCount\s*;/u.test(
+        fuzzSource,
+      );
+    const hasJavascriptLoop =
+      /for\s*\(\s*let\s+\w+\s*=\s*0;\s*\w+\s*<\s*4096;\s*\w+\s*\+=\s*1\s*\)/u.test(
+        fuzzSource,
+      );
+    assert(
+      hasJavaLoop || hasJavascriptLoop,
+      "P4G_FUZZ_EXECUTION_COUNT",
+      `${campaign.id} must contain a bounded 4,096-case loop`,
+    );
+    assert(
+      new RegExp(
+        `# ${campaign.id} (?:executions|cases)=4096 seed=\\d+ discards=0 [^\\n]*corpusSha256=[a-f0-9]{64}`,
+        "u",
+      ).test(result.stdout),
+      "P4G_FUZZ_REPLAY_REPORT",
+      `${campaign.id} must report exact count, seed and corpus digest`,
+    );
+  }
+  const property010 =
+    /P4-PROP-010 executions=4096 seed=1346650896 discards=0 corpusSha256=([a-f0-9]{64}) namespaceHistogram=([0-9,]+)/u.exec(
+      result.stdout,
+    );
+  assert(
+    property010 && property010[2].split(",").length === 97,
+    "P4G_PROPERTY_010_REPORT",
+    "P4-PROP-010 seed, replay corpus digest, or namespace histogram missing",
   );
   delete process.env.VERIFACTU_JAVA_MUTATION;
   delete process.env.VERIFACTU_JACOCO_AGENT;
@@ -2153,6 +2838,87 @@ async function testP4G(context) {
   const dependencies = new Map(
     context.dependencyReports.map((report) => [report.taskId, report]),
   );
+  const seededFaultEvidence = [];
+  for (const taskId of [
+    "test:p4-a",
+    "test:p4-c",
+    "test:p4-d",
+    "test:p4-e",
+    "test:p4-f",
+  ]) {
+    const taskReport = dependencies.get(taskId);
+    const diagnostic = taskReport?.diagnostics.find((line) =>
+      line.startsWith("seededFaults="),
+    );
+    assert(diagnostic, "P4G_SEEDED_FAULT_REPORT_MISSING", taskId);
+    const header = /^seededFaults=(\d+)\/(\d+) (.+)$/u.exec(diagnostic);
+    assert(header, "P4G_SEEDED_FAULT_REPORT_INVALID", diagnostic);
+    const [, declared, executed, evidenceList] = header;
+    const faults = evidenceList.split(",").map((entry) => {
+      const separator = entry.indexOf(":");
+      return {
+        taskId,
+        name: separator < 0 ? entry : entry.slice(0, separator),
+        evidence: separator < 0 ? "" : entry.slice(separator + 1),
+      };
+    });
+    assert(
+      Number(declared) === faults.length && Number(executed) === faults.length,
+      "P4G_SEEDED_FAULT_TASK_COUNT",
+      `${taskId}: ${declared}/${executed}, records=${faults.length}`,
+    );
+    seededFaultEvidence.push(...faults);
+  }
+  const expectedFaults = new Set(plan.seededFaults);
+  const observedFaultNames = seededFaultEvidence.map((fault) => fault.name);
+  const observedFaults = new Set(observedFaultNames);
+  const missingFaults = [...expectedFaults].filter(
+    (fault) => !observedFaults.has(fault),
+  );
+  const unexpectedFaults = [...observedFaults].filter(
+    (fault) => !expectedFaults.has(fault),
+  );
+  const duplicateFaults = observedFaultNames.filter(
+    (fault, index) => observedFaultNames.indexOf(fault) !== index,
+  );
+  const passedTestLines = result.stdout.split("\n");
+  const evidenceMismatches = seededFaultEvidence
+    .filter(
+      (fault) =>
+        fault.evidence.length === 0 ||
+        !passedTestLines.some(
+          (line) =>
+            line.trimStart().startsWith("ok ") &&
+            line.includes(` - ${fault.evidence}`),
+        ),
+    )
+    .map((fault) => ({ name: fault.name, evidence: fault.evidence }));
+  assert(
+    seededFaultEvidence.length === plan.seededFaults.length &&
+      observedFaults.size === plan.seededFaults.length &&
+      missingFaults.length === 0 &&
+      unexpectedFaults.length === 0 &&
+      duplicateFaults.length === 0 &&
+      evidenceMismatches.length === 0,
+    "P4G_SEEDED_FAULT_CENSUS",
+    JSON.stringify({
+      expected: plan.seededFaults.length,
+      observed: seededFaultEvidence.length,
+      missingFaults,
+      unexpectedFaults,
+      duplicateFaults,
+      evidenceMismatches,
+    }),
+  );
+  await writeJsonAtomic(resolve(artifactRoot, "seeded-fault-report.json"), {
+    schemaVersion: 1,
+    subject: context.identity.subject,
+    tree: context.identity.tree,
+    expected: plan.seededFaults.length,
+    executed: seededFaultEvidence.length,
+    passed: seededFaultEvidence.length,
+    faults: seededFaultEvidence,
+  });
   const reportClasses = [
     [
       "coverage-report",
@@ -2175,15 +2941,15 @@ async function testP4G(context) {
     ],
     [
       "property-report-with-seeds-and-shrinks",
-      ["test:p4-a", "test:p4-e", "test:p4-f"],
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
     ],
     [
       "fuzz-report-with-corpus-and-seeds",
-      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e"],
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
     ],
     [
       "seeded-fault-report",
-      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e"],
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
     ],
     [
       "official-and-independent-vector-report",
@@ -2200,7 +2966,10 @@ async function testP4G(context) {
       "security-attack-report",
       ["test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
     ],
-    ["performance-and-resource-report", []],
+    [
+      "performance-and-resource-report",
+      ["test:p4-a", "test:p4-c", "test:p4-d", "test:p4-e", "test:p4-f"],
+    ],
     ["compatibility-matrix-report", []],
     ["clean-packed-consumer-report", ["integration:tarball-consumers"]],
     [
@@ -2239,11 +3008,17 @@ async function testP4G(context) {
       outputDigest: dependencies.get(taskId)?.outputDigest,
     })),
     rawArtifactNames:
-      name === "performance-and-resource-report"
-        ? ["node-test.tap", "jacoco.xml"]
-        : name === "compatibility-matrix-report"
-          ? []
-          : undefined,
+      name === "critical-branch-report"
+        ? ["critical-control-report.json"]
+        : name === "mutation-report"
+          ? ["overall-mutation-report.json"]
+          : name === "seeded-fault-report"
+            ? ["seeded-fault-report.json"]
+            : name === "performance-and-resource-report"
+              ? ["node-test.tap", "jacoco.xml"]
+              : name === "compatibility-matrix-report"
+                ? []
+                : undefined,
     requiredCells:
       name === "compatibility-matrix-report"
         ? plan.compatibilityMatrix
@@ -2251,6 +3026,18 @@ async function testP4G(context) {
   }));
   const rawArtifacts = [
     ["node-test.tap", await sha256File(resolve(artifactRoot, "node-test.tap"))],
+    [
+      "overall-mutation-report.json",
+      await sha256File(overallMutationReportPath),
+    ],
+    [
+      "critical-control-report.json",
+      await sha256File(resolve(artifactRoot, "critical-control-report.json")),
+    ],
+    [
+      "seeded-fault-report.json",
+      await sha256File(resolve(artifactRoot, "seeded-fault-report.json")),
+    ],
     ["jacoco.xml", await sha256File(resolve(artifactRoot, "jacoco.xml"))],
     ["jacoco.exec", await sha256File(resolve(artifactRoot, "jacoco.exec"))],
     [
@@ -2282,6 +3069,7 @@ async function testP4G(context) {
     },
     oracle: oracleReport,
     reportClasses: evidenceReports,
+    performanceBudgets: plan.performanceBudgets,
     rawArtifacts,
     compatibilityCell: {
       id: compatibilityCell.id,
@@ -2581,6 +3369,13 @@ async function testP4D(context) {
     "P4D_TEST_COMPLETENESS",
     `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
   );
+  assert(
+    /P4-FUZZ-004 cases=4096 seed=1346651652 discards=0 parsed=\d+ rejected=\d+ verifierRejected=4096 corpusSha256=[a-f0-9]{64}/u.test(
+      result.stdout,
+    ),
+    "P4D_XADES_FUZZ_COMPLETENESS",
+    "Java XAdES parser/profile fuzz report is missing or incomplete",
+  );
   const coverage = await runMaven(
     maven,
     [
@@ -2666,9 +3461,27 @@ async function testP4D(context) {
       /# Subtest: P4-MUT-0(?:26|27|28|29|37|38|39|40|41)\b/gu,
     ),
   ];
+  const dHarnessCases = [
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: overall mutation loader intercepts only its exact runtime module\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: property campaign validation selects its declaration, not references\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Python mutation spans stay aligned across UTF-8 and UTF-16 text\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java mutation selections share one worker per test file\b/gu,
+    ),
+    ...mutationResult.stdout.matchAll(
+      /# Subtest: Java bridge probe keeps an independent timeout from mutation oracles\b/gu,
+    ),
+  ];
   assert(
-    Number(mutants) === 39 &&
-      Number(killed) === 39 &&
+    Number(mutants) - dHarnessCases.length === 43 &&
+      Number(killed) - dHarnessCases.length === 43 &&
+      dHarnessCases.length === 5 &&
       Number(mutationFailures) === 0 &&
       Number(mutationCancelled) === 0 &&
       Number(mutationSkipped) === 0 &&
@@ -2706,13 +3519,23 @@ async function testP4D(context) {
     `line=${javaLines.toFixed(2)}%, branch=${javaBranches.toFixed(2)}%; required 98/95`,
   );
   const p4DSeededFaults = [
+    ["signature-reference-wrap", "P4-MUT-026"],
+    ["signature-transform-extra", "P4-MUT-027"],
     ["dss-altered-signed-bytes-success", "P4-MUT-038"],
     [
-      "provider-serializes-or-logs-private-key",
-      "bridge child environment excludes unrelated parent secrets",
+      "certificate-time-bypass",
+      "P4-FAULT-CERTIFICATE-TIME-BYPASS rejects a certificate outside caller time",
     ],
-    ["stale-crl-ocsp-promoted-valid", "P4-MUT-040"],
-    ["unauthorized-revocation-responder-trusted", "P4-MUT-039"],
+    [
+      "provider-serializes-or-logs-private-key",
+      "P4-FAULT-PRIVATE-KEY-SERIALIZATION detects private key bytes in bridge requests",
+    ],
+    ["revocation-unknown-valid", "P4-MUT-040"],
+    ["stale-crl-ocsp-promoted-valid", "P4-MUT-029"],
+    [
+      "unauthorized-revocation-responder-trusted",
+      "P4-FAULT-UNAUTHORIZED-REVOCATION-RESPONDER rejects good status from unauthorized responder",
+    ],
     ["provider-attempts-network-without-evidence", "P4-MUT-041"],
   ];
   for (const [fault, evidence] of p4DSeededFaults) {
@@ -2756,8 +3579,8 @@ async function testP4D(context) {
       `javaLineCoverage=${lineCoverage[2]}/${Number(lineCoverage[1]) + Number(lineCoverage[2])}`,
       `javaBranchCoverage=${branchCoverage[2]}/${Number(branchCoverage[1]) + Number(branchCoverage[2])}`,
       "properties=P4-PROP-013x4096 seed=1346650369 retries=0 discards=0",
-      "fuzz=P4-FUZZ-007x4096 seed=1346651655; P4-FUZZ-008x4096 seed=1430257929; minimized failures=0",
-      `seededFaults=${p4DSeededFaults.length}/${p4DSeededFaults.length} ${p4DSeededFaults.map(([fault]) => fault).join(",")}`,
+      "fuzz=P4-FUZZ-004x4096 seed=1346651652; P4-FUZZ-007x4096 seed=1346651655; P4-FUZZ-008x4096 seed=1430257929; minimized failures=0",
+      `seededFaults=${p4DSeededFaults.length}/${p4DSeededFaults.length} ${p4DSeededFaults.map(([fault, evidence]) => `${fault}:${evidence}`).join(",")}`,
       "criticalMutants=9/9 P4-D (P4-MUT-026..029,037..041); registered campaign now includes P4-F P4-MUT-033..036",
       `subject=${context.identity.subject}`,
     ],

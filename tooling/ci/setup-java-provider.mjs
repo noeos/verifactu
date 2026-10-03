@@ -132,8 +132,9 @@ const components = admission.components;
 if (components.length !== 140)
   throw new Error(`JAVA_PROVIDER_COMPONENT_COUNT: ${components.length}`);
 
+const admissionWorkerCount = 2;
 let cursor = 0;
-const workers = Array.from({ length: 8 }, async () => {
+const workers = Array.from({ length: admissionWorkerCount }, async () => {
   while (cursor < components.length) {
     const component = components[cursor++];
     await admitComponent(component, repository);
@@ -144,12 +145,15 @@ const metadataPoms = admission.buildMetadataPoms;
 if (!Array.isArray(metadataPoms) || metadataPoms.length !== 100)
   throw new Error(`JAVA_PROVIDER_METADATA_POM_COUNT: ${metadataPoms?.length}`);
 let metadataCursor = 0;
-const metadataWorkers = Array.from({ length: 8 }, async () => {
-  while (metadataCursor < metadataPoms.length) {
-    const pom = metadataPoms[metadataCursor++];
-    await admitMetadataPom(pom, repository);
-  }
-});
+const metadataWorkers = Array.from(
+  { length: admissionWorkerCount },
+  async () => {
+    while (metadataCursor < metadataPoms.length) {
+      const pom = metadataPoms[metadataCursor++];
+      await admitMetadataPom(pom, repository);
+    }
+  },
+);
 await Promise.all(metadataWorkers);
 
 const envLines = [
@@ -299,7 +303,13 @@ async function fetchBytes(url, maximumBytes) {
         );
     }
   }
-  throw lastError;
+  const detail =
+    lastError instanceof Error
+      ? `${lastError.name}: ${lastError.message}`
+      : String(lastError);
+  throw new Error(`JAVA_PROVIDER_FETCH_FAILED: ${url}: ${detail}`, {
+    cause: lastError,
+  });
 }
 
 function digest(algorithm, bytes) {

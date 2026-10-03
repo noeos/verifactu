@@ -39,6 +39,15 @@ test("billing sequence rejects duplicate, gap and wrong-scope predecessor", () =
   assert.equal(
     appendSequence(one.value, {
       ...first,
+      id: f.id("record", "r2-same-instant"),
+      predecessorId: first.id,
+    }).status,
+    "ok",
+    "sequence timestamps may be equal while still remaining nondecreasing",
+  );
+  assert.equal(
+    appendSequence(one.value, {
+      ...first,
       id: f.id("record", "r2"),
       predecessorId: null,
     }).status,
@@ -55,17 +64,86 @@ test("billing sequence rejects duplicate, gap and wrong-scope predecessor", () =
   );
 });
 
+test("billing sequence rejects malformed record data and foreign context", () => {
+  const f = fixture();
+  const valid = {
+    id: f.id("record", "r1"),
+    context: f.context,
+    occurredAt: "2025-01-01T00:00:00Z",
+    predecessorId: null,
+  };
+  const sequence = { context: f.context, records: [] };
+  for (const item of [
+    { ...valid, id: f.id("tenant", "wrong-kind") },
+    { ...valid, occurredAt: "not-an-instant" },
+    {
+      ...valid,
+      context: {
+        ...f.context,
+        tenantId: f.id("tenant", "foreign-tenant"),
+      },
+    },
+  ])
+    assert.equal(appendSequence(sequence, item).status, "invalid");
+});
+
 test("chain link keeps predecessor and current digest distinct and verifies scope", () => {
   const f = fixture();
   const id = f.id("record", "r1");
   const input = new TextEncoder().encode("ordered=fields");
   const link = createChainLink(f.context, id, null, input, digest);
   assert.equal(link.status, "ok");
+  assert.equal(
+    createChainLink(null, id, null, input, digest).status,
+    "invalid",
+  );
   assert.match(link.value.currentDigest, /^sha256:[0-9a-f]{64}$/u);
   assert.equal(link.value.previousDigest, null);
   assert.equal(
+    verifyChainLink(link.value, null, null, input, digest).status,
+    "invalid",
+  );
+  assert.equal(
     verifyChainLink(link.value, f.context, null, input, digest).status,
     "ok",
+  );
+  assert.equal(
+    verifyChainLink(
+      { ...link.value, previousDigest: "bad-digest" },
+      f.context,
+      "bad-digest",
+      input,
+      digest,
+    ).status,
+    "invalid",
+  );
+  const otherContext = createFiscalContext({
+    ...f.context,
+    tenantId: f.id("tenant", "other-context"),
+  }).value;
+  assert.equal(
+    verifyChainLink(
+      { ...link.value, context: otherContext },
+      f.context,
+      null,
+      input,
+      digest,
+    ).status,
+    "invalid",
+  );
+  assert.equal(
+    verifyChainLink(link.value, f.context, null, input, digest).value,
+    true,
+  );
+  assert.equal(
+    verifyChainLink(
+      { ...link.value, context: null },
+      f.context,
+      null,
+      input,
+      digest,
+    ).status,
+    "invalid",
   );
   assert.equal(
     createChainLink(
@@ -144,6 +222,16 @@ test("chain link keeps predecessor and current digest distinct and verifies scop
       digest,
     ),
     { status: "verified", headDigest: link.value.currentDigest },
+  );
+  assert.deepEqual(
+    verifyCompleteChain(
+      [{ ...link.value, context: otherContext }],
+      new Map(),
+      f.context,
+      link.value.currentDigest,
+      digest,
+    ),
+    { status: "broken", code: "DIAG-CHAIN-LINK" },
   );
   assert.equal(
     verifyCompleteChain(

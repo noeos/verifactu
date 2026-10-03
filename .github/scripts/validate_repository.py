@@ -101,7 +101,7 @@ def validate(root: Path) -> list[str]:
                 forbidden,
                 "single-maintainer policy forbids CODEOWNERS",
             )
-    excluded_roots = {".git", ".build-cache", "node_modules"}
+    excluded_roots = {".git", ".build-cache", "node_modules", "target"}
     all_files = [
         p
         for p in root.rglob("*")

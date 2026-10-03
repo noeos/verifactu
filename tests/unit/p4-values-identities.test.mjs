@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   createIdentity,
+  createFiscalDocumentIdentity,
   isIdentity,
   sameIdentity,
 } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/identities.js";
@@ -23,6 +24,31 @@ import {
 test("identities retain kind validation and reject noncanonical control input", () => {
   assert.equal(createIdentity("tenant", " tenant ").status, "invalid");
   assert.equal(createIdentity("taxpayer", "ES123").status, "ok");
+  assert.equal(createIdentity("tenant", "x").status, "ok");
+  const taxpayer = createIdentity("taxpayer", "ES123").value;
+  const document = {
+    issuer: taxpayer,
+    series: "A",
+    number: "1",
+    issueDate: "2025-01-01",
+  };
+  assert.equal(createFiscalDocumentIdentity(document).status, "ok");
+  assert.equal(
+    createFiscalDocumentIdentity({
+      ...document,
+      issuer: createIdentity("tenant", "wrong-kind").value,
+    }).status,
+    "invalid",
+  );
+  for (const malformed of [
+    { ...document, series: "" },
+    { ...document, number: "" },
+    { ...document, issueDate: "2025-02-30" },
+  ])
+    assert.equal(createFiscalDocumentIdentity(malformed).status, "invalid");
+  const maximumIdentity = createIdentity("taxpayer", "x".repeat(128));
+  assert.equal(maximumIdentity.status, "ok");
+  assert.equal(isIdentity(maximumIdentity.value, "taxpayer"), true);
   assert.equal(createIdentity("event", "\0bad").status, "invalid");
   assert.equal(createIdentity("tenant", "").status, "invalid");
   assert.equal(createIdentity("tenant", "x".repeat(129)).status, "invalid");
@@ -55,6 +81,10 @@ test("decimal representation is exact and scale, sign and unsafe number are boun
   assert.equal(amount.status, "ok");
   assert.equal(amount.value.coefficient, 123450n);
   assert.equal(amount.value.scale, 3);
+  assert.equal(
+    createDecimal("9", { maxIntegerDigits: 1, maxScale: 0 }).status,
+    "ok",
+  );
   assert.equal(
     createDecimal("01.2", { maxIntegerDigits: 5, maxScale: 3 }).status,
     "invalid",
@@ -103,11 +133,26 @@ test("decimal representation is exact and scale, sign and unsafe number are boun
     "invalid",
   );
   assert.equal(
+    createDecimal("9".repeat(64), {
+      maxIntegerDigits: 64,
+      maxScale: 18,
+    }).status,
+    "ok",
+  );
+  assert.equal(
+    createDecimal(`0.${"1".repeat(18)}`, {
+      maxIntegerDigits: 64,
+      maxScale: 18,
+    }).status,
+    "ok",
+  );
+  assert.equal(
     decimalFromNumber(-0, { maxIntegerDigits: 5, maxScale: 0 }).status,
     "invalid",
   );
   for (const policy of [
     { maxIntegerDigits: Number.MAX_SAFE_INTEGER + 1, maxScale: 0 },
+    { maxIntegerDigits: Number.NaN, maxScale: 0 },
     { maxIntegerDigits: 65, maxScale: 0 },
     { maxIntegerDigits: 5, maxScale: -1 },
     { maxIntegerDigits: 5, maxScale: Number.NaN },
@@ -130,6 +175,14 @@ test("digest port validates every input, provider failure, and output form", () 
   const bytes = new Uint8Array([1, 2, 3]);
   const valid = { providerId: "test:digest", digest: () => "a".repeat(64) };
   assert.equal(digestBytes(valid, "sha256", bytes).status, "ok");
+  assert.equal(
+    digestBytes(
+      { providerId: "x".repeat(128), digest: () => "a".repeat(64) },
+      "sha256",
+      bytes,
+    ).status,
+    "ok",
+  );
   for (const [provider, algorithm, payload] of [
     [null, "sha256", bytes],
     [{ providerId: "", digest: () => "a".repeat(64) }, "sha256", bytes],
@@ -196,6 +249,10 @@ test("fiscal contexts require all four correctly typed identities", () => {
     requireSameContext(context.value, { ...context.value }).status,
     "ok",
   );
+  assert.equal(
+    requireSameContext(context.value, { ...context.value }).value,
+    true,
+  );
   for (const malformed of [
     null,
     { ...valid, tenantId: id("taxpayer", "wrong") },
@@ -219,6 +276,10 @@ test("fiscal contexts require all four correctly typed identities", () => {
 
 test("date and instant constructors reject impossible and implicit-time values", () => {
   assert.equal(createFiscalDate("2024-02-29").status, "ok");
+  assert.equal(
+    createFiscalDate({ toString: () => "2024-02-29" }).status,
+    "invalid",
+  );
   assert.equal(createFiscalDate("2023-02-29").status, "invalid");
   assert.equal(createFiscalDate("2000-02-29").status, "ok");
   assert.equal(createFiscalDate("1900-02-29").status, "invalid");
@@ -230,6 +291,10 @@ test("date and instant constructors reject impossible and implicit-time values",
   assert.equal(createFiscalDate("0000-01-01").status, "invalid");
   assert.equal(createFiscalDate("2024-2-09").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T03:04:05+01:00").status, "ok");
+  assert.equal(
+    createFiscalInstant({ toString: () => "2025-01-02T03:04:05Z" }).status,
+    "invalid",
+  );
   assert.equal(createFiscalInstant("2025-01-02T03:04:05Z").status, "ok");
   assert.equal(createFiscalInstant("2025-01-02T03:04:05.1-14:00").status, "ok");
   assert.equal(
@@ -251,6 +316,7 @@ test("date and instant constructors reject impossible and implicit-time values",
   assert.equal(createFiscalInstant("2025-01-02T03:04:05").status, "invalid");
   assert.equal(createFiscalInstant("2025-02-31T03:04:05Z").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T24:00:00Z").status, "invalid");
+  assert.equal(createFiscalInstant("2025-01-02T24:60:00Z").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T03:60:00Z").status, "invalid");
   assert.equal(createFiscalInstant("2025-01-02T03:04:60Z").status, "invalid");
   assert.equal(
@@ -265,6 +331,9 @@ test("date and instant constructors reject impossible and implicit-time values",
     createFiscalInstant("2025-01-02T03:04:05.123456789Z").status,
     "ok",
   );
+  const maximumInstant = "2025-01-02T03:04:05.123456789+14:00";
+  assert.equal(maximumInstant.length, 35);
+  assert.equal(createFiscalInstant(maximumInstant).status, "ok");
 });
 
 test("calendar and offset boundaries remain valid across every month", () => {

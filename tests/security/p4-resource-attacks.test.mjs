@@ -26,10 +26,20 @@ import { createAltaRecord } from "../../evidence/runs/artifacts/build/verifactu/
 import {
   encodeRequest,
   decodeResponse,
+  dssChildOptions,
   DSS_JVM_OPTIONS,
   minimalEnvironment,
   spawnDssBridge,
 } from "../../internal/xades-provider/worker.mjs";
+
+test("DSS child process options disable shell execution and hide console windows", () => {
+  const options = dssChildOptions("/tmp/verifactu-dss", { PATH: "/bin" });
+  assert.equal(options.cwd, "/tmp/verifactu-dss");
+  assert.deepEqual(options.env, { PATH: "/bin" });
+  assert.equal(options.shell, false);
+  assert.deepEqual(options.stdio, ["pipe", "pipe", "pipe"]);
+  assert.equal(options.windowsHide, true);
+});
 
 const request = {
   command: "VERIFY",
@@ -61,6 +71,24 @@ test("bridge encoder rejects unknown commands and malformed evidence lists", () 
   assert.equal(encodeRequest({ ...request, certificateChainDer: null }), null);
   assert.equal(encodeRequest({ ...request, command: "SHELL" }), null);
   assert.equal(encodeRequest({ ...request, crlEvidence: ["not bytes"] }), null);
+  assert.equal(encodeRequest({ ...request, trustAnchorsDer: null }), null);
+  assert.equal(encodeRequest({ ...request, crlEvidence: null }), null);
+  assert.equal(
+    encodeRequest({
+      ...request,
+      certificateChainDer: Array.from({ length: 32 }, (_, index) =>
+        index === 31 ? "not bytes" : new Uint8Array(),
+      ),
+    }),
+    null,
+  );
+  assert.equal(
+    encodeRequest({
+      ...request,
+      certificateChainDer: Array.from({ length: 33 }, () => new Uint8Array()),
+    }),
+    null,
+  );
   assert.equal(
     encodeRequest({
       ...request,
@@ -96,6 +124,77 @@ test("bridge encoder serializes a bounded request using strict base64 lines", ()
   const lines = new TextDecoder().decode(encoded).trimEnd().split("\n");
   assert.ok(lines.length >= 17);
   assert.ok(lines.every((line) => /^(?:[A-Za-z0-9+/]*={0,2})$/u.test(line)));
+  assert.ok(
+    encodeRequest({
+      ...request,
+      editionId: "e".repeat(128),
+      certificateChainDer: Array.from({ length: 32 }, () => new Uint8Array()),
+    }) instanceof Uint8Array,
+  );
+});
+
+test("DSS request encoder accepts exactly its declared byte limit", () => {
+  const atLimit = encodeRequest({
+    ...request,
+    certificateChainDer: Array.from({ length: 3 }, () => new Uint8Array()),
+    artifactBytes: new Uint8Array(17_999_847),
+  });
+  assert.ok(atLimit instanceof Uint8Array);
+  assert.equal(atLimit.byteLength, 24_000_000);
+  assert.equal(
+    encodeRequest({
+      ...request,
+      certificateChainDer: Array.from({ length: 3 }, () => new Uint8Array()),
+      artifactBytes: new Uint8Array(17_999_850),
+    }),
+    null,
+  );
+});
+
+test("Java bridge accepts exact request and field-count ceilings before parsing semantics", () => {
+  const base = rawWireRequest();
+  const baseFieldBytes = base
+    .toString("ascii")
+    .trimEnd()
+    .split("\n")
+    .reduce((total, line) => total + line.length, 0);
+  const remaining = 24_000_000 - baseFieldBytes;
+  assert.ok(remaining > 0 && remaining % 4 === 0);
+  const exactByteRequest = Buffer.concat([
+    base,
+    Buffer.from(`${"A".repeat(remaining)}\n`, "ascii"),
+  ]);
+  const exactBytes = runRawBridge(exactByteRequest, 30_000);
+  assert.equal(exactBytes.status, 0, exactBytes.stderr);
+  assert.match(
+    exactBytes.stdout,
+    /^VERIFACTU-DSS-1\nDEFECT\nDIAG-XADES-BRIDGE\n/u,
+  );
+
+  // The protocol request has 17 fields. Empty extension fields are decoded
+  // and rejected as trailing data, while exactly 128 total fields remain
+  // within the bridge's parser ceiling.
+  const exactFieldRequest = Buffer.concat([
+    base,
+    Buffer.from("\n".repeat(111), "ascii"),
+  ]);
+  const exactFields = runRawBridge(exactFieldRequest);
+  assert.equal(exactFields.status, 0, exactFields.stderr);
+  assert.match(
+    exactFields.stdout,
+    /^VERIFACTU-DSS-1\nDEFECT\nDIAG-XADES-BRIDGE\n/u,
+  );
+
+  const exactEvidenceCount = runRawBridge(
+    rawWireRequest({
+      certificateChainDer: Array.from({ length: 32 }, () => new Uint8Array()),
+    }),
+  );
+  assert.equal(exactEvidenceCount.status, 0, exactEvidenceCount.stderr);
+  assert.match(
+    exactEvidenceCount.stdout,
+    /^VERIFACTU-DSS-1\nLIMIT\nDIAG-XADES-EVIDENCE-BYTES\n/u,
+  );
 });
 
 test("DSS response decoder rejects malformed framing and validates every field", () => {
@@ -157,12 +256,26 @@ test("bridge child environment excludes unrelated parent secrets", () => {
   );
 });
 
+test("P4-FAULT-PRIVATE-KEY-SERIALIZATION detects private key bytes in bridge requests", () => {
+  const privateKey = new TextEncoder().encode(
+    "P4-PRIVATE-KEY-MUST-REMAIN-IN-OPAQUE-CALLBACK",
+  );
+  const encoded = encodeRequest({ ...request, privateKey });
+  assert.ok(encoded instanceof Uint8Array);
+  const wire = Buffer.from(encoded).toString("ascii");
+  assert.doesNotMatch(wire, /privateKey/u);
+  assert.doesNotMatch(
+    wire,
+    new RegExp(Buffer.from(privateKey).toString("base64"), "u"),
+  );
+});
+
 test("DSS JVM enables the process network-deny policy", () => {
   assert.ok(DSS_JVM_OPTIONS.includes("-Djava.security.manager=allow"));
   assert.ok(DSS_JVM_OPTIONS.includes("-Djava.net.useSystemProxies=false"));
 });
 
-function runRawBridge(input) {
+function runRawBridge(input, timeout = 10_000) {
   const javaExecutable =
     process.env.VERIFACTU_JAVA ??
     (process.platform === "win32" ? "java.exe" : "java");
@@ -181,8 +294,81 @@ function runRawBridge(input) {
       jarPath,
       "eu.noeos.verifactu.bridge.DssBridge",
     ],
-    { input, encoding: "utf8", timeout: 10_000, maxBuffer: 4_096 },
+    { input, encoding: "utf8", timeout, maxBuffer: 4_096 },
   );
+}
+
+async function probeUnsignedTargetRules(cases) {
+  const directory = await mkdtemp(
+    join(tmpdir(), "verifactu-dss-unsigned-target-probe-"),
+  );
+  const source = join(directory, "UnsignedTargetProbe.java");
+  const jarPath =
+    process.env.VERIFACTU_DSS_JAR ??
+    resolve(
+      "internal/xades-provider/dss/target/verifactu-xades-provider-0.0.0-development.jar",
+    );
+  const javaExecutable =
+    process.env.VERIFACTU_JAVA ??
+    (process.platform === "win32" ? "java.exe" : "java");
+  const classPathSeparator = process.platform === "win32" ? ";" : ":";
+  try {
+    await writeFile(
+      source,
+      [
+        "import java.lang.reflect.Method;",
+        "import java.nio.charset.StandardCharsets;",
+        "import java.util.Base64;",
+        "import javax.xml.parsers.DocumentBuilderFactory;",
+        "import org.xml.sax.InputSource;",
+        "import java.io.StringReader;",
+        "public final class UnsignedTargetProbe {",
+        "  public static void main(String[] args) throws Exception {",
+        '    Class<?> bridge = Class.forName("eu.noeos.verifactu.bridge.DssBridge");',
+        '    Method validate = bridge.getDeclaredMethod("validateUnsignedTarget", org.w3c.dom.Document.class, String.class);',
+        "    validate.setAccessible(true);",
+        "    for (int i = 0; i < args.length; i += 2) {",
+        "      var factory = DocumentBuilderFactory.newInstance();",
+        "      factory.setNamespaceAware(true);",
+        '      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);',
+        "      byte[] xml = Base64.getDecoder().decode(args[i]);",
+        "      var document = factory.newDocumentBuilder().parse(new InputSource(new StringReader(new String(xml, StandardCharsets.UTF_8))));",
+        "      System.out.println(validate.invoke(null, document, args[i + 1]));",
+        "    }",
+        "  }",
+        "}",
+        "",
+      ].join("\n"),
+    );
+    const compile = await promisify(execFile)(
+      javacExecutable,
+      ["--release", "21", "-cp", jarPath, "-d", directory, source],
+      { timeout: 30_000, maxBuffer: 16 * 1024 },
+    );
+    assert.equal(compile.stderr, "");
+    const probeArgs = cases.flatMap(({ xml, target }) => [
+      Buffer.from(xml, "utf8").toString("base64"),
+      target,
+    ]);
+    const result = spawnSync(
+      javaExecutable,
+      [
+        ...DSS_JVM_OPTIONS,
+        "-cp",
+        `${directory}${classPathSeparator}${jarPath}`,
+        "UnsignedTargetProbe",
+        ...probeArgs,
+      ],
+      { encoding: "utf8", timeout: 15_000, maxBuffer: 16 * 1024 },
+    );
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout
+      .trim()
+      .split(/\r?\n/u)
+      .map((value) => value === "true");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 }
 
 function jacocoJvmOptions() {
@@ -347,6 +533,18 @@ test("Java bridge fails closed across invalid command, digest, signing and XML r
       diagnostic: "DIAG-XADES-XML",
     },
     {
+      name: "signing XML depth limit remains a resource-limit response",
+      request: {
+        command: "SIGN_PREPARE",
+        signerCertificateDer: new Uint8Array([1]),
+        artifactBytes: new TextEncoder().encode(
+          `<RegistroAlta>${"<a>".repeat(65)}${"</a>".repeat(65)}</RegistroAlta>`,
+        ),
+      },
+      kind: "LIMIT",
+      diagnostic: "DIAG-XADES-REQUEST-BYTES",
+    },
+    {
       name: "malformed verification XML",
       request: { artifactBytes: new TextEncoder().encode("<RegistroAlta>") },
       kind: "INVALID",
@@ -382,9 +580,36 @@ test("Java bridge fails closed across invalid command, digest, signing and XML r
       assert.equal(report[12], item.reportDiagnostic, item.name);
     }
   }
+
+  const exactMinimumSignature = runRawBridge(
+    rawWireRequest({
+      command: "SIGN_COMPLETE",
+      signerCertificateDer: new Uint8Array([1]),
+      signatureBytes: new Uint8Array(128),
+    }),
+  );
+  assert.equal(exactMinimumSignature.status, 0, exactMinimumSignature.stderr);
+  assert.match(
+    exactMinimumSignature.stdout,
+    /^VERIFACTU-DSS-1\nDEFECT\nDIAG-XADES-BRIDGE\n/u,
+  );
+
+  const exactMaximumSignature = runRawBridge(
+    rawWireRequest({
+      command: "SIGN_COMPLETE",
+      signerCertificateDer: new Uint8Array([1]),
+      signatureBytes: new Uint8Array(1_024),
+    }),
+  );
+  assert.equal(exactMaximumSignature.status, 0, exactMaximumSignature.stderr);
+  assert.match(
+    exactMaximumSignature.stdout,
+    /^VERIFACTU-DSS-1\nDEFECT\nDIAG-XADES-BRIDGE\n/u,
+  );
 });
 
 test("Java bridge enforces every top-level request identity and artifact bound", () => {
+  const exactLimit = new Uint8Array(8_388_608);
   const tooLarge = new Uint8Array(8_388_609);
   const cases = [
     { name: "wrong protocol", request: { protocol: "VERIFACTU-DSS-0" } },
@@ -403,18 +628,78 @@ test("Java bridge enforces every top-level request identity and artifact bound",
       item.name,
     );
   }
+
+  const exactLimitResult = runRawBridge(
+    rawWireRequest({ artifactBytes: exactLimit }),
+  );
+  assert.equal(exactLimitResult.status, 0, exactLimitResult.stderr);
+  assert.match(exactLimitResult.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u);
+  const exactLimitReport = Buffer.from(
+    exactLimitResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(exactLimitReport[12], "DIAG-XADES-XML");
+});
+
+test("Java bridge checks unsigned targets with exact root, signature and ID rules", async () => {
+  const namespace =
+    "https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/tike/cont/ws/SuministroInformacion.xsd";
+  const valid = `<s:RegistroAlta xmlns:s="${namespace}"><s:ID/></s:RegistroAlta>`;
+  const cases = [
+    { xml: valid, target: "RegistroAlta", expected: true },
+    {
+      xml: valid.replaceAll("RegistroAlta", "RegistroAnulacion"),
+      target: "RegistroAlta",
+      expected: false,
+    },
+    {
+      xml: valid.replace(namespace, "urn:wrong"),
+      target: "RegistroAlta",
+      expected: false,
+    },
+    {
+      xml: valid.replace(
+        "</s:RegistroAlta>",
+        '<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></s:RegistroAlta>',
+      ),
+      target: "RegistroAlta",
+      expected: false,
+    },
+    {
+      xml: valid.replace(
+        "<s:ID/>",
+        '<s:First Id="duplicate"/><s:Second Id="duplicate"/>',
+      ),
+      target: "RegistroAlta",
+      expected: false,
+    },
+  ];
+  const outcomes = await probeUnsignedTargetRules(cases);
+  assert.deepEqual(
+    outcomes,
+    cases.map(({ expected }) => expected),
+  );
 });
 
 test("Java XML parser enforces depth, node, attribute and expanded-text limits", () => {
+  const exactDepth = `${"<n>".repeat(64)}x${"</n>".repeat(64)}`;
+  const exactNodes = `<r>${"<n/>".repeat(99_999)}</r>`;
+  const exactAttributes = `<r ${Array.from({ length: 4_096 }, (_, i) => `a${i}="x"`).join(" ")}/>`;
+  const exactText = `<r>${"x".repeat(2_097_152)}</r>`;
+  const exactCdataText = `<r><![CDATA[${"x".repeat(2_097_152)}]]></r>`;
   const nested = `${"<n>".repeat(65)}x${"</n>".repeat(65)}`;
   const tooManyNodes = `<r>${"<n/>".repeat(100_000)}</r>`;
   const tooManyAttributes = `<r ${Array.from({ length: 4_097 }, (_, i) => `a${i}="x"`).join(" ")}/>`;
   const tooMuchText = `<r>${"x".repeat(2_097_153)}</r>`;
+  const tooMuchCdataText = `<r><![CDATA[${"x".repeat(2_097_153)}]]></r>`;
   for (const [name, xml] of [
     ["depth", nested],
     ["nodes", tooManyNodes],
     ["attributes", tooManyAttributes],
     ["expanded text", tooMuchText],
+    ["expanded CDATA text", tooMuchCdataText],
   ]) {
     const result = runRawBridge(
       rawWireRequest({ artifactBytes: new TextEncoder().encode(xml) }),
@@ -425,6 +710,79 @@ test("Java XML parser enforces depth, node, attribute and expanded-text limits",
       /^VERIFACTU-DSS-1\nLIMIT\nDIAG-XADES-REQUEST-BYTES\n/u,
       name,
     );
+  }
+
+  const doctype =
+    '<!DOCTYPE RegistroAlta [<!ENTITY secret SYSTEM "file:///etc/passwd">]>' +
+    "<RegistroAlta>&secret;</RegistroAlta>";
+  const doctypeResult = runRawBridge(
+    rawWireRequest({ artifactBytes: new TextEncoder().encode(doctype) }),
+  );
+  assert.equal(doctypeResult.status, 0, doctypeResult.stderr);
+  assert.match(
+    doctypeResult.stdout,
+    /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u,
+    "DOCTYPE and external entities must be rejected by the Java parser",
+  );
+  const doctypeReport = Buffer.from(
+    doctypeResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(doctypeReport[12], "DIAG-XADES-XML");
+
+  const xinclude = new TextEncoder().encode(
+    '<RegistroAlta xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="file:///etc/passwd" parse="xml"/></RegistroAlta>',
+  );
+  const xincludeResult = runRawBridge(
+    rawWireRequest({ artifactBytes: xinclude }),
+  );
+  assert.equal(xincludeResult.status, 0, xincludeResult.stderr);
+  assert.match(xincludeResult.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u);
+  const xincludeReport = Buffer.from(
+    xincludeResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(xincludeReport[12], "DIAG-XADES-PROFILE");
+
+  const internalEntity =
+    '<!DOCTYPE RegistroAlta [<!ENTITY expanded "expanded-text">]>' +
+    "<RegistroAlta>&expanded;</RegistroAlta>";
+  const internalEntityResult = runRawBridge(
+    rawWireRequest({ artifactBytes: new TextEncoder().encode(internalEntity) }),
+  );
+  assert.equal(internalEntityResult.status, 0, internalEntityResult.stderr);
+  assert.match(
+    internalEntityResult.stdout,
+    /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u,
+  );
+  const internalEntityReport = Buffer.from(
+    internalEntityResult.stdout.trimEnd().split("\n")[3],
+    "base64",
+  )
+    .toString("ascii")
+    .split("\t");
+  assert.equal(internalEntityReport[12], "DIAG-XADES-XML");
+
+  for (const [name, xml] of [
+    ["exact depth", exactDepth],
+    ["exact node count", exactNodes],
+    ["exact attribute count", exactAttributes],
+    ["exact expanded text", exactText],
+    ["exact expanded CDATA text", exactCdataText],
+  ]) {
+    const result = runRawBridge(
+      rawWireRequest({ artifactBytes: new TextEncoder().encode(xml) }),
+    );
+    assert.equal(result.status, 0, `${name}: ${result.stderr}`);
+    assert.match(result.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u, name);
+    const report = Buffer.from(result.stdout.trimEnd().split("\n")[3], "base64")
+      .toString("ascii")
+      .split("\t");
+    assert.equal(report[12], "DIAG-XADES-PROFILE", name);
   }
 });
 
@@ -449,6 +807,16 @@ test("Java bridge rejects malformed and excessive certificate/revocation evidenc
       request: {
         certificateChainDer: Array.from(
           { length: 17 },
+          () => new Uint8Array([1]),
+        ),
+      },
+    },
+    {
+      name: "signer plus chain certificate count",
+      request: {
+        signerCertificateDer: new Uint8Array([1]),
+        certificateChainDer: Array.from(
+          { length: 16 },
           () => new Uint8Array([1]),
         ),
       },
@@ -492,6 +860,76 @@ test("Java bridge rejects malformed and excessive certificate/revocation evidenc
       item.name,
     );
   }
+
+  const profileReport = (overrides) => {
+    const result = runRawBridge(
+      rawWireRequest({
+        artifactBytes: new TextEncoder().encode("<RegistroAlta/>"),
+        ...overrides,
+      }),
+    );
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /^VERIFACTU-DSS-1\nINVALID\nNONE\n/u);
+    const report = Buffer.from(result.stdout.trimEnd().split("\n")[3], "base64")
+      .toString("ascii")
+      .split("\t");
+    assert.equal(report[12], "DIAG-XADES-PROFILE");
+  };
+
+  // Each individual ceiling is inclusive. These requests proceed to profile
+  // validation, proving the evidence gate did not reject the exact boundary.
+  profileReport({ signerCertificateDer: oneMegabyte });
+  profileReport({
+    certificateChainDer: Array.from({ length: 16 }, () => new Uint8Array([1])),
+  });
+  profileReport({
+    trustAnchorsDer: Array.from({ length: 8 }, () => new Uint8Array([1])),
+    crlEvidence: Array.from({ length: 4 }, () => new Uint8Array([1])),
+    ocspEvidence: Array.from({ length: 4 }, () => new Uint8Array([1])),
+  });
+
+  // The combined count is 18. Replacing either addition with subtraction
+  // would incorrectly allow this request past the aggregate item ceiling.
+  const tooManyCombinedItems = runRawBridge(
+    rawWireRequest({
+      artifactBytes: new TextEncoder().encode("<RegistroAlta/>"),
+      trustAnchorsDer: Array.from({ length: 16 }, () => new Uint8Array([1])),
+      crlEvidence: [new Uint8Array([1])],
+      ocspEvidence: [new Uint8Array([1])],
+    }),
+  );
+  assert.equal(tooManyCombinedItems.status, 0, tooManyCombinedItems.stderr);
+  assert.match(
+    tooManyCombinedItems.stdout,
+    /^VERIFACTU-DSS-1\nLIMIT\nDIAG-XADES-EVIDENCE-BYTES\n/u,
+  );
+
+  // Eight anchors plus the four-byte artifact total exactly 8 MiB; each
+  // individual certificate remains within its own 1 MiB ceiling.
+  profileReport({
+    artifactBytes: new TextEncoder().encode("<r/>"),
+    trustAnchorsDer: [
+      ...Array.from({ length: 7 }, () => oneMegabyte),
+      new Uint8Array(1_048_572),
+    ],
+  });
+
+  // The artifact is individually permitted, but adding even one byte of
+  // signer certificate crosses the combined evidence ceiling.
+  const artifactAtLimit = new TextEncoder().encode(
+    `<RegistroAlta>${" ".repeat(8_388_608 - "<RegistroAlta></RegistroAlta>".length)}</RegistroAlta>`,
+  );
+  const combinedBytesOverLimit = runRawBridge(
+    rawWireRequest({
+      artifactBytes: artifactAtLimit,
+      signerCertificateDer: new Uint8Array([1]),
+    }),
+  );
+  assert.equal(combinedBytesOverLimit.status, 0, combinedBytesOverLimit.stderr);
+  assert.match(
+    combinedBytesOverLimit.stdout,
+    /^VERIFACTU-DSS-1\nLIMIT\nDIAG-XADES-EVIDENCE-BYTES\n/u,
+  );
 });
 
 test("Java bridge installs a policy that denies socket permissions at runtime", async () => {
@@ -588,105 +1026,231 @@ test("bridge process applies deadline and cancellation, with a minimal environme
   }
 });
 
-test("DSS worker rejects oversized requests, output, diagnostics and failed process outcomes", async (t) => {
-  const directory = await mkdtemp(
-    join(tmpdir(), "verifactu-dss-worker-census-"),
-  );
-  const source = join(directory, "eu/noeos/verifactu/bridge/DssBridge.java");
-  const classPath = join(directory, "classes");
-  await mkdir(join(directory, "eu/noeos/verifactu/bridge"), {
-    recursive: true,
-  });
-  await mkdir(classPath);
-  const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
-  await writeFile(
-    source,
-    `package eu.noeos.verifactu.bridge; public final class DssBridge { public static void main(String[] args) throws Exception { ${body} } }\n`,
-  );
-  await promisify(execFile)(javacExecutable, [
-    "--release",
-    "21",
-    "-d",
-    classPath,
-    source,
-  ]);
-  t.after(() => rm(directory, { recursive: true, force: true }));
+test(
+  "DSS worker rejects oversized requests, output, diagnostics and failed process outcomes",
+  { timeout: 15_000 },
+  async (t) => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "verifactu-dss-worker-census-"),
+    );
+    const source = join(directory, "eu/noeos/verifactu/bridge/DssBridge.java");
+    const classPath = join(directory, "classes");
+    await mkdir(join(directory, "eu/noeos/verifactu/bridge"), {
+      recursive: true,
+    });
+    await mkdir(classPath);
+    const body = `String input = new String(System.in.readAllBytes(), java.nio.charset.StandardCharsets.US_ASCII); String[] fields = input.split("\\n"); String mode = new String(java.util.Base64.getDecoder().decode(fields[2]), java.nio.charset.StandardCharsets.UTF_8); if (mode.equals("stdout")) { System.out.print("x".repeat(13_000_000)); return; } if (mode.equals("wire-at-limit")) { System.out.print("x".repeat(134_358)); return; } if (mode.equals("wire-over-limit")) { System.out.print("x".repeat(134_359)); return; } if (mode.equals("bounded")) { byte[] payload = new byte[100_000]; System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\n" + java.util.Base64.getEncoder().encodeToString(payload) + "\\n"); return; } if (mode.equals("nonzero")) { System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n"); System.exit(1); return; } if (mode.equals("stderr-wire-over")) { System.err.print("x".repeat(5000)); System.err.flush(); Thread.sleep(5000); return; } if (mode.equals("stderr-wire-at-limit")) { System.err.print("x".repeat(4096)); System.err.flush(); Thread.sleep(5000); return; } if (mode.equals("stderr")) { System.err.print("x".repeat(5000)); return; } if (mode.equals("diagnostic-at-limit")) System.err.print("x".repeat(256)); if (mode.equals("diagnostic")) System.err.print("x".repeat(300)); if (mode.equals("exit")) System.exit(1); System.out.print("VERIFACTU-DSS-1\\nVERIFIED\\nNONE\\nYQ==\\n");`;
+    await writeFile(
+      source,
+      `package eu.noeos.verifactu.bridge; public final class DssBridge { public static void main(String[] args) throws Exception { ${body} } }\n`,
+    );
+    await promisify(execFile)(javacExecutable, [
+      "--release",
+      "21",
+      "-d",
+      classPath,
+      source,
+    ]);
+    t.after(() => rm(directory, { recursive: true, force: true }));
 
-  const response = (mode) =>
-    spawnDssBridge(
-      { ...request, editionId: mode },
+    const response = (mode) =>
+      spawnDssBridge(
+        { ...request, editionId: mode },
+        {
+          javaExecutable:
+            process.env.VERIFACTU_JAVA ??
+            (process.platform === "win32" ? "java.exe" : "java"),
+          jarPath: classPath,
+        },
+      );
+    assert.equal((await response("valid")).kind, "VERIFIED");
+    const exactLimitRequest = {
+      ...request,
+      certificateChainDer: Array.from({ length: 3 }, () => new Uint8Array()),
+      artifactBytes: new Uint8Array(17_999_847),
+    };
+    const exactLimitWire = encodeRequest(exactLimitRequest);
+    assert.equal(exactLimitWire.byteLength, 24_000_000);
+    const exactLimitResponse = await spawnDssBridge(exactLimitRequest, {
+      javaExecutable:
+        process.env.VERIFACTU_JAVA ??
+        (process.platform === "win32" ? "java.exe" : "java"),
+      jarPath: classPath,
+    });
+    assert.equal(exactLimitResponse.kind, "VERIFIED");
+    const absentRequest = await spawnDssBridge(null, {
+      javaExecutable:
+        process.env.VERIFACTU_JAVA ??
+        (process.platform === "win32" ? "java.exe" : "java"),
+      jarPath: classPath,
+    });
+    assert.equal(absentRequest.kind, "LIMIT");
+    assert.equal(absentRequest.diagnostic, "DIAG-XADES-REQUEST-BYTES");
+    const boundedResponse = await spawnDssBridge(
+      { ...request, editionId: "bounded" },
       {
-        javaExecutable:
-          process.env.VERIFACTU_JAVA ??
-          (process.platform === "win32" ? "java.exe" : "java"),
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
         jarPath: classPath,
+        maximumOutputBytes: 100_000,
       },
     );
-  assert.equal((await response("valid")).kind, "VERIFIED");
-  assert.equal(
-    (
-      await spawnDssBridge(
-        { ...request, editionId: "valid" },
-        {
+    assert.equal(boundedResponse.kind, "VERIFIED");
+    assert.equal(boundedResponse.payload.byteLength, 100_000);
+    const wireAtLimit = await spawnDssBridge(
+      { ...request, editionId: "wire-at-limit" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        maximumOutputBytes: 100_000,
+      },
+    );
+    assert.equal(wireAtLimit.kind, "DEFECT");
+    assert.equal(wireAtLimit.diagnostic, "DIAG-XADES-PROTOCOL");
+    const wireOverLimit = await spawnDssBridge(
+      { ...request, editionId: "wire-over-limit" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        maximumOutputBytes: 100_000,
+      },
+    );
+    assert.equal(wireOverLimit.kind, "LIMIT");
+    assert.equal(wireOverLimit.diagnostic, "DIAG-XADES-OUTPUT");
+    assert.equal(
+      (
+        await spawnDssBridge(
+          { ...request, editionId: "valid" },
+          {
+            javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+            jarPath: classPath,
+            maximumOutputBytes: 0,
+          },
+        )
+      ).kind,
+      "LIMIT",
+    );
+    assert.equal((await response("stdout")).kind, "LIMIT");
+    assert.equal((await response("stderr")).kind, "LIMIT");
+    assert.equal((await response("diagnostic")).kind, "LIMIT");
+    const diagnosticAtLimit = await response("diagnostic-at-limit");
+    assert.equal(diagnosticAtLimit.kind, "VERIFIED");
+    assert.deepEqual([...diagnosticAtLimit.payload], [97]);
+    const stderrWireOver = await spawnDssBridge(
+      { ...request, editionId: "stderr-wire-over" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        timeoutMs: 1_000,
+      },
+    );
+    assert.equal(stderrWireOver.kind, "LIMIT");
+    assert.equal(stderrWireOver.diagnostic, "DIAG-XADES-OUTPUT");
+    const stderrWireAtLimit = await spawnDssBridge(
+      { ...request, editionId: "stderr-wire-at-limit" },
+      {
+        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+        jarPath: classPath,
+        timeoutMs: 3_000,
+      },
+    );
+    assert.equal(stderrWireAtLimit.kind, "LIMIT");
+    assert.equal(stderrWireAtLimit.diagnostic, "DIAG-XADES-DEADLINE");
+    assert.equal((await response("exit")).kind, "DEFECT");
+    const nonzeroResponse = await response("nonzero");
+    assert.equal(nonzeroResponse.kind, "DEFECT");
+    assert.equal(nonzeroResponse.diagnostic, "DIAG-XADES-PROCESS");
+    assert.equal(
+      (
+        await spawnDssBridge(request, {
+          javaExecutable: "/missing/verifactu-java",
+          jarPath: classPath,
+        })
+      ).kind,
+      "UNAVAILABLE",
+    );
+    const abortListenerOptions = [];
+    const abortListenerRemovals = [];
+    const observationSignal = {
+      aborted: false,
+      addEventListener(type, listener, options) {
+        assert.equal(type, "abort");
+        abortListenerOptions.push(options);
+      },
+      removeEventListener(type, listener) {
+        assert.equal(type, "abort");
+        abortListenerRemovals.push(listener);
+      },
+    };
+    const missingJava = await spawnDssBridge(request, {
+      javaExecutable: "/missing/verifactu-java",
+      jarPath: classPath,
+      signal: observationSignal,
+    });
+    assert.equal(missingJava.kind, "UNAVAILABLE");
+    assert.deepEqual(abortListenerOptions, [{ once: true }]);
+    assert.equal(abortListenerRemovals.length, 1);
+    assert.equal(
+      (
+        await spawnDssBridge(request, {
           javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
           jarPath: classPath,
-          maximumOutputBytes: 0,
-        },
-      )
-    ).kind,
-    "LIMIT",
-  );
-  assert.equal((await response("stdout")).kind, "LIMIT");
-  assert.equal((await response("stderr")).kind, "LIMIT");
-  assert.equal((await response("diagnostic")).kind, "LIMIT");
-  assert.equal((await response("exit")).kind, "DEFECT");
-  assert.equal(
-    (
-      await spawnDssBridge(request, {
+          cwd: "/missing/verifactu-dss-cwd",
+        })
+      ).kind,
+      "UNAVAILABLE",
+    );
+    assert.equal(
+      (
+        await spawnDssBridge(request, {
+          javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+          jarPath: classPath,
+          cwd: Symbol("invalid cwd"),
+        })
+      ).kind,
+      "UNAVAILABLE",
+    );
+    assert.equal(
+      encodeRequest({ ...request, artifactBytes: new Uint8Array(18_000_000) }),
+      null,
+    );
+    const previousAgent = process.env.VERIFACTU_JACOCO_AGENT;
+    const previousDestination = process.env.VERIFACTU_JACOCO_DESTFILE;
+    try {
+      process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
+      process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
+      const invalidAgent = await spawnDssBridge(request, {
         javaExecutable: "/missing/verifactu-java",
         jarPath: classPath,
-      })
-    ).kind,
-    "UNAVAILABLE",
-  );
-  assert.equal(
-    (
-      await spawnDssBridge(request, {
-        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
+      });
+      assert.equal(invalidAgent.kind, "DEFECT");
+      assert.equal(invalidAgent.diagnostic, "DIAG-XADES-JACOCO");
+
+      delete process.env.VERIFACTU_JACOCO_AGENT;
+      const missingAgent = await spawnDssBridge(request, {
+        javaExecutable: "/missing/verifactu-java",
         jarPath: classPath,
-        cwd: "/missing/verifactu-dss-cwd",
-      })
-    ).kind,
-    "UNAVAILABLE",
-  );
-  assert.equal(
-    (
-      await spawnDssBridge(request, {
-        javaExecutable: process.env.VERIFACTU_JAVA ?? "java",
-        jarPath: classPath,
-        cwd: Symbol("invalid cwd"),
-      })
-    ).kind,
-    "UNAVAILABLE",
-  );
-  assert.equal(
-    encodeRequest({ ...request, artifactBytes: new Uint8Array(18_000_000) }),
-    null,
-  );
-  const previousAgent = process.env.VERIFACTU_JACOCO_AGENT;
-  const previousDestination = process.env.VERIFACTU_JACOCO_DESTFILE;
-  try {
-    process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco,invalid.jar";
-    process.env.VERIFACTU_JACOCO_DESTFILE = "/tmp/jacoco.exec";
-    assert.equal((await spawnDssBridge(request)).kind, "DEFECT");
-  } finally {
-    if (previousAgent === undefined) delete process.env.VERIFACTU_JACOCO_AGENT;
-    else process.env.VERIFACTU_JACOCO_AGENT = previousAgent;
-    if (previousDestination === undefined)
+      });
+      assert.equal(missingAgent.kind, "DEFECT");
+      assert.equal(missingAgent.diagnostic, "DIAG-XADES-JACOCO");
+
+      process.env.VERIFACTU_JACOCO_AGENT = "/tmp/jacoco.jar";
       delete process.env.VERIFACTU_JACOCO_DESTFILE;
-    else process.env.VERIFACTU_JACOCO_DESTFILE = previousDestination;
-  }
-});
+      const missingDestination = await spawnDssBridge(request, {
+        javaExecutable: "/missing/verifactu-java",
+        jarPath: classPath,
+      });
+      assert.equal(missingDestination.kind, "DEFECT");
+      assert.equal(missingDestination.diagnostic, "DIAG-XADES-JACOCO");
+    } finally {
+      if (previousAgent === undefined)
+        delete process.env.VERIFACTU_JACOCO_AGENT;
+      else process.env.VERIFACTU_JACOCO_AGENT = previousAgent;
+      if (previousDestination === undefined)
+        delete process.env.VERIFACTU_JACOCO_DESTFILE;
+      else process.env.VERIFACTU_JACOCO_DESTFILE = previousDestination;
+    }
+  },
+);
 
 const qrEditionId = "rrsif-2026-09-21-authoritative-candidate";
 const qrId = (kind, value) => createIdentity(kind, value).value;
@@ -734,11 +1298,15 @@ test("QR verifier rejects duplicate, unknown, missing, noncanonical and cross-en
       "www2.agenciatributaria.gob.es",
     ),
   ];
-  for (const candidate of malformed)
+  for (const [index, candidate] of malformed.entries()) {
     assert.equal(
       verifyQrPayload(candidate, qrRecord, selected, qrDigest).status,
       "invalid",
+      index === 0
+        ? "P4-CB-031 reject duplicate parameters assertion"
+        : undefined,
     );
+  }
 });
 
 test("QR renderer rejects dimension overflow before allocation without fallback", () => {

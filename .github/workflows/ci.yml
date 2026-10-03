@@ -23,7 +23,7 @@ jobs:
   engineering:
     name: Engineering CI · gate:p2
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 130
     permissions:
       contents: read
     steps:

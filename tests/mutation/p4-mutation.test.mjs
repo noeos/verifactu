@@ -10,8 +10,427 @@ import { inflateRawSync } from "node:zlib";
 import { promisify } from "node:util";
 import { spawnDssBridge } from "../../internal/xades-provider/worker.mjs";
 import test from "node:test";
+import { propertyCampaignTestBody } from "../../tooling/tasks/operations.mjs";
+import {
+  focusedProviderMutationTest,
+  mutationTestPatterns,
+  mutationCompileFailed,
+  javaMutationTestSelections,
+  combineJavaMutationTestSelections,
+  planJavaMutationTestRuns,
+  DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS,
+} from "../../tooling/assurance/p4-overall-mutation-campaign.mjs";
+import {
+  initialize as initializeMutationHooks,
+  load as loadMutationHooks,
+} from "../../tooling/assurance/p4-mutation-hooks.mjs";
+import { pythonMutations } from "../../tooling/assurance/p4-mutation-catalog.mjs";
+
+test("Python mutation spans stay aligned across UTF-8 and UTF-16 text", () => {
+  const source =
+    'label = "😀 é €"\ndef decide(left, right):\n    return left == right\n';
+  const mutations = pythonMutations("fixture.py", source);
+  const equality = mutations.find((mutation) => mutation.before === "==");
+  assert.ok(equality);
+  assert.equal(source.slice(equality.start, equality.end), "==");
+  const changed = `${source.slice(0, equality.start)}${equality.after}${source.slice(equality.end)}`;
+  assert.match(changed, /return left != right/u);
+});
+
+test("Java mutation selections share one worker per test file", () => {
+  const selected = combineJavaMutationTestSelections([
+    ["pki.test.mjs", "^certificate time policy$"],
+    ["pki.test.mjs", "^revocation remains indeterminate$"],
+    ["attacks.test.mjs", "^signature wrapping rejects$"],
+  ]);
+  assert.equal(selected.length, 2);
+  assert.equal(selected[0][0], "pki.test.mjs");
+  assert.match(selected[0][1], /certificate time policy/u);
+  assert.match(selected[0][1], /revocation remains indeterminate/u);
+  assert.equal(selected[1][0], "attacks.test.mjs");
+  assert.equal(selected[1][1], "^signature wrapping rejects$");
+  assert.deepEqual(
+    combineJavaMutationTestSelections([
+      ["pki.test.mjs", "^certificate time policy$"],
+      ["pki.test.mjs", undefined],
+    ]),
+    [["pki.test.mjs", undefined]],
+  );
+});
+
+test("Java bridge probe keeps an independent timeout from mutation oracles", () => {
+  const planned = [
+    ["pki.test.mjs", "^certificate time policy$"],
+    ["pki.test.mjs", "^revocation remains indeterminate$"],
+  ];
+  const probe = ["pki.test.mjs", "^bridge probe$"];
+  const runs = planJavaMutationTestRuns(planned, probe);
+  assert.equal(runs.selections.length, 1);
+  assert.match(runs.selections[0][1], /certificate time policy/u);
+  assert.match(runs.selections[0][1], /revocation remains indeterminate/u);
+  assert.deepEqual(runs.supplementalProbe, probe);
+  assert.deepEqual(runs.selectedTests, ["pki.test.mjs"]);
+
+  const included = planJavaMutationTestRuns([...planned, probe], probe);
+  assert.equal(included.selections.length, 1);
+  assert.equal(included.supplementalProbe, null);
+});
+
+{
+  assert.equal(DEFAULT_JAVA_MUTATION_TEST_TIMEOUT_MS, 180_000);
+
+  assert.deepEqual(javaMutationTestSelections({ line: 120 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java bridge enforces every top-level request identity and artifact bound|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+    ],
+  ]);
+  const signingGuardProbe = [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^P4-OVERALL-MUTATION-JAVA-GUARD-PROBE enforces DSS signing request boundaries$",
+    ],
+  ];
+  assert.deepEqual(
+    javaMutationTestSelections({ line: 127 }),
+    signingGuardProbe,
+  );
+  assert.deepEqual(
+    javaMutationTestSelections({ line: 140 }),
+    signingGuardProbe,
+  );
+  assert.deepEqual(javaMutationTestSelections({ line: 279 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^P4-OVERALL-MUTATION-JAVA-PROBE checks deterministic DSS bridge behaviors$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 525 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects a qualifying-properties target without its fragment marker$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 526 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects a qualifying-properties target without its fragment marker$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 250 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^(?:revoked is terminal and unknown, absent and malformed never become valid|DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence)$",
+    ],
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^exact DSS bridge verifies official XAdES structure and signature without inventing trust$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 420 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java bridge enforces every top-level request identity and artifact bound|Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+    ],
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects each altered XAdES profile component before crypto validation$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 439 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java XML parser enforces depth, node, attribute and expanded-text limits|Java XML parser traverses bounded comments, text, CDATA and nested elements)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 455 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 535 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 542 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS rejects each altered XAdES profile component before crypto validation$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 553 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 557 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^Java bridge checks unsigned targets with exact root, signature and ID rules$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 569 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation|DSS distinguishes optional and malformed embedded KeyValue data)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 578 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^(?:signed XML rejects wrapping, duplicate IDs, extra references, and entity attacks|DSS rejects each altered XAdES profile component before crypto validation|DSS distinguishes optional and malformed embedded KeyValue data)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 590 }), [
+    [
+      "tests/security/p4-signature-attacks.test.mjs",
+      "^DSS distinguishes optional and malformed embedded KeyValue data$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 145 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^DSS signs through the opaque callback and validates explicit fresh CRL/OCSP evidence$",
+    ],
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^Java bridge fails closed across invalid command, digest, signing and XML request paths$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 640 }), [
+    [
+      "tests/integration/p4-xades-pki.test.mjs",
+      "^(?:certificate policy keeps chain, trust, time, use, identity and authorization distinct|revoked is terminal and unknown, absent and malformed never become valid)$",
+    ],
+  ]);
+  assert.deepEqual(javaMutationTestSelections({ line: 760 }), [
+    [
+      "tests/security/p4-resource-attacks.test.mjs",
+      "^(?:Java bridge turns malformed wire data into a bounded defect response|Java bridge accepts exact request and field-count ceilings before parsing semantics|Java bridge fails closed across invalid command, digest, signing and XML request paths)$",
+    ],
+  ]);
+
+  const integration = "tests/integration/p4-qr-roundtrip.test.mjs";
+  const qr = "packages/verifactu/src/application/qr.ts";
+  const xmlModel = "packages/verifactu/src/ports/xml-xsd.ts";
+  const xmlUnit = "tests/unit/p4-xml-model.test.mjs";
+  const patterns = (module, line, test = integration) =>
+    mutationTestPatterns({ module, line }, test).map((entry) => entry.pattern);
+
+  assert.deepEqual(patterns(xmlModel, 182, xmlUnit), [
+    "^(?:XML model accepts each documented exact capacity|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model rejects a valid element name that exceeds the serialized byte ceiling)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 262, xmlUnit), [
+    "^(?:XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model applies a total serialized-byte ceiling before allocating output|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model fails closed across namespace, attribute, node, and text boundaries|XML model stops traversing siblings after serialized bytes overflow|XML model accounts for quotes as text without attribute expansion|XML model stops counting escaped text at the serialized byte ceiling|XML model accepts the complete valid scalar ranges and empty processing instructions|XML model accepts each documented exact capacity)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 330, xmlUnit), [
+    "^(?:XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model rejects maximum-length names before scanning their characters|XML model distinguishes default element namespaces from unprefixed attributes|XML model accepts the complete valid scalar ranges and empty processing instructions)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 395, xmlUnit), [
+    "^(?:XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model stops traversing siblings after serialized bytes overflow|XML model accounts for quotes as text without attribute expansion|XML model stops counting escaped text at the serialized byte ceiling|XML model accepts each documented exact capacity)$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 401, xmlUnit), [
+    "^(?:XML model accepts the complete valid scalar ranges and empty processing instructions|XML model enforces the text byte ceiling for three-byte characters|XML model enforces the text byte ceiling for supplementary characters|XML model counts DEL as one UTF-8 text byte|XML model stops counting escaped text at the serialized byte ceiling)$",
+  ]);
+  const xmlSerialization =
+    "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model sorts attributes deterministically when namespace keys are equal|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model accounts for quotes as text without attribute expansion|XML model accepts each documented exact capacity)$";
+  assert.deepEqual(patterns(xmlModel, 430, xmlUnit), [xmlSerialization]);
+  assert.deepEqual(patterns(xmlModel, 478, xmlUnit), [xmlSerialization]);
+
+  assert.deepEqual(patterns(qr, 100), [
+    "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+    "^P4-PROP-011",
+    "^P4-FUZZ-005",
+  ]);
+  assert.deepEqual(patterns(qr, 200), [
+    "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+  ]);
+  assert.deepEqual(patterns(qr, 250), [
+    "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
+  ]);
+  assert.deepEqual(patterns(qr, 400), [
+    "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+  ]);
+  assert.deepEqual(patterns(qr, 285), [
+    "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+  ]);
+  assert.deepEqual(patterns("packages/verifactu/src/domain/records.ts", 40), [
+    "^P4-PROP-011",
+  ]);
+  assert.deepEqual(
+    patterns(qr, 250, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^(?:P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 100, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^(?:QR encoder rejects non-Uint8Array byte sources|P4-E encoder port enforces admitted byte and correction-level input|P4-E payload binds canonical ordered query and mode endpoint|P4-E rejects cross-edition payloads, oversized fields and render bounds|P4-E rejects forged record facts, unsupported QR lexicals and digest failures|P4-E malformed verifier and edition identities fail closed)$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 308, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^(?:P4-E compact PNG keeps stored blocks bounded|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling)$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 320, "tests/contract/p4-qr-provider.test.mjs"),
+    [
+      "^(?:P4-E rejects malformed encoder ports, matrices and render option boundaries|P4-E deterministic PNG supports multi-block bounded rasters|P4-E SVG and PNG enforce the exact 4096-pixel dimension ceiling|P4-E PNG fails closed when its raster allocation ends at a row boundary|P4-E PNG encodes exact raster pixels, physical density and chunk checksums)$",
+    ],
+  );
+  assert.deepEqual(
+    patterns(qr, 320, "tests/integration/p4-qr-roundtrip.test.mjs"),
+    [
+      "^P4-E PNG renderer is deterministic, bounded and independently decodable$",
+    ],
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xml-provider/provider.mjs",
+      line: 213,
+    }),
+    "tests/contract/p4-xml-xsd-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "packages/verifactu/src/verification/engine-adapter.ts",
+      line: 54,
+    }),
+    "tests/contract/p4-engine-adapter.test.mjs [--test-name-pattern=^engine evidence rejects null shaped record and chain summaries$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 96,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 618,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs [--test-name-pattern=^deadline settlement ignores a timer callback after completion$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 623,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 627,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs [--test-name-pattern=^opaque signer callback cannot hold the provider past its explicit deadline$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/pki.mjs",
+      line: 60,
+    }),
+    "tests/integration/p4-xades-pki.test.mjs [--test-name-pattern=^(?:revoked is terminal and unknown, absent and malformed never become valid|PKI observation requires evidence and a fresh caller-time interval)$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 326,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/worker.mjs",
+      line: 280,
+    }),
+    "tests/security/p4-resource-attacks.test.mjs [--test-name-pattern=^DSS response decoder rejects malformed framing and validates every field$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xml-provider/worker.mjs",
+      line: 370,
+    }),
+    "tests/security/p4-xml-attacks.test.mjs [--test-name-pattern=^XML worker normalizes child spawn errors and post-spawn cancellation$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xml-provider/worker.mjs",
+      line: 441,
+    }),
+    "tests/security/p4-xml-attacks.test.mjs [--test-name-pattern=^XML worker normalizes child spawn errors and post-spawn cancellation$]",
+  );
+  assert.equal(
+    focusedProviderMutationTest({
+      module: "internal/xades-provider/provider.mjs",
+      line: 693,
+    }),
+    "tests/contract/p4-xades-provider.test.mjs",
+  );
+  assert.equal(
+    mutationCompileFailed(
+      "P4_MUTATION_ACTIVE:P4-OM-example:\nSyntaxError: Invalid regular expression",
+      true,
+    ),
+    false,
+  );
+  assert.equal(
+    mutationCompileFailed("P4_MUTATION_TYPESCRIPT_EMIT: invalid syntax", false),
+    true,
+  );
+}
+
+test("overall mutation loader intercepts only its exact runtime module", async () => {
+  const runtimeUrl = "file:///tmp/verifactu-mutation-runtime.mjs";
+  const runtimeSource = "export const mutated = true;";
+  initializeMutationHooks({ runtimeUrl, runtimeSource });
+  const fallback = async (url) => ({ format: "module", source: url });
+
+  assert.deepEqual(await loadMutationHooks(runtimeUrl, {}, fallback), {
+    format: "module",
+    source: runtimeSource,
+    shortCircuit: true,
+  });
+  assert.deepEqual(
+    await loadMutationHooks("file:///tmp/unrelated.mjs", {}, fallback),
+    { format: "module", source: "file:///tmp/unrelated.mjs" },
+  );
+});
 
 const built = resolve("evidence/runs/artifacts/build/verifactu/dist");
+
+test("property campaign validation selects its declaration, not references", () => {
+  const campaignId = "P4-PROP-011";
+  const selector = `test("mutation selector", () => {
+    assert.match(pattern, /^P4-PROP-011/);
+  });`;
+  const property = `test("P4-PROP-011 QR bytes remain exact", (t) => {
+    for (let index = 0; index < 4096; index += 1) runCase(index);
+    t.diagnostic("P4-PROP-011 executions=4096");
+  });`;
+
+  assert.equal(propertyCampaignTestBody(selector, campaignId), null);
+  assert.match(
+    propertyCampaignTestBody(`${selector}\n${property}`, campaignId),
+    /for \(let index = 0; index < 4096; index \+= 1\)/u,
+  );
+});
+
+const xmlSchemaSourceRoot = resolve(
+  "editions/source-snapshots/rrsif-2026-09-21-authoritative/sources",
+);
+const xmlSchemaPaths = {
+  "xsd-suministro-informacion": "aeat/SuministroInformacion.xsd",
+  "xmldsig-schema": "standards/xmldsig-core-schema.xsd",
+};
 let serial = 0;
 
 async function mutation(id, control, module, before, after, observe) {
@@ -127,6 +546,20 @@ async function contextFor(load) {
       installationId: id("installation", "mutation-installation"),
       editionId: id("edition", "mutation-edition"),
     }).value,
+  };
+}
+
+function xsdFaultRequest(xml, pinnedSchemas) {
+  return {
+    editionId: "rrsif-2026-09-21-authoritative-candidate",
+    xml: Buffer.from(xml, "utf8"),
+    rootSchemaId: "xsd-suministro-informacion",
+    schemas: Object.entries(xmlSchemaPaths).map(([id, path]) => ({
+      id,
+      bytes: readFileSync(join(xmlSchemaSourceRoot, path)),
+      sha256: pinnedSchemas[id].sha256,
+    })),
+    semanticStatus: "not-evaluated",
   };
 }
 
@@ -328,12 +761,9 @@ test("P4-MUT-006 kills an instant without an explicit offset", async () => {
     async ({ load }) => {
       const { createFiscalInstant } = await load("domain/date-time.js");
       let result;
-      assert.doesNotThrow(
-        () => {
-          result = createFiscalInstant("2025-01-01T12:00:00");
-        },
-        "P4-CB-006 instant rejection remains total",
-      );
+      assert.doesNotThrow(() => {
+        result = createFiscalInstant("2025-01-01T12:00:00");
+      }, "P4-CB-006 instant rejection remains total");
       assert.equal(
         result.status,
         "invalid",
@@ -864,12 +1294,94 @@ test("P4-MUT-021 kills a fingerprint edition mismatch", async () => {
   );
 });
 
+test("P4-FAULT-ENCODING rejects an unadmitted encoding change", async () => {
+  await mutation(
+    "P4-FAULT-ENCODING",
+    "P4-FAULT-ENCODING",
+    "application/official-serialization.js",
+    'rule.encoding !== "utf-8"',
+    "false",
+    async ({ load }) => {
+      const { serializeOfficialProjection } = await load(
+        "application/official-serialization.js",
+      );
+      const result = serializeOfficialProjection(
+        [{ name: "A", order: 0, presence: "value", value: "1" }],
+        {
+          editionId: { kind: "edition", value: "e" },
+          label: "FP",
+          separator: "&",
+          encoding: "utf-16le",
+          fields: ["A"],
+        },
+      );
+      assert.equal(
+        result.status,
+        "invalid",
+        "P4-FAULT-ENCODING rejects encoding changes",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-ENGINE-VERSION rejects a swapped Engine profile version", async () => {
+  await mutation(
+    "P4-FAULT-ENGINE-VERSION",
+    "P4-FAULT-ENGINE-VERSION",
+    "verification/engine-profile.js",
+    "version: ENGINE_PROFILE_VERSION",
+    'version: "2.0.0"',
+    async ({ load }) => {
+      const { ENGINE_PROFILE_MANIFEST } = await load(
+        "verification/engine-profile.js",
+      );
+      assert.equal(
+        ENGINE_PROFILE_MANIFEST.version,
+        "1.0.0",
+        "P4-FAULT-ENGINE-VERSION exact profile version assertion",
+      );
+    },
+  );
+});
+
+test("P4-FAULT-XSD-CRASH-VALID keeps worker crashes non-valid", async () => {
+  await mutation(
+    "P4-FAULT-XSD-CRASH-VALID",
+    "P4-FAULT-XSD-CRASH-VALID",
+    "internal/xml-provider/provider.mjs",
+    [
+      {
+        before:
+          '} catch {\n    return outcome("defect", "not-evaluated", semantic, ["DIAG-XSD-PROVIDER"]);\n  }\n}',
+        after:
+          '} catch {\n    return outcome("valid", "valid", semantic, []);\n  }\n}',
+      },
+    ],
+    undefined,
+    async ({ load }) => {
+      const { createXmlXsdProvider, PINNED_SCHEMAS } = await load(
+        "internal/xml-provider/provider.mjs",
+      );
+      const result = await createXmlXsdProvider({
+        execute: async () => {
+          throw new Error("seeded worker crash");
+        },
+      }).validate(xsdFaultRequest("<RegistroAlta/>", PINNED_SCHEMAS));
+      assert.notEqual(
+        result.status,
+        "valid",
+        "P4-FAULT-XSD-CRASH-VALID worker crash cannot prove validity",
+      );
+    },
+  );
+});
+
 test("P4-MUT-022 kills exact artifact byte custody substitution", async () => {
   await mutation(
     "P4-MUT-022",
     "P4-CB-022",
     "application/xml-artifacts.js",
-    "Boolean(originalBytes) &&\n        originalBytes !== undefined &&\n        bytesEqual(expectedBytes, originalBytes)",
+    "Boolean(originalBytes) &&\n        originalBytes !== undefined &&\n        originalBytes.byteLength === artifact.length &&\n        bytesEqual(expectedBytes, originalBytes)",
     "true",
     async ({ load }) => {
       const { id, context } = await contextFor(load);
@@ -1592,6 +2104,46 @@ test("P4-MUT-036 redacts malformed profile identity data from diagnostics", asyn
         JSON.stringify(result),
         /ES12345678/u,
         "P4-CB-036 diagnostic redaction assertion",
+      );
+    },
+  );
+});
+
+test("P4-MUT-032 kills a global valid flag on the claim set", async () => {
+  await mutation(
+    "P4-MUT-032",
+    "P4-CB-032",
+    "verification/claims.js",
+    "return ok(Object.freeze({ claims }));",
+    'return ok(Object.freeze({ claims, status: "valid" }));',
+    async ({ load }) => {
+      const { CLAIM_KINDS, createVerificationClaimSet } = await load(
+        "verification/claims.js",
+      );
+      const statuses = ["valid", "invalid", "indeterminate", "unsupported"];
+      const result = createVerificationClaimSet(
+        CLAIM_KINDS.map((kind, index) => {
+          const status = statuses[index];
+          return {
+            kind,
+            status,
+            ...(status === "valid"
+              ? { evidenceDigest: `sha256:${"a".repeat(64)}` }
+              : {}),
+            diagnostics: status === "valid" ? [] : [`DIAG-${index}`],
+          };
+        }),
+      );
+      assert.equal(result.status, "ok", "P4-CB-032 creation assertion");
+      assert.equal(
+        Object.hasOwn(result.value, "status"),
+        false,
+        "P4-CB-032 no global status assertion",
+      );
+      assert.equal(
+        Object.hasOwn(result.value, "valid"),
+        false,
+        "P4-CB-032 no global valid assertion",
       );
     },
   );

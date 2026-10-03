@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import {
   decodeJson,
@@ -11,8 +12,8 @@ const bytes = (value) => new TextEncoder().encode(value);
 
 test("staged JSON decoding rejects syntax and UTF-8 errors without partial output", () => {
   assert.equal(
-    decodeJson(Uint8Array.from([0xc3, 0x28]), schema).status,
-    "invalid",
+    decodeJson(Uint8Array.from([0xc3, 0x28]), schema).diagnostics[0].code,
+    "DIAG-INPUT-UTF8",
   );
   assert.equal(decodeJson(bytes('{"id":'), schema).status, "invalid");
   assert.equal(decodeJson(bytes("{}{}"), schema).status, "invalid");
@@ -22,7 +23,10 @@ test("staged JSON decoding rejects syntax and UTF-8 errors without partial outpu
     '{"id":"a" "kind":"alta"}',
     '{"id":"a","kind":"alta","memo":"bad\nline"}',
   ])
-    assert.equal(decodeJson(bytes(malformed), schema).status, "invalid");
+    assert.equal(
+      decodeJson(bytes(malformed), schema).diagnostics[0].code,
+      "DIAG-JSON-SYNTAX",
+    );
   assert.equal(
     decodeJson(bytes('\ufeff{"id":"a","kind":"alta"}'), schema).diagnostics[0]
       .stage,
@@ -67,15 +71,43 @@ test("closed object schema rejects duplicate, unknown and missing members", () =
     decodeJson(bytes('{"id":"a"}'), schema).diagnostics[0].code,
     "DIAG-JSON-REQUIRED",
   );
-  assert.equal(decodeJson(bytes("[]"), schema).status, "invalid");
-  assert.equal(decodeJson(bytes("null"), schema).status, "invalid");
   assert.equal(
-    decodeJson(
-      bytes('{"id":"a","kind":"alta","memo":[true,false,null,1,{},[]]}'),
-      schema,
-    ).status,
-    "ok",
+    decodeJson(bytes("[]"), schema).diagnostics[0].code,
+    "DIAG-JSON-OBJECT",
   );
+  assert.equal(
+    decodeJson(bytes("null"), schema).diagnostics[0].code,
+    "DIAG-JSON-OBJECT",
+  );
+  assert.equal(
+    decodeJson(bytes("2"), schema).diagnostics[0].code,
+    "DIAG-JSON-OBJECT",
+  );
+  const jsonValues = decodeJson(
+    bytes('{"id":"a","kind":"alta","memo":[true,false,null,1,{},[]]}'),
+    schema,
+  );
+  assert.equal(jsonValues.status, "ok");
+  assert.deepEqual(jsonValues.value.memo, [
+    true,
+    false,
+    null,
+    1,
+    Object.create(null),
+    [],
+  ]);
+  const memoWithSpaces = decodeJson(
+    bytes('{"id":"a","kind":"alta","memo":"with spaces"}'),
+    schema,
+  );
+  assert.equal(memoWithSpaces.status, "ok");
+  assert.equal(memoWithSpaces.value.memo, "with spaces");
+  const memoWithEscape = decodeJson(
+    bytes('{"id":"a","kind":"alta","memo":"line\\nbreak"}'),
+    schema,
+  );
+  assert.equal(memoWithEscape.status, "ok");
+  assert.equal(memoWithEscape.value.memo, "line\nbreak");
   const good = bytes('{"id":"a","kind":"alta"}');
   assert.equal(
     decodeJson(good, { ...schema, validateStructure: () => false })
@@ -160,6 +192,25 @@ test("codec enforces limits and emits schema-ordered LF terminated JSON", () => 
     }).diagnostics[0].code,
     "DIAG-JSON-LIMIT",
   );
+  const atByteLimit = bytes('{"id":"a","kind":"alta"}');
+  assert.equal(
+    decodeJson(atByteLimit, schema, {
+      maxBytes: atByteLimit.byteLength,
+      maxDepth: 1,
+      maxNodes: 3,
+      maxStringLength: 4,
+    }).status,
+    "ok",
+  );
+  assert.equal(
+    decodeJson(atByteLimit, schema, {
+      maxBytes: atByteLimit.byteLength - 1,
+      maxDepth: 1,
+      maxNodes: 3,
+      maxStringLength: 4,
+    }).diagnostics[0].stage,
+    "bytes",
+  );
   assert.equal(
     decodeJson(bytes('{"id":"a","kind":"alta","memo":[[]]}'), schema, {
       maxBytes: 64,
@@ -180,9 +231,10 @@ test("codec enforces limits and emits schema-ordered LF terminated JSON", () => 
   );
 });
 
-test("P4-FUZZ-001 bounds and replays 4096 staged codec byte inputs", () => {
+test("P4-FUZZ-001 bounds and replays 4096 staged codec byte inputs", (t) => {
   const seed = 0x50444601;
   let state = seed >>> 0;
+  const corpus = createHash("sha256");
   for (let index = 0; index < 4096; index += 1) {
     state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
     const length = state % 257;
@@ -191,6 +243,8 @@ test("P4-FUZZ-001 bounds and replays 4096 staged codec byte inputs", () => {
       state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
       input[offset] = state >>> 24;
     }
+    corpus.update(Buffer.from([length >>> 8, length & 0xff]));
+    corpus.update(input);
     const result = decodeJson(input, schema, {
       maxBytes: 256,
       maxDepth: 8,
@@ -202,6 +256,9 @@ test("P4-FUZZ-001 bounds and replays 4096 staged codec byte inputs", () => {
       `P4-FUZZ-001 seed=${seed} case=${index}`,
     );
   }
+  t.diagnostic(
+    `P4-FUZZ-001 executions=4096 seed=${seed} discards=0 corpusSha256=${corpus.digest("hex")}`,
+  );
 });
 
 test("edition configuration cannot enable record creation", () => {
@@ -219,4 +276,13 @@ test("edition configuration cannot enable record creation", () => {
   assert.equal(configure({ ...base, editionId: "" }).status, "invalid");
   assert.equal(configure({ ...base, maxInputBytes: 0 }).status, "invalid");
   assert.equal(configure({ ...base, maxInputBytes: 1.5 }).status, "invalid");
+  assert.equal(
+    configure({ ...base, editionId: "e".repeat(128), maxInputBytes: 1 }).status,
+    "ok",
+  );
+  assert.equal(configure({ ...base, maxInputBytes: 16_777_216 }).status, "ok");
+  assert.equal(
+    configure({ ...base, editionId: "e".repeat(129) }).status,
+    "invalid",
+  );
 });

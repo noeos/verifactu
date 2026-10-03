@@ -265,6 +265,7 @@ async function withDeclaredEnvironment(task, callback) {
     "SystemRoot",
     "TEMP",
     "TMP",
+    "TMPDIR",
     "USERPROFILE",
     "WINDIR",
   ]);

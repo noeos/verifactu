@@ -66,6 +66,9 @@ export async function run(executable, args, options = {}) {
       code: Number.isInteger(error.code) ? error.code : 1,
       stdout: error.stdout ?? "",
       stderr: error.stderr ?? error.message,
+      timedOut: error.code === "ETIMEDOUT",
+      signal: error.signal ?? null,
+      killed: error.killed === true,
     };
   }
 }

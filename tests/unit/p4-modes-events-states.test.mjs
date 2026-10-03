@@ -73,7 +73,15 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     "invalid",
   );
   assert.equal(
+    transitionMode(null, { ...start, effectiveFrom: "not-an-instant" }).status,
+    "invalid",
+  );
+  assert.equal(
     transitionMode(null, { ...start, mode: "unrecognized" }).status,
+    "invalid",
+  );
+  assert.equal(
+    transitionMode({ ...start, mode: "unrecognized" }, pending).status,
     "invalid",
   );
   assert.equal(
@@ -85,6 +93,11 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     "invalid",
   );
   assert.equal(
+    transitionMode({ ...start, effectiveFrom: "bad" }, pending).status,
+    "invalid",
+    "a transition cannot build on a tenure with an invalid start time",
+  );
+  assert.equal(
     transitionMode({ ...start, effectiveUntil: start.effectiveFrom }, pending)
       .status,
     "invalid",
@@ -93,6 +106,18 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
     transitionMode(start, { ...pending, effectiveUntil: pending.effectiveFrom })
       .status,
     "invalid",
+  );
+  const zeroLengthPrevious = {
+    ...start,
+    effectiveFrom: start.effectiveUntil,
+  };
+  assert.equal(
+    transitionMode(zeroLengthPrevious, {
+      ...pending,
+      effectiveFrom: start.effectiveUntil,
+    }).status,
+    "invalid",
+    "a following tenure must begin after the previous tenure started",
   );
   assert.equal(
     transitionMode(start, {
@@ -111,6 +136,57 @@ test("mode tenures allow listed transitions, reject rollback and resolve explici
   );
 });
 
+test("mode resolution respects context and the half-open effective interval", () => {
+  const x = f();
+  const open = {
+    context: x.context,
+    mode: "verifactu",
+    effectiveFrom: x.at,
+    effectiveUntil: null,
+    authorizationId: "auth",
+    evidenceId: "ev",
+  };
+  assert.equal(
+    resolveMode([open], "2025-01-03T00:00:00Z", x.context).status,
+    "ok",
+  );
+  assert.equal(
+    resolveMode(
+      [{ ...open, effectiveFrom: "2025-01-02T00:00:00Z" }],
+      x.at,
+      x.context,
+    ).status,
+    "indeterminate",
+    "a tenure beginning after the observation time is not active",
+  );
+  assert.equal(
+    resolveMode(
+      [
+        {
+          ...open,
+          context: { ...x.context, tenantId: x.id("tenant", "other") },
+        },
+      ],
+      x.at,
+      x.context,
+    ).status,
+    "indeterminate",
+    "a tenure for another context is not active",
+  );
+  assert.equal(
+    resolveMode(
+      [{ ...open, effectiveUntil: "2025-01-02T00:00:00Z" }],
+      "2025-01-02T00:00:00Z",
+      x.context,
+    ).status,
+    "indeterminate",
+    "the effective interval excludes its end timestamp",
+  );
+  const unresolved = resolveMode([], x.at, x.context);
+  assert.equal(unresolved.status, "indeterminate");
+  assert.equal(unresolved.diagnostics[0].retryable, false);
+});
+
 test("regulated events are append-only and separate from billing chain sequencing", () => {
   const x = f();
   const event = {
@@ -124,6 +200,11 @@ test("regulated events are append-only and separate from billing chain sequencin
   const sequence = { context: x.context, events: [] };
   assert.equal(appendEvent(sequence, event).status, "ok");
   assert.equal(
+    appendEvent(sequence, { ...event, id: x.id("tenant", "wrong-kind") })
+      .status,
+    "invalid",
+  );
+  assert.equal(
     appendEvent(sequence, { ...event, previousEventId: event.id }).status,
     "invalid",
   );
@@ -136,6 +217,19 @@ test("regulated events are append-only and separate from billing chain sequencin
     previousEventId: event.id,
   };
   assert.equal(appendEvent(first, second).status, "ok");
+  assert.equal(
+    appendEvent(first, {
+      ...second,
+      context: { ...x.context, tenantId: x.id("tenant", "other") },
+    }).status,
+    "invalid",
+    "a valid predecessor does not permit an event from another context",
+  );
+  assert.equal(
+    appendEvent(first, { ...second, occurredAt: event.occurredAt }).status,
+    "ok",
+    "event timestamps may be equal while remaining nondecreasing",
+  );
   assert.equal(
     appendEvent(first, { ...second, occurredAt: "2024-12-31T00:00:00Z" })
       .status,
