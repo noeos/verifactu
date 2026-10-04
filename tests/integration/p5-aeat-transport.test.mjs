@@ -10,7 +10,7 @@ import {
   context,
   p5TestPki,
   profile,
-} from "../support/p5-aeat-fixture.mjs";
+} from "../support/p5-aeat-wire-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
 
 test("transport output is sanitized and one exact request makes one adapter observation", async () => {

@@ -1,6 +1,5 @@
 import { createHash, randomUUID, X509Certificate } from "node:crypto";
 import { createAeatEditionProfile } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/edition-profile.js";
-import { planAeatBatches } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/batch-planner.js";
 import { context, hash, identity } from "./p5-domain-fixture.mjs";
 import { createP5TestPki } from "./p5-test-pki.mjs";
 
@@ -101,59 +100,7 @@ export function profile(overrides = {}) {
   return result.value;
 }
 
-export function batchPlan(active = profile()) {
-  const bytes = Buffer.from(
-    '<f:Record xmlns:f="https://example.test/fiscal"><f:Value>synthetic</f:Value></f:Record>',
-  );
-  const artifact = {
-    artifactId: "artifact-1",
-    recordId: identity("record", "record-1"),
-    context,
-    editionId: identity("edition", "test-edition"),
-    sequence: 1,
-    sha256: `sha256:${hash(bytes)}`,
-    bytes,
-  };
-  const document = {
-    issuer: context.taxpayerId,
-    series: "A",
-    number: "1",
-    issueDate: "2026-10-03",
-  };
-  const result = planAeatBatches({
-    profile: active,
-    operationId: "voluntary-submission",
-    environment: "test",
-    endpointId: "voluntary-submission-test",
-    context,
-    header: {
-      context,
-      taxpayerId: context.taxpayerId.value,
-      installationId: context.installationId.value,
-      productId: "noeos",
-      softwareVersion: "1.0",
-      installationNumber: "install-1",
-    },
-    candidates: [
-      {
-        artifact,
-        document,
-        operationId: "voluntary-submission",
-        environment: "test",
-        committed: true,
-        requiredClaimsComplete: true,
-        submissionState: "pending",
-        priorAttemptState: "none",
-        eligibleAt: "2026-10-03T00:00:00.000Z",
-      },
-    ],
-    now: "2026-10-03T12:00:00.000Z",
-    nextBatchId: () => "batch-1",
-  });
-  if (result.status !== "ok" || result.value.batches.length !== 1)
-    throw new Error(JSON.stringify(result));
-  return result.value.batches[0];
-}
+
 
 export const acceptedResponse = Buffer.from(
   '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" xmlns:r="https://example.test/response"><s:Body><r:SubmitResponse><r:GlobalStatus>Correcto</r:GlobalStatus><r:Wait>1</r:Wait><r:Line><r:Issuer>ES123</r:Issuer><r:Series>A</r:Series><r:Number>1</r:Number><r:IssueDate>2026-10-03</r:IssueDate><r:State>Correcto</r:State></r:Line></r:SubmitResponse></s:Body></s:Envelope>',

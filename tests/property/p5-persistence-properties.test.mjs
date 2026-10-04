@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { validateRecord, sha256Digest } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/model.js";
-import { identity, context } from "../support/p5-aeat-fixture.mjs";
+import { identity, context } from "../support/p5-domain-fixture.mjs";
 
 const seeds = [1346651001, 1346651002, 1346651003, 1346651004];
 function rng(seed) { let state = seed >>> 0; return () => { state = (Math.imul(state, 1664525) + 1013904223) >>> 0; return state; }; }

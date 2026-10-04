@@ -35,6 +35,10 @@ import {
 } from "../lib/core.mjs";
 import { discoverOverallMutationCatalog } from "../assurance/p4-mutation-catalog.mjs";
 import { executeOverallMutationCampaign } from "../assurance/p4-overall-mutation-campaign.mjs";
+import {
+  getP5WaveScope,
+  resolveP5Wave,
+} from "../assurance/p5-delivery-stage.mjs";
 
 const PACKAGE_ROOTS = [
   "packages/verifactu",
@@ -5401,6 +5405,11 @@ async function p4QualityPlan(context) {
 }
 
 async function p5QualityPlan(context) {
+  const wave = resolveP5Wave();
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p5-quality-plan.json"),
+  );
+  const scope = getP5WaveScope(wave, plan);
   const result = await run("node", ["tooling/assurance/p5-quality-plan.mjs"], {
     cwd: context.root,
     timeoutMs: 60000,
@@ -5413,13 +5422,15 @@ async function p5QualityPlan(context) {
   const outcome = JSON.parse(result.stdout.trim().split(/\r?\n/u).at(-1));
   assert(
     outcome.status === "passed" &&
-      outcome.productionModules === 25 &&
-      outcome.testFiles === 23 &&
-      outcome.criticalBranches === 24 &&
-      outcome.criticalMutants === 24 &&
-      outcome.otherMutants === 16 &&
-      outcome.propertyExecutions === 49152 &&
-      outcome.faultInjections === 56 &&
+      outcome.stage === `P5-${wave}` &&
+      outcome.cumulative === scope.full &&
+      outcome.productionModules === scope.productionModules.length &&
+      outcome.testFiles === scope.testFiles.length &&
+      outcome.criticalBranches === scope.criticalMutantIds.length &&
+      outcome.criticalMutants === scope.criticalMutantIds.length &&
+      outcome.otherMutants === scope.otherMutantIds.length &&
+      outcome.propertyExecutions === scope.propertyIds.length * 4096 &&
+      outcome.faultInjections === scope.faultIds.length &&
       outcome.compatibilityCells === 5 &&
       outcome.seededPlanDefectsKilled === 5,
     "P5_QUALITY_PLAN_CENSUS",
@@ -5432,6 +5443,7 @@ async function p5QualityPlan(context) {
     outputDigest: outcome.planSha256,
     diagnostics: [
       `stage=${outcome.stage}`,
+      `full-population=${scope.full ? "yes" : "no"}`,
       `production-modules=${outcome.productionModules}`,
       `test-files=${outcome.testFiles}`,
       `critical-mutants=${outcome.criticalMutants}/${outcome.criticalMutants}`,
@@ -5448,6 +5460,8 @@ async function testP5(context) {
   const plan = await readJson(
     resolve(context.root, "config/quality/p5-quality-plan.json"),
   );
+  const wave = resolveP5Wave();
+  const scope = getP5WaveScope(wave, plan);
   const coverageIncludes = [
     "evidence/runs/artifacts/build/verifactu/dist/persistence/**/*.js",
     "evidence/runs/artifacts/build/verifactu/dist/aeat/**/*.js",
@@ -5463,7 +5477,7 @@ async function testP5(context) {
       ]),
       "--test",
       "--test-reporter=tap",
-      ...plan.testFiles,
+      ...scope.testFiles,
     ],
     { cwd: context.root, timeoutMs: 3_600_000 },
   );
@@ -5496,9 +5510,7 @@ async function testP5(context) {
   const faultMarkers = [
     ...result.stdout.matchAll(/^# P5_FAULT_DETECTED (P5-FAULT-\d{3})$/gmu),
   ].map((match) => match[1]);
-  const plannedFaultIds = plan.faultInjectionIds.map(
-    (entry) => entry.split(":", 1)[0],
-  );
+  const plannedFaultIds = scope.faultIds;
   const faultCounts = new Map(
     faultMarkers.map((id) => [
       id,
@@ -5521,39 +5533,52 @@ async function testP5(context) {
   const performanceLine = result.stdout
     .split(/\r?\n/u)
     .find((line) => line.startsWith("# P5_PERFORMANCE_METRICS "));
-  assert(
-    performanceLine,
-    "P5_PERFORMANCE_METRICS_MISSING",
-    "recovery campaign did not report the frozen performance metrics",
-  );
-  const performanceMetrics = JSON.parse(
-    performanceLine.slice("# P5_PERFORMANCE_METRICS ".length),
-  );
-  assert(
-    Number.isFinite(performanceMetrics.wallMs) &&
-      performanceMetrics.wallMs >= 0 &&
-      performanceMetrics.wallMs <=
-        plan.performance.hardBounds.campaignDeadlineMs &&
-      Number.isSafeInteger(performanceMetrics.peakRssBytes) &&
-      performanceMetrics.peakRssBytes > 0 &&
-      Number.isFinite(performanceMetrics.eventLoopDelayMs) &&
-      performanceMetrics.eventLoopDelayMs >= 0 &&
-      Number.isSafeInteger(performanceMetrics.queueHighWater) &&
-      performanceMetrics.queueHighWater > 0 &&
-      Number.isSafeInteger(
-        performanceMetrics.maxConcurrentSyntheticOperations,
-      ) &&
-      performanceMetrics.maxConcurrentSyntheticOperations <=
-        plan.performance.hardBounds.maxConcurrentSyntheticOperations &&
-      Number.isSafeInteger(performanceMetrics.openHandlesBeforeAfter?.before) &&
-      Number.isSafeInteger(performanceMetrics.openHandlesBeforeAfter?.after) &&
-      performanceMetrics.openHandlesBeforeAfter.before < 128 &&
-      performanceMetrics.openHandlesBeforeAfter.after < 128 &&
-      performanceMetrics.openHandlesBeforeAfter.after <=
-        performanceMetrics.openHandlesBeforeAfter.before + 8,
-    "P5_PERFORMANCE_METRICS_INVALID",
-    JSON.stringify(performanceMetrics),
-  );
+  let performanceMetrics = null;
+  if (scope.full) {
+    assert(
+      performanceLine,
+      "P5_PERFORMANCE_METRICS_MISSING",
+      "recovery campaign did not report the frozen performance metrics",
+    );
+    performanceMetrics = JSON.parse(
+      performanceLine.slice("# P5_PERFORMANCE_METRICS ".length),
+    );
+    assert(
+      Number.isFinite(performanceMetrics.wallMs) &&
+        performanceMetrics.wallMs >= 0 &&
+        performanceMetrics.wallMs <=
+          plan.performance.hardBounds.campaignDeadlineMs &&
+        Number.isSafeInteger(performanceMetrics.peakRssBytes) &&
+        performanceMetrics.peakRssBytes > 0 &&
+        Number.isFinite(performanceMetrics.eventLoopDelayMs) &&
+        performanceMetrics.eventLoopDelayMs >= 0 &&
+        Number.isSafeInteger(performanceMetrics.queueHighWater) &&
+        performanceMetrics.queueHighWater > 0 &&
+        Number.isSafeInteger(
+          performanceMetrics.maxConcurrentSyntheticOperations,
+        ) &&
+        performanceMetrics.maxConcurrentSyntheticOperations <=
+          plan.performance.hardBounds.maxConcurrentSyntheticOperations &&
+        Number.isSafeInteger(
+          performanceMetrics.openHandlesBeforeAfter?.before,
+        ) &&
+        Number.isSafeInteger(
+          performanceMetrics.openHandlesBeforeAfter?.after,
+        ) &&
+        performanceMetrics.openHandlesBeforeAfter.before < 128 &&
+        performanceMetrics.openHandlesBeforeAfter.after < 128 &&
+        performanceMetrics.openHandlesBeforeAfter.after <=
+          performanceMetrics.openHandlesBeforeAfter.before + 8,
+      "P5_PERFORMANCE_METRICS_INVALID",
+      JSON.stringify(performanceMetrics),
+    );
+  } else {
+    assert(
+      performanceLine === undefined,
+      "P5_STAGE_PERFORMANCE_SCOPE",
+      `the full recovery performance campaign belongs to P5-G, got P5-${wave}`,
+    );
+  }
   const coverage =
     /^# all files\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)/mu.exec(
       result.stdout,
@@ -5571,20 +5596,29 @@ async function testP5(context) {
     `line=${lines}, branch=${branches}, function=${functions}; required ${plan.coverage.thresholds.linesPercent}/${plan.coverage.thresholds.branchesPercent}/${plan.coverage.thresholds.functionsPercent}`,
   );
   for (const module of [
-    ...plan.productionModules,
-    ...plan.sharedProductionModules,
+    ...scope.productionModules,
+    ...scope.sharedProductionModules,
   ]) {
     const name = basename(module).replace(/\.ts$/u, ".js");
     assert(result.stdout.includes(name), "P5_COVERAGE_MODULE_MISSING", module);
   }
-  for (let index = 0; index < plan.propertyCampaigns.length; index += 1) {
-    const campaign = plan.propertyCampaigns[index];
+  for (const campaign of plan.propertyCampaigns.filter((candidate) =>
+    scope.propertyIds.includes(candidate.id),
+  )) {
     assert(
       result.stdout.includes(
         `${campaign.id} seed=${campaign.seed} executions=${campaign.executions}`,
       ),
       "P5_PROPERTY_CAMPAIGN_MISSING",
       campaign.id,
+    );
+  }
+  for (const campaign of plan.propertyCampaigns) {
+    const shouldRun = scope.propertyIds.includes(campaign.id);
+    assert(
+      result.stdout.includes(campaign.id) === shouldRun,
+      "P5_PROPERTY_STAGE_SCOPE",
+      `${campaign.id} expected=${shouldRun}`,
     );
   }
   return {
@@ -5597,20 +5631,31 @@ async function testP5(context) {
       `coverage.line=${lines}`,
       `coverage.branch=${branches}`,
       `coverage.function=${functions}`,
-      `testFiles=${plan.testFiles.length}`,
-      "properties=12x4096 executions=49152",
+      `stage=P5-${wave}`,
+      `cumulative=${scope.full}`,
+      `testFiles=${scope.testFiles.length}/${plan.testFiles.length}`,
+      `properties=${scope.propertyIds.length}/${plan.propertyCampaigns.length} executions=${scope.propertyIds.length * 4096}/${plan.propertyCampaigns.length * 4096}`,
       `faultInjections=${faultMarkers.length}/${plannedFaultIds.length}`,
-      `performance.wallMs=${performanceMetrics.wallMs}`,
-      `performance.peakRssBytes=${performanceMetrics.peakRssBytes}`,
-      `performance.eventLoopDelayMs=${performanceMetrics.eventLoopDelayMs}`,
-      `performance.queueHighWater=${performanceMetrics.queueHighWater}`,
-      `performance.openHandles=${performanceMetrics.openHandlesBeforeAfter.before}->${performanceMetrics.openHandlesBeforeAfter.after}`,
+      ...(performanceMetrics
+        ? [
+            `performance.wallMs=${performanceMetrics.wallMs}`,
+            `performance.peakRssBytes=${performanceMetrics.peakRssBytes}`,
+            `performance.eventLoopDelayMs=${performanceMetrics.eventLoopDelayMs}`,
+            `performance.queueHighWater=${performanceMetrics.queueHighWater}`,
+            `performance.openHandles=${performanceMetrics.openHandlesBeforeAfter.before}->${performanceMetrics.openHandlesBeforeAfter.after}`,
+          ]
+        : []),
       `subject=${context.identity.subject}`,
     ],
   };
 }
 
 async function p5Mutation(context) {
+  const wave = resolveP5Wave();
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p5-quality-plan.json"),
+  );
+  const scope = getP5WaveScope(wave, plan);
   const result = await run(
     process.execPath,
     ["tooling/assurance/p5-mutation-campaign.mjs"],
@@ -5658,11 +5703,19 @@ async function p5Mutation(context) {
   );
   assert(
     report.status === "passed" &&
-      report.criticalKilled === 24 &&
-      report.criticalTotal === 24 &&
-      report.otherKilled >= 16 &&
-      report.otherTotal === 16 &&
-      report.results.length === 40,
+      report.stage === `P5-${wave}` &&
+      report.cumulative === scope.full &&
+      report.criticalKilled === scope.criticalMutantIds.length &&
+      report.criticalTotal === scope.criticalMutantIds.length &&
+      (report.otherKilled / Math.max(1, scope.otherMutantIds.length)) * 100 >=
+        (scope.otherMutantIds.length > 0
+          ? plan.mutation.otherKilledPercent
+          : 0) &&
+      report.otherTotal === scope.otherMutantIds.length &&
+      report.results.length ===
+        scope.criticalMutantIds.length + scope.otherMutantIds.length &&
+      [...report.results.map((item) => item.id)].sort().join(",") ===
+        [...scope.criticalMutantIds, ...scope.otherMutantIds].sort().join(","),
     "P5_MUTATION_COMPLETENESS",
     JSON.stringify({
       criticalKilled: report.criticalKilled,
@@ -5671,11 +5724,13 @@ async function p5Mutation(context) {
     }),
   );
   return {
-    selected: 40,
+    selected: scope.criticalMutantIds.length + scope.otherMutantIds.length,
     executed: report.results.length,
     passed: report.results.filter((item) => item.outcome === "killed").length,
     outputDigest: sha256(result.stdout + result.stderr),
     diagnostics: [
+      `stage=P5-${wave}`,
+      `cumulative=${scope.full}`,
       `criticalMutants=${report.criticalKilled}/${report.criticalTotal}`,
       `otherMutants=${report.otherKilled}/${report.otherTotal}`,
       `syntaxCandidatesExcluded=${report.candidateSyntaxExcluded}`,

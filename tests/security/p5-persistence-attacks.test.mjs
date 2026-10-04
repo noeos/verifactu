@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { validateArtifact, contextMatches, contextStoreKey, sha256Digest, sha512Digest } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/model.js";
 import { planRetention } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/retention.js";
-import { context, hash, identity } from "../support/p5-aeat-fixture.mjs";
+import { context, hash, identity } from "../support/p5-domain-fixture.mjs";
 
 test("stored artifact bytes, lengths and both digests are recomputed before admission", () => {
   const bytes = Buffer.from("artifact bytes");

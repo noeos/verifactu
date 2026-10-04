@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { getP5WaveScope, resolveP5Wave } from "./p5-delivery-stage.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const planPath = "config/quality/p5-quality-plan.json";
@@ -207,6 +208,8 @@ export function validateP5QualityPlan(plan, discovered = {}) {
 }
 
 const plan = await readJson(planPath);
+const wave = resolveP5Wave();
+const scope = getP5WaveScope(wave, plan);
 const doc = await readFile(resolve(root, docPath), "utf8");
 const extract = (heading) => {
   const position = doc.indexOf(heading);
@@ -281,10 +284,18 @@ const scanTests = async (directory) => {
 await scanTests("tests");
 assert(
   canonical([...discoveredP5Production].sort()) ===
-    canonical([...presentProduction].sort()) &&
-    canonical(allTestPaths.sort()) === canonical([...presentTests].sort()),
+    canonical([...scope.productionModules].sort()) &&
+    canonical(allTestPaths.sort()) === canonical([...scope.testFiles].sort()),
   "P5_PLAN_DISCOVERY_MISMATCH",
-  "discovered P5 source/test paths differ from frozen plan",
+  `discovered paths differ from cumulative P5-${wave} inventory`,
+);
+assert(
+  canonical([...presentProduction].sort()) ===
+    canonical([...scope.productionModules].sort()) &&
+    canonical([...presentTests].sort()) ===
+      canonical([...scope.testFiles].sort()),
+  "P5_WAVE_INCOMPLETE",
+  `working tree does not contain the exact cumulative P5-${wave} inventory`,
 );
 validateP5QualityPlan(plan, {
   productionModules: discoveredP5Production,
@@ -326,21 +337,18 @@ const report = {
   schemaVersion: 1,
   planId: plan.id,
   status: "passed",
-  stage:
-    presentProduction.length === 0 && presentTests.length === 0
-      ? "pre-implementation"
-      : "implementation",
-  productionModules: plan.productionModules.length,
+  stage: `P5-${wave}`,
+  cumulative: scope.full,
+  productionModules: scope.productionModules.length,
   sharedProductionModules: plan.sharedProductionModules.length,
-  testFiles: plan.testFiles.length,
-  criticalBranches: plan.criticalCatalogue.length,
-  criticalMutants: plan.mutation.criticalMutants.length,
-  otherMutants: plan.mutation.otherMutants.length,
-  propertyExecutions: plan.propertyCampaigns.reduce(
-    (total, campaign) => total + campaign.executions,
-    0,
-  ),
-  faultInjections: plan.faultInjectionIds.length,
+  testFiles: scope.testFiles.length,
+  criticalBranches: scope.criticalMutantIds.length,
+  criticalMutants: scope.criticalMutantIds.length,
+  otherMutants: scope.otherMutantIds.length,
+  propertyExecutions: plan.propertyCampaigns
+    .filter((campaign) => scope.propertyIds.includes(campaign.id))
+    .reduce((total, campaign) => total + campaign.executions, 0),
+  faultInjections: scope.faultIds.length,
   compatibilityCells: plan.compatibilityMatrix.length,
   seededPlanDefectsKilled: negativeCases.length,
   planSha256: createHash("sha256").update(canonical(plan)).digest("hex"),

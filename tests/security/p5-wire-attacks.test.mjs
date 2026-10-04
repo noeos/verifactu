@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { parseAeatResponse } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/response-parser.js";
-import { acceptedResponse, profile } from "../support/p5-aeat-fixture.mjs";
+import { acceptedResponse, profile } from "../support/p5-aeat-profile-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
 
 test("wire parser rejects external entities, namespace rebinding, duplicate status and malformed bytes", () => {

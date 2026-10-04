@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { genesisHead, readHeadOrGenesis, validateHeadAdvance } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/head-cas.js";
 import { sha256Digest } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/model.js";
-import { identity, context } from "../support/p5-aeat-fixture.mjs";
+import { identity, context } from "../support/p5-domain-fixture.mjs";
 
 const seeds = [1346651005, 1346651006, 1346651007, 1346651008];
 function rng(seed) { let state = seed >>> 0; return () => { state = (Math.imul(state, 1103515245) + 12345) >>> 0; return state; }; }

@@ -1112,13 +1112,15 @@
     },
     {
       "id": "p5:quality-plan",
-      "version": 1,
+      "version": 2,
       "owner": "assurance-owner",
       "dependencies": [],
       "inputs": [
         "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
         "docs/17-roadmap-risk/p5-quality-plan.md",
         "tooling/assurance/p5-quality-plan.mjs",
+        "tooling/assurance/p5-delivery-stage.mjs",
         "packages/verifactu/src/persistence/**",
         "packages/verifactu/src/aeat/**",
         "packages/verifactu/src/operations/**",
@@ -1130,6 +1132,8 @@
       "environment": [
         "CI",
         "PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_BASE_REF",
         "VERIFACTU_SUBJECT_SHA",
         "VERIFACTU_SUBJECT_TREE"
       ],
@@ -1145,11 +1149,12 @@
     },
     {
       "id": "test:p5",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": ["build:packages", "p5:quality-plan"],
       "inputs": [
         "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
         "packages/verifactu/src/persistence/**",
         "packages/verifactu/src/aeat/**",
         "packages/verifactu/src/operations/**",
@@ -1167,6 +1172,8 @@
       "environment": [
         "CI",
         "PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_BASE_REF",
         "VERIFACTU_SUBJECT_SHA",
         "VERIFACTU_SUBJECT_TREE"
       ],
@@ -1182,11 +1189,13 @@
     },
     {
       "id": "p5:mutation",
-      "version": 1,
+      "version": 2,
       "owner": "assurance-owner",
       "dependencies": ["build:packages", "p5:quality-plan", "test:p5"],
       "inputs": [
         "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
+        "tooling/assurance/p5-delivery-stage.mjs",
         "tooling/assurance/p5-mutation-campaign.mjs",
         "tooling/assurance/p4-mutation-catalog.mjs",
         "tooling/assurance/p4-overall-mutation-campaign.mjs",
@@ -1204,6 +1213,8 @@
       "environment": [
         "CI",
         "PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_BASE_REF",
         "VERIFACTU_SUBJECT_SHA",
         "VERIFACTU_SUBJECT_TREE"
       ],
@@ -1219,11 +1230,12 @@
     },
     {
       "id": "gate:p5",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": ["test:p5", "p5:mutation"],
       "inputs": [
         "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
         "config/tasks/task-registry.json"
       ],
       "outputs": ["evidence/runs/gate--p5.json"],

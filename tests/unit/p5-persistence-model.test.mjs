@@ -1,15 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  contextMatches,
+  contextStoreKey,
+  isSafeStoreToken,
   sha256Digest,
   sha512Digest,
   parseSha256,
+  storeFailure,
+  storeOk,
   validateArtifact,
   validateEvidenceClaim,
   validateRecord,
 } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/model.js";
 import { createFiscalContext, requireSameContext } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/context.js";
 import { createFiscalDocumentIdentity, createIdentity, identityKey, isIdentity, sameIdentity } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/identities.js";
+import { PERSISTENCE_PORT_CONTRACT_VERSION } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/ports.js";
 
 const id = (kind, value) => createIdentity(kind, value).value;
 const context = createFiscalContext({
@@ -150,4 +156,38 @@ test("fiscal context comparison returns a diagnostic when any scope identity dif
   assert.deepEqual(requireSameContext(context, otherTenant), {
     status: "invalid", diagnostics: [{ code: "DIAG-CONTEXT-MISMATCH", stage: "domain", path: "", severity: "error", retryable: false }],
   });
+});
+
+test("persistence results and tokens are explicit and context keys bind all scope identities", () => {
+  assert.equal(PERSISTENCE_PORT_CONTRACT_VERSION, 1);
+  const value = Object.freeze({ stored: true });
+  assert.deepEqual(storeOk(value), { status: "ok", value });
+  assert.deepEqual(storeFailure("conflict", "idempotency-conflict"), {
+    status: "conflict",
+    code: "idempotency-conflict",
+  });
+
+  assert.equal(isSafeStoreToken("store-key-1"), true);
+  assert.equal(isSafeStoreToken("x".repeat(256)), true);
+  for (const token of [null, 1, "", " padded ", "bad\ntoken", "x".repeat(257)])
+    assert.equal(isSafeStoreToken(token), false);
+  assert.equal(isSafeStoreToken("x".repeat(3), 2), false);
+
+  const expectedKey = contextStoreKey(context);
+  assert.equal(typeof expectedKey, "string");
+  assert.equal(expectedKey.length > 0, true);
+  assert.equal(contextMatches(context, context), true);
+  for (const [field, kind, value] of [
+    ["tenantId", "tenant", "tenant-b"],
+    ["taxpayerId", "taxpayer", "taxpayer-b"],
+    ["installationId", "installation", "install-b"],
+    ["editionId", "edition", "edition-b"],
+  ]) {
+    const otherContext = createFiscalContext({
+      ...context,
+      [field]: id(kind, value),
+    }).value;
+    assert.notEqual(contextStoreKey(otherContext), expectedKey);
+    assert.equal(contextMatches(context, otherContext), false);
+  }
 });

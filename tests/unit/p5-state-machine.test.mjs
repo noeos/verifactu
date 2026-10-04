@@ -3,9 +3,7 @@ import { X509Certificate } from "node:crypto";
 import test from "node:test";
 import { appendJournalTransition, isAllowedDurableTransition, validateJournalTransition } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/journal.js";
 import { decideRetry } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/retry-policy.js";
-import { claimOutboxLease, completeOutboxWithLease, releaseOutboxLease, renewOutboxLease } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/leases.js";
 import { context, hash, identity } from "../support/p5-aeat-fixture.mjs";
-import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
 import { createP5TestPki } from "../support/p5-test-pki.mjs";
 
 test("synthetic PKI emits canonical positive DER certificate serials", () => {
@@ -121,95 +119,4 @@ test("ambiguous delivery always routes to reconciliation before retry", () => {
     policy: { ...policy, maximumAttempts: 20 } });
   assert.equal(waitPassed.action, "retry-at");
   assert.equal(waitPassed.retryAt, "2026-10-03T12:02:00.000Z");
-});
-
-test("lease service supplies an authoritative clock and stable fencing generation", async () => {
-  const lease = { outboxId: "outbox-1", ownerInstanceId: "worker-1", fencingToken: 5, acquiredAt: "2026-10-03T12:00:00Z",
-    expiresAt: "2026-10-03T12:05:00Z", version: 1, clockPolicyId: "db-clock-v1", authoritativeClock: true };
-  const store = { contractVersion: 1, async claim() { return { status: "ok", value: lease }; },
-    async renew() { return { status: "ok", value: { ...lease, version: 2, expiresAt: "2026-10-03T12:10:00Z" } }; } };
-  assert.equal((await claimOutboxLease(store, { context, outboxId: "outbox-1", ownerInstanceId: "worker-1", ttlMs: 10_000, expectedVersion: 0 })).status, "ok");
-  assert.equal((await renewOutboxLease(store, context, lease, 10_000)).status, "ok");
-  const falseClock = { ...store, async claim() { return { status: "ok", value: { ...lease, authoritativeClock: false } }; } };
-  assert.equal((await claimOutboxLease(falseClock, { context, outboxId: "outbox-1", ownerInstanceId: "worker-1", ttlMs: 10_000, expectedVersion: 0 })).status, "indeterminate");
-  const fullStore = { ...store, async release() { return { status: "ok", value: "released" }; }, async complete(input) {
-    return { status: "ok", value: { outboxId: input.lease.outboxId, fencingToken: input.lease.fencingToken,
-      version: input.expectedOutboxVersion + 1, state: input.nextState, lastObservationId: input.observationId } };
-  } };
-  assert.equal((await releaseOutboxLease(fullStore, context, lease)).status, "ok");
-  assert.equal((await completeOutboxWithLease(fullStore, { context, lease, expectedOutboxVersion: 1, nextState: "accepted", observationId: "observation-1" })).status, "ok");
-  const stale = { ...fullStore, async complete(input) { return { status: "ok", value: { outboxId: input.lease.outboxId,
-    fencingToken: input.lease.fencingToken + 1, version: input.expectedOutboxVersion + 1, state: input.nextState,
-    lastObservationId: input.observationId } }; } };
-  const staleCompletion = await completeOutboxWithLease(stale, { context, lease, expectedOutboxVersion: 1, nextState: "accepted", observationId: "observation-1" });
-  assert.equal(staleCompletion.status, "indeterminate");
-  recordP5FaultDetection("P5-FAULT-017", staleCompletion.status === "indeterminate");
-
-  let claimed = false;
-  const raceStore = { contractVersion: 1, async claim(input) {
-    if (claimed) return { status: "conflict", code: "fenced" };
-    claimed = true;
-    return { status: "ok", value: { ...lease, outboxId: input.outboxId, ownerInstanceId: input.ownerInstanceId,
-      version: input.expectedVersion + 1 } };
-  } };
-  const raceInput = { context, outboxId: "outbox-race", ttlMs: 10_000, expectedVersion: 0 };
-  const racedClaims = await Promise.all([
-    claimOutboxLease(raceStore, { ...raceInput, ownerInstanceId: "worker-a" }),
-    claimOutboxLease(raceStore, { ...raceInput, ownerInstanceId: "worker-b" }),
-  ]);
-  assert.deepEqual(racedClaims.map((item) => item.status).sort(), ["conflict", "ok"]);
-  recordP5FaultDetection("P5-FAULT-015", racedClaims.filter((item) => item.status === "ok").length === 1);
-
-  // The lease is structurally valid but expired according to the store's
-  // authoritative clock; the worker deliberately supplies no clock of its own.
-  const expiredLease = { ...lease, acquiredAt: "2026-10-03T11:50:00Z", expiresAt: "2026-10-03T11:59:00Z" };
-  const expiredRenewal = await renewOutboxLease({ contractVersion: 1, async renew() { return { status: "conflict", code: "fenced" }; } },
-    context, expiredLease, 10_000);
-  assert.deepEqual(expiredRenewal, { status: "conflict", code: "fenced" });
-  recordP5FaultDetection("P5-FAULT-016", expiredRenewal.status === "conflict" && expiredRenewal.code === "fenced");
-});
-
-test("lease validation fails closed on malformed requests, store results, renewals and completion readbacks", async () => {
-  const lease = { outboxId: "outbox-2", ownerInstanceId: "worker-2", fencingToken: 7, acquiredAt: "2026-10-03T12:00:00Z",
-    expiresAt: "2026-10-03T12:05:00Z", version: 2, clockPolicyId: "db-clock-v1", authoritativeClock: true };
-  const claimStore = { contractVersion: 1, async claim() { return { status: "ok", value: lease }; } };
-  const claimInput = { context, outboxId: "outbox-2", ownerInstanceId: "worker-2", ttlMs: 10_000, expectedVersion: 1 };
-  assert.equal((await claimOutboxLease(null, claimInput)).status, "invalid");
-  for (const invalid of [
-    { ...claimInput, outboxId: " padded " }, { ...claimInput, ownerInstanceId: "" }, { ...claimInput, ttlMs: 999 },
-    { ...claimInput, ttlMs: 300_001 }, { ...claimInput, expectedVersion: -1 }, { ...claimInput, expectedVersion: 1.5 },
-  ]) assert.equal((await claimOutboxLease(claimStore, invalid)).status, "invalid");
-  assert.equal((await claimOutboxLease({ ...claimStore, async claim() { return { status: "unavailable", code: "unavailable" }; } }, claimInput)).status, "unavailable");
-  for (const altered of [
-    { ...lease, outboxId: "other" }, { ...lease, ownerInstanceId: "other" }, { ...lease, version: 1 },
-    { ...lease, fencingToken: 0 }, { ...lease, authoritativeClock: false }, { ...lease, expiresAt: "2026-10-03T11:59:00Z" },
-  ]) assert.equal((await claimOutboxLease({ ...claimStore, async claim() { return { status: "ok", value: altered }; } }, claimInput)).status, "indeterminate");
-
-  const renewStore = { contractVersion: 1, async renew() { return { status: "ok", value: { ...lease, version: 3, expiresAt: "2026-10-03T12:10:00Z" } }; } };
-  assert.equal((await renewOutboxLease(null, context, lease, 10_000)).status, "invalid");
-  assert.equal((await renewOutboxLease(renewStore, context, lease, 999)).status, "invalid");
-  assert.equal((await renewOutboxLease({ ...renewStore, async renew() { return { status: "conflict", code: "fenced" }; } }, context, lease, 10_000)).status, "conflict");
-  for (const altered of [
-    { ...lease, ownerInstanceId: "other", version: 3, expiresAt: "2026-10-03T12:10:00Z" },
-    { ...lease, fencingToken: 8, version: 3, expiresAt: "2026-10-03T12:10:00Z" },
-    { ...lease, version: 4, expiresAt: "2026-10-03T12:10:00Z" },
-    { ...lease, version: 3, expiresAt: lease.expiresAt },
-  ]) assert.equal((await renewOutboxLease({ ...renewStore, async renew() { return { status: "ok", value: altered }; } }, context, lease, 10_000)).status, "indeterminate");
-
-  assert.equal((await releaseOutboxLease(null, context, lease)).status, "invalid");
-  const completeInput = { context, lease, expectedOutboxVersion: 2, nextState: "accepted", observationId: "observation-2" };
-  const completeStore = { contractVersion: 1, async complete(input) { return { status: "ok", value: { outboxId: input.lease.outboxId,
-    fencingToken: input.lease.fencingToken, version: input.expectedOutboxVersion + 1, state: input.nextState,
-    lastObservationId: input.observationId } }; } };
-  assert.equal((await completeOutboxWithLease(null, completeInput)).status, "invalid");
-  assert.equal((await completeOutboxWithLease(completeStore, { ...completeInput, expectedOutboxVersion: 0 })).status, "invalid");
-  assert.equal((await completeOutboxWithLease(completeStore, { ...completeInput, nextState: "future-state" })).status, "invalid");
-  assert.equal((await completeOutboxWithLease(completeStore, { ...completeInput, observationId: " padded " })).status, "invalid");
-  assert.equal((await completeOutboxWithLease({ ...completeStore, async complete() { return { status: "unavailable", code: "unavailable" }; } }, completeInput)).status, "unavailable");
-  for (const altered of [
-    { outboxId: "other", fencingToken: lease.fencingToken, version: 3, state: "accepted", lastObservationId: "observation-2" },
-    { outboxId: lease.outboxId, fencingToken: lease.fencingToken, version: 4, state: "accepted", lastObservationId: "observation-2" },
-    { outboxId: lease.outboxId, fencingToken: lease.fencingToken, version: 3, state: "rejected", lastObservationId: "observation-2" },
-    { outboxId: lease.outboxId, fencingToken: lease.fencingToken, version: 3, state: "accepted", lastObservationId: "other" },
-  ]) assert.equal((await completeOutboxWithLease({ ...completeStore, async complete() { return { status: "ok", value: altered }; } }, completeInput)).status, "indeterminate");
 });

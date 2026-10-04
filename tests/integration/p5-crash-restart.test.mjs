@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { assessStartupRecovery } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/recovery.js";
 import { genesisHead } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/head-cas.js";
-import { context, hash, identity } from "../support/p5-aeat-fixture.mjs";
+import { context, hash, identity } from "../support/p5-domain-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
 
 const recoveryModule = fileURLToPath(

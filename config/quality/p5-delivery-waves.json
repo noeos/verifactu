@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "id": "P5-DELIVERY-WAVES-0001",
+  "branchPattern": "work/p5-[a-g]",
+  "baseBranch": "main",
+  "waves": {
+    "A": {
+      "productionModules": [
+        "packages/verifactu/src/persistence/model.ts",
+        "packages/verifactu/src/persistence/ports.ts"
+      ],
+      "testFiles": [
+        "tests/unit/p5-persistence-model.test.mjs",
+        "tests/property/p5-persistence-properties.test.mjs"
+      ],
+      "faultIds": [],
+      "propertyIds": [
+        "P5-PROP-001",
+        "P5-PROP-002",
+        "P5-PROP-003",
+        "P5-PROP-004"
+      ],
+      "criticalMutantIds": ["P5-MUT-013"],
+      "otherMutantIds": ["P5-MUT-025"]
+    },
+    "B": {
+      "productionModules": [
+        "packages/verifactu/src/persistence/unit-of-work.ts",
+        "packages/verifactu/src/persistence/atomic-coordinator.ts",
+        "packages/verifactu/src/persistence/head-cas.ts",
+        "packages/verifactu/src/persistence/leases.ts"
+      ],
+      "testFiles": [
+        "tests/contract/p5-host-uow-contract.test.mjs",
+        "tests/integration/p5-host-atomicity.test.mjs",
+        "tests/property/p5-concurrency-properties.test.mjs"
+      ],
+      "faultIds": [
+        "P5-FAULT-001",
+        "P5-FAULT-002",
+        "P5-FAULT-003",
+        "P5-FAULT-004",
+        "P5-FAULT-005",
+        "P5-FAULT-006",
+        "P5-FAULT-007",
+        "P5-FAULT-008",
+        "P5-FAULT-009",
+        "P5-FAULT-010",
+        "P5-FAULT-011",
+        "P5-FAULT-012",
+        "P5-FAULT-013",
+        "P5-FAULT-014",
+        "P5-FAULT-015",
+        "P5-FAULT-016",
+        "P5-FAULT-017",
+        "P5-FAULT-056"
+      ],
+      "propertyIds": [
+        "P5-PROP-005",
+        "P5-PROP-006",
+        "P5-PROP-007",
+        "P5-PROP-008"
+      ],
+      "criticalMutantIds": [
+        "P5-MUT-001",
+        "P5-MUT-002",
+        "P5-MUT-003",
+        "P5-MUT-004",
+        "P5-MUT-005",
+        "P5-MUT-006",
+        "P5-MUT-007"
+      ],
+      "otherMutantIds": ["P5-MUT-026", "P5-MUT-027", "P5-MUT-028", "P5-MUT-029"]
+    },
+    "C": {
+      "productionModules": [
+        "packages/verifactu/src/persistence/journal.ts",
+        "packages/verifactu/src/persistence/recovery.ts",
+        "packages/verifactu/src/persistence/migrations.ts",
+        "packages/verifactu/src/persistence/backup-restore.ts",
+        "packages/verifactu/src/persistence/retention.ts"
+      ],
+      "testFiles": [
+        "tests/contract/p5-persistence-contract.test.mjs",
+        "tests/contract/p5-recovery-contract.test.mjs",
+        "tests/integration/p5-crash-restart.test.mjs",
+        "tests/integration/p5-migration-restore.test.mjs",
+        "tests/security/p5-persistence-attacks.test.mjs"
+      ],
+      "faultIds": [
+        "P5-FAULT-018",
+        "P5-FAULT-019",
+        "P5-FAULT-020",
+        "P5-FAULT-021",
+        "P5-FAULT-022",
+        "P5-FAULT-023",
+        "P5-FAULT-024",
+        "P5-FAULT-025",
+        "P5-FAULT-026",
+        "P5-FAULT-054",
+        "P5-FAULT-055"
+      ],
+      "propertyIds": [],
+      "criticalMutantIds": [
+        "P5-MUT-012",
+        "P5-MUT-021",
+        "P5-MUT-022",
+        "P5-MUT-023"
+      ],
+      "otherMutantIds": [
+        "P5-MUT-030",
+        "P5-MUT-031",
+        "P5-MUT-032",
+        "P5-MUT-033",
+        "P5-MUT-034"
+      ]
+    },
+    "D": {
+      "productionModules": [
+        "packages/verifactu/src/aeat/edition-profile.ts",
+        "packages/verifactu/src/aeat/soap-wire.ts",
+        "packages/verifactu/src/aeat/response-parser.ts",
+        "packages/verifactu/src/aeat/transport.ts",
+        "packages/verifactu/src/aeat/node-https-transport.ts",
+        "packages/verifactu/src/aeat/certificate-authorization.ts"
+      ],
+      "testFiles": [
+        "tests/contract/p5-aeat-wire-contract.test.mjs",
+        "tests/contract/p5-local-peer-contract.test.mjs",
+        "tests/integration/p5-aeat-transport.test.mjs",
+        "tests/property/p5-protocol-properties.test.mjs",
+        "tests/security/p5-wire-attacks.test.mjs",
+        "tests/unit/p5-aeat-binding.test.mjs"
+      ],
+      "faultIds": [
+        "P5-FAULT-027",
+        "P5-FAULT-028",
+        "P5-FAULT-029",
+        "P5-FAULT-030",
+        "P5-FAULT-031",
+        "P5-FAULT-032",
+        "P5-FAULT-033",
+        "P5-FAULT-034",
+        "P5-FAULT-035",
+        "P5-FAULT-036",
+        "P5-FAULT-037",
+        "P5-FAULT-038",
+        "P5-FAULT-040",
+        "P5-FAULT-041",
+        "P5-FAULT-042",
+        "P5-FAULT-043",
+        "P5-FAULT-051",
+        "P5-FAULT-052"
+      ],
+      "propertyIds": [
+        "P5-PROP-009",
+        "P5-PROP-010",
+        "P5-PROP-011",
+        "P5-PROP-012"
+      ],
+      "criticalMutantIds": ["P5-MUT-016", "P5-MUT-018", "P5-MUT-019"],
+      "otherMutantIds": [
+        "P5-MUT-035",
+        "P5-MUT-036",
+        "P5-MUT-037",
+        "P5-MUT-038",
+        "P5-MUT-039",
+        "P5-MUT-040"
+      ]
+    },
+    "E": {
+      "productionModules": [
+        "packages/verifactu/src/aeat/batch-planner.ts",
+        "packages/verifactu/src/aeat/submission-coordinator.ts",
+        "packages/verifactu/src/aeat/retry-policy.ts",
+        "packages/verifactu/src/aeat/correlation.ts",
+        "packages/verifactu/src/aeat/reconciliation.ts",
+        "packages/verifactu/src/aeat/consultation.ts"
+      ],
+      "testFiles": [
+        "tests/contract/p5-aeat-orchestration-contract.test.mjs",
+        "tests/integration/p5-aeat-reconciliation.test.mjs",
+        "tests/security/p5-resource-limits.test.mjs",
+        "tests/unit/p5-state-machine.test.mjs"
+      ],
+      "faultIds": [
+        "P5-FAULT-039",
+        "P5-FAULT-044",
+        "P5-FAULT-045",
+        "P5-FAULT-046",
+        "P5-FAULT-047",
+        "P5-FAULT-048",
+        "P5-FAULT-049",
+        "P5-FAULT-050"
+      ],
+      "propertyIds": [],
+      "criticalMutantIds": [
+        "P5-MUT-008",
+        "P5-MUT-009",
+        "P5-MUT-010",
+        "P5-MUT-011",
+        "P5-MUT-014",
+        "P5-MUT-015",
+        "P5-MUT-017",
+        "P5-MUT-020"
+      ],
+      "otherMutantIds": []
+    },
+    "F": {
+      "productionModules": [
+        "packages/verifactu/src/operations/safe-observability.ts",
+        "packages/verifactu/src/operations/runbook-decisions.ts"
+      ],
+      "testFiles": ["tests/security/p5-redaction.test.mjs"],
+      "faultIds": ["P5-FAULT-053"],
+      "propertyIds": [],
+      "criticalMutantIds": ["P5-MUT-024"],
+      "otherMutantIds": []
+    },
+    "G": {
+      "productionModules": [],
+      "testFiles": [
+        "tests/performance/p5-recovery-campaign.test.mjs",
+        "tests/mutation/p5-mutation.test.mjs"
+      ],
+      "faultIds": [],
+      "propertyIds": [],
+      "criticalMutantIds": [],
+      "otherMutantIds": []
+    }
+  }
+}

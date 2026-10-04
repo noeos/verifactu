@@ -10,7 +10,7 @@ import {
   identity,
   profile,
   testCredentialHandle,
-} from "../support/p5-aeat-fixture.mjs";
+} from "../support/p5-aeat-wire-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
 
 test("transport port runs one observation and strips response fields outside the safe allowlist", async () => {

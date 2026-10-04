@@ -6,25 +6,29 @@ import { createHash } from "node:crypto";
 import { discoverOverallMutationCatalog } from "./p4-mutation-catalog.mjs";
 import { applyOverallMutation } from "./p4-mutation-catalog.mjs";
 import { executeNodeMutation } from "./p4-overall-mutation-campaign.mjs";
+import { getP5WaveScope, resolveP5Wave } from "./p5-delivery-stage.mjs";
 import ts from "typescript";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const plan = JSON.parse(
   await readFile(resolve(root, "config/quality/p5-quality-plan.json"), "utf8"),
 );
+const wave = resolveP5Wave();
+const scope = getP5WaveScope(wave, plan);
 const testsFor = new Map([
   [
     "packages/verifactu/src/persistence/model.ts",
     [
       "tests/unit/p5-persistence-model.test.mjs",
+      "tests/property/p5-persistence-properties.test.mjs",
       "tests/security/p5-persistence-attacks.test.mjs",
     ],
   ],
   [
     "packages/verifactu/src/persistence/unit-of-work.ts",
     [
-      "tests/contract/p5-persistence-contract.test.mjs",
       "tests/contract/p5-host-uow-contract.test.mjs",
+      "tests/integration/p5-host-atomicity.test.mjs",
     ],
   ],
   [
@@ -40,21 +44,15 @@ const testsFor = new Map([
   ],
   [
     "packages/verifactu/src/persistence/leases.ts",
-    ["tests/unit/p5-state-machine.test.mjs"],
+    ["tests/integration/p5-host-atomicity.test.mjs"],
   ],
   [
     "packages/verifactu/src/persistence/journal.ts",
-    [
-      "tests/unit/p5-state-machine.test.mjs",
-      "tests/contract/p5-recovery-contract.test.mjs",
-    ],
+    ["tests/contract/p5-recovery-contract.test.mjs"],
   ],
   [
     "packages/verifactu/src/persistence/recovery.ts",
-    [
-      "tests/integration/p5-crash-restart.test.mjs",
-      "tests/performance/p5-recovery-campaign.test.mjs",
-    ],
+    ["tests/integration/p5-crash-restart.test.mjs"],
   ],
   [
     "packages/verifactu/src/persistence/migrations.ts",
@@ -74,8 +72,8 @@ const testsFor = new Map([
   [
     "packages/verifactu/src/aeat/edition-profile.ts",
     [
-      "tests/unit/p5-aeat-binding.test.mjs",
       "tests/contract/p5-aeat-wire-contract.test.mjs",
+      "tests/unit/p5-aeat-binding.test.mjs",
     ],
   ],
   [
@@ -113,10 +111,7 @@ const testsFor = new Map([
   ],
   [
     "packages/verifactu/src/aeat/batch-planner.ts",
-    [
-      "tests/contract/p5-aeat-wire-contract.test.mjs",
-      "tests/unit/p5-aeat-binding.test.mjs",
-    ],
+    ["tests/contract/p5-aeat-orchestration-contract.test.mjs"],
   ],
   [
     "packages/verifactu/src/aeat/submission-coordinator.ts",
@@ -250,7 +245,8 @@ const criticalTargets = [
 ].map(([module, needle]) => ({ module, needle }));
 
 async function main() {
-  const catalog = await discoverOverallMutationCatalog(root, plan);
+  const stagedPlan = { ...plan, productionModules: scope.productionModules };
+  const catalog = await discoverOverallMutationCatalog(root, stagedPlan);
   const used = new Set();
   const results = [];
   const syntaxExclusions = [];
@@ -316,7 +312,9 @@ async function main() {
             mutation.start >= targetStart && mutation.end <= targetEnd,
         );
       }
-      const testPaths = testsFor.get(module) ?? [];
+      const testPaths = (testsFor.get(module) ?? []).filter((path) =>
+        scope.testFiles.includes(path),
+      );
       assert.ok(
         testPaths.length > 0,
         `No P5 oracle mapped for ${id} (${module})`,
@@ -396,51 +394,70 @@ async function main() {
       let index = 0;
       index < plan.mutation.criticalMutants.length;
       index += 1
-    )
-      if (
-        await execute(
-          plan.mutation.criticalMutants[index],
-          criticalTargets[index],
-        )
-      )
-        criticalKilled += 1;
+    ) {
+      const id = plan.mutation.criticalMutants[index];
+      if (!scope.criticalMutantIds.includes(id)) continue;
+      if (await execute(id, criticalTargets[index])) criticalKilled += 1;
+    }
 
-    const secondaryModules = [...testsFor.keys()].filter((module) =>
-      catalog.mutants.some((mutation) => mutation.module === module),
-    );
+    const secondaryModules = [
+      "packages/verifactu/src/persistence/model.ts",
+      "packages/verifactu/src/persistence/unit-of-work.ts",
+      "packages/verifactu/src/persistence/atomic-coordinator.ts",
+      "packages/verifactu/src/persistence/head-cas.ts",
+      "packages/verifactu/src/persistence/leases.ts",
+      "packages/verifactu/src/persistence/journal.ts",
+      "packages/verifactu/src/persistence/recovery.ts",
+      "packages/verifactu/src/persistence/migrations.ts",
+      "packages/verifactu/src/persistence/backup-restore.ts",
+      "packages/verifactu/src/persistence/retention.ts",
+      "packages/verifactu/src/aeat/edition-profile.ts",
+      "packages/verifactu/src/aeat/soap-wire.ts",
+      "packages/verifactu/src/aeat/response-parser.ts",
+      "packages/verifactu/src/aeat/transport.ts",
+      "packages/verifactu/src/aeat/node-https-transport.ts",
+      "packages/verifactu/src/aeat/certificate-authorization.ts",
+    ];
     let otherKilled = 0;
-    for (let index = 0; index < plan.mutation.otherMutants.length; index += 1) {
+    for (let index = 0; index < plan.mutation.otherMutants.length; index++) {
+      const id = plan.mutation.otherMutants[index];
+      if (!scope.otherMutantIds.includes(id)) continue;
       const module = secondaryModules[index % secondaryModules.length];
-      if (await execute(plan.mutation.otherMutants[index], module))
-        otherKilled += 1;
+      if (await execute(id, module)) otherKilled += 1;
     }
     const criticalSurvivors = results
       .filter(
         (result) =>
-          plan.mutation.criticalMutants.includes(result.id) &&
+          scope.criticalMutantIds.includes(result.id) &&
           result.outcome !== "killed",
       )
       .map((result) => result.id);
     assert.equal(
       criticalKilled,
-      plan.mutation.criticalMutants.length,
+      scope.criticalMutantIds.length,
       `critical mutation survivors are forbidden: ${criticalSurvivors.join(",")}`,
     );
-    assert.ok(
-      (otherKilled / plan.mutation.otherMutants.length) * 100 >=
-        plan.mutation.otherKilledPercent,
-      `other mutant score ${otherKilled}/${plan.mutation.otherMutants.length}`,
+    if (scope.otherMutantIds.length > 0)
+      assert.ok(
+        (otherKilled / scope.otherMutantIds.length) * 100 >=
+          plan.mutation.otherKilledPercent,
+        `other mutant score ${otherKilled}/${scope.otherMutantIds.length}`,
+      );
+    assert.equal(
+      results.length,
+      scope.criticalMutantIds.length + scope.otherMutantIds.length,
     );
-    assert.equal(results.length, 40);
     const report = {
       schemaVersion: 1,
       status: "passed",
+      stage: `P5-${wave}`,
+      cumulative: scope.full,
       subject: process.env.VERIFACTU_SUBJECT_SHA ?? "unbound",
       tree: process.env.VERIFACTU_SUBJECT_TREE ?? "unbound",
       criticalKilled,
-      criticalTotal: 24,
+      criticalTotal: scope.criticalMutantIds.length,
       otherKilled,
-      otherTotal: 16,
+      otherTotal: scope.otherMutantIds.length,
       candidateSyntaxExcluded: syntaxExclusions.length,
       syntaxExclusions,
       results,
