@@ -193,14 +193,15 @@ export async function submitAeatBatch(input: {
       : null;
   const correlation =
     parsed?.status === "ok" ? correlateAeatResponse(batch, parsed.value) : null;
-  const terminalOutcome =
+  const terminalResult =
     correlation?.status === "complete" && parsed?.status === "ok"
       ? parsed.value.status === "accepted" ||
         parsed.value.status === "accepted-with-errors" ||
         parsed.value.status === "rejected"
-        ? parsed.value.status
-        : "indeterminate"
-      : "indeterminate";
+        ? { outcome: parsed.value.status, response: parsed.value }
+        : null
+      : null;
+  const terminalOutcome = terminalResult?.outcome ?? "indeterminate";
   const resultDigest = digestJson({
     attemptId: input.attemptId,
     requestDigest: batch.request.sha256,
@@ -252,14 +253,7 @@ export async function submitAeatBatch(input: {
       attemptId: input.attemptId,
       diagnostic: "DIAG-AEAT-RESULT-NOT-DURABLE",
     };
-  if (terminalOutcome === "indeterminate")
-    return {
-      status: "indeterminate",
-      attemptId: input.attemptId,
-      diagnostic: "DIAG-AEAT-OUTCOME-UNRESOLVED",
-    };
-  const parsedResponse = parsed;
-  if (!parsedResponse || parsedResponse.status !== "ok")
+  if (!terminalResult)
     return {
       status: "indeterminate",
       attemptId: input.attemptId,
@@ -268,8 +262,8 @@ export async function submitAeatBatch(input: {
   return {
     status: "complete",
     attemptId: input.attemptId,
-    outcome: terminalOutcome,
-    responseDigest: parsedResponse.value.responseDigest,
+    outcome: terminalResult.outcome,
+    responseDigest: terminalResult.response.responseDigest,
     resultDigest,
   };
 }

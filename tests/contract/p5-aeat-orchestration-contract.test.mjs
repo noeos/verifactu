@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { submitAeatBatch } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/submission-coordinator.js";
 import { acceptedResponse, batchPlan, certificateAuthorization, context, profile } from "../support/p5-aeat-fixture.mjs";
@@ -166,4 +167,13 @@ test("submission contains begin and finish exceptions and stores unknown authori
     attemptId: "attempt-malformed-response", observationId: "observation-malformed-response", limits, clock });
   assert.equal(malformedOutcome.status, "indeterminate");
   assert.equal(malformedOutcome.diagnostic, "DIAG-AEAT-OUTCOME-UNRESOLVED");
+  const malformedFinish = malformedEvents.find(
+    (event) => Array.isArray(event) && event[0] === "finish",
+  );
+  assert.ok(malformedFinish);
+  assert.equal(malformedFinish[1].outcome, "indeterminate");
+  assert.equal(
+    malformedFinish[1].responseDigest,
+    `sha256:${createHash("sha256").update("malformed").digest("hex")}`,
+  );
 });

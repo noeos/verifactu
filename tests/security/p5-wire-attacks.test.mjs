@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { parseAeatResponse } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/response-parser.js";
-import { profile } from "../support/p5-aeat-fixture.mjs";
+import { acceptedResponse, profile } from "../support/p5-aeat-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
 
 test("wire parser rejects external entities, namespace rebinding, duplicate status and malformed bytes", () => {
@@ -19,4 +19,20 @@ test("wire parser rejects external entities, namespace rebinding, duplicate stat
   assert.equal(soapFault.value.status, "soap-fault");
   assert.notEqual(soapFault.value.status, "accepted");
   recordP5FaultDetection("P5-FAULT-041", soapFault.value.status === "soap-fault");
+
+  const entityResponse = parse(Buffer.from(
+    acceptedResponse.toString().replace(
+      "<r:Series>A</r:Series>",
+      "<r:Series>A&amp;&lt;&gt;&quot;&apos;&#65;&#x42;</r:Series>",
+    ),
+  ));
+  assert.equal(entityResponse.status, "ok");
+  assert.equal(entityResponse.value.lines[0].identity[1], `A&<>\"'AB`);
+  const unknownEntityResponse = parse(Buffer.from(
+    acceptedResponse.toString().replace(
+      "<r:Series>A</r:Series>",
+      "<r:Series>A&unknown;</r:Series>",
+    ),
+  ));
+  assert.equal(unknownEntityResponse.value.status, "malformed");
 });
