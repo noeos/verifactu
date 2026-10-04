@@ -19,10 +19,16 @@ Prepend `/goal` to exactly one phase prompt. Do not combine phases. Each prompt
 is a derived execution aid; [`implementation-roadmap.md`](implementation-roadmap.md),
 higher-authority documentation and current law prevail.
 
-The operator should issue the next prompt only after the prior phase closure is
-on protected `main`. If a session resumes an unfinished goal, reuse the same
-phase prompt: Codex must inspect the existing branch/PR/evidence and continue
-rather than recreate completed work.
+Normally, issue the next phase prompt only after the prior phase closure is on
+protected `main`. Apply an explicit, recorded decision when one authorizes a
+bounded exception. In particular, ADR-0060 authorizes P5-A…P5-G implementation
+to start or continue on issue #113's `work/p5-implementation` branch while P4
+phase closure remains incomplete. This exception permits branch implementation
+only; it does not mark P4 complete, authorize a protected P5 merge, waive any
+required check or allow P5 phase closure while applicable P4 closure rows remain
+unresolved. If a session resumes an unfinished goal, reuse the same phase
+prompt: Codex must inspect the existing branch/PR/evidence and continue rather
+than recreate completed work.
 
 ## Mandatory behavior embedded in every prompt
 

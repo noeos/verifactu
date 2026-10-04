@@ -260,3 +260,14 @@ changelog and makes no compliance, publication or support claim.
 - P4 remains blocked. P5 protected merge still requires all normal required
   contexts to pass, and P5 phase closure still requires truthful resolution of
   applicable P4 closure rows. No check or gate is waived.
+
+## 2026-10-04 — Clarify phase-prompt sequencing exception
+
+- Clarified the general prompt-use rule: the next phase normally waits for
+  predecessor closure, except where an explicit recorded decision authorizes a
+  bounded implementation exception.
+- Named ADR-0060 and its exact scope in that rule so a resumed P5 session can
+  start or continue P5-A…P5-G branch work without treating P4 closure as an
+  entry blocker.
+- P4 remains blocked; P5 protected merges and phase closure retain their
+  existing checks and dependencies.
