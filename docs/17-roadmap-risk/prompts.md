@@ -297,14 +297,17 @@ describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
 the normal protected required checks, or close P5 while applicable P4 closure
 rows remain unresolved. P4 phase closure is not a prerequisite for starting or
 continuing implementation on the named P5 branch under ADR-0060. Read the latest
-active-state amendment in `handoff.md` (currently P5-008), inspect the worktree
+active-state amendment in `handoff.md` (currently P5-009), inspect the worktree
 before changing it, and continue any
 P5 work already present. Start with P5-A only if it has not already started; do
 not stop after repeating the P4 closure analysis. Verify the current handoff, exact
 main/branch identities, restored ruleset and current status of every outstanding
 P4 workflow before implementation. This P4 check is observational for P5 entry:
-the three recorded P4 required-check failures do not prevent this authorized
-branch work from starting or continuing. Stop affected work only if fresh
+the recorded P4 failures in `Required · OSV`,
+`Required · npm audit signatures and licenses`, and the derived
+`Required · required-check closure` do not prevent this authorized branch work
+from starting or continuing. These are retained failures, not exceptions that
+make a check pass or authorize disabling it. Stop affected work only if fresh
 evidence identifies a direct safety, regulatory or functional impact on P5, and
 record that impact against the affected scope. Read all documentation; verify
 the handoff and deterministic-core package bytes.

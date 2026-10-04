@@ -283,3 +283,14 @@ changelog and makes no compliance, publication or support claim.
 - Recorded the unresolved difference between issue #113's serial wave PR
   requirement and the single cumulative PR #114; no check, denominator or phase
   closure criterion was waived.
+
+## 2026-10-04 — Refresh the P5 entry handoff
+
+- The project owner reaffirmed the ADR-0060 authorization to continue P5-A…P5-G
+  branch implementation while P4 remains phase-unclosed.
+- Refreshed the handoff capsule and added Amendment P5-009 with the observed
+  local/remote SHA and exact-head PR #114 status. Updated the P5 prompt to point
+  at that amendment and name the three outstanding P4 closure failures.
+- The failures remain failed and do not become waived checks: P4 stays blocked,
+  P5 merge needs every normal protected context, and P5 phase closure retains
+  its applicable P4 closure dependency.
