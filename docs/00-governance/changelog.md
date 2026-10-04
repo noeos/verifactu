@@ -15,6 +15,14 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Refresh P5 documentation-head checks
+
+- Added Amendment P5-019 with the exact `00e0c27` branch/PR identity and
+  check-run states after P5-018 was pushed. All current checks were queued;
+  the new docs subject requires a fresh read-back.
+- Preserved the instruction to continue P5 branch work under ADR-0060 while
+  P4 remains blocked, without changing any merge or phase-exit requirement.
+
 ## 2026-10-04 — Refresh the active P5 continuation handoff
 
 - Added Amendment P5-018 and refreshed the handoff capsule with the current
