@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-10-03
+last-reviewed: 2026-10-04
 dependencies: [ROADMAP-DOC-0004, ROADMAP-DOC-0017]
 decisions: [ADR-0001, ADR-0031, ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 historical-inputs: [REV-063, REV-074, REV-079, REV-084]
@@ -290,12 +290,16 @@ block P5 branch development solely because P4 is not `evidence-complete`; do not
 describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
 the normal protected required checks, or close P5 while applicable P4 closure
 rows remain unresolved. Read the latest active-state amendment in `handoff.md`
-(currently P5-004), inspect the worktree before changing it, and continue any
+(currently P5-005), inspect the worktree before changing it, and continue any
 P5 work already present. Start with P5-A only if it has not already started; do
 not stop after repeating the P4 closure analysis. Verify the current handoff, exact
 main/branch identities, restored ruleset and current status of every outstanding
-P4 workflow before implementation. Read all documentation; verify the handoff
-and deterministic-core package bytes.
+P4 workflow before implementation. This P4 check is observational for P5 entry:
+the three recorded P4 required-check failures do not prevent this authorized
+branch work from starting or continuing. Stop affected work only if fresh
+evidence identifies a direct safety, regulatory or functional impact on P5, and
+record that impact against the affected scope. Read all documentation; verify
+the handoff and deterministic-core package bytes.
 Prioritize all 08-persistence-consistency and 09-aeat-integration documents plus
 host/provider contracts, concurrency, security/privacy, quality, performance and
 historical findings. Re-observe authorized AEAT/certificate access without

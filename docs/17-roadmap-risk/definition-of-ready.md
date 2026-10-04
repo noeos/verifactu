@@ -31,7 +31,11 @@ For P5 only, ADR-0060 authorizes P5-A through P5-G implementation on issue
 #113's named branch while P4 phase closure remains incomplete. This authorization
 continues to cover work already underway; a resumed session must inspect and
 continue that work rather than treating the initial start as a consumed or
-expired permission. It does not make P4 `evidence-complete`, establish P5
+expired permission. P4's three recorded failed required contexts are not an
+entry blocker for this branch work; rechecking them records current evidence
+but does not gate P5-A…P5-G implementation. Stop affected work only if fresh
+evidence identifies a direct safety, regulatory or functional impact. This
+authorization does not make P4 `evidence-complete`, establish P5
 readiness for protected merge, waive any P5 control or permit P5 closure while
 applicable P4 closure rows remain unresolved. Re-observe P4's current checks
 and preserve their exact status before continuing.

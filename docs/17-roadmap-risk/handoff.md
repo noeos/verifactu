@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-10-03
+last-reviewed: 2026-10-04
 dependencies:
   [ROADMAP-DOC-0004, ROADMAP-DOC-0005, ROADMAP-DOC-0007, ROADMAP-DOC-0013]
 decisions:
@@ -38,7 +38,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The current state is amended by Amendment P5-003 in this file and ADR-0060.
+The current state is amended by Amendment P5-005 in this file and ADR-0060.
 P4-A–P4-F have protected final read-backs. P4-G implementation
 PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4 phase closure is blocked by
@@ -99,7 +99,7 @@ Historical detail belongs in phase records below.
 | Current phase                | P5 implementation active, issue `#113`, branch `work/p5-implementation`, under ADR-0060. |
 | Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 implementation is `active` on the ADR-0060 branch; P5 merge requires its ordinary protected checks, and P5 phase closure remains blocked while applicable P4 closure rows are unresolved. `creationAllowed=false`. |
 | Last evidence-complete wave  | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding. |
-| Local repository             | Canonical checkout on `work/p5-implementation` at `3ea693524aa6b2f699ba8fbf015af8589f0a2455`; P5 implementation changes are present but uncommitted. The remote branch points to that same commit. |
+| Local repository             | Canonical checkout on `work/p5-implementation` at `95a01d1c9cd4f477424cb6f8b2c74023cd1f6991`; clean at observation. `origin/work/p5-implementation` points to that same commit. |
 | Protected `main` SHA         | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`. |
 | GitHub effective state       | EXC-0001 / issue #112 allowed only the one-time merge of PR #109 and is closed. `protected-main` is restored with all 17 required contexts. On the PR head, OSV and npm audit/signature/licence failed, and required-check closure failed as a consequence. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
@@ -107,7 +107,7 @@ Historical detail belongs in phase records below.
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
 | Public packages              | Three `0.0.0-development` package shells; not published. P4-D provider and its new internal interfaces are not re-exported from `packages/verifactu/src/index.ts`.                |
 | External gates               | Legal, AEAT, stable-performance, independent-assurance and publication gates remain downstream; none is claimed.                                                                |
-| Immediate instruction        | Continue the existing P5-A…P5-G implementation from the current worktree. Do not refuse P5 solely because P4 closure is open: ADR-0060 authorizes this branch work. Preserve P4's blocked status and failures; do not treat P5 work as P4 evidence. Refresh exact-head checks before any push or merge; never merge without every normal required check passing, and do not close P5 while applicable P4 rows remain unresolved. |
+| Immediate instruction        | P5-A…P5-G branch implementation is authorized and active. Start or continue from the current branch; the three recorded P4 required-check failures do not block P5 entry. Preserve P4's blocked status and failures; do not treat P5 work as P4 evidence. Refresh exact-head checks before any push or merge; never merge without every normal required check passing, and do not close P5 while applicable P4 rows remain unresolved. |
 
 ## Phase ledger
 
@@ -3905,3 +3905,43 @@ not declare P5 `evidence-complete` while P4's applicable closure rows remain
 unresolved. The P5 prompt, ADR-0060 and this amendment must be read together;
 older historical P4-to-P5 sequencing statements are superseded only for this
 named P5 implementation start.
+
+## Amendment P5-005 — 2026-10-04 explicit P5 entry read-back
+
+The project owner explicitly reaffirmed in the Codex session that P5-A…P5-G
+implementation should proceed and authorized this documentation update. This
+amendment makes the P5 entry decision direct for future sessions and refreshes
+the handoff capsule from observed Git and GitHub state. It does not alter P4's
+status or the P5 merge/closure gates.
+
+### Observed state at 2026-10-04 01:00 UTC
+
+- Local `work/p5-implementation` is clean at
+  `95a01d1c9cd4f477424cb6f8b2c74023cd1f6991`. `origin/work/p5-implementation`
+  points to the same SHA; `origin/main` is
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`.
+- PR [#114](https://github.com/noeos/verifactu/pull/114) is open, not merged,
+  with exact head `95a01d1c9cd4f477424cb6f8b2c74023cd1f6991`.
+- At this observation, `Required · OSV`,
+  `Required · npm audit signatures and licenses`, and derived
+  `Required · required-check closure` were failures. Required engineering
+  foundation, Engineering CI and Conformance workflows were still in progress;
+  Regulatory source observation, Security and Performance workflows had
+  succeeded. In-progress is not passed; refresh every check at the exact head
+  before relying on its result.
+- P4 remains `blocked`, not `evidence-complete`. The P4 required failures remain
+  open and visible. The three failures do not block P5 branch entry or
+  continuation under ADR-0060. No GitHub check, ruleset, denominator or P5
+  acceptance criterion is waived by this entry authorization.
+
+### Successor-session instruction
+
+Continue P5-A…P5-G implementation on `work/p5-implementation`; do not spend the
+session re-litigating whether open P4 closure alone prevents P5 branch work.
+First verify the current repository, branch, remote, PR and exact-head checks.
+Treat P4 check observation as status evidence, not as a P5 entry gate. Stop only
+an affected P5 scope if fresh evidence shows a direct safety, regulatory or
+functional impact, and record that evidence. Keep P4 blocked until its own
+applicable closure rows receive truthful dispositions. P5 protected integration
+still requires all effective required contexts to pass; P5 cannot be declared
+`evidence-complete` while applicable P4 closure rows remain unresolved.

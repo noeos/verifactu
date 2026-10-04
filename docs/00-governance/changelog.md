@@ -233,3 +233,17 @@ changelog and makes no compliance, publication or support claim.
 - Protected P5 merges still require every normal required context, and P5 phase
   closure still requires applicable P4 closure rows to be resolved. No check,
   denominator, or phase-exit criterion was waived.
+
+## 2026-10-04 — Make P5 entry decision explicit
+
+- The project owner reaffirmed that P5-A…P5-G branch implementation should
+  proceed while P4 retains its three failed required contexts. The prompt,
+  readiness definition, roadmap index and handoff now state directly that these
+  failures are not a P5 branch-entry blocker.
+- This wording records authorization to start or continue P5 implementation. It
+  leaves P4 `blocked`, preserves the failed results, and does not waive P5 checks,
+  protected merge requirements or the P5 phase-exit dependency on applicable P4
+  closure rows.
+- The handoff capsule now records the observed local/remote implementation SHA
+  `95a01d1c9cd4f477424cb6f8b2c74023cd1f6991`; the full point-in-time read-back is
+  Amendment P5-005.

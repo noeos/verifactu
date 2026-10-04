@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-10-03
+last-reviewed: 2026-10-04
 dependencies: [GOV-INDEX, REQ-INDEX]
 historical-inputs: [REV-001, REV-084]
 ---
@@ -20,6 +20,9 @@ is incomplete. Under ADR-0060, P5 implementation is active on issue #113's
 `work/p5-implementation` branch; P4 is not evidence-complete, and protected P5
 merges and P5 closure remain gated. Continue the authorized branch work rather
 than treating P4's open closure rows as a reason to refuse P5 implementation.
+The three recorded P4 required-check failures do not block P5 branch entry or
+continuation; they remain visible P4 closure findings and do not waive any P5
+required check or phase-exit criterion.
 
 Authority for dependency-driven execution, readiness, completion and visible
 risk. Phases order work; they do not reduce final scope.
