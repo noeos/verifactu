@@ -101,9 +101,9 @@ Historical detail belongs in phase records below.
 | Current phase                | P5 implementation active, issue `#113`, branch `work/p5-implementation`, under ADR-0060. |
 | Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 implementation is `active` on the ADR-0060 branch; P5 merge requires its ordinary protected checks, and P5 phase closure remains blocked while applicable P4 closure rows are unresolved. `creationAllowed=false`. |
 | Last evidence-complete wave  | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding. |
-| Local repository             | At the 2026-10-04 pre-amendment read-back, clean local and remote `work/p5-implementation` both point to signed+DCO commit `89bec616288084f8840ef7732c7625766e5e57b8` (tree `25e5b77107b45067353a8d5b1761433d4d16486d`). This documentation update will create a new exact-head subject and require fresh checks. |
+| Local repository             | At the 2026-10-04 22:58 UTC read-back, clean local and remote `work/p5-implementation` both point to signed+DCO commit `909db8ab5041d0ce22c095d87d7eb2c275e668e0` (tree `4fad0eed9139c46386d3e74a88e1698085b2c9a2`). This documentation update will create a new exact-head subject and require fresh checks. |
 | Protected `main` SHA         | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`. |
-| GitHub effective state       | EXC-0001 / issue #112 is closed. Ruleset `protected-main` is active and strict with all 17 configured contexts. PR #114 is open and `BLOCKED` at remote head `89bec616288084f8840ef7732c7625766e5e57b8`, based on protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`. At 2026-10-04 20:12 UTC, OSV and npm audit had failed; integration, dependency review, CodeQL, secret scan, governance/DCO, docs, package reproducibility, security, performance and regulatory observation had passed. Platform cells, quality/policy, Engineering CI `gate:p2`, Conformance generated-contract work and required-check closure were still in progress/not yet reported. Do not count pending results as passes. Runs: Required `37229915224`, Engineering CI `37229915220`, Conformance `37229915247`, regulatory observation `37229915205`, Security `37229915185`, Performance `37229915362`. |
+| GitHub effective state       | EXC-0001 / issue #112 is closed. Ruleset `protected-main` is active and strict with all 17 configured contexts. PR #114 is open and `BLOCKED` at remote head `909db8ab5041d0ce22c095d87d7eb2c275e668e0`, based on protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`. At 2026-10-04 22:58 UTC, Security supply chain had passed, Engineering CI `gate:p2` was in progress, and the other current-head jobs/checks were queued. The three P4 closure findings remain OSV, npm audit signatures/licences and derived required-check closure; their presence does not block continuing the already-authorized P5 branch work. Pending results are not passes. Runs: Required `37240681291`, Engineering CI `37240681195`, Conformance `37240681211`, regulatory observation `37240681193`, Security `37240681253`, Performance `37240681225`. See Amendment P5-018 for the exact check-run snapshot. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
@@ -120,7 +120,7 @@ Historical detail belongs in phase records below.
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
 | P4    | blocked           | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | implementation merge `1f66da46e21127d1d82018cfdf093f595e1c08ae` | PR `#109`; EXC-0001 `#112` | P4-A–G implementation is merged; phase closure is incomplete because exact PR required contexts OSV, npm audit/signature/licence and derived required-check closure failed; protected-push runs are recorded below. |
-| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation`, PR `#114` | Local cumulative `gate:p5` passed on clean commit `89bec61`: 101/101 TAP, 40/40 valid mutants, 49,152 property executions, 56/56 faults and five seeded plan defects killed. `policy:supply-chain` passed 259/259; npm signatures verified 232 packages/87 attestations. PR #114 remains a single cumulative A…G PR, not serial wave acceptance. At current head `89bec61`, OSV and npm audit failed while platform cells, quality/policy, `gate:p2`, generated-contract work and closure remain in progress. See Amendment P5-017. P5 closure still requires applicable P4 rows, qualified external boundaries and protected serial-wave delivery. |
+| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation`, PR `#114` | Local cumulative `gate:p5` and policy checks passed on clean `909db8a`; see Amendment P5-018. PR #114 remains a single cumulative A…G PR, not serial wave acceptance. Its exact-head GitHub workflows are pending/in progress at the latest read-back. P4's three failed closure rows do not block P5 branch continuation; P5 closure still requires applicable P4 rows, qualified external boundaries and protected serial-wave delivery. |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
 | P8    | planned           | P7 closure required                                              | —                                          | —                  | Stable publication, verification and support.                                                                            |
@@ -4801,3 +4801,56 @@ checks or authorize a protected merge.
   continue on the named branch; protected merge still needs every ordinary
   required context, and P5 closure still requires applicable P4 rows, the
   qualified durable adapter boundary and protected serial-wave acceptance.
+
+## Amendment P5-018 — 2026-10-04 active P5 continuation and exact-head refresh
+
+This amendment supersedes P5-017 as the active P5 state snapshot. It records
+the local and GitHub state read at 2026-10-04 22:58 UTC, before this
+documentation change. This commit creates a new exact-head subject whose
+workflows must be read back independently. It does not waive checks, close P4
+or P5, or authorize a protected merge.
+
+### Explicit instruction for resumed P5 sessions
+
+ADR-0060, the P5 prompt and the P5 quality plan already authorize continuing
+P5-A…P5-G implementation on issue #113's `work/p5-implementation` branch while
+P4 phase closure remains blocked. The current handoff now points at the live
+branch and run state as well. A new session must inspect the current Git and
+GitHub state, then continue existing P5 work; it must not stop solely to
+re-litigate whether P4 closure is an entry prerequisite. P4 remains `blocked`.
+The OSV, npm audit signatures/licences and derived required-check closure
+failures remain unresolved P4 rows and are not converted into passes or
+exceptions. Normal required checks still govern every P5 PR merge, and P5
+phase closure still requires applicable P4 rows, qualified external boundaries
+and the protected serial-wave delivery required by the plan.
+
+### Exact local and GitHub read-back
+
+- Local `work/p5-implementation` was clean at signed+DCO commit
+  `909db8ab5041d0ce22c095d87d7eb2c275e668e0`, tree
+  `4fad0eed9139c46386d3e74a88e1698085b2c9a2`. `gate:p5` passed 2/2 tasks:
+  103/103 TAP, 99.11% line, 95.18% branch and 99.02% function coverage,
+  12 property campaigns / 49,152 executions, 56/56 injected faults and five
+  seeded plan defects killed. The same clean commit passed `policy:docs`
+  544/544, `policy:supply-chain` 259/259, `policy:lint` 84/84,
+  `policy:types` 3/3 and `policy:format` 124/124. npm signature verification
+  covered 232 registry signatures and 87 attestations. These are local results,
+  not GitHub acceptance.
+- GitHub PR #114 is open and `BLOCKED` at exact head
+  `909db8ab5041d0ce22c095d87d7eb2c275e668e0`, based on protected `main`
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`. The latest check-run read-back
+  showed `Security · supply chain` successful; `Engineering CI · gate:p2`
+  in progress; all other checks queued. This includes the 17 required contexts,
+  Conformance, regulatory observation, Performance, Security secret
+  regressions and required-check closure. None of the queued or in-progress
+  checks is a pass. Workflow runs: Required engineering
+  [37240681291](https://github.com/noeos/verifactu/actions/runs/37240681291),
+  Engineering CI [37240681195](https://github.com/noeos/verifactu/actions/runs/37240681195),
+  Conformance [37240681211](https://github.com/noeos/verifactu/actions/runs/37240681211),
+  regulatory observation [37240681193](https://github.com/noeos/verifactu/actions/runs/37240681193),
+  Security [37240681253](https://github.com/noeos/verifactu/actions/runs/37240681253)
+  and Performance [37240681225](https://github.com/noeos/verifactu/actions/runs/37240681225).
+- This branch still represents one cumulative P5-A…P5-G PR; it has not
+  satisfied the plan's serial signed+DCO wave acceptance. Production durable
+  adapter qualification and external AEAT evidence remain outstanding, and
+  `creationAllowed=false`.

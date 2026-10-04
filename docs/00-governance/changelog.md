@@ -15,6 +15,16 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Refresh the active P5 continuation handoff
+
+- Added Amendment P5-018 and refreshed the handoff capsule with the current
+  clean local/remote branch SHA and PR #114 exact-head workflow snapshot.
+- Made the operational instruction explicit: a P5 session must continue
+  authorized branch work while P4 is blocked. The P4 failures remain visible;
+  this does not waive checks, enable a protected merge or close either phase.
+- Recorded local P5 gate evidence and the remaining serial-wave and external
+  qualification conditions without treating pending GitHub checks as passes.
+
 ## 2026-10-04 — Clarify continued P5 implementation authorization
 
 - Clarified ADR-0060: its one-time owner decision authorizes continued P5-A…P5-G
