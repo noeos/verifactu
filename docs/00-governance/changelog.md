@@ -15,6 +15,15 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Refresh exact P5 remote-state handoff
+
+- Added Amendment P5-014 to replace the stale P5-013 read-back with the exact
+  `94db4c6` branch/PR identity and current required workflow states.
+- Recorded the completed prior-head P2 and conformance results separately from
+  the newer exact-head runs, which remain pending or failed as observed.
+- P4 remains blocked; no required check, serial-wave condition or P5 exit gate
+  changed.
+
 ## 2026-10-04 — Refresh P5 handoff after entry-rule clarification
 
 - Added Amendment P5-013 with the exact local commit/tree, local P5-G and
