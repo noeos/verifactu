@@ -15,6 +15,14 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Refresh P5 handoff after entry-rule clarification
+
+- Added Amendment P5-013 with the exact local commit/tree, local P5-G and
+  documentation check evidence, current PR #114 workflow observation, active
+  protection state and the still-open serial-wave delivery gap.
+- Recorded the latest upstream npm/cli bundled-dependency issue observation.
+  P4 remains blocked; no required check or P5 exit dependency changed.
+
 ## 2026-10-04 — Cross-reference the scoped P5 entry decision from ADR-0058
 
 - Updated ADR-0058's governing transition rule to point directly to ADR-0060's
