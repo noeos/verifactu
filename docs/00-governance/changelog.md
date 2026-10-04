@@ -15,6 +15,16 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Cross-reference the scoped P5 entry decision from ADR-0058
+
+- Updated ADR-0058's governing transition rule to point directly to ADR-0060's
+  P4-to-P5 implementation-entry exception. A resumed P5 session is explicitly
+  directed to continue the named branch without treating open P4 closure as an
+  implementation blocker.
+- The exception is limited to P5 branch implementation. P4 remains blocked;
+  P4's sequence and assurance criteria, P5 required checks, protected merge
+  rules and P5 phase-exit dependency remain in force.
+
 ## 2026-10-03 — P5 assurance population frozen
 
 - Before P5 product modules, the P5-specific quality plan declares 25 production

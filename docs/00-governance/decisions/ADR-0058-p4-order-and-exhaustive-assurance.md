@@ -5,8 +5,8 @@ status: accepted
 authority: decision
 owner: quality-owner
 created: 2026-09-24
-last-reviewed: 2026-09-24
-dependencies: [ADR-0021, ADR-0026, ADR-0027, ADR-0028, ADR-0033, ADR-0051, ADR-0052]
+last-reviewed: 2026-10-04
+dependencies: [ADR-0021, ADR-0026, ADR-0027, ADR-0028, ADR-0033, ADR-0051, ADR-0052, ADR-0060]
 historical-inputs: [REV-010, REV-011, REV-012, REV-015, REV-021, REV-045, REV-046, REV-056, REV-057, REV-062, REV-063, REV-074, REV-079, REV-084]
 ---
 
@@ -34,6 +34,17 @@ until the immediately preceding wave has a protected closure and its final-head
 evidence is read back. No parallel child-wave PRs and no merge of a later wave
 against a stale base. P4-G is a cumulative closure campaign, not the first
 measurement of earlier waves.
+
+This predecessor-closure rule remains the default for phase transitions. For
+the specific P4-to-P5 implementation entry, the later scoped decision
+[`ADR-0060`](ADR-0060-scoped-p5-start-with-open-p4-closure.md) authorizes P5-A
+through P5-G work to start or continue on issue #113's named branch while P4
+phase closure is blocked. A session resuming that branch must inspect and
+continue the existing work; it must not stop solely to repeat the P4 closure
+analysis. This exception changes only the P5 implementation-entry prerequisite.
+It does not close P4, change P4's serial order or assurance criteria, waive P5
+checks, authorize a protected P5 merge, or permit P5 phase closure while
+applicable P4 closure rows remain unresolved.
 
 Before P4-A implementation, a protected P4-readiness change must freeze the
 machine-readable production/test population, critical branch and mutation
