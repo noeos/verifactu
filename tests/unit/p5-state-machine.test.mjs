@@ -1,10 +1,43 @@
 import assert from "node:assert/strict";
+import { X509Certificate } from "node:crypto";
 import test from "node:test";
 import { appendJournalTransition, isAllowedDurableTransition, validateJournalTransition } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/journal.js";
 import { decideRetry } from "../../evidence/runs/artifacts/build/verifactu/dist/aeat/retry-policy.js";
 import { claimOutboxLease, completeOutboxWithLease, releaseOutboxLease, renewOutboxLease } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/leases.js";
 import { context, hash, identity } from "../support/p5-aeat-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
+import { createP5TestPki } from "../support/p5-test-pki.mjs";
+
+test("synthetic PKI emits canonical positive DER certificate serials", () => {
+  const serials = [
+    "007f" + "11".repeat(14),
+    "0080" + "22".repeat(14),
+    "0001" + "33".repeat(14),
+    "ff" + "44".repeat(15),
+  ].map((serial) => Buffer.from(serial, "hex"));
+  const expectedSerials = [
+    "7f" + "11".repeat(14),
+    "80" + "22".repeat(14),
+    "01" + "33".repeat(14),
+    "ff" + "44".repeat(15),
+  ];
+  let nextSerial = 0;
+  const pki = createP5TestPki({ serialBytes: () => serials[nextSerial++] });
+  const certificates = [
+    pki.caPem,
+    pki.serverCertificate,
+    pki.wrongHostCertificate,
+    pki.clientCertificate,
+  ];
+
+  assert.equal(nextSerial, certificates.length);
+  assert.deepEqual(
+    certificates.map((certificate) =>
+      new X509Certificate(certificate).serialNumber.toLowerCase(),
+    ),
+    expectedSerials,
+  );
+});
 
 test("durable journal has no blind retry or terminal-state escape", () => {
   assert.equal(isAllowedDurableTransition("attempt-started", "indeterminate"), true);

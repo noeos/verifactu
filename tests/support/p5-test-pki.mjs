@@ -22,9 +22,16 @@ function tlv(tag, content) {
 const sequence = (...values) => tlv(0x30, Buffer.concat(values));
 const set = (...values) => tlv(0x31, Buffer.concat(values));
 const integer = (value) => {
-  const bytes = Buffer.isBuffer(value)
+  let bytes = Buffer.isBuffer(value)
     ? Buffer.from(value)
     : Buffer.from([value]);
+  while (
+    bytes.length > 1 &&
+    bytes[0] === 0 &&
+    (bytes[1] & 0x80) === 0
+  ) {
+    bytes = bytes.subarray(1);
+  }
   return tlv(
     0x02,
     bytes[0] & 0x80 ? Buffer.concat([Buffer.from([0]), bytes]) : bytes,
@@ -111,7 +118,7 @@ function keyPair() {
   });
 }
 
-export function createP5TestPki() {
+export function createP5TestPki({ serialBytes = randomBytes } = {}) {
   const ca = keyPair();
   const server = keyPair();
   const wrongHost = keyPair();
@@ -122,7 +129,7 @@ export function createP5TestPki() {
     publicKey: ca.publicKey,
     issuerName: caName,
     issuerKey: ca.privateKey,
-    serial: randomBytes(16),
+    serial: serialBytes(16),
     ca: true,
   });
   const serverCertificate = issueCertificate({
@@ -130,7 +137,7 @@ export function createP5TestPki() {
     publicKey: server.publicKey,
     issuerName: caName,
     issuerKey: ca.privateKey,
-    serial: randomBytes(16),
+    serial: serialBytes(16),
     usages: ["1.3.6.1.5.5.7.3.1"],
     names: [
       tlv(0x82, Buffer.from("localhost")),
@@ -142,7 +149,7 @@ export function createP5TestPki() {
     publicKey: wrongHost.publicKey,
     issuerName: caName,
     issuerKey: ca.privateKey,
-    serial: randomBytes(16),
+    serial: serialBytes(16),
     usages: ["1.3.6.1.5.5.7.3.1"],
     names: [tlv(0x82, Buffer.from("wrong-host.invalid"))],
   });
@@ -151,7 +158,7 @@ export function createP5TestPki() {
     publicKey: client.publicKey,
     issuerName: caName,
     issuerKey: ca.privateKey,
-    serial: randomBytes(16),
+    serial: serialBytes(16),
     usages: ["1.3.6.1.5.5.7.3.2"],
   });
   const privateKeyPem = (key) =>
