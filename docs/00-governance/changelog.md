@@ -247,3 +247,16 @@ changelog and makes no compliance, publication or support claim.
 - The handoff capsule now records the observed local/remote implementation SHA
   `95a01d1c9cd4f477424cb6f8b2c74023cd1f6991`; the full point-in-time read-back is
   Amendment P5-005.
+
+## 2026-10-04 — Refresh P5 continuation handoff
+
+- Reaffirmed in the executable P5 prompt that P4 phase closure is not a
+  prerequisite to start or continue P5 implementation on the ADR-0060 branch.
+  A resumed session must inspect the current state and continue existing P5
+  work rather than stopping after repeating the P4 closure analysis.
+- Updated the handoff capsule and added Amendment P5-007 with the observed
+  clean local/remote SHA `87edec46df6f74582f8a651226876cb3801762f3`, PR #114
+  state and exact-head checks observed at 2026-10-04 07:18:39 UTC.
+- P4 remains blocked. P5 protected merge still requires all normal required
+  contexts to pass, and P5 phase closure still requires truthful resolution of
+  applicable P4 closure rows. No check or gate is waived.

@@ -99,9 +99,9 @@ Historical detail belongs in phase records below.
 | Current phase                | P5 implementation active, issue `#113`, branch `work/p5-implementation`, under ADR-0060. |
 | Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 implementation is `active` on the ADR-0060 branch; P5 merge requires its ordinary protected checks, and P5 phase closure remains blocked while applicable P4 closure rows are unresolved. `creationAllowed=false`. |
 | Last evidence-complete wave  | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding. |
-| Local repository             | At the 2026-10-04 06:56 UTC read-back, canonical checkout is on `work/p5-implementation` at `c28854b3af0ff1e67155912124760350b644f473`; `origin/work/p5-implementation` points to that commit. The working tree has the P5 coverage and handoff updates recorded in Amendment P5-006; refresh after their commit. |
+| Local repository             | At the 2026-10-04 07:18:39 UTC read-back, canonical checkout is clean on `work/p5-implementation` at `87edec46df6f74582f8a651226876cb3801762f3` (tree `2317b231d2b74deba5ea34765f8a767b366abaeb`); `origin/work/p5-implementation` points to the same commit. |
 | Protected `main` SHA         | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`. |
-| GitHub effective state       | EXC-0001 / issue #112 allowed only the one-time merge of PR #109 and is closed. `protected-main` is restored with all 17 required contexts. On P5 PR #114 at `c28854b3af0ff1e67155912124760350b644f473`, OSV, npm audit/signatures/licences, Engineering CI `gate:p2`, both Node 22 platform cells and Windows/Node 24 failed. The detailed exact-head status is in Amendment P5-006. |
+| GitHub effective state       | EXC-0001 / issue #112 allowed only the one-time merge of PR #109 and is closed. `protected-main` is restored with all 17 required contexts. PR #114 is open at `87edec46df6f74582f8a651226876cb3801762f3`; at 2026-10-04 07:18:39 UTC, OSV and npm audit/signatures/licences had failed, engineering `gate:p2`, regulatory/generated-contracts and five platform/quality jobs were still in progress, and other observed checks had passed. See Amendment P5-007; no pending result is a pass. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
@@ -118,7 +118,7 @@ Historical detail belongs in phase records below.
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
 | P4    | blocked           | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | implementation merge `1f66da46e21127d1d82018cfdf093f595e1c08ae` | PR `#109`; EXC-0001 `#112` | P4-A–G implementation is merged; phase closure is incomplete because exact PR required contexts OSV, npm audit/signature/licence and derived required-check closure failed; protected-push runs are recorded below. |
-| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation`, PR `#114` | Implementation continues under the explicit P5 entry authorization. PR #114 was open at `c28854b3af0ff1e67155912124760350b644f473` at the 2026-10-04 06:56 UTC observation; six checks had failed, including the Windows/Node 24 cell. A P5 implementation update is being prepared locally and needs exact-head CI read-back. P5 merge requires normal passing protected checks; P5 phase closure also requires truthful resolution of applicable P4 closure rows. |
+| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation`, PR `#114` | P5-A…P5-G development is authorized to continue on the named branch without waiting for P4 phase closure. PR #114 is open at `87edec46df6f74582f8a651226876cb3801762f3`; exact-head check status is recorded in Amendment P5-007. P5 merge requires normal passing checks; P5 phase closure also requires truthful resolution of applicable P4 closure rows. |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
 | P8    | planned           | P7 closure required                                              | —                                          | —                  | Stable publication, verification and support.                                                                            |
@@ -4008,3 +4008,47 @@ artifact, required context and closure report on the new exact SHA. Keep P4
 blocked while its own applicable closure rows remain unresolved. Do not merge
 PR #114 or claim P5 phase completion unless the effective protected checks and
 handoff conditions are satisfied.
+
+## Amendment P5-007 — 2026-10-04 refreshed P5 continuation handoff
+
+This amendment refreshes the active-state capsule and makes the distinction
+between P5 implementation entry and P5 phase closure explicit in the executable
+prompt. It does not change ADR-0060, close P4, waive any required check or alter
+P5 acceptance criteria.
+
+### Repository and PR observation
+
+- At 2026-10-04 07:18:39 UTC, the local checkout was clean on
+  `work/p5-implementation` at `87edec46df6f74582f8a651226876cb3801762f3`, tree
+  `2317b231d2b74deba5ea34765f8a767b366abaeb`; the remote branch pointed to the
+  same commit. PR [#114](https://github.com/noeos/verifactu/pull/114) was open
+  at that exact head, based on protected main
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`.
+- The exact-head required checks `Required · OSV` and
+  `Required · npm audit signatures and licenses` had failed. Engineering CI
+  `gate:p2`, Conformance regulatory sources/generated contracts, Required
+  regulatory sources/generated contracts, quality/policy and the five required
+  platform/runtime cells (Ubuntu Node 22.14.0, Ubuntu Node 22.23.2, Ubuntu
+  Node 24.21.0, Windows Node 24.21.0 and macOS Node 24.21.0) were still
+  in progress. Required-check closure had no terminal passing result at this
+  observation. Pending or absent results are not passes.
+- The observed passing results included governance signatures/DCO,
+  documentation/traceability, integration conformance, package reproducibility,
+  dependency review, CodeQL, secret scan, regulatory source observation on all
+  three platforms, performance smoke, packed-consumer conformance and both
+  security jobs. Full run/job locators are in GitHub workflow runs
+  `37184472077`, `37184472089`, `37184472092`, `37184472094`,
+  `37184472095` and `37184472107`; reread the checks before relying on these
+  point-in-time statuses.
+
+### Successor-session instruction
+
+P4 phase closure is not a prerequisite for starting or continuing P5
+implementation on the specific branch authorized by ADR-0060. A successor
+session must inspect current Git/GitHub state, then continue the existing P5
+work; unresolved P4 checks are status evidence and remain separately owned, not
+a reason to stop P5 branch development or repeat the closure debate. Stop an
+affected P5 scope only when fresh evidence shows a direct safety, regulatory or
+functional impact. Keep P4 `blocked`; P5 merges still require every effective
+protected required context to pass, and P5 cannot become `evidence-complete`
+while applicable P4 closure rows remain unresolved.
