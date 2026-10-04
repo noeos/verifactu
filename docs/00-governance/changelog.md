@@ -294,3 +294,15 @@ changelog and makes no compliance, publication or support claim.
 - The failures remain failed and do not become waived checks: P4 stays blocked,
   P5 merge needs every normal protected context, and P5 phase closure retains
   its applicable P4 closure dependency.
+
+## 2026-10-04 — Add P5 implementation and recovery evidence matrices
+
+- Added exact-subject `gate:p5` results and handoff matrices for stores, outbox
+  state/retry, protocol operations, recovery/fault campaigns, external gaps and
+  P6 readiness.
+- Recorded the verified serial-wave delivery conflict: aggregate `gate:p2` and
+  `gate:platform` depend on a P5 gate whose current validator requires the full
+  frozen source/test population, preventing a partial-wave PR from passing.
+- P5 remains active and P4 remains blocked. The cumulative PR, audit failures,
+  incomplete current-head checks and external boundaries remain open; no check,
+  threshold, denominator or phase-exit dependency was waived.

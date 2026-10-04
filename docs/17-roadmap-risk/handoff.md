@@ -38,7 +38,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 
 ## Current authority notice
 
-The current state is amended by Amendment P5-009 in this file and ADR-0060.
+The current state is amended by Amendment P5-010 in this file and ADR-0060.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
 by `Required · OSV`, `Required · npm audit signatures and licenses`, and the
@@ -99,9 +99,9 @@ Historical detail belongs in phase records below.
 | Current phase                | P5 implementation active, issue `#113`, branch `work/p5-implementation`, under ADR-0060. |
 | Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 implementation is `active` on the ADR-0060 branch; P5 merge requires its ordinary protected checks, and P5 phase closure remains blocked while applicable P4 closure rows are unresolved. `creationAllowed=false`. |
 | Last evidence-complete wave  | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding. |
-| Local repository             | Clean `work/p5-implementation` at `6aceb3c12833af83196673022bdce9e8ca80ec69` (tree `d9673e949292dd53a611ac3194925b51b9cccee7`), SSH-signed+DCO; `origin/work/p5-implementation` matches at this observation. Amendment P5-008 remains the historical source-validation record. |
+| Local repository             | At the 2026-10-04 10:22:46 UTC read-back, clean `work/p5-implementation` and `origin/work/p5-implementation` both pointed to `2aef66190ec0c7119c4189fa9ff57c3ca80c49ff` (tree `76533035e8d1985422ef4e52af2ca6e5aeb25101`), SSH-signed+DCO. Amendment P5-008 remains the historical source-validation record. |
 | Protected `main` SHA         | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`. |
-| GitHub effective state       | EXC-0001 / issue #112 is closed. `protected-main` is active with all 17 required contexts. At 2026-10-04 10:07:15 UTC, PR #114 was open at `6aceb3c12833af83196673022bdce9e8ca80ec69`, `BLOCKED`; OSV and npm audit/signatures/licences had failed, while seven required contexts were pending and the remaining reported contexts passed. P4's protected-push closure remains three failures: OSV, npm audit/signatures/licences and derived required-check closure. Amendment P5-009 records this exact-head observation; refresh after push. |
+| GitHub effective state       | EXC-0001 / issue #112 is closed. Ruleset `protected-main` is active with all 17 required contexts. At 2026-10-04 10:22:46 UTC, PR #114 was open at `2aef66190ec0c7119c4189fa9ff57c3ca80c49ff`, `BLOCKED`: OSV and npm audit/signatures/licences failed, seven required contexts were pending, seven passed, and the required-check closure context had not yet reported. P4 PR #109's exact head remains terminal with OSV, npm audit/signatures/licences and derived required-check closure failed. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
@@ -118,7 +118,7 @@ Historical detail belongs in phase records below.
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
 | P4    | blocked           | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | implementation merge `1f66da46e21127d1d82018cfdf093f595e1c08ae` | PR `#109`; EXC-0001 `#112` | P4-A–G implementation is merged; phase closure is incomplete because exact PR required contexts OSV, npm audit/signature/licence and derived required-check closure failed; protected-push runs are recorded below. |
-| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation`, PR `#114` | P5-A…P5-G implementation remains active. Local correction commit `a44720839260867ad1b79de27104691d7d82fa70` had not yet been pushed at this read-back; PR #114 remained on its earlier head. PR #114 is one cumulative P5 implementation PR, while issue #113 requires serial wave PRs; that delivery requirement remains unresolved. P5 merge requires normal passing checks; P5 phase closure also requires truthful resolution of applicable P4 closure rows. |
+| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation`, PR `#114` | At the P5-010 pre-amendment read-back, P5 implementation was present on PR #114 head `2aef66190ec0c7119c4189fa9ff57c3ca80c49ff`; the cumulative local gate passed, but the PR was `BLOCKED` by audit failures and incomplete checks. Issue #113 requires serial wave PRs; the cumulative PR does not establish wave-by-wave protected acceptance. P5 phase closure also requires truthful resolution of applicable P4 closure rows. |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
 | P8    | planned           | P7 closure required                                              | —                                          | —                  | Stable publication, verification and support.                                                                            |
@@ -4182,3 +4182,127 @@ check before merging P5; and do not declare P5 `evidence-complete` while
 applicable P4 closure rows remain unresolved. Stop only P5 scope directly
 affected by fresh safety, regulatory or functional evidence, and record the
 impact.
+
+## Amendment P5-010 — 2026-10-04 implementation evidence and closure matrices
+
+This amendment adds the handoff matrices required by the frozen P5 quality
+plan. The evidence below is local implementation evidence for the exact
+pre-amendment source commit; it is not protected wave acceptance, external AEAT
+acceptance or phase closure. It preserves the current P4 and PR blockers.
+
+### Exact local evidence
+
+- Source subject: `2aef66190ec0c7119c4189fa9ff57c3ca80c49ff`, tree
+  `76533035e8d1985422ef4e52af2ca6e5aeb25101`, Node `24.21.0`, npm `11.19.1`.
+- `node tooling/tasks/run-task.mjs --task gate:p5` passed 2/2 tasks, with zero
+  failures and zero skips. The quality-plan report counted 25 production
+  modules, one shared production module, 23 tests, 24 critical branches, 24/24
+  critical mutants, 16/16 other mutants, 49,152 property executions, 56 fault
+  injections, five platform cells and five seeded plan defects killed.
+- The TAP report records 97/97 tests; 99.13% line, 95.32% branch and 99.32%
+  function coverage; 12 property campaigns × 4,096 executions; 56/56 seeded
+  faults; and zero skipped tests. Performance observations were 1,886.47 ms,
+  94,801,920 peak RSS bytes, 12.75 ms event-loop delay, queue high-water 128,
+  and open handles 2→2. These are synthetic local-campaign measurements, not
+  a production deployment SLO.
+- Report locators/digests: `evidence/runs/gate--p5.json` output digest
+  `0974010174371256cb5733ee359334ab5fa80953da0aa88889ede9f5f7fb4471`;
+  `evidence/runs/p5--quality-plan.json` output digest
+  `779a4c91e4cacd35c3d2cd230f2e65424951a648323eedcbaf3ee543e41e33b6`;
+  `evidence/runs/test--p5.json` output digest
+  `5556cafbab8ba71e40db1decff4a6247ab8c3d75f69838927951eee7dc9fb95c`;
+  `evidence/runs/p5--mutation.json` output digest
+  `9c0a95d185bec3095abd43c1ebb1d6496164ae18898af26fda5bc5633ffddda3`;
+  mutation report artifact SHA-256
+  `590d180731a64554caea6b268b02d29f3e5b94107a9bf2ba86729468e7e679df`.
+  The two syntax-invalid P4-derived mutation candidates remain separately
+  identified and are not counted as P5 survivors or as killed mutants.
+- Dependency audit on the unchanged exact lock found one moderate and three
+  high advisories: `brace-expansion@5.0.9`,
+  `http-cache-semantics@4.2.0`, `ip-address@10.5.0` and `undici@6.28.0`, all
+  marked `inBundle` under `node_modules/npm/node_modules`; the registry/OSV
+  result reports 11 advisories. The repository pins npm `11.19.1`. Inspecting
+  official npm CLI tarballs `11.20.0` and `12.2.0` confirmed they still bundle
+  those same four versions. npm `12.2.0` also requires Node `^22.22.2 ||
+  ^24.15.0 || >=26.0.0`, excluding the frozen Node `22.14.0` cell. No
+  compatible official npm update currently removes these findings; the
+  findings remain blockers. Sources: [npm CLI v11.20.0 release](https://github.com/npm/cli/releases/tag/v11.20.0),
+  [npm CLI v12.2.0 release](https://github.com/npm/cli/releases/tag/v12.2.0).
+- `gate:p5` passed on Node 22.14.0, 22.23.2 and 24.21.0 for source commit
+  `a44720839260867ad1b79de27104691d7d82fa70`; the 2aef local run above is the
+  fresh full campaign after the P5-009 documentation commit. GitHub remains the
+  authority for the five exact OS/runtime cells on the final pushed head.
+
+### Store contract matrix
+
+| Store/boundary | Contract enforced by code | Local proof |
+| --- | --- | --- |
+| Records | Context/edition-scoped immutable canonical bytes, sequence/predecessor identity, digest validation and command idempotency. | `model.ts`, `ports.ts`, `unit-of-work.ts`; `tests/unit/p5-persistence-model.test.mjs`, `tests/contract/p5-persistence-contract.test.mjs`, `tests/integration/p5-host-atomicity.test.mjs`. |
+| Artifacts | Bounded exact bytes; byte length plus SHA-256/SHA-512 recomputed; returned bytes copied; artifact references remain transaction-bound. | `model.ts`, `unit-of-work.ts`; persistence contract, model, attack and host-atomicity tests. |
+| Evidence | Scoped claims bind subject digest, verifier/profile, result, validation instant and a unique bounded artifact-reference set. | `model.ts`; persistence-model, persistence-contract and recovery-contract tests. |
+| Journal/events | Append-only aggregate/version and prior-state binding; validated transitions and safe diagnostics under the live transaction token. | `journal.ts`, `unit-of-work.ts`; `tests/unit/p5-state-machine.test.mjs`, `tests/contract/p5-recovery-contract.test.mjs`. |
+| Outbox | Idempotent operation intent, record/artifact membership, ordered discovery and explicit versioned delivery state. | `model.ts`, `ports.ts`, `unit-of-work.ts`; persistence-contract, orchestration-contract, crash-restart and reconciliation tests. |
+| Sequence heads | Compare-and-append checks expected generation, predecessor and record binding; competing writers admit one successor and preserve forks as conflicts. | `head-cas.ts`; host-atomicity, concurrency-property and seeded-fault tests. |
+| Leases/fencing | Backend supplies authoritative time; owner, expiry, version and fencing token bind renew/release/complete; stale owners cannot record completion. | `leases.ts`; state-machine, host-atomicity and seeded `P5-FAULT-015..017` tests. |
+| Host UoW | `atomic-host` requires publication staged in the same transaction; tokens bind adapter, context, command and digest; unknown commit remains indeterminate pending read-back. | `ports.ts`, `unit-of-work.ts`, `atomic-coordinator.ts`; host-UoW, persistence-contract, host-atomicity and crash-restart tests. |
+
+No production durable adapter is shipped or qualified. `standalone-test` evidence
+proves the contract/model behavior only; host applications must implement the
+atomic capability and pass the adapter contract before a durability claim.
+
+### Outbox state and retry matrix
+
+| State class | States and permitted disposition | Rule/evidence |
+| --- | --- | --- |
+| Ready/owned | `pending` → `leased`; an expired or released lease can return to `pending`. | Lease/fencing controls; state-machine and concurrency tests. |
+| Network attempt | `leased` → `attempt-started` only after the attempt journal commits. | No network observation before durable start; `tests/contract/p5-aeat-orchestration-contract.test.mjs`. |
+| Uncertain delivery | `attempt-started` may become `indeterminate`; `indeterminate` advances only to `reconciliation-required`. | Never blindly resend an ambiguous attempt; orchestration, crash-restart and reconciliation tests. |
+| Retry/reconciliation | `retry-wait` returns to `leased` or enters reconciliation; reconciliation may classify a proven outcome or authorize a safe retry. | Retry requires known non-application evidence when delivery may have started; replay after delivery also requires authorization evidence. `retry-policy.ts`, `p5-state-machine` and reconciliation tests. |
+| Terminal | `accepted`, `accepted-with-errors`, `rejected`, `permanently-failed`. | No outgoing state transitions; no terminal retry. Journal and state-machine contract tests. |
+
+The transition oracle is `packages/verifactu/src/persistence/journal.ts`; its
+complete transition table is encoded in `tests/contract/p5-recovery-contract.test.mjs`.
+
+### Protocol/operation matrix
+
+| Operation | Contracted purpose | Protocol and protections | Local proof / limit |
+| --- | --- | --- | --- |
+| `voluntary-submission` | Voluntary record submission. | Edition-bound endpoint/WSDL/schema digests, SOAP binding/header QNames, exact committed record bytes, TLS peer/host validation, mTLS certificate-purpose/context authorization, bounded response parser. | AEAT binding, wire, local-peer, transport and orchestration tests. Test endpoints and credentials are synthetic. |
+| `consultation` | Read remote registration state and pages. | Same edition/endpoint binding; stable snapshot and cursor continuity; bounded pages; exact record identity correlation. | `tests/integration/p5-aeat-reconciliation.test.mjs` and resource-limit tests; no live AEAT consultation claimed. |
+| `authority-requested-submission` | Submission under a separately identified authority request. | Separate operation ID and purpose; cannot be substituted for voluntary submission; exact profile, endpoint, identity and certificate authorization. | Edition profile, certificate authorization and batch-planner tests; profile fixture is synthetic. |
+
+The harness fixture uses SOAP 1.1, `POST`, synthetic `.test` endpoints, mTLS,
+65,536 request bytes, 1,048,576 response bytes and 20 items per batch. Those
+fixture values are not asserted to be AEAT's current production WSDL or limits.
+The active candidate remains verification-only with `creationAllowed=false`.
+
+### Recovery/fault evidence matrix
+
+| Failure boundary | Frozen fault IDs | Proof locator | Result asserted |
+| --- | --- | --- | --- |
+| Staged writes, host commit, acknowledgement and wake-up | `P5-FAULT-001..014` | Host-UoW contract, host-atomicity, crash-restart; `test--p5.json` and TAP artifact. | No partial record/head/publication/outbox visibility; lost commit acknowledgement is read back or remains indeterminate. |
+| Lease claims, expiry, fencing and concurrency | `P5-FAULT-015..017`, `055..056` | State-machine, host-atomicity and concurrency-property tests. | Exactly one valid successor/owner; stale fences and duplicate commands cannot create a second effect. |
+| Checkpoint, backup, restore, migration, retention | `P5-FAULT-018..026` | Recovery contract, migration-restore, crash-restart, persistence-contract and persistence-attack tests. | Verify whole backup/manifest and checkpoint chain before enabling workers; unknown newer schema is read-only; legal hold blocks purge. |
+| Authorization, endpoint, DNS, TLS, request and response | `P5-FAULT-027..052` | Local-peer contract, AEAT transport/wire/security, orchestration and reconciliation tests. | Reject unauthorized credential/context and unsafe destination; bound and safely parse bytes; ambiguous or partial results reconcile before retry. |
+| Telemetry/store availability and recovery | `P5-FAULT-053..054` | Redaction and crash-restart tests. | Exporter/store failures do not expose secrets or silently resume unsafe effects. |
+
+The 56/56 local fault count is recorded by the P5 TAP suite. The repository's
+exact-head `Engineering CI · gate:p2` and all five platform reports remain
+separate required evidence; a local campaign does not substitute for them.
+
+### External gaps and P6 readiness
+
+| Gate | Status | Evidence/boundary | Required before P5/P6 closure |
+| --- | --- | --- | --- |
+| Production durable adapter | `blocked` | No production adapter is present; only ports and synthetic atomic test stores are implemented. | Qualified host adapter must prove the same UoW/CAS/fencing/recovery contract. |
+| AEAT test access and certificate | `blocked` | Re-observation found no AEAT/certificate credential variables or certificate/key files; no portal call was made. | Owner-authorized credentials/certificate and competent AEAT test endpoint observation; never replace with the synthetic peer. |
+| Edition activation/submission | `blocked` | Candidate edition has `creationAllowed=false`; no external activation or taxpayer submission. | Authoritative edition admission and activation evidence before creation/submission. |
+| Legal/regulatory/external acceptance | `blocked` | No competent legal or external conformance acceptance is claimed. | Applicable independent/legal/AEAT evidence under the downstream gates. |
+| Production reliability/SLO | `not applicable` | Current measurements are deterministic local synthetic campaigns only. | Calibrated durable backend, host workload, operational SLO and recovery drills. |
+| Wave delivery | `blocked` | Issue #113 requires serial signed+DCO wave PRs; PR #114 is one cumulative PR. Current `gate:p2` and `gate:platform` call `gate:p5`, whose validator requires the full 25-module/23-test inventory, so a partial wave currently cannot pass those aggregate gates. | Add a wave-aware progressive gate that preserves the frozen final population/thresholds, then prove and merge each exact wave head in order. |
+| P4 predecessor closure | `blocked` | P4 PR #109 retains OSV, npm audit/signatures/licences and derived closure failures. | Resolve every applicable P4 row under normal protected evidence; ADR-0060 permits P5 branch work only. |
+
+P6 remains `planned`, not ready to start. P5's full local model campaign is
+complete on the observed source subject, but P5 is not `evidence-complete`:
+wave-by-wave protected acceptance, all final-head CI contexts, the external
+boundaries above and applicable P4 closure rows remain unresolved.
