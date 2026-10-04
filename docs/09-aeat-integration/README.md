@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: integration-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-10-04
 dependencies: [REG-INDEX, DOM-INDEX, SEC-INDEX]
 historical-inputs: [REV-037, REV-046]
 ---
@@ -13,9 +13,11 @@ historical-inputs: [REV-037, REV-046]
 # AEAT integration
 
 Status: all 18 substantive specifications are approved as design authority.
-Executable local-protocol and transport evidence remains pending. The local
-harness is not external AEAT acceptance, and authorized portal evidence remains
-an external gate.
+P5's executable edition-bound transport, protocol harness and deterministic
+fault evidence are active on issue #113's `work/p5-implementation` branch;
+exact local results are in the roadmap handoff. The local peer is synthetic and
+does not establish external AEAT acceptance. Authorized portal/certificate
+evidence remains an external gate.
 
 Authority for official service bindings, network observations and remote result
 classification.

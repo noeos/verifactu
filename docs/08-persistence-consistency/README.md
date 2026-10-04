@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: persistence-owner
 created: 2026-09-12
-last-reviewed: 2026-09-12
+last-reviewed: 2026-10-04
 dependencies: [DOM-INDEX, ARCH-INDEX, SEC-INDEX]
 historical-inputs: [REV-015, REV-019, REV-028, REV-036, REV-083]
 ---
@@ -13,8 +13,11 @@ historical-inputs: [REV-015, REV-019, REV-028, REV-036, REV-083]
 # Persistence and consistency
 
 Status: all 16 substantive specifications are approved as design authority.
-P5 implementation and executable persistence evidence remain pending. A
-production durable backend remains an explicit adapter qualification boundary.
+P5 implementation and its deterministic model/contract/fault evidence are
+active on issue #113's `work/p5-implementation` branch; current local campaign
+results are recorded in the roadmap handoff. Those results validate the
+synthetic host model and recovery contracts. A production durable backend is
+still an explicit adapter qualification boundary and has not been qualified.
 
 Authority for durable state, atomic host integration, concurrency and recovery
 invariants.
