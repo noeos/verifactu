@@ -21,6 +21,11 @@
       "expectedCode": "IMPORT_FORBIDDEN_BUILTIN"
     },
     {
+      "id": "FIX-IMPORT-EXCEPTION-001",
+      "control": "architecture",
+      "mutation": "exact-builtin-exception"
+    },
+    {
       "id": "NEG-GENERATED-001",
       "control": "generated",
       "mutation": "hand-edit",

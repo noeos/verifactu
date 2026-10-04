@@ -970,7 +970,7 @@
     },
     {
       "id": "gate:platform",
-      "version": 2,
+      "version": 3,
       "owner": "quality-owner",
       "dependencies": [
         "policy:tree",
@@ -986,7 +986,8 @@
         "test:p4-e",
         "test:p4-f",
         "gate:p4",
-        "p5:quality-plan"
+        "p5:quality-plan",
+        "gate:p5"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -1019,7 +1020,8 @@
         "test:p4-e",
         "test:p4-f",
         "gate:p4",
-        "p5:quality-plan"
+        "p5:quality-plan",
+        "gate:p5"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],
@@ -1140,6 +1142,103 @@
       "zeroWork": "fail",
       "operation": "p5QualityPlan",
       "tools": ["node"]
+    },
+    {
+      "id": "test:p5",
+      "version": 1,
+      "owner": "quality-owner",
+      "dependencies": ["build:packages", "p5:quality-plan"],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "packages/verifactu/src/persistence/**",
+        "packages/verifactu/src/aeat/**",
+        "packages/verifactu/src/operations/**",
+        "packages/verifactu/src/domain/identities.ts",
+        "tests/**/p5-*.test.mjs",
+        "tests/support/p5-*.mjs",
+        "tests/support/p5-*.b64"
+      ],
+      "outputs": [
+        "evidence/runs/test--p5.json",
+        "evidence/runs/artifacts/p5/test-tap.txt"
+      ],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 3600,
+      "concurrencyLock": "p5-tests",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "testP5",
+      "tools": ["node"]
+    },
+    {
+      "id": "p5:mutation",
+      "version": 1,
+      "owner": "assurance-owner",
+      "dependencies": ["build:packages", "p5:quality-plan", "test:p5"],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "tooling/assurance/p5-mutation-campaign.mjs",
+        "tooling/assurance/p4-mutation-catalog.mjs",
+        "tooling/assurance/p4-overall-mutation-campaign.mjs",
+        "packages/verifactu/src/persistence/**",
+        "packages/verifactu/src/aeat/**",
+        "packages/verifactu/src/operations/**",
+        "tests/**/p5-*.test.mjs"
+      ],
+      "outputs": [
+        "evidence/runs/p5--mutation.json",
+        "evidence/runs/artifacts/p5/mutation-report.json"
+      ],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 3600,
+      "concurrencyLock": "p5-mutation",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "p5Mutation",
+      "tools": ["node", "typescript"]
+    },
+    {
+      "id": "gate:p5",
+      "version": 1,
+      "owner": "quality-owner",
+      "dependencies": ["test:p5", "p5:mutation"],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "config/tasks/task-registry.json"
+      ],
+      "outputs": ["evidence/runs/gate--p5.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": ["CI", "VERIFACTU_SUBJECT_SHA", "VERIFACTU_SUBJECT_TREE"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 7200,
+      "concurrencyLock": "closure",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "gate",
+      "tools": []
     },
     {
       "id": "p4:quality-plan",

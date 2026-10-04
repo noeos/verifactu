@@ -247,11 +247,39 @@ function parseImports(source, fileName) {
   return { imports, exportCount };
 }
 
-export function validateImportText(source, fileName, packageRule) {
+export function validateImportText(
+  source,
+  fileName,
+  packageRule,
+  builtinExceptions = [],
+) {
   const { imports, exportCount } = parseImports(source, fileName);
   for (const specifier of imports) {
+    const matchingExceptions = builtinExceptions.filter(
+      (exception) =>
+        exception.file === fileName && exception.specifier === specifier,
+    );
     assert(
-      !packageRule.forbiddenBuiltins?.includes(specifier),
+      matchingExceptions.length <= 1,
+      "IMPORT_EXCEPTION_AMBIGUOUS",
+      `${fileName}: ${specifier}`,
+    );
+    const exception = matchingExceptions[0];
+    if (exception) {
+      assert(
+        typeof exception.rationale === "string" &&
+          exception.rationale.trim().length >= 20 &&
+          typeof exception.owner === "string" &&
+          /^[a-z][a-z0-9-]*-owner$/u.test(exception.owner) &&
+          typeof exception.expires === "string" &&
+          /^\d{4}-\d{2}-\d{2}$/u.test(exception.expires) &&
+          exception.expires > new Date().toISOString().slice(0, 10),
+        "IMPORT_EXCEPTION_INVALID",
+        `${fileName}: ${specifier}`,
+      );
+    }
+    assert(
+      !packageRule.forbiddenBuiltins?.includes(specifier) || exception,
       "IMPORT_FORBIDDEN_BUILTIN",
       `${fileName}: ${specifier}`,
     );
@@ -311,6 +339,29 @@ async function checkArchitecture(root, importRules, files = null) {
       (path) => path.startsWith("packages/") && path.endsWith(".ts"),
     );
   const known = new Set(sourceFiles);
+  const builtinExceptions = importRules.builtinExceptions ?? [];
+  const exceptionKeys = new Set();
+  for (const exception of builtinExceptions) {
+    const key = `${exception.file}\0${exception.specifier}`;
+    assert(!exceptionKeys.has(key), "IMPORT_EXCEPTION_DUPLICATE", key);
+    exceptionKeys.add(key);
+    const packageRule = Object.values(importRules.packages).find((rule) =>
+      exception.file.startsWith(`${rule.root}/`),
+    );
+    assert(
+      packageRule &&
+        known.has(exception.file) &&
+        packageRule.forbiddenBuiltins?.includes(exception.specifier),
+      "IMPORT_EXCEPTION_EDGE",
+      key,
+    );
+    validateImportText(
+      `import ${JSON.stringify(exception.specifier)};`,
+      exception.file,
+      packageRule,
+      builtinExceptions,
+    );
+  }
   const graph = new Map();
   let importCount = 0;
   for (const file of sourceFiles) {
@@ -319,7 +370,12 @@ async function checkArchitecture(root, importRules, files = null) {
     );
     assert(packageRule, "IMPORT_PACKAGE_UNKNOWN", file);
     const source = await readFile(resolve(root, file), "utf8");
-    const parsed = validateImportText(source, file, packageRule);
+    const parsed = validateImportText(
+      source,
+      file,
+      packageRule,
+      builtinExceptions,
+    );
     importCount += parsed.imports.length;
     graph.set(
       file,
@@ -1243,6 +1299,35 @@ async function testPolicy(context) {
           ),
         );
         break;
+      case "exact-builtin-exception": {
+        const file = "packages/verifactu/src/aeat/node-https-transport.ts";
+        const exceptions = [
+          {
+            file,
+            specifier: "node:crypto",
+            rationale:
+              "Node TLS adapter validates certificate fingerprints using the platform cryptographic provider.",
+            owner: "architecture-owner",
+            expires: "2099-12-31",
+          },
+        ];
+        const result = validateImportText(
+          'import "node:crypto";',
+          file,
+          imports.packages["@noeos/verifactu"],
+          exceptions,
+        );
+        assert(result.imports.length === 1, "FIXTURE_IMPORT_EXCEPTION", file);
+        fixtureError("IMPORT_FORBIDDEN_BUILTIN", () =>
+          validateImportText(
+            'import "node:crypto";',
+            "packages/verifactu/src/aeat/other.ts",
+            imports.packages["@noeos/verifactu"],
+            exceptions,
+          ),
+        );
+        break;
+      }
       case "hand-edit":
         fixtureError(fixture.expectedCode, () =>
           validateGenerated({ ...generated, primaryNode: "0.0.0" }, generated),
@@ -5359,6 +5444,246 @@ async function p5QualityPlan(context) {
   };
 }
 
+async function testP5(context) {
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p5-quality-plan.json"),
+  );
+  const coverageIncludes = [
+    "evidence/runs/artifacts/build/verifactu/dist/persistence/**/*.js",
+    "evidence/runs/artifacts/build/verifactu/dist/aeat/**/*.js",
+    "evidence/runs/artifacts/build/verifactu/dist/operations/**/*.js",
+    "evidence/runs/artifacts/build/verifactu/dist/domain/identities.js",
+  ];
+  const result = await run(
+    process.execPath,
+    [
+      "--experimental-test-coverage",
+      ...coverageIncludes.flatMap((path) => [
+        `--test-coverage-include=${path}`,
+      ]),
+      "--test",
+      "--test-reporter=tap",
+      ...plan.testFiles,
+    ],
+    { cwd: context.root, timeoutMs: 3_600_000 },
+  );
+  const artifactDirectory = resolve(context.root, "evidence/runs/artifacts/p5");
+  await mkdir(artifactDirectory, { recursive: true });
+  await writeFile(
+    resolve(artifactDirectory, "test-tap.txt"),
+    `${result.stdout}${result.stderr}`,
+  );
+  assert(
+    result.code === 0,
+    "P5_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.slice(-12_000),
+  );
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P5_TEST_REPORT", result.stdout.slice(-2_000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P5_TEST_COMPLETENESS",
+    `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  const faultMarkers = [
+    ...result.stdout.matchAll(/^# P5_FAULT_DETECTED (P5-FAULT-\d{3})$/gmu),
+  ].map((match) => match[1]);
+  const plannedFaultIds = plan.faultInjectionIds.map(
+    (entry) => entry.split(":", 1)[0],
+  );
+  const faultCounts = new Map(
+    faultMarkers.map((id) => [
+      id,
+      faultMarkers.filter((candidate) => candidate === id).length,
+    ]),
+  );
+  const missingFaultIds = plannedFaultIds.filter(
+    (id) => faultCounts.get(id) !== 1,
+  );
+  assert(
+    missingFaultIds.length === 0 &&
+      faultMarkers.length === plannedFaultIds.length,
+    "P5_FAULT_CENSUS",
+    JSON.stringify({
+      planned: plannedFaultIds.length,
+      observed: faultMarkers.length,
+      missingOrDuplicate: missingFaultIds,
+    }),
+  );
+  const performanceLine = result.stdout
+    .split(/\r?\n/u)
+    .find((line) => line.startsWith("# P5_PERFORMANCE_METRICS "));
+  assert(
+    performanceLine,
+    "P5_PERFORMANCE_METRICS_MISSING",
+    "recovery campaign did not report the frozen performance metrics",
+  );
+  const performanceMetrics = JSON.parse(
+    performanceLine.slice("# P5_PERFORMANCE_METRICS ".length),
+  );
+  assert(
+    Number.isFinite(performanceMetrics.wallMs) &&
+      performanceMetrics.wallMs >= 0 &&
+      performanceMetrics.wallMs <=
+        plan.performance.hardBounds.campaignDeadlineMs &&
+      Number.isSafeInteger(performanceMetrics.peakRssBytes) &&
+      performanceMetrics.peakRssBytes > 0 &&
+      Number.isFinite(performanceMetrics.eventLoopDelayMs) &&
+      performanceMetrics.eventLoopDelayMs >= 0 &&
+      Number.isSafeInteger(performanceMetrics.queueHighWater) &&
+      performanceMetrics.queueHighWater > 0 &&
+      Number.isSafeInteger(
+        performanceMetrics.maxConcurrentSyntheticOperations,
+      ) &&
+      performanceMetrics.maxConcurrentSyntheticOperations <=
+        plan.performance.hardBounds.maxConcurrentSyntheticOperations &&
+      Number.isSafeInteger(performanceMetrics.openHandlesBeforeAfter?.before) &&
+      Number.isSafeInteger(performanceMetrics.openHandlesBeforeAfter?.after) &&
+      performanceMetrics.openHandlesBeforeAfter.before < 128 &&
+      performanceMetrics.openHandlesBeforeAfter.after < 128 &&
+      performanceMetrics.openHandlesBeforeAfter.after <=
+        performanceMetrics.openHandlesBeforeAfter.before + 8,
+    "P5_PERFORMANCE_METRICS_INVALID",
+    JSON.stringify(performanceMetrics),
+  );
+  const coverage =
+    /^# all files\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)/mu.exec(
+      result.stdout,
+    );
+  assert(coverage, "P5_COVERAGE_REPORT", result.stdout.slice(-4_000));
+  const [, linesText, branchesText, functionsText] = coverage;
+  const lines = Number(linesText);
+  const branches = Number(branchesText);
+  const functions = Number(functionsText);
+  assert(
+    lines >= plan.coverage.thresholds.linesPercent &&
+      branches >= plan.coverage.thresholds.branchesPercent &&
+      functions >= plan.coverage.thresholds.functionsPercent,
+    "P5_COVERAGE_THRESHOLD",
+    `line=${lines}, branch=${branches}, function=${functions}; required ${plan.coverage.thresholds.linesPercent}/${plan.coverage.thresholds.branchesPercent}/${plan.coverage.thresholds.functionsPercent}`,
+  );
+  for (const module of [
+    ...plan.productionModules,
+    ...plan.sharedProductionModules,
+  ]) {
+    const name = basename(module).replace(/\.ts$/u, ".js");
+    assert(result.stdout.includes(name), "P5_COVERAGE_MODULE_MISSING", module);
+  }
+  for (let index = 0; index < plan.propertyCampaigns.length; index += 1) {
+    const campaign = plan.propertyCampaigns[index];
+    assert(
+      result.stdout.includes(
+        `${campaign.id} seed=${campaign.seed} executions=${campaign.executions}`,
+      ),
+      "P5_PROPERTY_CAMPAIGN_MISSING",
+      campaign.id,
+    );
+  }
+  return {
+    selected: Number(tests),
+    executed: Number(passed),
+    passed: Number(passed),
+    outputDigest: sha256(result.stdout + result.stderr),
+    diagnostics: [
+      `testCases=${tests}`,
+      `coverage.line=${lines}`,
+      `coverage.branch=${branches}`,
+      `coverage.function=${functions}`,
+      `testFiles=${plan.testFiles.length}`,
+      "properties=12x4096 executions=49152",
+      `faultInjections=${faultMarkers.length}/${plannedFaultIds.length}`,
+      `performance.wallMs=${performanceMetrics.wallMs}`,
+      `performance.peakRssBytes=${performanceMetrics.peakRssBytes}`,
+      `performance.eventLoopDelayMs=${performanceMetrics.eventLoopDelayMs}`,
+      `performance.queueHighWater=${performanceMetrics.queueHighWater}`,
+      `performance.openHandles=${performanceMetrics.openHandlesBeforeAfter.before}->${performanceMetrics.openHandlesBeforeAfter.after}`,
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
+async function p5Mutation(context) {
+  const result = await run(
+    process.execPath,
+    ["tooling/assurance/p5-mutation-campaign.mjs"],
+    {
+      cwd: context.root,
+      timeoutMs: 3_600_000,
+      env: {
+        ...process.env,
+        VERIFACTU_SUBJECT_SHA: context.identity.subject,
+        VERIFACTU_SUBJECT_TREE: context.identity.tree,
+      },
+    },
+  );
+  assert(
+    result.code === 0,
+    "P5_MUTATION_EXECUTION",
+    `${result.stdout}${result.stderr}`.slice(-12_000),
+  );
+  const reportLine = result.stdout
+    .split(/\r?\n/u)
+    .find((line) => line.startsWith('{"schemaVersion":1,"status":'));
+  assert(reportLine, "P5_MUTATION_REPORT", result.stdout.slice(-4_000));
+  const report = JSON.parse(reportLine);
+  const durableReport = JSON.parse(
+    await readFile(
+      resolve(context.root, "evidence/runs/artifacts/p5/mutation-report.json"),
+      "utf8",
+    ),
+  );
+  assert(
+    durableReport.subject === context.identity.subject &&
+      durableReport.tree === context.identity.tree,
+    "P5_MUTATION_SUBJECT",
+    JSON.stringify({
+      report: durableReport.subject,
+      expected: context.identity.subject,
+      tree: durableReport.tree,
+      expectedTree: context.identity.tree,
+    }),
+  );
+  assert(
+    sha256(canonicalJson(durableReport)) === sha256(canonicalJson(report)),
+    "P5_MUTATION_DURABLE_REPORT",
+    "stdout and evidence artifact differ",
+  );
+  assert(
+    report.status === "passed" &&
+      report.criticalKilled === 24 &&
+      report.criticalTotal === 24 &&
+      report.otherKilled >= 16 &&
+      report.otherTotal === 16 &&
+      report.results.length === 40,
+    "P5_MUTATION_COMPLETENESS",
+    JSON.stringify({
+      criticalKilled: report.criticalKilled,
+      otherKilled: report.otherKilled,
+      results: report.results?.length,
+    }),
+  );
+  return {
+    selected: 40,
+    executed: report.results.length,
+    passed: report.results.filter((item) => item.outcome === "killed").length,
+    outputDigest: sha256(result.stdout + result.stderr),
+    diagnostics: [
+      `criticalMutants=${report.criticalKilled}/${report.criticalTotal}`,
+      `otherMutants=${report.otherKilled}/${report.otherTotal}`,
+      `syntaxCandidatesExcluded=${report.candidateSyntaxExcluded}`,
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -5426,6 +5751,8 @@ export const operations = {
   p3bAssurance,
   p4QualityPlan,
   p5QualityPlan,
+  testP5,
+  p5Mutation,
   gate,
 };
 
@@ -5476,5 +5803,7 @@ export const operationCapabilities = Object.freeze({
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
   p4QualityPlan: { tools: ["git", "node", "python"], network: "denied" },
   p5QualityPlan: { tools: ["node"], network: "denied" },
+  testP5: { tools: ["node"], network: "denied" },
+  p5Mutation: { tools: ["node", "typescript"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });
