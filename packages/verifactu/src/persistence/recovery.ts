@@ -1,21 +1,19 @@
 import { sameContext } from "../domain/context.js";
 import type { FiscalContext } from "../domain/context.js";
 import { createFiscalInstant } from "../domain/date-time.js";
-import type { OutboxState, SequenceHead, StoreResult } from "./model.js";
+import type {
+  OutboxState,
+  RecoveryCheckpoint,
+  SequenceHead,
+  StoreResult,
+} from "./model.js";
 import { isSafeStoreToken, storeFailure } from "./model.js";
+import {
+  PERSISTENCE_PORT_CONTRACT_VERSION,
+  type RecoveryCheckpointStore,
+} from "./ports.js";
 
-export interface RecoveryCheckpoint {
-  readonly storeId: string;
-  readonly context: FiscalContext;
-  readonly schemaVersion: number;
-  readonly generation: number;
-  readonly headDigest: string | null;
-  readonly journalVersion: number;
-  readonly manifestDigest: string;
-  readonly previousCheckpointDigest: string | null;
-  readonly createdAt: string;
-  readonly externalAnchorDigest: string | null;
-}
+export type { RecoveryCheckpoint } from "./model.js";
 
 export interface RecoveryObservation {
   readonly storeId: string;
@@ -38,6 +36,123 @@ export interface RecoveryDecision {
   readonly networkAllowed: boolean;
   readonly attemptsRequiringReconciliation: number;
   readonly reasons: readonly string[];
+}
+
+const MAX_CHECKPOINT_READ_TIMEOUT_MS = 3_600_000;
+
+function blockedRecovery(
+  input: Omit<
+    RecoveryObservation,
+    "latestCheckpoint" | "checkpointChainVerified"
+  >,
+  diagnostic: string,
+): StoreResult<RecoveryDecision> {
+  const assessed = assessStartupRecovery({
+    ...input,
+    latestCheckpoint: null,
+    checkpointChainVerified: false,
+  });
+  if (assessed.status !== "ok") return assessed;
+  return {
+    status: "ok",
+    value: Object.freeze({
+      ...assessed.value,
+      status: "blocked",
+      workerDiscoveryAllowed: false,
+      networkAllowed: false,
+      reasons: Object.freeze(
+        [...new Set([...assessed.value.reasons, diagnostic])].sort(),
+      ),
+    }),
+  };
+}
+
+/**
+ * Read the persisted checkpoint through its bounded adapter port before
+ * assessing startup. Timeout, cancellation, thrown adapter errors and
+ * unavailable results all fence workers and network activity.
+ */
+export async function assessStartupRecoveryFromStore(
+  input: Omit<
+    RecoveryObservation,
+    "latestCheckpoint" | "checkpointChainVerified"
+  >,
+  checkpoints: RecoveryCheckpointStore,
+  options: { readonly timeoutMs: number; readonly signal?: AbortSignal },
+): Promise<StoreResult<RecoveryDecision>> {
+  if (
+    !input ||
+    !checkpoints ||
+    !options ||
+    checkpoints.contractVersion !== PERSISTENCE_PORT_CONTRACT_VERSION ||
+    typeof checkpoints.readLatest !== "function" ||
+    !Number.isSafeInteger(options?.timeoutMs) ||
+    options.timeoutMs < 1 ||
+    options.timeoutMs > MAX_CHECKPOINT_READ_TIMEOUT_MS
+  )
+    return storeFailure("invalid", "invalid-input");
+  if (options.signal?.aborted)
+    return blockedRecovery(input, "DIAG-CHECKPOINT-READ-ABORTED");
+
+  const controller = new globalThis.AbortController();
+  let onAbort: (() => void) | undefined;
+  let resolveTimeout!: (value: { readonly kind: "timeout" }) => void;
+  let resolveAbort!: (value: { readonly kind: "aborted" }) => void;
+  const timeout = new Promise<{ readonly kind: "timeout" }>((resolve) => {
+    resolveTimeout = resolve;
+  });
+  const aborted = new Promise<{ readonly kind: "aborted" }>((resolve) => {
+    resolveAbort = resolve;
+  });
+  const timeoutHandle = globalThis.setTimeout(() => {
+    controller.abort();
+    resolveTimeout({ kind: "timeout" });
+  }, options.timeoutMs);
+  if (options.signal) {
+    onAbort = () => {
+      controller.abort();
+      resolveAbort({ kind: "aborted" });
+    };
+    options.signal.addEventListener("abort", onAbort, { once: true });
+  }
+
+  const read = Promise.resolve()
+    .then(() =>
+      checkpoints.readLatest({
+        storeId: input.storeId,
+        context: input.context,
+        signal: controller.signal,
+      }),
+    )
+    .then(
+      (result) => ({ kind: "result" as const, result }),
+      () => ({ kind: "unavailable" as const }),
+    );
+  try {
+    const outcome = await Promise.race([read, timeout, aborted]);
+    if (outcome.kind === "timeout")
+      return blockedRecovery(input, "DIAG-CHECKPOINT-READ-TIMEOUT");
+    if (outcome.kind === "aborted")
+      return blockedRecovery(input, "DIAG-CHECKPOINT-READ-ABORTED");
+    if (outcome.kind === "unavailable" || outcome.result.status !== "ok")
+      return blockedRecovery(input, "DIAG-CHECKPOINT-READ-UNAVAILABLE");
+    const value = outcome.result.value;
+    if (
+      !value ||
+      typeof value.chainVerified !== "boolean" ||
+      (value.checkpoint !== null && typeof value.checkpoint !== "object")
+    )
+      return blockedRecovery(input, "DIAG-CHECKPOINT-READ-UNAVAILABLE");
+    return assessStartupRecovery({
+      ...input,
+      latestCheckpoint: value.checkpoint,
+      checkpointChainVerified: value.chainVerified,
+    });
+  } finally {
+    globalThis.clearTimeout(timeoutHandle);
+    if (options.signal && onAbort)
+      options.signal.removeEventListener("abort", onAbort);
+  }
 }
 
 export function assessStartupRecovery(

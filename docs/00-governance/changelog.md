@@ -15,6 +15,21 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Add durable recovery checkpoint port and bounded startup read
+
+- P5 review found that recovery accepted `RecoveryCheckpoint` as an input but
+  `PersistencePorts` had no checkpoint storage contract. Added
+  `RecoveryCheckpointStore` with complete-chain read verification and an
+  immutable predecessor-digest compare-and-append staged in the host UoW; the
+  persistence port contract is now version 2.
+- Startup recovery now applies a bounded, cancellable checkpoint read and
+  blocks worker/network activity on timeout, cancellation, unavailable data or
+  adapter failure. Replaced the immediate unavailable mock behind
+  `P5-FAULT-054` with a real deadline and abort-triggered store response.
+- The P5 production/test path inventories and campaign counts are unchanged.
+  Exact local gate and protected-head evidence will be recorded after the
+  revised commit and workflows complete.
+
 ## 2026-10-04 — Record terminal P5-head workflow closure
 
 - Added Amendment P5-015 with terminal results for PR #114's exact `94db4c6`

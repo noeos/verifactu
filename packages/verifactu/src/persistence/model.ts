@@ -115,6 +115,20 @@ export interface IdempotencyBinding {
   readonly resultDigest: Sha256 | null;
 }
 
+/** Immutable, identity-bound recovery marker retained across store restarts. */
+export interface RecoveryCheckpoint {
+  readonly storeId: string;
+  readonly context: FiscalContext;
+  readonly schemaVersion: number;
+  readonly generation: number;
+  readonly headDigest: Sha256 | null;
+  readonly journalVersion: number;
+  readonly manifestDigest: Sha256;
+  readonly previousCheckpointDigest: Sha256 | null;
+  readonly createdAt: string;
+  readonly externalAnchorDigest: Sha256 | null;
+}
+
 export type StoreErrorCode =
   | "invalid-input"
   | "context-mismatch"

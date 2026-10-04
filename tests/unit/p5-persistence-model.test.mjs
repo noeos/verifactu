@@ -159,7 +159,7 @@ test("fiscal context comparison returns a diagnostic when any scope identity dif
 });
 
 test("persistence results and tokens are explicit and context keys bind all scope identities", () => {
-  assert.equal(PERSISTENCE_PORT_CONTRACT_VERSION, 1);
+  assert.equal(PERSISTENCE_PORT_CONTRACT_VERSION, 2);
   const value = Object.freeze({ stored: true });
   assert.deepEqual(storeOk(value), { status: "ok", value });
   assert.deepEqual(storeFailure("conflict", "idempotency-conflict"), {

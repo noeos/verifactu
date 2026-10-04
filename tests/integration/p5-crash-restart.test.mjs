@@ -5,7 +5,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { assessStartupRecovery } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/recovery.js";
+import {
+  assessStartupRecovery,
+  assessStartupRecoveryFromStore,
+} from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/recovery.js";
 import { genesisHead } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/head-cas.js";
 import { context, hash, identity } from "../support/p5-domain-fixture.mjs";
 import { recordP5FaultDetection } from "../support/p5-fault-evidence.mjs";
@@ -325,29 +328,36 @@ test("supervised process crash preserves atomic bytes and restart reconciles an 
     ),
     true,
   );
+  let timeoutSignal;
   const timedOutStore = {
-    async readCheckpoint() {
-      return { status: "unavailable", code: "unavailable" };
+    contractVersion: 2,
+    async readLatest({ signal }) {
+      timeoutSignal = signal;
+      return new Promise((resolve) => {
+        signal.addEventListener(
+          "abort",
+          () => resolve({ status: "unavailable", code: "unavailable" }),
+          { once: true },
+        );
+      });
+    },
+    async compareAndAppend() {
+      return { status: "ok", value: "created" };
     },
   };
-  const unavailableCheckpoint = await timedOutStore.readCheckpoint();
-  const blockedAfterReadTimeout = assessStartupRecovery({
+  const blockedAfterReadTimeout = await assessStartupRecoveryFromStore({
     storeId: "store-p5-process-crash",
     context,
     schemaVersion: 1,
     generation: 0,
     head: genesis,
     journalVersion: 0,
-    latestCheckpoint:
-      unavailableCheckpoint.status === "ok"
-        ? unavailableCheckpoint.value
-        : null,
-    checkpointChainVerified: false,
     artifactClosureVerified: false,
     eventChainVerified: false,
     observedAt: "2026-10-04T00:00:00.000Z",
     pendingOutboxStates: [],
-  });
+  }, timedOutStore, { timeoutMs: 5 });
+  assert.equal(timeoutSignal.aborted, true);
   assert.equal(blockedAfterReadTimeout.value.status, "blocked");
   assert.equal(blockedAfterReadTimeout.value.workerDiscoveryAllowed, false);
   assert.equal(blockedAfterReadTimeout.value.networkAllowed, false);
@@ -356,6 +366,8 @@ test("supervised process crash preserves atomic bytes and restart reconciles an 
     beforeCommit.generation === 0 &&
       afterDurableCommit.generation === 1 &&
       afterDurableCommit.recovery.value.attemptsRequiringReconciliation === 1 &&
+      timeoutSignal.aborted &&
+      blockedAfterReadTimeout.value.reasons.includes("DIAG-CHECKPOINT-READ-TIMEOUT") &&
       blockedAfterReadTimeout.value.networkAllowed === false,
   );
 });

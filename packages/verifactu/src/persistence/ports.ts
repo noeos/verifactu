@@ -7,13 +7,15 @@ import type {
   ImmutableRecord,
   JournalEntry,
   OutboxItem,
+  RecoveryCheckpoint,
+  Sha256,
   SequenceHead,
   StoreCapabilityLevel,
   StoreResult,
 } from "./model.js";
 
 /** Runtime value shared by every host and store port in this contract. */
-export const PERSISTENCE_PORT_CONTRACT_VERSION = 1 as const;
+export const PERSISTENCE_PORT_CONTRACT_VERSION = 2 as const;
 
 export interface StorePage<T> {
   readonly items: readonly T[];
@@ -121,6 +123,31 @@ export interface SequenceHeadStore {
   ): Promise<StoreResult<"advanced">>;
 }
 
+export interface RecoveryCheckpointRead {
+  readonly checkpoint: RecoveryCheckpoint | null;
+  /** True only after validating the complete immutable chain and its anchor. */
+  readonly chainVerified: boolean;
+}
+
+export interface RecoveryCheckpointStore {
+  readonly contractVersion: typeof PERSISTENCE_PORT_CONTRACT_VERSION;
+  readLatest(input: {
+    readonly storeId: string;
+    readonly context: FiscalContext;
+    readonly signal: AbortSignal;
+  }): Promise<StoreResult<RecoveryCheckpointRead>>;
+  /**
+   * Stage an append in the caller's host UoW. The adapter must compare the
+   * current chain head with expectedPreviousDigest atomically and permit replay
+   * only when all checkpoint fields are identical.
+   */
+  compareAndAppend(
+    token: TransactionToken,
+    expectedPreviousDigest: Sha256 | null,
+    checkpoint: RecoveryCheckpoint,
+  ): Promise<StoreResult<"created" | "replayed">>;
+}
+
 export interface LeaseRecord {
   readonly outboxId: string;
   readonly ownerInstanceId: string;
@@ -211,6 +238,7 @@ export interface PersistencePorts {
   readonly outbox: OutboxStore;
   readonly heads: SequenceHeadStore;
   readonly leases: LeaseStore;
+  readonly checkpoints: RecoveryCheckpointStore;
 }
 
 export interface PersistenceAdapterDescriptor {

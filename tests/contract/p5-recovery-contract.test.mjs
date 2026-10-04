@@ -7,7 +7,10 @@ import {
   verifyBackupObjects,
   authorizeRestoredStore,
 } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/backup-restore.js";
-import { assessStartupRecovery } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/recovery.js";
+import {
+  assessStartupRecovery,
+  assessStartupRecoveryFromStore,
+} from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/recovery.js";
 import { isAllowedDurableTransition, validateJournalTransition } from "../../evidence/runs/artifacts/build/verifactu/dist/persistence/journal.js";
 import { createFiscalContext } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/context.js";
 import { createIdentity } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/identities.js";
@@ -104,6 +107,108 @@ test("startup recovery detects rollback and fences work on incomplete evidence",
   assert.equal(assessStartupRecovery({ ...observation, pendingOutboxStates: ["future-state"] }).status, "invalid");
   const twoUncertain = assessStartupRecovery({ ...observation, pendingOutboxStates: ["attempt-started", "indeterminate"] });
   assert.equal(twoUncertain.value.attemptsRequiringReconciliation, 2);
+});
+
+test("checkpoint reads are bounded, cancellable and fail closed before startup work", async () => {
+  const checkpoint = {
+    storeId: "store-a",
+    context,
+    schemaVersion: 1,
+    generation: 3,
+    headDigest: `sha256:${"a".repeat(64)}`,
+    journalVersion: 9,
+    manifestDigest: `sha256:${"b".repeat(64)}`,
+    previousCheckpointDigest: null,
+    createdAt: "2026-10-03T10:00:00Z",
+    externalAnchorDigest: `sha256:${"c".repeat(64)}`,
+  };
+  const base = {
+    storeId: "store-a",
+    context,
+    schemaVersion: 1,
+    generation: 3,
+    head: {
+      id: id("chain", "chain-a"),
+      context,
+      schemaVersion: 1,
+      generation: 3,
+      lastRecordId: id("record", "record-3"),
+      officialFingerprint: checkpoint.headDigest,
+      generatedAt: checkpoint.createdAt,
+      commitId: "commit-3",
+    },
+    journalVersion: 10,
+    artifactClosureVerified: true,
+    eventChainVerified: true,
+    observedAt: "2026-10-03T12:00:00Z",
+    pendingOutboxStates: [],
+  };
+  const verified = await assessStartupRecoveryFromStore(
+    base,
+    {
+      contractVersion: 2,
+      async readLatest(input) {
+        assert.equal(input.storeId, "store-a");
+        assert.equal(input.signal.aborted, false);
+        return {
+          status: "ok",
+          value: { checkpoint, chainVerified: true },
+        };
+      },
+      async compareAndAppend() {
+        return { status: "ok", value: "created" };
+      },
+    },
+    { timeoutMs: 100 },
+  );
+  assert.equal(verified.value.status, "ready");
+  assert.equal(verified.value.networkAllowed, true);
+
+  let observedSignal;
+  const timedOut = await assessStartupRecoveryFromStore(
+    base,
+    {
+      contractVersion: 2,
+      async readLatest({ signal }) {
+        observedSignal = signal;
+        return new Promise((resolve) => {
+          signal.addEventListener(
+            "abort",
+            () => resolve({ status: "unavailable", code: "unavailable" }),
+            { once: true },
+          );
+        });
+      },
+      async compareAndAppend() {
+        return { status: "ok", value: "created" };
+      },
+    },
+    { timeoutMs: 5 },
+  );
+  assert.equal(observedSignal.aborted, true);
+  assert.equal(timedOut.value.status, "blocked");
+  assert.equal(timedOut.value.workerDiscoveryAllowed, false);
+  assert.equal(timedOut.value.networkAllowed, false);
+  assert.ok(timedOut.value.reasons.includes("DIAG-CHECKPOINT-READ-TIMEOUT"));
+
+  const canceledController = new AbortController();
+  canceledController.abort();
+  const canceled = await assessStartupRecoveryFromStore(
+    base,
+    {
+      contractVersion: 2,
+      async readLatest() {
+        assert.fail("an already-canceled startup must not read the store");
+      },
+      async compareAndAppend() {
+        return { status: "ok", value: "created" };
+      },
+    },
+    { timeoutMs: 100, signal: canceledController.signal },
+  );
+  assert.equal(canceled.value.status, "blocked");
+  assert.equal(canceled.value.networkAllowed, false);
+  assert.ok(canceled.value.reasons.includes("DIAG-CHECKPOINT-READ-ABORTED"));
 });
 
 test("backup manifest signs canonical metadata and independently verifies every object", async () => {

@@ -1,7 +1,11 @@
 import { createFiscalContext } from "../domain/context.js";
 import type { FiscalContext } from "../domain/context.js";
 import { createFiscalInstant } from "../domain/date-time.js";
-import type { LeaseRecord, LeaseStore } from "./ports.js";
+import {
+  PERSISTENCE_PORT_CONTRACT_VERSION,
+  type LeaseRecord,
+  type LeaseStore,
+} from "./ports.js";
 import type { OutboxItem, StoreResult } from "./model.js";
 import { isSafeStoreToken, storeFailure } from "./model.js";
 
@@ -58,7 +62,11 @@ export async function claimOutboxLease(
   store: LeaseStore,
   input: LeaseRequest,
 ): Promise<StoreResult<LeaseRecord>> {
-  if (!store || store.contractVersion !== 1 || !validRequest(input))
+  if (
+    !store ||
+    store.contractVersion !== PERSISTENCE_PORT_CONTRACT_VERSION ||
+    !validRequest(input)
+  )
     return storeFailure("invalid", "invalid-input");
   const result = await store.claim(input);
   if (result.status !== "ok") return result;
@@ -80,7 +88,7 @@ export async function renewOutboxLease(
 ): Promise<StoreResult<LeaseRecord>> {
   if (
     !store ||
-    store.contractVersion !== 1 ||
+    store.contractVersion !== PERSISTENCE_PORT_CONTRACT_VERSION ||
     !validLease(lease, context) ||
     !Number.isSafeInteger(ttlMs) ||
     ttlMs < MIN_TTL_MS ||
@@ -105,7 +113,11 @@ export async function releaseOutboxLease(
   context: FiscalContext,
   lease: LeaseRecord,
 ): Promise<StoreResult<"released">> {
-  if (!store || store.contractVersion !== 1 || !validLease(lease, context))
+  if (
+    !store ||
+    store.contractVersion !== PERSISTENCE_PORT_CONTRACT_VERSION ||
+    !validLease(lease, context)
+  )
     return storeFailure("invalid", "invalid-input");
   return store.release({ context, lease });
 }
@@ -122,7 +134,7 @@ export async function completeOutboxWithLease(
 ): Promise<StoreResult<OutboxItem>> {
   if (
     !store ||
-    store.contractVersion !== 1 ||
+    store.contractVersion !== PERSISTENCE_PORT_CONTRACT_VERSION ||
     !validLease(input.lease, input.context) ||
     !Number.isSafeInteger(input.expectedOutboxVersion) ||
     input.expectedOutboxVersion < 1 ||

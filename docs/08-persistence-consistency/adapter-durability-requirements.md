@@ -20,10 +20,12 @@ and proof equivalent to `atomic-host`.
 
 Qualification proves transaction isolation/durability, unique and referential
 constraints, compare-and-set, monotonic fencing, consistent bounded enumeration,
-exact byte streaming, idempotency conflicts, crash restart, backup/restore,
-migration and resource/cancellation semantics. Filesystem adapters additionally
-prove atomic create/no-overwrite without check-then-write races and directory/
-data durability on supported platforms.
+exact byte streaming, idempotency conflicts, checkpoint-chain append/readback,
+crash restart, backup/restore, migration and resource/cancellation semantics.
+Checkpoint append must share the host UoW commit and compare the prior digest
+atomically; readback must verify the full chain and configured anchor.
+Filesystem adapters additionally prove atomic create/no-overwrite without
+check-then-write races and directory/data durability on supported platforms.
 
 The report declares backend/version/configuration, replication acknowledgment,
 known anomalies and unsupported topologies. In-memory adapters are never

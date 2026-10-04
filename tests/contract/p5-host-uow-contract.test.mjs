@@ -5,11 +5,21 @@ import { sha256Digest } from "../../evidence/runs/artifacts/build/verifactu/dist
 import { createIdentity } from "../../evidence/runs/artifacts/build/verifactu/dist/domain/identities.js";
 import { context, hash } from "../support/p5-domain-fixture.mjs";
 
+const checkpoints = {
+  contractVersion: 2,
+  async readLatest() {
+    return { status: "ok", value: { checkpoint: null, chainVerified: false } };
+  },
+  async compareAndAppend() {
+    return { status: "ok", value: "created" };
+  },
+};
+
 test("host capability and store adapter identity are checked before transaction open", async () => {
   let opens = 0;
   const ok = (value) => ({ status: "ok", value });
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     append: async () => ok("created"),
     put: async () => ok("created"),
     get: async () => ok(null),
@@ -31,14 +41,14 @@ test("host capability and store adapter identity are checked before transaction 
     compareAndAppend: async () => ok("advanced"),
   };
   const leases = {
-    contractVersion: 1,
+    contractVersion: 2,
     claim: async () => ok(null),
     renew: async () => ok(null),
     release: async () => ok("released"),
     complete: async () => ok(null),
   };
   const host = {
-    contractVersion: 1,
+    contractVersion: 2,
     capabilityLevel: "atomic-host",
     adapterId: "host-adapter-1",
     async begin() {
@@ -76,6 +86,7 @@ test("host capability and store adapter identity are checked before transaction 
     outbox: store,
     heads: store,
     leases,
+    checkpoints,
   };
   const result = await beginUnitOfWork(ports, {
     context,
@@ -90,7 +101,7 @@ test("token mismatch triggers rollback and never hands out an unbound session", 
   let rollbacks = 0;
   const ok = (value) => ({ status: "ok", value });
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     append: async () => ok("created"),
     put: async () => ok("created"),
     get: async () => ok(null),
@@ -112,14 +123,14 @@ test("token mismatch triggers rollback and never hands out an unbound session", 
     compareAndAppend: async () => ok("advanced"),
   };
   const leases = {
-    contractVersion: 1,
+    contractVersion: 2,
     claim: async () => ok(null),
     renew: async () => ok(null),
     release: async () => ok("released"),
     complete: async () => ok(null),
   };
   const host = {
-    contractVersion: 1,
+    contractVersion: 2,
     capabilityLevel: "atomic-host",
     adapterId: "host-adapter-1",
     async begin() {
@@ -157,6 +168,7 @@ test("token mismatch triggers rollback and never hands out an unbound session", 
     outbox: store,
     heads: store,
     leases,
+    checkpoints,
   };
   const result = await beginUnitOfWork(ports, {
     context,
@@ -170,7 +182,7 @@ test("token mismatch triggers rollback and never hands out an unbound session", 
 test("active UoW rejects malformed staged writes and terminal sessions reject further changes", async () => {
   const ok = (value) => ({ status: "ok", value });
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     append: async () => ok("created"),
     put: async () => ok("created"),
     get: async () => ok(null),
@@ -192,14 +204,14 @@ test("active UoW rejects malformed staged writes and terminal sessions reject fu
     compareAndAppend: async () => ok("advanced"),
   };
   const leases = {
-    contractVersion: 1,
+    contractVersion: 2,
     claim: async () => ok(null),
     renew: async () => ok(null),
     release: async () => ok("released"),
     complete: async () => ok(null),
   };
   const host = {
-    contractVersion: 1,
+    contractVersion: 2,
     capabilityLevel: "atomic-host",
     adapterId: "host-adapter-1",
     async begin() {
@@ -236,6 +248,7 @@ test("active UoW rejects malformed staged writes and terminal sessions reject fu
     outbox: store,
     heads: store,
     leases,
+    checkpoints,
   };
   const opened = await beginUnitOfWork(ports, {
     context,
@@ -334,7 +347,7 @@ test("record idempotency binds both command identity and canonical digest", asyn
   const ok = (value) => ({ status: "ok", value });
   let appends = 0;
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     async append() {
       appends += 1;
       return ok("created");
@@ -369,7 +382,7 @@ test("record idempotency binds both command identity and canonical digest", asyn
     },
   };
   const leases = {
-    contractVersion: 1,
+    contractVersion: 2,
     async claim() {
       return ok(null);
     },
@@ -384,7 +397,7 @@ test("record idempotency binds both command identity and canonical digest", asyn
     },
   };
   const host = {
-    contractVersion: 1,
+    contractVersion: 2,
     capabilityLevel: "atomic-host",
     adapterId: "host-adapter-1",
     async begin() {
@@ -421,6 +434,7 @@ test("record idempotency binds both command identity and canonical digest", asyn
     outbox: store,
     heads: store,
     leases,
+    checkpoints,
   };
   const opened = await beginUnitOfWork(ports, {
     context,
@@ -470,7 +484,7 @@ test("cancellation before commit rolls back and preserves uncertainty when rollb
   const makePorts = (rollback) => {
     const ok = (value) => ({ status: "ok", value });
     const store = {
-      contractVersion: 1,
+      contractVersion: 2,
       async append() {
         return ok("created");
       },
@@ -504,7 +518,7 @@ test("cancellation before commit rolls back and preserves uncertainty when rollb
       },
     };
     const leases = {
-      contractVersion: 1,
+      contractVersion: 2,
       async claim() {
         return ok(null);
       },
@@ -520,7 +534,7 @@ test("cancellation before commit rolls back and preserves uncertainty when rollb
     };
     let commits = 0;
     const host = {
-      contractVersion: 1,
+      contractVersion: 2,
       capabilityLevel: "atomic-host",
       adapterId: "host-adapter-1",
       async begin() {
@@ -557,6 +571,7 @@ test("cancellation before commit rolls back and preserves uncertainty when rollb
         outbox: store,
         heads: store,
         leases,
+        checkpoints,
       },
       commits: () => commits,
     };

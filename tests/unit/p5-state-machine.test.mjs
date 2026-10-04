@@ -57,7 +57,7 @@ test("journal transitions validate every field, freeze retained arrays and appen
   assert.equal(validateJournalTransition({ ...entry, safeDiagnostics: ["taxpayer-id"] }, context, 0, null).status, "invalid");
 
   let appends = 0;
-  const store = { contractVersion: 1, async append(token, value) {
+  const store = { contractVersion: 2, async append(token, value) {
     appends += 1;
     assert.equal(token.transactionId, "tx-1");
     assert.equal(Object.isFrozen(value.claimIds), true);

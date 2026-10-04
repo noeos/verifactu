@@ -8,6 +8,8 @@ import type {
   ImmutableRecord,
   JournalEntry,
   OutboxItem,
+  RecoveryCheckpoint,
+  Sha256,
   SequenceHead,
   StoreResult,
 } from "./model.js";
@@ -60,6 +62,10 @@ export interface UnitOfWorkSession {
   ): Promise<StoreResult<"created" | "replayed">>;
   appendJournal(
     entry: JournalEntry,
+  ): Promise<StoreResult<"created" | "replayed">>;
+  appendRecoveryCheckpoint(
+    checkpoint: RecoveryCheckpoint,
+    expectedPreviousDigest: Sha256 | null,
   ): Promise<StoreResult<"created" | "replayed">>;
   appendOutbox(item: OutboxItem): Promise<StoreResult<"created" | "replayed">>;
   compareAndAppendHead(
@@ -192,6 +198,43 @@ class Session implements UnitOfWorkSession {
       )
         return storeFailure("invalid", "invalid-input");
       return this.ports.journal.append(this.token, freezeJournal(entry));
+    });
+  }
+
+  appendRecoveryCheckpoint(
+    checkpoint: RecoveryCheckpoint,
+    expectedPreviousDigest: Sha256 | null,
+  ): Promise<StoreResult<"created" | "replayed">> {
+    return this.stage(async () => {
+      if (
+        !checkpoint ||
+        !isSafeStoreToken(checkpoint.storeId) ||
+        !sameContext(checkpoint.context, this.token.context) ||
+        !Number.isSafeInteger(checkpoint.schemaVersion) ||
+        checkpoint.schemaVersion < 1 ||
+        !Number.isSafeInteger(checkpoint.generation) ||
+        checkpoint.generation < 0 ||
+        !Number.isSafeInteger(checkpoint.journalVersion) ||
+        checkpoint.journalVersion < 0 ||
+        (checkpoint.headDigest !== null &&
+          !validDigest(checkpoint.headDigest)) ||
+        !validDigest(checkpoint.manifestDigest) ||
+        (expectedPreviousDigest !== null &&
+          !validDigest(expectedPreviousDigest)) ||
+        checkpoint.previousCheckpointDigest !== expectedPreviousDigest ||
+        (checkpoint.externalAnchorDigest !== null &&
+          !validDigest(checkpoint.externalAnchorDigest)) ||
+        !validInstant(checkpoint.createdAt)
+      )
+        return storeFailure("invalid", "invalid-input");
+      return this.ports.checkpoints.compareAndAppend(
+        this.token,
+        expectedPreviousDigest,
+        Object.freeze({
+          ...checkpoint,
+          context: Object.freeze({ ...checkpoint.context }),
+        }),
+      );
     });
   }
 
@@ -391,7 +434,8 @@ export async function beginUnitOfWork(
     validPort(ports.journal, ["append", "list"]) &&
     validPort(ports.outbox, ["append", "get", "discover"]) &&
     validPort(ports.heads, ["read", "compareAndAppend"]) &&
-    validPort(ports.leases, ["claim", "renew", "release", "complete"]);
+    validPort(ports.leases, ["claim", "renew", "release", "complete"]) &&
+    validPort(ports.checkpoints, ["readLatest", "compareAndAppend"]);
   if (
     !ports ||
     !ports.hostUnitOfWork ||

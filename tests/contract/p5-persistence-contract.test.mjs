@@ -18,7 +18,13 @@ const context = createFiscalContext({
 const digest = `sha256:${createHash("sha256").update("command").digest("hex")}`;
 
 function ports(overrides = {}) {
-  const calls = { begin: 0, publication: 0, commit: 0, rollback: 0 };
+  const calls = {
+    begin: 0,
+    publication: 0,
+    commit: 0,
+    rollback: 0,
+    checkpointAppends: [],
+  };
   const token = {
     adapterId: "test:atomic-host",
     transactionId: "tx-1",
@@ -29,7 +35,7 @@ function ports(overrides = {}) {
   };
   const ok = (value) => ({ status: "ok", value });
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     append: async () => ok("created"),
     put: async () => ok("created"),
     get: async () => ({ status: "unavailable", code: "not-found" }),
@@ -39,14 +45,25 @@ function ports(overrides = {}) {
     compareAndAppend: async () => ok("advanced"),
   };
   const leases = {
-    contractVersion: 1,
+    contractVersion: 2,
     claim: async () => ({ status: "unavailable", code: "unavailable" }),
     renew: async () => ({ status: "unavailable", code: "unavailable" }),
     release: async () => ok("released"),
     complete: async () => ({ status: "unavailable", code: "unavailable" }),
   };
+  const checkpoints = {
+    contractVersion: 2,
+    readLatest: async () => ({
+      status: "ok",
+      value: { checkpoint: null, chainVerified: false },
+    }),
+    compareAndAppend: async (transaction, previousDigest, checkpoint) => {
+      calls.checkpointAppends.push({ transaction, previousDigest, checkpoint });
+      return ok("created");
+    },
+  };
   const hostUnitOfWork = {
-    contractVersion: 1,
+    contractVersion: 2,
     capabilityLevel: "atomic-host",
     adapterId: "test:atomic-host",
     begin: async () => { calls.begin += 1; return ok(token); },
@@ -69,6 +86,7 @@ function ports(overrides = {}) {
       outbox: store,
       heads: store,
       leases,
+      checkpoints,
     },
   };
 }
@@ -82,7 +100,8 @@ test("host UoW refuses weak capabilities before opening a transaction", async ()
   assert.equal((await beginUnitOfWork(mismatched.ports, { context, commandId: "command-1", canonicalDigest: digest })).status, "invalid");
   assert.equal(mismatched.calls.rollback, 1);
   for (const [family, method] of [["records", "list"], ["artifacts", "get"], ["evidence", "append"], ["journal", "list"],
-    ["outbox", "discover"], ["heads", "read"], ["leases", "claim"]]) {
+    ["outbox", "discover"], ["heads", "read"], ["leases", "claim"],
+    ["checkpoints", "readLatest"], ["checkpoints", "compareAndAppend"]]) {
     const invalidPorts = ports();
     invalidPorts.ports[family][method] = undefined;
     assert.equal((await beginUnitOfWork(invalidPorts.ports, { context, commandId: "command-1", canonicalDigest: digest })).status,
@@ -97,6 +116,48 @@ test("host UoW refuses weak capabilities before opening a transaction", async ()
     { context, commandId: "command-1", canonicalDigest: digest, signal: aborted.signal }])
     assert.equal((await beginUnitOfWork(malformed.ports, input)).status, "invalid");
   assert.equal(malformed.calls.begin, 0);
+});
+
+test("recovery checkpoints use an atomic append-only compare-and-append port", async () => {
+  const fixture = ports();
+  const opened = await beginUnitOfWork(fixture.ports, {
+    context,
+    commandId: "command-1",
+    canonicalDigest: digest,
+  });
+  assert.equal(opened.status, "ok");
+  const checkpoint = {
+    storeId: "store-1",
+    context,
+    schemaVersion: 1,
+    generation: 0,
+    headDigest: null,
+    journalVersion: 0,
+    manifestDigest: `sha256:${"a".repeat(64)}`,
+    previousCheckpointDigest: null,
+    createdAt: "2026-10-04T12:00:00Z",
+    externalAnchorDigest: null,
+  };
+  assert.deepEqual(
+    await opened.value.appendRecoveryCheckpoint(checkpoint, null),
+    { status: "ok", value: "created" },
+  );
+  assert.equal(fixture.calls.checkpointAppends.length, 1);
+  assert.equal(
+    fixture.calls.checkpointAppends[0].transaction.transactionId,
+    fixture.token.transactionId,
+  );
+  assert.equal(fixture.calls.checkpointAppends[0].previousDigest, null);
+  assert.equal(
+    (
+      await opened.value.appendRecoveryCheckpoint(
+        { ...checkpoint, previousCheckpointDigest: `sha256:${"b".repeat(64)}` },
+        null,
+      )
+    ).status,
+    "invalid",
+  );
+  assert.equal(fixture.calls.checkpointAppends.length, 1);
 });
 
 test("concurrent duplicate command reservation returns one original record", async () => {

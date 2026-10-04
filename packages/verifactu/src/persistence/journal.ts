@@ -3,7 +3,11 @@ import type { FiscalContext } from "../domain/context.js";
 import { createFiscalInstant } from "../domain/date-time.js";
 import type { JournalEntry, StoreResult } from "./model.js";
 import { isSafeStoreToken, storeFailure } from "./model.js";
-import type { JournalStore, TransactionToken } from "./ports.js";
+import {
+  PERSISTENCE_PORT_CONTRACT_VERSION,
+  type JournalStore,
+  type TransactionToken,
+} from "./ports.js";
 
 const durableStates = new Set([
   "pending",
@@ -108,7 +112,7 @@ export async function appendJournalTransition(
 ): Promise<StoreResult<"created" | "replayed">> {
   if (
     !store ||
-    store.contractVersion !== 1 ||
+    store.contractVersion !== PERSISTENCE_PORT_CONTRACT_VERSION ||
     token.capabilityLevel !== "atomic-host" ||
     !sameContext(token.context, input?.entry?.context)
   )

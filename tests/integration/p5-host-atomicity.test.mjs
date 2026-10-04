@@ -33,7 +33,7 @@ function fixture(failHead = false) {
   };
   const ok = (value) => ({ status: "ok", value });
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     async append(token) {
       calls.push(["record", token.transactionId]);
       return ok("created");
@@ -72,14 +72,26 @@ function fixture(failHead = false) {
     },
   };
   const leases = {
-    contractVersion: 1,
+    contractVersion: 2,
     claim: async () => ({ status: "unavailable", code: "unavailable" }),
     renew: async () => ({ status: "unavailable", code: "unavailable" }),
     release: async () => ok("released"),
     complete: async () => ({ status: "unavailable", code: "unavailable" }),
   };
+  const checkpoints = {
+    contractVersion: 2,
+    async readLatest() {
+      return {
+        status: "ok",
+        value: { checkpoint: null, chainVerified: false },
+      };
+    },
+    async compareAndAppend() {
+      return { status: "ok", value: "created" };
+    },
+  };
   const hostUnitOfWork = {
-    contractVersion: 1,
+    contractVersion: 2,
     capabilityLevel: "atomic-host",
     adapterId: "atomic-host",
     async begin() {
@@ -113,6 +125,7 @@ function fixture(failHead = false) {
     outbox: store,
     heads: store,
     leases,
+    checkpoints,
   };
   const bytes = Buffer.from("fiscal-record");
   const record = {
@@ -1131,7 +1144,7 @@ test("lease service supplies an authoritative clock and stable fencing generatio
     authoritativeClock: true,
   };
   const store = {
-    contractVersion: 1,
+    contractVersion: 2,
     async claim() {
       return { status: "ok", value: lease };
     },
@@ -1240,7 +1253,7 @@ test("lease service supplies an authoritative clock and stable fencing generatio
 
   let claimed = false;
   const raceStore = {
-    contractVersion: 1,
+    contractVersion: 2,
     async claim(input) {
       if (claimed) return { status: "conflict", code: "fenced" };
       claimed = true;
@@ -1283,7 +1296,7 @@ test("lease service supplies an authoritative clock and stable fencing generatio
   };
   const expiredRenewal = await renewOutboxLease(
     {
-      contractVersion: 1,
+      contractVersion: 2,
       async renew() {
         return { status: "conflict", code: "fenced" };
       },
@@ -1311,7 +1324,7 @@ test("lease validation fails closed on malformed requests, store results, renewa
     authoritativeClock: true,
   };
   const claimStore = {
-    contractVersion: 1,
+    contractVersion: 2,
     async claim() {
       return { status: "ok", value: lease };
     },
@@ -1374,7 +1387,7 @@ test("lease validation fails closed on malformed requests, store results, renewa
     );
 
   const renewStore = {
-    contractVersion: 1,
+    contractVersion: 2,
     async renew() {
       return {
         status: "ok",
@@ -1451,7 +1464,7 @@ test("lease validation fails closed on malformed requests, store results, renewa
     observationId: "observation-2",
   };
   const completeStore = {
-    contractVersion: 1,
+    contractVersion: 2,
     async complete(input) {
       return {
         status: "ok",
