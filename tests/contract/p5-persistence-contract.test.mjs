@@ -136,7 +136,7 @@ test("recovery checkpoints use an atomic append-only compare-and-append port", a
     manifestDigest: `sha256:${"a".repeat(64)}`,
     previousCheckpointDigest: null,
     createdAt: "2026-10-04T12:00:00Z",
-    externalAnchorDigest: null,
+    externalAnchorDigest: `sha256:${"c".repeat(64)}`,
   };
   assert.deepEqual(
     await opened.value.appendRecoveryCheckpoint(checkpoint, null),
@@ -148,6 +148,15 @@ test("recovery checkpoints use an atomic append-only compare-and-append port", a
     fixture.token.transactionId,
   );
   assert.equal(fixture.calls.checkpointAppends[0].previousDigest, null);
+  assert.equal(
+    (
+      await opened.value.appendRecoveryCheckpoint(
+        { ...checkpoint, externalAnchorDigest: null },
+        null,
+      )
+    ).status,
+    "invalid",
+  );
   assert.equal(
     (
       await opened.value.appendRecoveryCheckpoint(

@@ -222,8 +222,7 @@ class Session implements UnitOfWorkSession {
         (expectedPreviousDigest !== null &&
           !validDigest(expectedPreviousDigest)) ||
         checkpoint.previousCheckpointDigest !== expectedPreviousDigest ||
-        (checkpoint.externalAnchorDigest !== null &&
-          !validDigest(checkpoint.externalAnchorDigest)) ||
+        !validDigest(checkpoint.externalAnchorDigest) ||
         !validInstant(checkpoint.createdAt)
       )
         return storeFailure("invalid", "invalid-input");

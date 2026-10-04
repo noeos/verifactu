@@ -100,6 +100,12 @@ test("startup recovery detects rollback and fences work on incomplete evidence",
   assert.ok(assessStartupRecovery({ ...observation, latestCheckpoint: null }).value.reasons.includes("DIAG-CHECKPOINT-MISSING"));
   assert.ok(assessStartupRecovery({ ...observation, head: { ...observation.head, officialFingerprint: `sha256:${"f".repeat(64)}` } }).value.reasons.includes("DIAG-CHECKPOINT-HEAD-MISMATCH"));
   assert.ok(assessStartupRecovery({ ...observation, checkpointChainVerified: false }).value.reasons.includes("DIAG-CHECKPOINT-CHAIN"));
+  assert.ok(assessStartupRecovery({ ...observation, latestCheckpoint: { ...checkpoint, externalAnchorDigest: null } }).value.reasons.includes("DIAG-CHECKPOINT-CHAIN"));
+  const futureCheckpoint = assessStartupRecovery({ ...observation,
+    latestCheckpoint: { ...checkpoint, createdAt: "2026-10-03T13:00:00Z" },
+  });
+  assert.equal(futureCheckpoint.value.status, "blocked");
+  assert.ok(futureCheckpoint.value.reasons.includes("DIAG-CHECKPOINT-FUTURE"));
   assert.ok(assessStartupRecovery({ ...observation, latestCheckpoint: { ...checkpoint, previousCheckpointDigest: "bad" } }).value.reasons.includes("DIAG-CHECKPOINT-CHAIN"));
   assert.ok(assessStartupRecovery({ ...observation, latestCheckpoint: { ...checkpoint, storeId: "other" } }).value.reasons.includes("DIAG-CHECKPOINT-IDENTITY"));
   assert.ok(assessStartupRecovery({ ...observation, eventChainVerified: false }).value.reasons.includes("DIAG-JOURNAL-CLOSURE"));

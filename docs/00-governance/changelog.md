@@ -15,6 +15,16 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Clarify continued P5 implementation authorization
+
+- Clarified ADR-0060: its one-time owner decision authorizes continued P5-A…P5-G
+  implementation on issue #113's named branch; the authorization was not
+  consumed by the first session or commit. Resumed sessions must continue the
+  branch without reopening P4 closure as an entry prerequisite.
+- P4 remains blocked. The clarification changes no P4 finding, required check,
+  P5 protected-merge gate, P5 phase-exit criterion or external qualification
+  requirement.
+
 ## 2026-10-04 — Add durable recovery checkpoint port and bounded startup read
 
 - P5 review found that recovery accepted `RecoveryCheckpoint` as an input but

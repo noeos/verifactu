@@ -95,7 +95,7 @@ test("bounded recovery and AEAT reconciliation campaign records resource metrics
     manifestDigest: `sha256:${hash("manifest")}`,
     previousCheckpointDigest: null,
     createdAt: "2026-10-03T12:00:00Z",
-    externalAnchorDigest: null,
+    externalAnchorDigest: `sha256:${hash("checkpoint-anchor")}`,
   };
   const observation = {
     storeId: "store-1",

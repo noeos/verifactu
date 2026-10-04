@@ -5,7 +5,7 @@ status: accepted
 authority: decision
 owner: project-owner
 created: 2026-10-03
-last-reviewed: 2026-10-03
+last-reviewed: 2026-10-04
 dependencies: [ADR-0051, ADR-0058]
 ---
 
@@ -59,9 +59,9 @@ later phase from being used as an implicit repair or waiver for P4.
 ## Decision
 
 The project owner, `ddavid07`, explicitly approved option 2 in the Codex session
-on 2026-10-03. This decision is a one-time, narrowly scoped amendment to the
-P4-to-P5 start prerequisite in ADR-0058 and the roadmap: P5-A through P5-G
-implementation work may begin from protected `main`
+on 2026-10-03. This decision is a narrowly scoped amendment to the P4-to-P5
+implementation prerequisite in ADR-0058 and the roadmap: P5-A through P5-G
+implementation work may proceed from protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`, tracked by issue #113 and branch
 `work/p5-implementation`.
 
@@ -104,3 +104,15 @@ not generalize to later phases or other exceptions. If P4 evidence reveals
 functional, regulatory or security impact beyond the documented dependency
 findings, stop affected P5 work and reassess. Withdrawal before P5 closure
 returns phase sequencing to ADR-0058's normal predecessor-closure rule.
+
+## Clarification — 2026-10-04
+
+The owner confirmed that this authorization covers continued implementation of
+P5-A through P5-G on the named branch; it was not consumed by the first P5
+session or first implementation commit. A resumed P5 session must inspect the
+current state and continue the existing work without treating P4 phase closure
+as a prerequisite to branch development. The authorization remains scoped to
+that branch and does not change any P5 protected-merge check, P4 closure row,
+P5 phase-exit criterion or external qualification requirement. A fresh P4
+safety, regulatory or functional impact can still stop the affected P5 work as
+stated above.

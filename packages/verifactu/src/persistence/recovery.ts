@@ -206,6 +206,12 @@ export function assessStartupRecovery(
     )
       reasons.add("DIAG-CHECKPOINT-IDENTITY");
     if (
+      checkpoint.createdAt &&
+      createFiscalInstant(checkpoint.createdAt).status === "ok" &&
+      Date.parse(checkpoint.createdAt) > Date.parse(input.observedAt)
+    )
+      reasons.add("DIAG-CHECKPOINT-FUTURE");
+    if (
       input.generation < checkpoint.generation ||
       input.journalVersion < checkpoint.journalVersion
     )
@@ -219,8 +225,14 @@ export function assessStartupRecovery(
       !input.checkpointChainVerified ||
       typeof checkpoint.manifestDigest !== "string" ||
       !/^sha256:[0-9a-f]{64}$/u.test(checkpoint.manifestDigest) ||
+      (checkpoint.generation === 0
+        ? checkpoint.headDigest !== null
+        : typeof checkpoint.headDigest !== "string" ||
+          !/^sha256:[0-9a-f]{64}$/u.test(checkpoint.headDigest)) ||
       (checkpoint.previousCheckpointDigest !== null &&
-        !/^sha256:[0-9a-f]{64}$/u.test(checkpoint.previousCheckpointDigest))
+        !/^sha256:[0-9a-f]{64}$/u.test(checkpoint.previousCheckpointDigest)) ||
+      typeof checkpoint.externalAnchorDigest !== "string" ||
+      !/^sha256:[0-9a-f]{64}$/u.test(checkpoint.externalAnchorDigest)
     )
       reasons.add("DIAG-CHECKPOINT-CHAIN");
   }
@@ -237,6 +249,7 @@ export function assessStartupRecovery(
   const blocked =
     reasons.has("DIAG-CHECKPOINT-MISSING") ||
     reasons.has("DIAG-CHECKPOINT-IDENTITY") ||
+    reasons.has("DIAG-CHECKPOINT-FUTURE") ||
     reasons.has("DIAG-ROLLBACK-DETECTED") ||
     reasons.has("DIAG-CHECKPOINT-HEAD-MISMATCH") ||
     reasons.has("DIAG-CHECKPOINT-CHAIN") ||

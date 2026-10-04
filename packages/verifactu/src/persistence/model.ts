@@ -126,7 +126,7 @@ export interface RecoveryCheckpoint {
   readonly manifestDigest: Sha256;
   readonly previousCheckpointDigest: Sha256 | null;
   readonly createdAt: string;
-  readonly externalAnchorDigest: Sha256 | null;
+  readonly externalAnchorDigest: Sha256;
 }
 
 export type StoreErrorCode =

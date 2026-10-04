@@ -125,7 +125,7 @@ function checkpoint(generation, headDigest, journalVersion, manifestDigest) {
     manifestDigest,
     previousCheckpointDigest: null,
     createdAt: "2026-10-04T00:00:00.000Z",
-    externalAnchorDigest: null,
+    externalAnchorDigest: `sha256:${hash("external-checkpoint-anchor")}`,
   };
 }
 

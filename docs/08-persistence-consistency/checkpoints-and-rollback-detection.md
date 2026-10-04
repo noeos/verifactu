@@ -17,6 +17,14 @@ creation instant source, predecessor checkpoint and signer/anchor evidence. A
 timestamp or caller assertion without identity/digest/external trust is not
 freshness evidence.
 
+Every checkpoint admitted for startup recovery must carry the digest of its
+configured external anchor. The digest is an identifier for evidence; it does
+not itself prove the anchor is independent or authentic. The checkpoint-store
+adapter must verify the complete chain and authenticate the configured anchor
+before returning `chainVerified: true`. Missing anchor evidence, malformed
+head/manifest/predecessor digests, or a checkpoint dated after the observed
+startup instant blocks workers and network activity.
+
 At startup and before sensitive export/recovery, compare current monotonic
 positions and head digests to the latest independently retained checkpoint.
 Regression, missing checkpoint chain, store replacement, truncated journal,
