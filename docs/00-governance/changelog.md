@@ -15,6 +15,14 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-04 — Record terminal P5-head workflow closure
+
+- Added Amendment P5-015 with terminal results for PR #114's exact `94db4c6`
+  head: all five platform cells, P2, conformance and 14/17 required contexts
+  passed; OSV, npm audit and derived required-check closure failed.
+- Recorded that the closure job downloaded all 16 expected leaf artifacts and
+  rejected only the two audit reports. P4 remains blocked and unwaived.
+
 ## 2026-10-04 — Refresh exact P5 remote-state handoff
 
 - Added Amendment P5-014 to replace the stale P5-013 read-back with the exact
