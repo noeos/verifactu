@@ -222,6 +222,9 @@ test("Java bridge probe keeps an independent timeout from mutation oracles", () 
     mutationTestPatterns({ module, line }, test).map((entry) => entry.pattern);
 
   assert.deepEqual(patterns(xmlModel, 182, xmlUnit), [
+    "^XML model fails closed across namespace, attribute, node, and text boundaries$",
+  ]);
+  assert.deepEqual(patterns(xmlModel, 210, xmlUnit), [
     "^(?:XML model accepts each documented exact capacity|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model rejects a valid element name that exceeds the serialized byte ceiling)$",
   ]);
   assert.deepEqual(patterns(xmlModel, 262, xmlUnit), [
@@ -240,6 +243,15 @@ test("Java bridge probe keeps an independent timeout from mutation oracles", () 
     "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model sorts attributes deterministically when namespace keys are equal|XML model distinguishes default element namespaces from unprefixed attributes|XML serializer orders expanded attributes by namespace then local name|XML model accounts for serialized bytes in every node class|XML model rejects exact one-byte serialized overflows in each markup class|XML model accounts for quotes as text without attribute expansion|XML model accepts each documented exact capacity)$";
   assert.deepEqual(patterns(xmlModel, 430, xmlUnit), [xmlSerialization]);
   assert.deepEqual(patterns(xmlModel, 478, xmlUnit), [xmlSerialization]);
+
+  assert.deepEqual(
+    patterns(
+      "internal/xml-provider/worker.mjs",
+      403,
+      "tests/security/p4-xml-attacks.test.mjs",
+    ),
+    ["^XML worker normalizes child spawn errors and post-spawn cancellation$"],
+  );
 
   assert.deepEqual(patterns(qr, 100), [
     "^(?:P4-MUT-(?:030|031|042|043)|P4-FAULT-QR-(?:ENVIRONMENT|TRUNCATION))",
