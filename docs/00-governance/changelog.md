@@ -271,3 +271,15 @@ changelog and makes no compliance, publication or support claim.
   entry blocker.
 - P4 remains blocked; P5 protected merges and phase closure retain their
   existing checks and dependencies.
+
+## 2026-10-04 — Record P5 DER fixture correction and continuation state
+
+- Recorded the intermittent Node 22.14 synthetic-certificate failure, its
+  noncanonical DER serial root cause, deterministic regression and local P5
+  results in the active handoff amendment.
+- Refreshed the P5 prompt's handoff pointer and corrected the P4 workflow
+  observation to its terminal status while preserving the three failed closure
+  contexts and active protection.
+- Recorded the unresolved difference between issue #113's serial wave PR
+  requirement and the single cumulative PR #114; no check, denominator or phase
+  closure criterion was waived.
