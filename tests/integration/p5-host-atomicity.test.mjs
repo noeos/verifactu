@@ -86,7 +86,8 @@ function fixture(failHead = false) {
         value: { checkpoint: null, chainVerified: false },
       };
     },
-    async compareAndAppend() {
+    async compareAndAppend(token, previousDigest, checkpoint) {
+      calls.push(["checkpoint", token.transactionId, previousDigest, checkpoint]);
       return { status: "ok", value: "created" };
     },
   };
@@ -149,7 +150,19 @@ function fixture(failHead = false) {
     generatedAt: "2026-10-03T12:00:00.000Z",
     commitId: "tx-1",
   };
-  return { calls, ports, record, expectedHead, nextHead, digest, tx };
+  const checkpoint = {
+    storeId: "store-1",
+    context,
+    schemaVersion: 1,
+    generation: nextHead.generation,
+    headDigest: nextHead.officialFingerprint,
+    journalVersion: 0,
+    manifestDigest: sha256Digest(Buffer.from("manifest")),
+    previousCheckpointDigest: null,
+    createdAt: "2026-10-03T12:00:00.000Z",
+    externalAnchorDigest: sha256Digest(Buffer.from("external-anchor")),
+  };
+  return { calls, ports, record, expectedHead, nextHead, checkpoint, digest, tx };
 }
 
 test("record, head and host publication share one atomic host transaction", async () => {
@@ -172,12 +185,14 @@ test("record, head and host publication share one atomic host transaction", asyn
     outbox: [],
     expectedHead: value.expectedHead,
     nextHead: value.nextHead,
+    checkpoint: value.checkpoint,
   });
   assert.equal(result.status, "committed");
   assert.deepEqual(
     value.calls.map(([kind]) => kind),
-    ["begin", "record", "head", "publication", "commit"],
+    ["begin", "record", "head", "checkpoint", "publication", "commit"],
   );
+  assert.equal(value.calls[3][2], null);
   assert.equal(
     new Set(value.calls.map(([, transactionId]) => transactionId)).size,
     1,
@@ -204,6 +219,7 @@ test("atomic publication preflight rejects malformed scope, identity, digest and
     outbox: [],
     expectedHead: value.expectedHead,
     nextHead: value.nextHead,
+    checkpoint: value.checkpoint,
   };
   const malformed = [
     null,
@@ -234,6 +250,10 @@ test("atomic publication preflight rejects malformed scope, identity, digest and
     { ...base, evidence: "invalid" },
     { ...base, journal: Array(1001).fill({}) },
     { ...base, outbox: Array(501).fill({}) },
+    {
+      ...base,
+      checkpoint: { ...value.checkpoint, headDigest: `sha256:${"f".repeat(64)}` },
+    },
   ];
   for (const input of malformed) {
     const callsBefore = value.calls.length;
@@ -265,6 +285,7 @@ test("head race rolls back all staged host-visible writes", async () => {
     outbox: [],
     expectedHead: value.expectedHead,
     nextHead: value.nextHead,
+    checkpoint: value.checkpoint,
   });
   assert.equal(result.status, "conflict");
   assert.deepEqual(
@@ -292,6 +313,7 @@ test("commit failure rolls back and outbox wake-up remains best effort", async (
     outbox: [],
     expectedHead: value.expectedHead,
     nextHead: value.nextHead,
+    checkpoint: value.checkpoint,
     notifyOutbox,
   });
 
@@ -422,6 +444,7 @@ test("atomic coordinator stages every declared data family and rolls back each r
       outbox: [outbox],
       expectedHead: value.expectedHead,
       nextHead: value.nextHead,
+      checkpoint: { ...value.checkpoint, journalVersion: 1 },
     };
   };
   const successful = fixture();
@@ -440,6 +463,7 @@ test("atomic coordinator stages every declared data family and rolls back each r
       "record",
       "record",
       "head",
+      "checkpoint",
       "publication",
       "commit",
     ],
@@ -451,10 +475,16 @@ test("atomic coordinator stages every declared data family and rolls back each r
     "evidence",
     "journal",
     "outbox",
+    "checkpoints",
   ]) {
     const failed = fixture();
     const original = failed.ports[family];
-    const method = family === "artifacts" ? "put" : "append";
+    const method =
+      family === "artifacts"
+        ? "put"
+        : family === "checkpoints"
+          ? "compareAndAppend"
+          : "append";
     failed.ports[family] = {
       ...original,
       async [method]() {
@@ -845,6 +875,7 @@ test("seeded local commit cuts preserve atomic visibility and resolve unknown ac
       outbox: [outbox],
       expectedHead: value.expectedHead,
       nextHead: value.nextHead,
+      checkpoint: { ...value.checkpoint, journalVersion: 1 },
       ...(notifyOutbox ? { notifyOutbox } : {}),
     };
   };

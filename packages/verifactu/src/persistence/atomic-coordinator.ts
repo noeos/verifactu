@@ -6,6 +6,7 @@ import type {
   ImmutableRecord,
   JournalEntry,
   OutboxItem,
+  RecoveryCheckpoint,
   SequenceHead,
   StoreResult,
 } from "./model.js";
@@ -28,6 +29,8 @@ export interface AtomicCommitInput {
   readonly outbox: readonly OutboxItem[];
   readonly expectedHead: SequenceHead;
   readonly nextHead: SequenceHead;
+  /** Optional durable checkpoint advancement, staged with the full publication UoW. */
+  readonly checkpoint?: RecoveryCheckpoint;
   readonly signal?: AbortSignal;
   /** Best-effort notification after commit; durable outbox discovery is authoritative. */
   readonly notifyOutbox?: () => Promise<void>;
@@ -52,6 +55,9 @@ function asCommitFailure(
   return { status: result.status, code: result.code };
 }
 
+const isDigest = (value: unknown): value is string =>
+  typeof value === "string" && /^sha256:[0-9a-f]{64}$/u.test(value);
+
 export async function commitFiscalPublication(
   ports: PersistencePorts,
   input: AtomicCommitInput,
@@ -64,6 +70,8 @@ export async function commitFiscalPublication(
     !isSafeStoreToken(input.commandId) ||
     !/^sha256:[0-9a-f]{64}$/u.test(input.canonicalDigest) ||
     !input.publication ||
+    !input.expectedHead ||
+    !input.nextHead ||
     input.publication.commandId !== input.commandId ||
     input.publication.canonicalDigest !== input.canonicalDigest ||
     !Array.isArray(input.artifacts) ||
@@ -74,6 +82,22 @@ export async function commitFiscalPublication(
     input.evidence.length > 500 ||
     input.journal.length > 1000 ||
     input.outbox.length > 500
+  )
+    return { status: "invalid", code: "invalid-input" };
+  if (
+    input.checkpoint &&
+    (!isSafeStoreToken(input.checkpoint.storeId) ||
+      !input.checkpoint.context ||
+      !sameContext(input.checkpoint.context, input.context) ||
+      input.checkpoint.schemaVersion !== input.nextHead.schemaVersion ||
+      input.checkpoint.generation !== input.nextHead.generation ||
+      input.checkpoint.headDigest !== input.nextHead.officialFingerprint ||
+      !Number.isSafeInteger(input.checkpoint.journalVersion) ||
+      input.checkpoint.journalVersion < 0 ||
+      !isDigest(input.checkpoint.manifestDigest) ||
+      (input.checkpoint.previousCheckpointDigest !== null &&
+        !isDigest(input.checkpoint.previousCheckpointDigest)) ||
+      !isDigest(input.checkpoint.externalAnchorDigest))
   )
     return { status: "invalid", code: "invalid-input" };
 
@@ -120,6 +144,14 @@ export async function commitFiscalPublication(
     input.record,
   );
   if (head.status !== "ok") return rollbackAfterStageFailure(unit, head);
+  if (input.checkpoint) {
+    const checkpoint = await unit.appendRecoveryCheckpoint(
+      input.checkpoint,
+      input.checkpoint.previousCheckpointDigest,
+    );
+    if (checkpoint.status !== "ok")
+      return rollbackAfterStageFailure(unit, checkpoint);
+  }
   const host = await unit.stagePublication(input.publication);
   if (host.status !== "ok") return rollbackAfterStageFailure(unit, host);
   const result = await unit.commit();
