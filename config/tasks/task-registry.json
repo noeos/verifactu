@@ -6,7 +6,8 @@
     "gate:platform",
     "gate:p3b",
     "gate:p4-readiness",
-    "gate:p4"
+    "gate:p4",
+    "p5:quality-plan"
   ],
   "tasks": [
     {
@@ -176,18 +177,21 @@
     },
     {
       "id": "policy:architecture",
-      "version": 2,
+      "version": 3,
       "owner": "architecture-owner",
       "dependencies": ["policy:tree"],
       "inputs": [
         "config/repository/import-rules.json",
+        "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
+        "tooling/assurance/p5-delivery-stage.mjs",
         "packages/**/*.ts",
         "packages/**/package.json"
       ],
       "outputs": ["evidence/runs/policy--architecture.json"],
       "workingDirectory": ".",
       "toolProfile": "primary",
-      "environment": ["CI", "PATH"],
+      "environment": ["CI", "PATH", "GITHUB_HEAD_REF", "GITHUB_BASE_REF"],
       "network": "denied",
       "secrets": "denied",
       "timeoutSeconds": 60,
@@ -969,7 +973,7 @@
     },
     {
       "id": "gate:platform",
-      "version": 1,
+      "version": 3,
       "owner": "quality-owner",
       "dependencies": [
         "policy:tree",
@@ -984,7 +988,9 @@
         "test:p4-d",
         "test:p4-e",
         "test:p4-f",
-        "gate:p4"
+        "gate:p4",
+        "p5:quality-plan",
+        "gate:p5"
       ],
       "inputs": ["config/**", "tooling/**", "packages/**"],
       "outputs": ["evidence/runs/gate--platform.json"],
@@ -1003,7 +1009,7 @@
     },
     {
       "id": "gate:p2",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": [
         "gate:foundation",
@@ -1016,7 +1022,9 @@
         "test:p4-d",
         "test:p4-e",
         "test:p4-f",
-        "gate:p4"
+        "gate:p4",
+        "p5:quality-plan",
+        "gate:p5"
       ],
       "inputs": ["**"],
       "outputs": ["evidence/runs/gate--p2.json"],
@@ -1106,12 +1114,155 @@
       "tools": []
     },
     {
+      "id": "p5:quality-plan",
+      "version": 2,
+      "owner": "assurance-owner",
+      "dependencies": [],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
+        "docs/17-roadmap-risk/p5-quality-plan.md",
+        "tooling/assurance/p5-quality-plan.mjs",
+        "tooling/assurance/p5-delivery-stage.mjs",
+        "packages/verifactu/src/persistence/**",
+        "packages/verifactu/src/aeat/**",
+        "packages/verifactu/src/operations/**",
+        "tests/**/p5-*.test.mjs"
+      ],
+      "outputs": ["evidence/runs/p5--quality-plan.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_BASE_REF",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 60,
+      "concurrencyLock": "assurance",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "p5QualityPlan",
+      "tools": ["node"]
+    },
+    {
+      "id": "test:p5",
+      "version": 2,
+      "owner": "quality-owner",
+      "dependencies": ["build:packages", "p5:quality-plan"],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
+        "packages/verifactu/src/persistence/**",
+        "packages/verifactu/src/aeat/**",
+        "packages/verifactu/src/operations/**",
+        "packages/verifactu/src/domain/identities.ts",
+        "tests/**/p5-*.test.mjs",
+        "tests/support/p5-*.mjs",
+        "tests/support/p5-*.b64"
+      ],
+      "outputs": [
+        "evidence/runs/test--p5.json",
+        "evidence/runs/artifacts/p5/test-tap.txt"
+      ],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_BASE_REF",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 3600,
+      "concurrencyLock": "p5-tests",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "testP5",
+      "tools": ["node"]
+    },
+    {
+      "id": "p5:mutation",
+      "version": 2,
+      "owner": "assurance-owner",
+      "dependencies": ["build:packages", "p5:quality-plan", "test:p5"],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
+        "tooling/assurance/p5-delivery-stage.mjs",
+        "tooling/assurance/p5-mutation-campaign.mjs",
+        "tooling/assurance/p4-mutation-catalog.mjs",
+        "tooling/assurance/p4-overall-mutation-campaign.mjs",
+        "packages/verifactu/src/persistence/**",
+        "packages/verifactu/src/aeat/**",
+        "packages/verifactu/src/operations/**",
+        "tests/**/p5-*.test.mjs"
+      ],
+      "outputs": [
+        "evidence/runs/p5--mutation.json",
+        "evidence/runs/artifacts/p5/mutation-report.json"
+      ],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": [
+        "CI",
+        "PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_BASE_REF",
+        "VERIFACTU_SUBJECT_SHA",
+        "VERIFACTU_SUBJECT_TREE"
+      ],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 3600,
+      "concurrencyLock": "p5-mutation",
+      "selectionClass": "code-and-build",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "p5Mutation",
+      "tools": ["node", "typescript"]
+    },
+    {
+      "id": "gate:p5",
+      "version": 2,
+      "owner": "quality-owner",
+      "dependencies": ["test:p5", "p5:mutation"],
+      "inputs": [
+        "config/quality/p5-quality-plan.json",
+        "config/quality/p5-delivery-waves.json",
+        "config/tasks/task-registry.json"
+      ],
+      "outputs": ["evidence/runs/gate--p5.json"],
+      "workingDirectory": ".",
+      "toolProfile": "runtime-matrix",
+      "environment": ["CI", "VERIFACTU_SUBJECT_SHA", "VERIFACTU_SUBJECT_TREE"],
+      "network": "denied",
+      "secrets": "denied",
+      "timeoutSeconds": 7200,
+      "concurrencyLock": "closure",
+      "selectionClass": "always",
+      "reportSchema": "evidence/schemas/task-report.schema.json",
+      "zeroWork": "fail",
+      "operation": "gate",
+      "tools": []
+    },
+    {
       "id": "p4:quality-plan",
-      "version": 6,
+      "version": 7,
       "owner": "assurance-owner",
       "dependencies": [],
       "inputs": [
         "config/quality/p4-quality-plan.json",
+        "config/quality/p5-quality-plan.json",
         "config/quality/p3b-baseline.json",
         "config/ci/required-checks.json",
         "config/toolchain/toolchain.json",
@@ -1151,7 +1302,7 @@
     },
     {
       "id": "gate:p4-readiness",
-      "version": 1,
+      "version": 2,
       "owner": "assurance-owner",
       "dependencies": ["gate:p3b", "p4:quality-plan"],
       "inputs": ["**"],
@@ -1171,7 +1322,7 @@
     },
     {
       "id": "gate:p4",
-      "version": 1,
+      "version": 2,
       "owner": "quality-owner",
       "dependencies": ["test:p4-g"],
       "inputs": [

@@ -9,6 +9,7 @@ const root = resolve(import.meta.dirname, "../..");
 const readJson = async (path) =>
   JSON.parse(await readFile(resolve(root, path), "utf8"));
 const plan = await readJson("config/quality/p4-quality-plan.json");
+const p5Plan = await readJson("config/quality/p5-quality-plan.json");
 const lifecycle = await readJson("config/regulatory/edition-lifecycle.json");
 const generation = await readJson(
   "editions/rrsif-2026-09-21-authoritative-candidate/generated/generation-report.json",
@@ -927,7 +928,9 @@ export function validateP4QualityPlan(
 const tracked = git("ls-files", "--cached", "--others", "--exclude-standard")
   .split(/\r?\n/u)
   .filter(Boolean);
-const discoveredProduction = tracked.filter(validProductionPath);
+const discoveredProduction = tracked
+  .filter(validProductionPath)
+  .filter((path) => !p5Plan.productionModules.includes(path));
 const discoveredP4Tests = tracked.filter(
   (path) => path.startsWith("tests/") && /p4-.*\.test\.mjs$/u.test(path),
 );
