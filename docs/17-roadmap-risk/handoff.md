@@ -5280,3 +5280,76 @@ integration.
 
 This documentation change creates a new subject. The local campaign results
 above are bound to `0761e17`; inspect all workflows again for the new head.
+
+## Amendment P5-026 — 2026-10-05 exact-head and npm 11.21.0 audit refresh
+
+This amendment supersedes P5-025 as the active-state snapshot. At 2026-10-05
+09:49 UTC, the clean `work/p5-implementation` checkout and remote were
+synchronized at signed+DCO commit
+`a29bea7db0f4e49c9e6e330088daa0ef46799a06` (tree
+`be68e2d3683b04b864388c2d8bc036a61f39cd4f`), based on protected `main`
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`. PR #114 is open and `BLOCKED`.
+Issue #113 remains open. PR #118 remains the P5-A delivery branch at exact head
+`916a6670c2a53835f9cc82af95a9d211cda57a3e`; it is open and `BLOCKED`.
+
+- Exact-subject local cumulative P5 validation passed on `a29bea7`: `gate:p5`
+  2/2; `test:p5` 104/104 in 23/23 files; 99.12% line, 95.21% branch and
+  99.04% function coverage; 49,152/49,152 property executions; 56/56 seeded
+  faults; and mutation 42/42 (26 critical, 16 other). The frozen plan passed
+  10/10 and reconciled all 25 production modules, 23 test files, five platform
+  cells, 12 property campaigns and 56 faults. `policy:docs` passed 544/544,
+  `policy:format` 124/124, `policy:supply-chain` 259/259, and package
+  reproducibility 6/6. Exact report digests: gate `c41fc3d445856f534488d4e9d8b23969199e532829b058786b9aee3686b9db97`,
+  tests `3d0fff14d96bc7c6995de9e894f9b8bf7bff05566c3294a61f866f24c7893f88`,
+  mutation `625289982d97e9968d36171054e48f137f725a424dacc9c943f3c2536dd74c41`,
+  plan `d60ba63ed6044e072c2f2d8960d6900f0cc39c216175bdc33caf1fd41885d2ac`,
+  docs `3d63a0fb08f2594b5a954a6179933175414d18781369f5b70c27124e6c0d0dd0`,
+  format `a52f43ba4a858c5973b1f0cae49a3cc24e1dd557969971982c4623f2864678bb`,
+  supply chain `b2e8bcc6560a169c79f3f88a0ff51abf30921d51991019559e2059e14ecb5fb1`,
+  and package reproducibility `373f8776e5c8927efb3511401b54215556f1fc4882fdb49f8cd5ac1018d08097`.
+- Exact-subject local P5-A reports on `916a667` remain 10/10 plan checks,
+  9/9 tests in the two assigned files, 16,384 property executions, 100% line,
+  branch and function coverage, and both assigned mutants killed. This local
+  evidence does not replace PR #118's required matrix.
+- On PR #114 at exact head `a29bea7`, Required engineering run `37289635957`,
+  Security `37289635925`, Conformance `37289636082`, Performance `37289636033`
+  and regulatory observation `37289635994` were queued at this read-back.
+  Engineering CI run `37289635954` was running its canonical `gate:p2` step
+  (started 09:38:47 UTC); its setup steps had passed. No required context or
+  closure result for this head was terminal. These states are pending, not
+  passes; re-read all exact-head workflows before acting on them.
+- On PR #118, `Required · OSV` and `Required · npm audit signatures and
+  licenses` had failed. `Required · quality and policy`, CodeQL, dependency
+  review, packed consumers, reproducibility smoke, secret regressions, supply
+  chain and all three regulatory observations had passed. Engineering CI,
+  Conformance and most matrix/required jobs remained pending or in progress;
+  required-check closure had no terminal result. PR #118 cannot be accepted or
+  used as the predecessor for wave B until every effective required context
+  passes and its closure report is complete.
+- The P4 PR #109 exact head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`,
+  merged as `1f66da46e21127d1d82018cfdf093f595e1c08ae`, remains terminal at
+  14/17 required reports. Exactly `Required · OSV`, `Required · npm audit
+  signatures and licenses`, and derived `Required · required-check closure`
+  failed. P4 remains phase-blocked; no P5 evidence changes that disposition.
+- Registry metadata now lists `npm@11.21.0` on `next-11`. Its official tarball
+  integrity is
+  `sha512-Zov8KhamNneiLdELtj5YALtNmJW4L4fCLTzjfpzXG2w6MSHcf0UxgdlK5uloCuksWT+7mGUU7wi79cO6RqivPg==`
+  and its Node engine range (`^20.17.0 || >=22.9.0`) includes the declared
+  Node 22.14 minimum. In a disposable lockfile containing this exact npm
+  version, the admitted OSV scanner found 144 packages and four affected
+  bundled packages across 11 advisories (4 High, 6 Medium, 1 Low):
+  `brace-expansion@5.0.9`, `http-cache-semantics@4.2.0`,
+  `ip-address@10.5.0` and `undici@6.28.0`. Therefore 11.21.0 is not a
+  correction. npm 12.2.0 requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`,
+  so it cannot replace the supported Node 22.14 cell. Upstream
+  [npm/cli #10062](https://github.com/npm/cli/issues/10062) remained open at
+  its 2026-10-02 update and confirms stale bundled copies in npm 11.21.0 and
+  12.2.0. Do not apply lockfile-only patches, overrides, scanner exclusions or
+  toolchain exceptions; retain complete coverage until an admitted compatible
+  upstream bundle corrects the runtime packages.
+
+P5 branch implementation remains authorized under ADR-0060. This amendment
+does not waive a scanner, check, threshold, serial-wave prerequisite, protected
+merge or P4/P5 phase-exit condition. Do not create P5-B before P5-A is merged.
+This handoff amendment creates a new subject; the local reports above are bound
+to `a29bea7`. Inspect all workflows again after this documentation change.

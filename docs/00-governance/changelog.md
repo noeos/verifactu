@@ -15,6 +15,15 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Refresh P5 exact-head and npm bundle evidence
+
+- Added Amendment P5-026 with exact-subject local P5/P5-A reports, the live
+  state of PRs #109, #114 and #118, and the current serial-wave handoff.
+- Tested npm 11.21.0's official lock package with the admitted OSV scanner;
+  its bundled dependencies still produce 11 advisories. The existing Node
+  22.14 minimum also prevents substituting npm 12.2.0. No scanner, lock,
+  toolchain, merge or phase-exit policy was weakened.
+
 ## 2026-10-05 — Make the P5 intake action explicit
 
 - Clarified that the P5 session's intake decision is to proceed with authorized
