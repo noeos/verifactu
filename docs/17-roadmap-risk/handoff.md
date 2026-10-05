@@ -4995,3 +4995,66 @@ stale and must be refreshed by an actor with PR metadata write access.
 The documentation update for P5-021 creates a new exact-head subject. Re-run
 the repository's applicable local and protected checks on that new SHA; the
 results above apply only to `ce21e8e`.
+
+## Amendment P5-022 — 2026-10-05 exact-head continuation read-back
+
+This amendment supersedes P5-021 as the active-state snapshot. At the
+2026-10-05 05:12 UTC read-back, local `work/p5-implementation` was clean at
+`5729aea6409ac8818df85ce444d4bc1937c938ee` (tree
+`c6dd1f6f554749fbbae6667c31beae7715454e26`); `git ls-remote` confirmed that
+`origin/work/p5-implementation` points to the same SHA. The branch is based on
+protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`. Issue #113 is open.
+PR #114 is open and unmerged at this exact head; the protected-main ruleset is
+active with strict required status checks, signed commits, linear history and
+squash-only integration.
+
+- A fresh exact-subject `gate:p5` run passed 2/2 tasks with no failures, skips
+  or diagnostics. `test:p5` passed 104/104 tests across 23/23 files; coverage
+  was 99.12% lines, 95.21% branches and 99.04% functions. All 12 property
+  campaigns completed 49,152 executions, all 56 seeded faults were detected,
+  and all 42 selected mutants were killed (26 critical, 16 other). The run
+  recorded wall time 1,812.36 ms, peak RSS 93,298,688 bytes, event-loop delay
+  12.95 ms, queue high-water 128 and open handles 2→2. `gate:p5` digest:
+  `f923ac7dc19e31931b7be88b3c720cc8d3e78af4d2d21dcd21a6334fb4fdf75a`;
+  `test:p5` digest:
+  `01011b46a1f03747824104a0078e287f1d8bf2f2787cd704c1ef58e238d722c7`;
+  mutation digest:
+  `36038e732b8ffaf026c394f9ec038446d4264ddb4f270c8d6bc61cec7623d83e`.
+- GitHub's exact-head documentation, DCO/signature, package reproducibility, integration
+  conformance, dependency review, CodeQL and secret-scan contexts passed.
+  Required `OSV` and `npm audit signatures and licenses` failed. Required
+  regulatory sources/generated contracts, quality/policy and all five
+  platform cells remained in progress. `Engineering CI · gate:p2` and
+  Conformance regulatory sources/generated contracts remained in progress.
+  Security, Performance and regulatory-observation workflows completed
+  successfully. The required-check closure context had not yet produced a
+  result; it is not a pass. Workflow runs: Required engineering
+  [37264284988](https://github.com/noeos/verifactu/actions/runs/37264284988),
+  Engineering CI
+  [37264284989](https://github.com/noeos/verifactu/actions/runs/37264284989),
+  Conformance
+  [37264284938](https://github.com/noeos/verifactu/actions/runs/37264284938),
+  Security [37264284969](https://github.com/noeos/verifactu/actions/runs/37264284969),
+  Performance
+  [37264284941](https://github.com/noeos/verifactu/actions/runs/37264284941)
+  and regulatory observation
+  [37264284965](https://github.com/noeos/verifactu/actions/runs/37264284965).
+- With this handoff amendment in the worktree, `policy:docs` passed 544/544
+  and `policy:format` passed 124/124 with zero failures or skips. Both reports
+  carry the diagnostic `working tree is dirty; this report is development
+  evidence only`; repeat them on the signed commit and read their exact-head
+  GitHub results before treating the amendment as closed.
+- Re-observation of merged P4 PR #109's exact head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`
+  confirms its required `OSV`, `npm audit signatures and licenses`, and
+  derived `required-check closure` contexts remain failed. P4 therefore
+  remains blocked; ADR-0060 authorizes P5 branch implementation only.
+- P5 is still represented by one cumulative PR rather than the required seven
+  serial signed+DCO wave PRs. No production durable backend has been selected
+  or qualified for `atomic-host`; the repository contains the durable ports,
+  coordinators and synthetic host only. A fresh access check found no GitHub
+  environments, no tracked certificate/key files and no AEAT/certificate
+  credential environment-variable names; no portal exercise or external
+  certificate evidence is available. The local peer remains synthetic and
+  the edition remains `creationAllowed=false`. These are open P5 qualification
+  and phase-closure conditions, not reasons to call local P5 implementation
+  evidence external or production-qualified.

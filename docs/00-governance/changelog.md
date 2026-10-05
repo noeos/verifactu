@@ -15,6 +15,16 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Refresh active P5 exact-head evidence
+
+- Added Amendment P5-022 with a fresh local `gate:p5` result and the live
+  workflow states for PR #114 at `5729aea`. P4 remains blocked by its three
+  exact required-check findings; the current P5 head has two failed audit
+  contexts and its remaining required checks are still running.
+- Recorded the still-open P5 boundaries: seven serial signed+DCO wave PRs,
+  qualified production `atomic-host` backend, and authorized external AEAT
+  evidence. No check, merge rule or phase-exit criterion was waived.
+
 ## 2026-10-05 — Reconfirm P5 continuation with P4 closure outstanding
 
 - Recorded the project owner's reconfirmation that a new or resumed session may
