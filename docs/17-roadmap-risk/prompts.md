@@ -5,9 +5,9 @@ status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-09-25
+last-reviewed: 2026-10-05
 dependencies: [ROADMAP-DOC-0004, ROADMAP-DOC-0017]
-decisions: [ADR-0001, ADR-0031, ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
+decisions: [ADR-0001, ADR-0031, ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 historical-inputs: [REV-063, REV-074, REV-079, REV-084]
 ---
 
@@ -19,10 +19,16 @@ Prepend `/goal` to exactly one phase prompt. Do not combine phases. Each prompt
 is a derived execution aid; [`implementation-roadmap.md`](implementation-roadmap.md),
 higher-authority documentation and current law prevail.
 
-The operator should issue the next prompt only after the prior phase closure is
-on protected `main`. If a session resumes an unfinished goal, reuse the same
-phase prompt: Codex must inspect the existing branch/PR/evidence and continue
-rather than recreate completed work.
+Normally, issue the next phase prompt only after the prior phase closure is on
+protected `main`. Apply an explicit, recorded decision when one authorizes a
+bounded exception. In particular, ADR-0060 authorizes P5-A…P5-G implementation
+to start or continue on issue #113's `work/p5-implementation` branch while P4
+phase closure remains incomplete. This exception permits branch implementation
+only; it does not mark P4 complete, authorize a protected P5 merge, waive any
+required check or allow P5 phase closure while applicable P4 closure rows remain
+unresolved. If a session resumes an unfinished goal, reuse the same phase
+prompt: Codex must inspect the existing branch/PR/evidence and continue rather
+than recreate completed work.
 
 ## Mandatory behavior embedded in every prompt
 
@@ -284,11 +290,44 @@ remaining external prerequisites; reread protected main and every required check
 
 ```text
 Execute Phase P5 of docs/17-roadmap-risk/implementation-roadmap.md completely.
-Read all documentation; verify the handoff and deterministic-core package bytes.
+P5 implementation start and continuation were explicitly authorized by ADR-0060
+and reconfirmed by the project owner on 2026-10-05, on issue #113 and branch
+`work/p5-implementation`, despite P4 remaining phase-unclosed. Do not
+block P5 branch development solely because P4 is not `evidence-complete`; do not
+ask the project owner to reconfirm this recorded authorization or wait for a
+new P4 closure decision before continuing the authorized P5 branch work. Do not
+describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
+the normal protected required checks, or close P5 while applicable P4 closure
+rows remain unresolved. P4 phase closure is not a prerequisite for starting or
+continuing implementation on the named P5 branch under ADR-0060. Read the latest
+active-state amendment in `handoff.md`: use the last numbered amendment that
+explicitly supersedes the preceding active-state snapshot, not an older number
+copied into this prompt. Inspect the worktree before changing it and continue
+any P5 work already present. Start with P5-A only if it has not already started; do
+not stop after repeating the P4 closure analysis. The P5 intake decision is
+`proceed with authorized branch implementation` unless fresh evidence shows a
+direct safety, regulatory or functional impact on the affected P5 work. Record
+the exact P4 state as a carried-forward blocker and continue; do not turn that
+observation into a P5 entry gate. Verify the current handoff, exact main/branch
+identities, restored ruleset and current status of every outstanding P4 workflow
+before implementation. This P4 check is observational for P5 entry:
+the recorded P4 failures in `Required · OSV`,
+`Required · npm audit signatures and licenses`, and the derived
+`Required · required-check closure` do not prevent this authorized branch work
+from starting or continuing. These are retained failures, not exceptions that
+make a check pass or authorize disabling it. Stop affected work only if fresh
+evidence identifies a direct safety, regulatory or functional impact on P5, and
+record that impact against the affected scope. Read all documentation; verify
+the handoff and deterministic-core package bytes.
 Prioritize all 08-persistence-consistency and 09-aeat-integration documents plus
 host/provider contracts, concurrency, security/privacy, quality, performance and
 historical findings. Re-observe authorized AEAT/certificate access without
 exposing credentials or taxpayer data.
+
+Before P5 production code, validate and freeze
+`docs/17-roadmap-risk/p5-quality-plan.md` and its machine manifest on the named
+branch. Preserve P4's separate denominator, and make the P4 plan validator
+recognize only those exact P5 paths assigned to the P5 population.
 
 Implement waves P5-A through P5-G with signed+DCO vertical PRs. Complete durable
 record/artifact/event/evidence/outbox ports, identity/idempotency and schema rules;

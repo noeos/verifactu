@@ -809,6 +809,19 @@ export async function executeNodeMutation(root, mutation, options = {}) {
 export function mutationTestPatterns(mutation, test, options = {}) {
   const normalTimeout = options.timeoutMs ?? 90_000;
   if (
+    mutation.module === "internal/xml-provider/worker.mjs" &&
+    mutation.line === 403 &&
+    test === "tests/security/p4-xml-attacks.test.mjs"
+  ) {
+    return [
+      {
+        pattern:
+          "^XML worker normalizes child spawn errors and post-spawn cancellation$",
+        timeoutMs: normalTimeout,
+      },
+    ];
+  }
+  if (
     mutation.module === "packages/verifactu/src/ports/xml-xsd.ts" &&
     test === "tests/unit/p4-xml-model.test.mjs"
   ) {
@@ -817,6 +830,14 @@ export function mutationTestPatterns(mutation, test, options = {}) {
         {
           pattern:
             "^(?:XML model freezes the tree and emits deterministic UTF-8 with expanded names|XML model applies a total serialized-byte ceiling before allocating output|XML model rejects malformed names, bindings, duplicate expanded attributes, and invalid text|XML model accepts each documented exact capacity)$",
+          timeoutMs: normalTimeout,
+        },
+      ];
+    if (mutation.line <= 203)
+      return [
+        {
+          pattern:
+            "^XML model fails closed across namespace, attribute, node, and text boundaries$",
           timeoutMs: normalTimeout,
         },
       ];

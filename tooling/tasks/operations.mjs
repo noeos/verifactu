@@ -35,6 +35,10 @@ import {
 } from "../lib/core.mjs";
 import { discoverOverallMutationCatalog } from "../assurance/p4-mutation-catalog.mjs";
 import { executeOverallMutationCampaign } from "../assurance/p4-overall-mutation-campaign.mjs";
+import {
+  getP5WaveScope,
+  resolveP5Wave,
+} from "../assurance/p5-delivery-stage.mjs";
 
 const PACKAGE_ROOTS = [
   "packages/verifactu",
@@ -247,11 +251,39 @@ function parseImports(source, fileName) {
   return { imports, exportCount };
 }
 
-export function validateImportText(source, fileName, packageRule) {
+export function validateImportText(
+  source,
+  fileName,
+  packageRule,
+  builtinExceptions = [],
+) {
   const { imports, exportCount } = parseImports(source, fileName);
   for (const specifier of imports) {
+    const matchingExceptions = builtinExceptions.filter(
+      (exception) =>
+        exception.file === fileName && exception.specifier === specifier,
+    );
     assert(
-      !packageRule.forbiddenBuiltins?.includes(specifier),
+      matchingExceptions.length <= 1,
+      "IMPORT_EXCEPTION_AMBIGUOUS",
+      `${fileName}: ${specifier}`,
+    );
+    const exception = matchingExceptions[0];
+    if (exception) {
+      assert(
+        typeof exception.rationale === "string" &&
+          exception.rationale.trim().length >= 20 &&
+          typeof exception.owner === "string" &&
+          /^[a-z][a-z0-9-]*-owner$/u.test(exception.owner) &&
+          typeof exception.expires === "string" &&
+          /^\d{4}-\d{2}-\d{2}$/u.test(exception.expires) &&
+          exception.expires > new Date().toISOString().slice(0, 10),
+        "IMPORT_EXCEPTION_INVALID",
+        `${fileName}: ${specifier}`,
+      );
+    }
+    assert(
+      !packageRule.forbiddenBuiltins?.includes(specifier) || exception,
       "IMPORT_FORBIDDEN_BUILTIN",
       `${fileName}: ${specifier}`,
     );
@@ -311,6 +343,29 @@ async function checkArchitecture(root, importRules, files = null) {
       (path) => path.startsWith("packages/") && path.endsWith(".ts"),
     );
   const known = new Set(sourceFiles);
+  const builtinExceptions = importRules.builtinExceptions ?? [];
+  const exceptionKeys = new Set();
+  for (const exception of builtinExceptions) {
+    const key = `${exception.file}\0${exception.specifier}`;
+    assert(!exceptionKeys.has(key), "IMPORT_EXCEPTION_DUPLICATE", key);
+    exceptionKeys.add(key);
+    const packageRule = Object.values(importRules.packages).find((rule) =>
+      exception.file.startsWith(`${rule.root}/`),
+    );
+    assert(
+      packageRule &&
+        known.has(exception.file) &&
+        packageRule.forbiddenBuiltins?.includes(exception.specifier),
+      "IMPORT_EXCEPTION_EDGE",
+      key,
+    );
+    validateImportText(
+      `import ${JSON.stringify(exception.specifier)};`,
+      exception.file,
+      packageRule,
+      builtinExceptions,
+    );
+  }
   const graph = new Map();
   let importCount = 0;
   for (const file of sourceFiles) {
@@ -319,7 +374,12 @@ async function checkArchitecture(root, importRules, files = null) {
     );
     assert(packageRule, "IMPORT_PACKAGE_UNKNOWN", file);
     const source = await readFile(resolve(root, file), "utf8");
-    const parsed = validateImportText(source, file, packageRule);
+    const parsed = validateImportText(
+      source,
+      file,
+      packageRule,
+      builtinExceptions,
+    );
     importCount += parsed.imports.length;
     graph.set(
       file,
@@ -1243,6 +1303,35 @@ async function testPolicy(context) {
           ),
         );
         break;
+      case "exact-builtin-exception": {
+        const file = "packages/verifactu/src/aeat/node-https-transport.ts";
+        const exceptions = [
+          {
+            file,
+            specifier: "node:crypto",
+            rationale:
+              "Node TLS adapter validates certificate fingerprints using the platform cryptographic provider.",
+            owner: "architecture-owner",
+            expires: "2099-12-31",
+          },
+        ];
+        const result = validateImportText(
+          'import "node:crypto";',
+          file,
+          imports.packages["@noeos/verifactu"],
+          exceptions,
+        );
+        assert(result.imports.length === 1, "FIXTURE_IMPORT_EXCEPTION", file);
+        fixtureError("IMPORT_FORBIDDEN_BUILTIN", () =>
+          validateImportText(
+            'import "node:crypto";',
+            "packages/verifactu/src/aeat/other.ts",
+            imports.packages["@noeos/verifactu"],
+            exceptions,
+          ),
+        );
+        break;
+      }
       case "hand-edit":
         fixtureError(fixture.expectedCode, () =>
           validateGenerated({ ...generated, primaryNode: "0.0.0" }, generated),
@@ -5315,6 +5404,341 @@ async function p4QualityPlan(context) {
   return outcome;
 }
 
+async function p5QualityPlan(context) {
+  const wave = resolveP5Wave();
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p5-quality-plan.json"),
+  );
+  const scope = getP5WaveScope(wave, plan);
+  const result = await run("node", ["tooling/assurance/p5-quality-plan.mjs"], {
+    cwd: context.root,
+    timeoutMs: 60000,
+  });
+  assert(
+    result.code === 0,
+    "P5_QUALITY_PLAN_EXECUTION",
+    result.stderr || result.stdout,
+  );
+  const outcome = JSON.parse(result.stdout.trim().split(/\r?\n/u).at(-1));
+  assert(
+    outcome.status === "passed" &&
+      outcome.stage === `P5-${wave}` &&
+      outcome.cumulative === scope.full &&
+      outcome.productionModules === scope.productionModules.length &&
+      outcome.testFiles === scope.testFiles.length &&
+      outcome.criticalBranches === scope.criticalMutantIds.length &&
+      outcome.criticalMutants === scope.criticalMutantIds.length &&
+      outcome.otherMutants === scope.otherMutantIds.length &&
+      outcome.propertyExecutions === scope.propertyIds.length * 4096 &&
+      outcome.faultInjections === scope.faultIds.length &&
+      outcome.compatibilityCells === 5 &&
+      outcome.seededPlanDefectsKilled === 5,
+    "P5_QUALITY_PLAN_CENSUS",
+    JSON.stringify(outcome),
+  );
+  return {
+    selected: 10,
+    executed: 10,
+    passed: 10,
+    outputDigest: outcome.planSha256,
+    diagnostics: [
+      `stage=${outcome.stage}`,
+      `full-population=${scope.full ? "yes" : "no"}`,
+      `production-modules=${outcome.productionModules}`,
+      `test-files=${outcome.testFiles}`,
+      `critical-mutants=${outcome.criticalMutants}/${outcome.criticalMutants}`,
+      `other-mutants=${outcome.otherMutants}`,
+      `property-executions=${outcome.propertyExecutions}`,
+      `fault-injections=${outcome.faultInjections}`,
+      `platform-cells=${outcome.compatibilityCells}`,
+      `seeded-plan-defects-killed=${outcome.seededPlanDefectsKilled}`,
+    ],
+  };
+}
+
+async function testP5(context) {
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p5-quality-plan.json"),
+  );
+  const wave = resolveP5Wave();
+  const scope = getP5WaveScope(wave, plan);
+  const coverageIncludes = [
+    "evidence/runs/artifacts/build/verifactu/dist/persistence/**/*.js",
+    "evidence/runs/artifacts/build/verifactu/dist/aeat/**/*.js",
+    "evidence/runs/artifacts/build/verifactu/dist/operations/**/*.js",
+    "evidence/runs/artifacts/build/verifactu/dist/domain/identities.js",
+  ];
+  const result = await run(
+    process.execPath,
+    [
+      "--experimental-test-coverage",
+      ...coverageIncludes.flatMap((path) => [
+        `--test-coverage-include=${path}`,
+      ]),
+      "--test",
+      "--test-reporter=tap",
+      ...scope.testFiles,
+    ],
+    { cwd: context.root, timeoutMs: 3_600_000 },
+  );
+  const artifactDirectory = resolve(context.root, "evidence/runs/artifacts/p5");
+  await mkdir(artifactDirectory, { recursive: true });
+  await writeFile(
+    resolve(artifactDirectory, "test-tap.txt"),
+    `${result.stdout}${result.stderr}`,
+  );
+  assert(
+    result.code === 0,
+    "P5_TEST_EXECUTION",
+    `${result.stdout}${result.stderr}`.slice(-12_000),
+  );
+  const stats =
+    /^# tests (\d+)\n# suites (\d+)\n# pass (\d+)\n# fail (\d+)\n# cancelled (\d+)\n# skipped (\d+)/mu.exec(
+      result.stdout,
+    );
+  assert(stats, "P5_TEST_REPORT", result.stdout.slice(-2_000));
+  const [, tests, , passed, failed, cancelled, skipped] = stats;
+  assert(
+    Number(tests) > 0 &&
+      Number(tests) === Number(passed) &&
+      Number(failed) === 0 &&
+      Number(cancelled) === 0 &&
+      Number(skipped) === 0,
+    "P5_TEST_COMPLETENESS",
+    `${tests}/${passed}, fail=${failed}, cancelled=${cancelled}, skipped=${skipped}`,
+  );
+  const faultMarkers = [
+    ...result.stdout.matchAll(/^# P5_FAULT_DETECTED (P5-FAULT-\d{3})$/gmu),
+  ].map((match) => match[1]);
+  const plannedFaultIds = scope.faultIds;
+  const faultCounts = new Map(
+    faultMarkers.map((id) => [
+      id,
+      faultMarkers.filter((candidate) => candidate === id).length,
+    ]),
+  );
+  const missingFaultIds = plannedFaultIds.filter(
+    (id) => faultCounts.get(id) !== 1,
+  );
+  assert(
+    missingFaultIds.length === 0 &&
+      faultMarkers.length === plannedFaultIds.length,
+    "P5_FAULT_CENSUS",
+    JSON.stringify({
+      planned: plannedFaultIds.length,
+      observed: faultMarkers.length,
+      missingOrDuplicate: missingFaultIds,
+    }),
+  );
+  const performanceLine = result.stdout
+    .split(/\r?\n/u)
+    .find((line) => line.startsWith("# P5_PERFORMANCE_METRICS "));
+  let performanceMetrics = null;
+  if (scope.full) {
+    assert(
+      performanceLine,
+      "P5_PERFORMANCE_METRICS_MISSING",
+      "recovery campaign did not report the frozen performance metrics",
+    );
+    performanceMetrics = JSON.parse(
+      performanceLine.slice("# P5_PERFORMANCE_METRICS ".length),
+    );
+    assert(
+      Number.isFinite(performanceMetrics.wallMs) &&
+        performanceMetrics.wallMs >= 0 &&
+        performanceMetrics.wallMs <=
+          plan.performance.hardBounds.campaignDeadlineMs &&
+        Number.isSafeInteger(performanceMetrics.peakRssBytes) &&
+        performanceMetrics.peakRssBytes > 0 &&
+        Number.isFinite(performanceMetrics.eventLoopDelayMs) &&
+        performanceMetrics.eventLoopDelayMs >= 0 &&
+        Number.isSafeInteger(performanceMetrics.queueHighWater) &&
+        performanceMetrics.queueHighWater > 0 &&
+        Number.isSafeInteger(
+          performanceMetrics.maxConcurrentSyntheticOperations,
+        ) &&
+        performanceMetrics.maxConcurrentSyntheticOperations <=
+          plan.performance.hardBounds.maxConcurrentSyntheticOperations &&
+        Number.isSafeInteger(
+          performanceMetrics.openHandlesBeforeAfter?.before,
+        ) &&
+        Number.isSafeInteger(
+          performanceMetrics.openHandlesBeforeAfter?.after,
+        ) &&
+        performanceMetrics.openHandlesBeforeAfter.before < 128 &&
+        performanceMetrics.openHandlesBeforeAfter.after < 128 &&
+        performanceMetrics.openHandlesBeforeAfter.after <=
+          performanceMetrics.openHandlesBeforeAfter.before + 8,
+      "P5_PERFORMANCE_METRICS_INVALID",
+      JSON.stringify(performanceMetrics),
+    );
+  } else {
+    assert(
+      performanceLine === undefined,
+      "P5_STAGE_PERFORMANCE_SCOPE",
+      `the full recovery performance campaign belongs to P5-G, got P5-${wave}`,
+    );
+  }
+  const coverage =
+    /^# all files\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)\s+\|\s+([\d.]+)/mu.exec(
+      result.stdout,
+    );
+  assert(coverage, "P5_COVERAGE_REPORT", result.stdout.slice(-4_000));
+  const [, linesText, branchesText, functionsText] = coverage;
+  const lines = Number(linesText);
+  const branches = Number(branchesText);
+  const functions = Number(functionsText);
+  assert(
+    lines >= plan.coverage.thresholds.linesPercent &&
+      branches >= plan.coverage.thresholds.branchesPercent &&
+      functions >= plan.coverage.thresholds.functionsPercent,
+    "P5_COVERAGE_THRESHOLD",
+    `line=${lines}, branch=${branches}, function=${functions}; required ${plan.coverage.thresholds.linesPercent}/${plan.coverage.thresholds.branchesPercent}/${plan.coverage.thresholds.functionsPercent}`,
+  );
+  for (const module of [
+    ...scope.productionModules,
+    ...scope.sharedProductionModules,
+  ]) {
+    const name = basename(module).replace(/\.ts$/u, ".js");
+    assert(result.stdout.includes(name), "P5_COVERAGE_MODULE_MISSING", module);
+  }
+  for (const campaign of plan.propertyCampaigns.filter((candidate) =>
+    scope.propertyIds.includes(candidate.id),
+  )) {
+    assert(
+      result.stdout.includes(
+        `${campaign.id} seed=${campaign.seed} executions=${campaign.executions}`,
+      ),
+      "P5_PROPERTY_CAMPAIGN_MISSING",
+      campaign.id,
+    );
+  }
+  for (const campaign of plan.propertyCampaigns) {
+    const shouldRun = scope.propertyIds.includes(campaign.id);
+    assert(
+      result.stdout.includes(campaign.id) === shouldRun,
+      "P5_PROPERTY_STAGE_SCOPE",
+      `${campaign.id} expected=${shouldRun}`,
+    );
+  }
+  return {
+    selected: Number(tests),
+    executed: Number(passed),
+    passed: Number(passed),
+    outputDigest: sha256(result.stdout + result.stderr),
+    diagnostics: [
+      `testCases=${tests}`,
+      `coverage.line=${lines}`,
+      `coverage.branch=${branches}`,
+      `coverage.function=${functions}`,
+      `stage=P5-${wave}`,
+      `cumulative=${scope.full}`,
+      `testFiles=${scope.testFiles.length}/${plan.testFiles.length}`,
+      `properties=${scope.propertyIds.length}/${plan.propertyCampaigns.length} executions=${scope.propertyIds.length * 4096}/${plan.propertyCampaigns.length * 4096}`,
+      `faultInjections=${faultMarkers.length}/${plannedFaultIds.length}`,
+      ...(performanceMetrics
+        ? [
+            `performance.wallMs=${performanceMetrics.wallMs}`,
+            `performance.peakRssBytes=${performanceMetrics.peakRssBytes}`,
+            `performance.eventLoopDelayMs=${performanceMetrics.eventLoopDelayMs}`,
+            `performance.queueHighWater=${performanceMetrics.queueHighWater}`,
+            `performance.openHandles=${performanceMetrics.openHandlesBeforeAfter.before}->${performanceMetrics.openHandlesBeforeAfter.after}`,
+          ]
+        : []),
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
+async function p5Mutation(context) {
+  const wave = resolveP5Wave();
+  const plan = await readJson(
+    resolve(context.root, "config/quality/p5-quality-plan.json"),
+  );
+  const scope = getP5WaveScope(wave, plan);
+  const result = await run(
+    process.execPath,
+    ["tooling/assurance/p5-mutation-campaign.mjs"],
+    {
+      cwd: context.root,
+      timeoutMs: 3_600_000,
+      env: {
+        ...process.env,
+        VERIFACTU_SUBJECT_SHA: context.identity.subject,
+        VERIFACTU_SUBJECT_TREE: context.identity.tree,
+      },
+    },
+  );
+  assert(
+    result.code === 0,
+    "P5_MUTATION_EXECUTION",
+    `${result.stdout}${result.stderr}`.slice(-12_000),
+  );
+  const reportLine = result.stdout
+    .split(/\r?\n/u)
+    .find((line) => line.startsWith('{"schemaVersion":1,"status":'));
+  assert(reportLine, "P5_MUTATION_REPORT", result.stdout.slice(-4_000));
+  const report = JSON.parse(reportLine);
+  const durableReport = JSON.parse(
+    await readFile(
+      resolve(context.root, "evidence/runs/artifacts/p5/mutation-report.json"),
+      "utf8",
+    ),
+  );
+  assert(
+    durableReport.subject === context.identity.subject &&
+      durableReport.tree === context.identity.tree,
+    "P5_MUTATION_SUBJECT",
+    JSON.stringify({
+      report: durableReport.subject,
+      expected: context.identity.subject,
+      tree: durableReport.tree,
+      expectedTree: context.identity.tree,
+    }),
+  );
+  assert(
+    sha256(canonicalJson(durableReport)) === sha256(canonicalJson(report)),
+    "P5_MUTATION_DURABLE_REPORT",
+    "stdout and evidence artifact differ",
+  );
+  assert(
+    report.status === "passed" &&
+      report.stage === `P5-${wave}` &&
+      report.cumulative === scope.full &&
+      report.criticalKilled === scope.criticalMutantIds.length &&
+      report.criticalTotal === scope.criticalMutantIds.length &&
+      (report.otherKilled / Math.max(1, scope.otherMutantIds.length)) * 100 >=
+        (scope.otherMutantIds.length > 0
+          ? plan.mutation.otherKilledPercent
+          : 0) &&
+      report.otherTotal === scope.otherMutantIds.length &&
+      report.results.length ===
+        scope.criticalMutantIds.length + scope.otherMutantIds.length &&
+      [...report.results.map((item) => item.id)].sort().join(",") ===
+        [...scope.criticalMutantIds, ...scope.otherMutantIds].sort().join(","),
+    "P5_MUTATION_COMPLETENESS",
+    JSON.stringify({
+      criticalKilled: report.criticalKilled,
+      otherKilled: report.otherKilled,
+      results: report.results?.length,
+    }),
+  );
+  return {
+    selected: scope.criticalMutantIds.length + scope.otherMutantIds.length,
+    executed: report.results.length,
+    passed: report.results.filter((item) => item.outcome === "killed").length,
+    outputDigest: sha256(result.stdout + result.stderr),
+    diagnostics: [
+      `stage=P5-${wave}`,
+      `cumulative=${scope.full}`,
+      `criticalMutants=${report.criticalKilled}/${report.criticalTotal}`,
+      `otherMutants=${report.otherKilled}/${report.otherTotal}`,
+      `syntaxCandidatesExcluded=${report.candidateSyntaxExcluded}`,
+      `subject=${context.identity.subject}`,
+    ],
+  };
+}
+
 async function gate(context) {
   const failures = context.dependencyReports.filter(
     (report) => report.status !== "passed",
@@ -5381,6 +5805,9 @@ export const operations = {
   gateP3,
   p3bAssurance,
   p4QualityPlan,
+  p5QualityPlan,
+  testP5,
+  p5Mutation,
   gate,
 };
 
@@ -5430,5 +5857,8 @@ export const operationCapabilities = Object.freeze({
   gateP3: { tools: [], network: "denied" },
   p3bAssurance: { tools: ["git", "node"], network: "denied" },
   p4QualityPlan: { tools: ["git", "node", "python"], network: "denied" },
+  p5QualityPlan: { tools: ["node"], network: "denied" },
+  testP5: { tools: ["node"], network: "denied" },
+  p5Mutation: { tools: ["node", "typescript"], network: "denied" },
   gate: { tools: [], network: "denied" },
 });

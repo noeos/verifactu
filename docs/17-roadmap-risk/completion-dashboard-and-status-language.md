@@ -5,8 +5,8 @@ status: approved
 authority: normative
 owner: documentation-owner
 created: 2026-09-12
-last-reviewed: 2026-09-25
-decisions: [ADR-0051, ADR-0052, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
+last-reviewed: 2026-10-03
+decisions: [ADR-0051, ADR-0052, ADR-0053, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 historical-inputs: [REV-063, REV-074, REV-080]
 ---
 
@@ -23,8 +23,14 @@ cannot edit underlying status or hide blocked work.
 
 ## Current scoped status
 
-P1, P2, P3, P3-B and the zero-code P4-readiness gate are evidence-complete at
-their protected subjects. P4-A is ready at protected `main`
-`763b58239d9e589e377b86928ecfc953d72f321b`; no P4 implementation has started.
-P4–P8 remain unimplemented. `creationAllowed=false` and no fiscal-compliance,
-AEAT-acceptance, publication or release claim is made.
+P1, P2, P3, P3-B and the zero-code P4-readiness gate remain evidence-complete
+at their recorded protected subjects. P4-A through P4-G implementation is
+merged at protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4
+phase closure is blocked: its exact PR-head OSV, npm audit/signature/licence and
+derived required-check closure contexts failed. ADR-0060 authorizes P5 branch
+implementation on issue #113, and that work is active on
+`work/p5-implementation`; open P4 closure rows do not block development there.
+P5 protected merges still require their normal passing checks, and P5 phase
+closure remains gated until applicable P4 closure rows are resolved. P6–P8 are
+planned. `creationAllowed=false` and no fiscal-compliance, AEAT-acceptance,
+publication or release claim is made.

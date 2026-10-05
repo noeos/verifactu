@@ -17,10 +17,27 @@ creation instant source, predecessor checkpoint and signer/anchor evidence. A
 timestamp or caller assertion without identity/digest/external trust is not
 freshness evidence.
 
+Every checkpoint admitted for startup recovery must carry the digest of its
+configured external anchor. The digest is an identifier for evidence; it does
+not itself prove the anchor is independent or authentic. The checkpoint-store
+adapter must verify the complete chain and authenticate the configured anchor
+before returning `chainVerified: true`. Missing anchor evidence, malformed
+head/manifest/predecessor digests, or a checkpoint dated after the observed
+startup instant blocks workers and network activity.
+
 At startup and before sensitive export/recovery, compare current monotonic
 positions and head digests to the latest independently retained checkpoint.
 Regression, missing checkpoint chain, store replacement, truncated journal,
 fork or future/invalid time blocks mutation and raises an incident.
+
+The persistence contract exposes `RecoveryCheckpointStore` through
+`PersistencePorts`. `readLatest` is deadline-bound and accepts an abort signal;
+an unavailable, timed-out or canceled read blocks worker discovery and network
+activity. A successful read includes verification of the complete checkpoint
+chain and configured anchor. `compareAndAppend` stages an immutable checkpoint
+in the host UoW and atomically compares its predecessor digest, so checkpoint
+advancement cannot split from the record, journal, head and outbox commit.
+Replays are accepted only when all checkpoint fields match.
 
 Anchoring options are signed checkpoints held outside the primary mutable store
 or a host-controlled independent durable service. Exact trust and availability

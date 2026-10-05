@@ -5,8 +5,8 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-12
-last-reviewed: 2026-09-25
-decisions: [ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058]
+last-reviewed: 2026-10-04
+decisions: [ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 ---
 
 # Open questions and blockers
@@ -20,13 +20,16 @@ Questions cannot live only in prose/issue comments. Overdue/unknown authority an
 decisions made without evidence appear in generated status. Resolution updates
 requirements/ADR/tests/risks; deletion without disposition fails.
 
-## Current P3-B baseline
+## Historical P3-B baseline and downstream questions
 
-Protected P1–P3 work now admits the immutable authoritative source snapshot,
-deterministic candidate contracts, independent oracle, package shells,
-workflows and exact-subject phase evidence described by
-[`p3b-evidence.md`](p3b-evidence.md). P4 has not started and fiscal execution,
-release and external-acceptance questions remain prospective.
+This table preserves the P3-B-era blocker snapshot; its then-current statement
+that P4 had not started is historical. Protected P1–P3-B are evidence-complete;
+P4-A…P4-G implementation has since merged while P4 phase closure remains
+blocked, and P5 implementation is active under ADR-0060. For current phase
+state, exact checks and P4/P5 blockers, use
+[`handoff.md`](handoff.md). The requirements below remain valid where applicable
+to current downstream work; historical P3-B resolutions retain their evidence
+in [`p3b-evidence.md`](p3b-evidence.md).
 
 | Question or blocker                                         | Required decision or evidence                                                                         | Impact if unresolved                                                  |
 | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |

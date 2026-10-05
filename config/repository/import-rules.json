@@ -19,6 +19,7 @@
       "forbiddenPrefixes": ["@noeos/verification-engine/"],
       "forbiddenBuiltins": [
         "node:child_process",
+        "node:dns",
         "node:crypto",
         "node:fs",
         "node:http",
@@ -46,5 +47,119 @@
     "../internal/",
     "../tests/"
   ],
-  "exceptions": []
+  "exceptions": [],
+  "builtinExceptions": [
+    {
+      "file": "packages/verifactu/src/operations/safe-observability.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/persistence/model.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/edition-profile.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/persistence/backup-restore.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/persistence/retention.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/soap-wire.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/node-https-transport.ts",
+      "specifier": "node:crypto",
+      "rationale": "Node HTTPS adapter uses the platform cryptographic provider for certificate validation and peer fingerprints.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/response-parser.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/submission-coordinator.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/batch-planner.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/consultation.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/correlation.ts",
+      "specifier": "node:crypto",
+      "rationale": "P5 uses the platform SHA-256 provider to bind canonical fiscal and persistence bytes to their digests.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/node-https-transport.ts",
+      "specifier": "node:dns",
+      "rationale": "The Node HTTPS adapter resolves and pins endpoint addresses before opening a socket.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/node-https-transport.ts",
+      "specifier": "node:https",
+      "rationale": "The Node HTTPS adapter performs one bounded TLS request through the approved transport port.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/node-https-transport.ts",
+      "specifier": "node:net",
+      "rationale": "The Node HTTPS adapter validates IP literals and pins the resolved peer address.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    },
+    {
+      "file": "packages/verifactu/src/aeat/node-https-transport.ts",
+      "specifier": "node:tls",
+      "rationale": "The Node HTTPS adapter inspects the authenticated TLS peer without exposing certificate material.",
+      "owner": "architecture-owner",
+      "expires": "2026-12-31"
+    }
+  ]
 }

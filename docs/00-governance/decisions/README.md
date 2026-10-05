@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11
-last-reviewed: 2026-09-25
+last-reviewed: 2026-10-03
 ---
 
 # Governance decision records
@@ -76,3 +76,4 @@ capabilities have been implemented.
 | [ADR-0057](ADR-0057-local-eu-dss-provider.md) | Use local EU DSS 6.5 behind a private, fully admitted XAdES/PKI provider boundary. |
 | [ADR-0058](ADR-0058-p4-order-and-exhaustive-assurance.md) | Enforce serial P4-A→G delivery and frozen whole-population quality gates. |
 | [ADR-0059](ADR-0059-xml-xsd-provider.md) | Admit lxml as P4-C provider candidate and xmlschema as independent oracle. |
+| [ADR-0060](ADR-0060-scoped-p5-start-with-open-p4-closure.md) | Authorize continued work on the named P5 implementation branch while P4 closure remains incomplete; keep merge and closure gates intact. |

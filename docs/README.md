@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11
-last-reviewed: 2026-09-13
+last-reviewed: 2026-10-05
 ---
 
 # VeriFactu documentation
@@ -25,11 +25,20 @@ maintained synthetic host, but MUST NOT claim or require a real Facturacion
 integration. That integration will be implemented and evidenced later in the
 separate Facturacion repository.
 
-This repository has protected P1–P3 foundation, package-shell, source-custody,
-generated-contract and assurance infrastructure. P3-B is active and P4 has not
-started: there is no fiscal runtime behavior, compliance claim, published
-package or release authorization. The approved specifications and generated
-candidate contracts remain distinct from evidence that later phases ran.
+Protected P1–P3-B foundation work is evidence-complete at its recorded subjects.
+P4-A…P4-G implementation is merged on protected `main`, while P4 phase closure
+remains `blocked` by its exact required-check findings. Under ADR-0060, P5
+implementation is active on issue #113's `work/p5-implementation` branch and
+may continue while P4 closure remains open. The local P5 synthetic campaign has
+passed; it does not establish production-backend qualification, external AEAT
+acceptance, a compliance claim, publication or release authorization. See the
+[current handoff](17-roadmap-risk/handoff.md) for exact subjects, checks and
+remaining blockers. To start or resume P5, use the P5 section in
+[`prompts.md`](17-roadmap-risk/prompts.md): it directs the session to proceed
+with authorized branch implementation while carrying P4's unresolved closure
+rows forward. ADR-0060 amends the general predecessor-closure rule for P5
+implementation entry; normal protected checks and the documented P5 exit
+criteria remain in force.
 
 The approved documentation map and the rules for developing it are recorded in
 [`STRUCTURE.md`](STRUCTURE.md).
