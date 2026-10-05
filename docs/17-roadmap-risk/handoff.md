@@ -39,7 +39,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current state is amended by the latest numbered P5 amendment in this file
-(currently P5-027) and ADR-0060. A session resuming P5 must read that amendment
+(currently P5-028) and ADR-0060. A session resuming P5 must read that amendment
 and inspect live GitHub state; older snapshots are historical.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
@@ -5389,3 +5389,78 @@ This documentation change creates a new exact subject. Re-read every workflow
 on its resulting head before treating any check as current. P4 remains blocked
 by its three exact closure failures; this clarification changes no check result
 and authorizes no waiver.
+
+## Amendment P5-028 — 2026-10-05 P5-A defensive snapshot fix and exact-head read-back
+
+This amendment supersedes P5-027 as the active-state snapshot. At 10:32 UTC,
+protected `main` remained `1f66da46e21127d1d82018cfdf093f595e1c08ae`, and the
+active `protected-main` ruleset required all 17 strict contexts, signatures,
+linear history and squash integration. PR #109 exact head
+`2396d87a3748e20a1a02f66a5b4ab21337f758ce` remained merged with its three
+terminal failures: `Required · OSV`, `Required · npm audit signatures and
+licenses`, and derived `Required · required-check closure`.
+
+### P5-A correction and local evidence
+
+- P5-A exposed three flaws in persistence model validation: `Buffer.slice()`
+  retains shared backing memory; accepted identity and context objects were
+  retained by reference; and an invalid predecessor identity normalized to
+  `null`, the same value as an absent predecessor. The validators now take
+  actual byte copies, clone/freeze identity and context values through the
+  domain factories, and reject an invalid non-null predecessor.
+- Regression tests mutate caller-owned buffers, identities and contexts after
+  validation and assert that the accepted snapshots remain unchanged. The
+  critical P5-MUT-013 needle now targets the preserved byte-digest check over
+  the copied bytes; the mutant ID, scope, critical classification and kill
+  criterion are unchanged.
+- Exact local evidence on signed+DCO P5-A commit
+  `cb874b069179f5393b2e97aacbd16e81def80abe` (tree
+  `344f65f442107b7a24c52d5be133fe90b022531e`): `gate:p5` 2/2;
+  `test:p5` 9/9 across 2/2 P5-A files, 100% lines, 98.43% branches and 100%
+  functions, with 16,384/16,384 property executions; quality plan 10/10;
+  mutation 2/2 (critical 1/1, other 1/1); types 3/3; format 101/101; lint
+  61/61. These reports are retained in the P5-A worktree and bound to that
+  exact subject. The P5-A branch is clean and pushed at this SHA.
+- `gate:p4-readiness` could not start its substantive checks in this local
+  environment because the required absolute Java, Maven, `JAVA_HOME` and Maven
+  local-repository paths were not admitted. This is unavailable local evidence,
+  not a P4 pass or a new P4 finding; protected P4 evidence remains the exact
+  GitHub read-back above.
+
+### Current P5-A and dependency state
+
+- PR #118 is open and `BLOCKED` at exact head
+  `cb874b069179f5393b2e97aacbd16e81def80abe`, based on protected main
+  `1f66da46e21127d1d82018cfdf093f595e1c08ae`. All its reported check-runs were
+  queued at 10:32 UTC. Pending means unknown, not passed; reread every required
+  workflow on this new exact head. Do not start P5-B on its delivery branch
+  until A has merged with all required contexts and closure successful.
+- The previous exact-head Engineering CI run `37281718987` for A head `916a667`
+  completed successfully at 10:26 UTC. The old-head Required run `37281716417`
+  remained queued overall: OSV and npm audit failed; CodeQL, dependency review,
+  quality/policy, supply chain, regulatory, packed consumers and performance
+  passed; several matrix, signature, integration, package and secret jobs were
+  still pending or running. None of those results substitutes for `cb874b0`.
+- The published npm `11.20.0` tarball was independently inspected at registry
+  integrity
+  `sha512-dF3EDFwbYN+N5RUip+ZYDe0NeURK5BgqKOcvT1iNtUYhTMTl0FwWhBuXrS7KtXyduqyTMS5aaQaregnHDAxNgw==`.
+  It supports the Node 22.14.0 floor but still bundles
+  `brace-expansion@5.0.9`, `http-cache-semantics@4.2.0`,
+  `ip-address@10.5.0` and `undici@6.28.0`; it does not resolve the scanner
+  findings. No dependency, scanner or Node-floor policy was changed.
+
+### P5-D protocol-peer review finding
+
+The normative [`local protocol harness`](../09-aeat-integration/local-protocol-harness.md)
+requires an independent strict SOAP peer that validates request headers,
+namespaces, schema, identities, order, limits and correlation. Current
+`tests/integration/p5-aeat-transport.test.mjs` uses a TLS server that captures
+the serializer-produced body and echoes generic responses; it does not
+independently validate the SOAP contract. The current
+`tests/contract/p5-local-peer-contract.test.mjs` exercises a stub transport
+port, not that peer. This remains an explicit P5-D implementation requirement;
+it does not authorize starting wave D before A/B/C are accepted in sequence.
+
+This amendment changes documentation on PR #114 and creates a new subject.
+Re-read all workflows for its resulting head. It changes no P4 status, P5-A
+check result, dependency finding, wave order or protected-merge requirement.
