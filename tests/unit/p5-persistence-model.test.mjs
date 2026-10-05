@@ -86,6 +86,9 @@ test("P5 immutable record validates context, edition, sequence and canonical byt
   const originalByte = byteSnapshot.value.canonicalBytes[0];
   mutableBytes[0] ^= 0xff;
   assert.equal(byteSnapshot.value.canonicalBytes[0], originalByte);
+  const exposedRecordBytes = byteSnapshot.value.canonicalBytes;
+  exposedRecordBytes[0] ^= 0xff;
+  assert.deepEqual(Buffer.from(byteSnapshot.value.canonicalBytes), recordBytes);
   const mutableContext = { ...context, tenantId: { kind: "tenant", value: "tenant-a" } };
   const mutableId = { kind: "record", value: "record-mutable" };
   const snapshotted = validateRecord({ ...valid, id: mutableId, context: mutableContext,
@@ -138,6 +141,9 @@ test("artifact descriptors bind exact bytes, length, both digests and context", 
   const originalByte = byteSnapshot.value.bytes[0];
   mutableBytes[0] ^= 0xff;
   assert.equal(byteSnapshot.value.bytes[0], originalByte);
+  const exposedArtifactBytes = byteSnapshot.value.bytes;
+  exposedArtifactBytes[0] ^= 0xff;
+  assert.deepEqual(Buffer.from(byteSnapshot.value.bytes), bytes);
   const mutableContext = { ...context, tenantId: { kind: "tenant", value: "tenant-a" } };
   const mutableId = { kind: "operation", value: "op-mutable" };
   const snapshotted = validateArtifact({ ...descriptor, id: mutableId, context: mutableContext }, bytes);

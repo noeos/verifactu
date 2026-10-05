@@ -241,16 +241,19 @@ export function validateRecord(
     createFiscalInstant(record.createdAt).status !== "ok"
   )
     return storeFailure("invalid", "invalid-input");
-  return storeOk(
-    Object.freeze({
-      ...record,
-      id: recordId,
-      context: context.value,
-      editionId,
-      predecessorId,
-      canonicalBytes,
-    }),
-  );
+  const snapshot = {
+    ...record,
+    id: recordId,
+    context: context.value,
+    editionId,
+    predecessorId,
+    canonicalBytes,
+  };
+  Object.defineProperty(snapshot, "canonicalBytes", {
+    enumerable: true,
+    get: () => Uint8Array.from(canonicalBytes),
+  });
+  return storeOk(Object.freeze(snapshot));
 }
 
 export function validateArtifact(
@@ -283,16 +286,19 @@ export function validateArtifact(
     createFiscalInstant(descriptor.createdAt).status !== "ok"
   )
     return storeFailure("invalid", "invalid-input");
-  return storeOk(
-    Object.freeze({
-      descriptor: Object.freeze({
-        ...descriptor,
-        id: identity,
-        context: context.value,
-      }),
-      bytes: exactBytes,
+  const snapshot = {
+    descriptor: Object.freeze({
+      ...descriptor,
+      id: identity,
+      context: context.value,
     }),
-  );
+    bytes: exactBytes,
+  };
+  Object.defineProperty(snapshot, "bytes", {
+    enumerable: true,
+    get: () => Uint8Array.from(exactBytes),
+  });
+  return storeOk(Object.freeze(snapshot));
 }
 
 export function validateEvidenceClaim(
