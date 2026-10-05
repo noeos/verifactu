@@ -1,15 +1,10 @@
 import { createHash } from "node:crypto";
 import { invalid, ok, type Result } from "../contracts/results.js";
 import type { FiscalContext } from "../domain/context.js";
-import { createFiscalContext } from "../domain/context.js";
 import type { FiscalInstant } from "../domain/date-time.js";
 import { createFiscalInstant } from "../domain/date-time.js";
 import type { Identity, IdentityKind } from "../domain/identities.js";
-import {
-  createIdentity,
-  identityKey,
-  isIdentity,
-} from "../domain/identities.js";
+import { createIdentity, identityKey } from "../domain/identities.js";
 
 export const PERSISTENCE_SCHEMA_VERSION = 1 as const;
 export type Sha256 = `sha256:${string}`;
@@ -192,147 +187,290 @@ export function sha512Digest(bytes: Uint8Array): `sha512:${string}` {
   return `sha512:${createHash("sha512").update(bytes).digest("hex")}`;
 }
 
+function ownDataProperties(
+  value: unknown,
+  names: readonly string[],
+): Record<string, unknown> | null {
+  if (!value || typeof value !== "object") return null;
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  const keys = Reflect.ownKeys(descriptors);
+  if (
+    keys.length !== names.length ||
+    keys.some((key) => typeof key !== "string" || !names.includes(key))
+  )
+    return null;
+  const result: Record<string, unknown> = Object.create(null);
+  for (const name of names) {
+    const descriptor = descriptors[name];
+    if (!descriptor || !Object.hasOwn(descriptor, "value")) return null;
+    result[name] = descriptor.value;
+  }
+  return result;
+}
+
 function snapshotIdentity<K extends IdentityKind>(
   value: unknown,
   kind: K,
 ): Identity<K> | null {
-  if (!isIdentity(value, kind)) return null;
-  const result = createIdentity(kind, value.value);
+  const input = ownDataProperties(value, ["kind", "value"]);
+  if (
+    !input ||
+    input.kind !== kind ||
+    typeof input.value !== "string" ||
+    input.value.length < 1 ||
+    input.value.length > 128 ||
+    input.value !== input.value.trim() ||
+    /[\u0000-\u001f\u007f]/u.test(input.value)
+  )
+    return null;
+  const result = createIdentity(kind, input.value);
   return result.status === "ok" ? result.value : null;
+}
+
+function snapshotContext(value: unknown): FiscalContext | null {
+  const input = ownDataProperties(value, [
+    "tenantId",
+    "taxpayerId",
+    "installationId",
+    "editionId",
+  ]);
+  if (!input) return null;
+  const tenantId = snapshotIdentity(input.tenantId, "tenant");
+  const taxpayerId = snapshotIdentity(input.taxpayerId, "taxpayer");
+  const installationId = snapshotIdentity(input.installationId, "installation");
+  const editionId = snapshotIdentity(input.editionId, "edition");
+  if (!tenantId || !taxpayerId || !installationId || !editionId) return null;
+  return Object.freeze({ tenantId, taxpayerId, installationId, editionId });
+}
+
+function snapshotStringArray(value: unknown, maximum: number): string[] | null {
+  if (!Array.isArray(value)) return null;
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  const properties = descriptors as unknown as Record<
+    string,
+    PropertyDescriptor
+  >;
+  const lengthDescriptor = properties.length;
+  if (
+    !lengthDescriptor ||
+    !Object.hasOwn(lengthDescriptor, "value") ||
+    !Number.isSafeInteger(lengthDescriptor.value) ||
+    lengthDescriptor.value < 0 ||
+    lengthDescriptor.value > maximum
+  )
+    return null;
+  const length = lengthDescriptor.value as number;
+  const keys = Reflect.ownKeys(descriptors);
+  if (
+    keys.length !== length + 1 ||
+    keys.some(
+      (key) =>
+        key !== "length" &&
+        (typeof key !== "string" || !/^(0|[1-9]\d*)$/u.test(key)),
+    )
+  )
+    return null;
+  const result: string[] = [];
+  for (let index = 0; index < length; index += 1) {
+    const descriptor = descriptors[index];
+    if (!descriptor || !Object.hasOwn(descriptor, "value")) return null;
+    if (typeof descriptor.value !== "string") return null;
+    result.push(descriptor.value);
+  }
+  return result;
 }
 
 export function validateRecord(
   record: ImmutableRecord,
 ): StoreResult<ImmutableRecord> {
-  const context = record && createFiscalContext(record.context);
-  const canonicalBytes =
-    record?.canonicalBytes instanceof Uint8Array
-      ? Uint8Array.from(record.canonicalBytes)
-      : null;
-  const recordId = record ? snapshotIdentity(record.id, "record") : null;
-  const editionId = record
-    ? snapshotIdentity(record.editionId, "edition")
-    : null;
-  const predecessorId: Identity<"record"> | null =
-    record?.predecessorId === null
-      ? null
-      : record
-        ? snapshotIdentity(record.predecessorId, "record")
+  try {
+    const input = ownDataProperties(record, [
+      "id",
+      "context",
+      "schemaVersion",
+      "editionId",
+      "kind",
+      "predecessorId",
+      "semanticDigest",
+      "canonicalBytes",
+      "createdAt",
+      "sequence",
+    ]);
+    if (!input) return storeFailure("invalid", "invalid-input");
+    const context = snapshotContext(input.context);
+    const canonicalBytes =
+      input.canonicalBytes instanceof Uint8Array
+        ? Uint8Array.from(input.canonicalBytes)
         : null;
-  if (
-    !record ||
-    typeof record !== "object" ||
-    record.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
-    !recordId ||
-    !editionId ||
-    (record.predecessorId !== null && !predecessorId) ||
-    predecessorId?.value === recordId.value ||
-    context?.status !== "ok" ||
-    context.value.editionId.value !== editionId.value ||
-    !["alta", "anulacion", "correction", "substitution"].includes(
-      record.kind,
-    ) ||
-    !canonicalBytes ||
-    canonicalBytes.byteLength === 0 ||
-    canonicalBytes.byteLength > 1_048_576 ||
-    record.semanticDigest !== sha256Digest(canonicalBytes) ||
-    !Number.isSafeInteger(record.sequence) ||
-    record.sequence < 1 ||
-    createFiscalInstant(record.createdAt).status !== "ok"
-  )
+    const recordId = snapshotIdentity(input.id, "record");
+    const editionId = snapshotIdentity(input.editionId, "edition");
+    const predecessorId: Identity<"record"> | null =
+      input.predecessorId === null
+        ? null
+        : snapshotIdentity(input.predecessorId, "record");
+    if (
+      input.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
+      !recordId ||
+      !editionId ||
+      (input.predecessorId !== null && !predecessorId) ||
+      predecessorId?.value === recordId.value ||
+      !context ||
+      context.editionId.value !== editionId.value ||
+      !["alta", "anulacion", "correction", "substitution"].includes(
+        input.kind as string,
+      ) ||
+      !canonicalBytes ||
+      canonicalBytes.byteLength === 0 ||
+      canonicalBytes.byteLength > 1_048_576 ||
+      input.semanticDigest !== sha256Digest(canonicalBytes) ||
+      !Number.isSafeInteger(input.sequence) ||
+      (input.sequence as number) < 1 ||
+      createFiscalInstant(input.createdAt as string).status !== "ok"
+    )
+      return storeFailure("invalid", "invalid-input");
+    const snapshot = {
+      id: recordId,
+      context,
+      schemaVersion: PERSISTENCE_SCHEMA_VERSION,
+      editionId,
+      kind: input.kind as ImmutableRecord["kind"],
+      predecessorId,
+      semanticDigest: input.semanticDigest as Sha256,
+      createdAt: input.createdAt as FiscalInstant,
+      sequence: input.sequence as number,
+      canonicalBytes,
+    };
+    Object.defineProperty(snapshot, "canonicalBytes", {
+      enumerable: true,
+      get: () => Uint8Array.from(canonicalBytes),
+    });
+    return storeOk(Object.freeze(snapshot));
+  } catch {
     return storeFailure("invalid", "invalid-input");
-  const snapshot = {
-    ...record,
-    id: recordId,
-    context: context.value,
-    editionId,
-    predecessorId,
-    canonicalBytes,
-  };
-  Object.defineProperty(snapshot, "canonicalBytes", {
-    enumerable: true,
-    get: () => Uint8Array.from(canonicalBytes),
-  });
-  return storeOk(Object.freeze(snapshot));
+  }
 }
 
 export function validateArtifact(
-  descriptor: ArtifactDescriptor,
+  candidate: ArtifactDescriptor,
   bytes: Uint8Array,
 ): StoreResult<ArtifactObject> {
-  const context = descriptor && createFiscalContext(descriptor.context);
-  const identity = descriptor
-    ? snapshotIdentity(descriptor.id, "operation")
-    : null;
-  const exactBytes =
-    bytes instanceof Uint8Array ? Uint8Array.from(bytes) : null;
-  if (
-    !descriptor ||
-    typeof descriptor !== "object" ||
-    descriptor.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
-    context?.status !== "ok" ||
-    !identity ||
-    !isSafeStoreToken(descriptor.artifactId) ||
-    !/^[a-zA-Z0-9][a-zA-Z0-9.+/-]{0,126}[a-zA-Z0-9]$/u.test(
-      descriptor.mediaType,
-    ) ||
-    !Number.isSafeInteger(descriptor.byteLength) ||
-    descriptor.byteLength < 0 ||
-    descriptor.byteLength > 1_048_576 ||
-    !exactBytes ||
-    exactBytes.byteLength !== descriptor.byteLength ||
-    sha256Digest(exactBytes) !== descriptor.sha256 ||
-    sha512Digest(exactBytes) !== descriptor.sha512 ||
-    createFiscalInstant(descriptor.createdAt).status !== "ok"
-  )
-    return storeFailure("invalid", "invalid-input");
-  const snapshot = {
-    descriptor: Object.freeze({
-      ...descriptor,
+  try {
+    const input = ownDataProperties(candidate, [
+      "id",
+      "context",
+      "schemaVersion",
+      "artifactId",
+      "mediaType",
+      "byteLength",
+      "sha256",
+      "sha512",
+      "createdAt",
+    ]);
+    if (!input) return storeFailure("invalid", "invalid-input");
+    const descriptor = input;
+    const context = snapshotContext(input.context);
+    const identity = snapshotIdentity(input.id, "operation");
+    const exactBytes =
+      bytes instanceof Uint8Array ? Uint8Array.from(bytes) : null;
+    if (
+      input.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
+      !context ||
+      !identity ||
+      !isSafeStoreToken(input.artifactId) ||
+      typeof input.mediaType !== "string" ||
+      !/^[a-zA-Z0-9][a-zA-Z0-9.+/-]{0,126}[a-zA-Z0-9]$/u.test(
+        input.mediaType,
+      ) ||
+      !Number.isSafeInteger(input.byteLength) ||
+      (input.byteLength as number) < 0 ||
+      (input.byteLength as number) > 1_048_576 ||
+      !exactBytes ||
+      exactBytes.byteLength !== input.byteLength ||
+      sha256Digest(exactBytes) !== descriptor.sha256 ||
+      sha512Digest(exactBytes) !== input.sha512 ||
+      createFiscalInstant(input.createdAt as string).status !== "ok"
+    )
+      return storeFailure("invalid", "invalid-input");
+    const acceptedDescriptor: ArtifactDescriptor = Object.freeze({
       id: identity,
-      context: context.value,
-    }),
-    bytes: exactBytes,
-  };
-  Object.defineProperty(snapshot, "bytes", {
-    enumerable: true,
-    get: () => Uint8Array.from(exactBytes),
-  });
-  return storeOk(Object.freeze(snapshot));
+      context,
+      schemaVersion: PERSISTENCE_SCHEMA_VERSION,
+      artifactId: input.artifactId as string,
+      mediaType: input.mediaType as string,
+      byteLength: input.byteLength as number,
+      sha256: input.sha256 as Sha256,
+      sha512: input.sha512 as `sha512:${string}`,
+      createdAt: input.createdAt as FiscalInstant,
+    });
+    const snapshot = { descriptor: acceptedDescriptor, bytes: exactBytes };
+    Object.defineProperty(snapshot, "bytes", {
+      enumerable: true,
+      get: () => Uint8Array.from(exactBytes),
+    });
+    return storeOk(Object.freeze(snapshot));
+  } catch {
+    return storeFailure("invalid", "invalid-input");
+  }
 }
 
 export function validateEvidenceClaim(
   claim: EvidenceClaim,
 ): StoreResult<EvidenceClaim> {
-  const context = claim && createFiscalContext(claim.context);
-  const identity = claim ? snapshotIdentity(claim.id, "operation") : null;
-  if (
-    !claim ||
-    typeof claim !== "object" ||
-    claim.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
-    !identity ||
-    context?.status !== "ok" ||
-    !isSafeStoreToken(claim.claimId) ||
-    !/^sha256:[0-9a-f]{64}$/u.test(claim.subjectDigest) ||
-    !isSafeStoreToken(claim.verifierId) ||
-    !isSafeStoreToken(claim.profileId) ||
-    !["verified", "rejected", "indeterminate"].includes(claim.result) ||
-    !Array.isArray(claim.supportingArtifactIds) ||
-    claim.supportingArtifactIds.length > 500 ||
-    claim.supportingArtifactIds.some((id) => !isSafeStoreToken(id)) ||
-    new Set(claim.supportingArtifactIds).size !==
-      claim.supportingArtifactIds.length ||
-    createFiscalInstant(claim.validatedAt).status !== "ok"
-  )
+  try {
+    const input = ownDataProperties(claim, [
+      "id",
+      "context",
+      "schemaVersion",
+      "claimId",
+      "subjectDigest",
+      "verifierId",
+      "profileId",
+      "result",
+      "supportingArtifactIds",
+      "validatedAt",
+    ]);
+    if (!input) return storeFailure("invalid", "invalid-input");
+    const context = snapshotContext(input.context);
+    const identity = snapshotIdentity(input.id, "operation");
+    const supportingArtifactIds = snapshotStringArray(
+      input.supportingArtifactIds,
+      500,
+    );
+    if (
+      input.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
+      !identity ||
+      !context ||
+      !isSafeStoreToken(input.claimId) ||
+      typeof input.subjectDigest !== "string" ||
+      !/^sha256:[0-9a-f]{64}$/u.test(input.subjectDigest) ||
+      !isSafeStoreToken(input.verifierId) ||
+      !isSafeStoreToken(input.profileId) ||
+      !["verified", "rejected", "indeterminate"].includes(
+        input.result as string,
+      ) ||
+      !supportingArtifactIds ||
+      supportingArtifactIds.some((id) => !isSafeStoreToken(id)) ||
+      new Set(supportingArtifactIds).size !== supportingArtifactIds.length ||
+      createFiscalInstant(input.validatedAt as string).status !== "ok"
+    )
+      return storeFailure("invalid", "invalid-input");
+    return storeOk(
+      Object.freeze({
+        id: identity,
+        context,
+        schemaVersion: PERSISTENCE_SCHEMA_VERSION,
+        claimId: input.claimId as string,
+        subjectDigest: input.subjectDigest as Sha256,
+        verifierId: input.verifierId as string,
+        profileId: input.profileId as string,
+        result: input.result as EvidenceClaim["result"],
+        supportingArtifactIds: Object.freeze(supportingArtifactIds),
+        validatedAt: input.validatedAt as FiscalInstant,
+      }),
+    );
+  } catch {
     return storeFailure("invalid", "invalid-input");
-  return storeOk(
-    Object.freeze({
-      ...claim,
-      id: identity,
-      context: context.value,
-      supportingArtifactIds: Object.freeze([...claim.supportingArtifactIds]),
-    }),
-  );
+  }
 }
 
 export function parseSha256(value: unknown): Result<Sha256> {

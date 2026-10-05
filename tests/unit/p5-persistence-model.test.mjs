@@ -86,6 +86,28 @@ test("P5 immutable record validates context, edition, sequence and canonical byt
     { ...valid, canonicalBytes: new Uint8Array() },
     { ...valid, canonicalBytes: Buffer.alloc(1_048_577) },
   ]) assert.equal(validateRecord(malformed).status, "invalid");
+
+  let getterReads = 0;
+  const accessorRecord = { ...valid };
+  Object.defineProperty(accessorRecord, "createdAt", {
+    enumerable: true,
+    get() {
+      getterReads += 1;
+      return valid.createdAt;
+    },
+  });
+  assert.equal(validateRecord(accessorRecord).status, "invalid");
+  assert.equal(getterReads, 0);
+  assert.equal(
+    validateRecord(
+      new Proxy(valid, {
+        ownKeys() {
+          throw new Error("hostile record proxy");
+        },
+      }),
+    ).status,
+    "invalid",
+  );
 });
 
 test("artifact descriptors bind exact bytes, length, both digests and context", () => {
@@ -136,6 +158,18 @@ test("artifact descriptors bind exact bytes, length, both digests and context", 
     { ...descriptor, byteLength: 1_048_577 },
     { ...descriptor, createdAt: "invalid" },
   ]) assert.equal(validateArtifact(malformed, bytes).status, "invalid");
+
+  assert.equal(
+    validateArtifact(
+      new Proxy(descriptor, {
+        ownKeys() {
+          throw new Error("hostile artifact proxy");
+        },
+      }),
+      bytes,
+    ).status,
+    "invalid",
+  );
 });
 
 test("evidence claims bind identity, verifier outcome and unique bounded artifacts", () => {
@@ -167,6 +201,42 @@ test("evidence claims bind identity, verifier outcome and unique bounded artifac
     { ...claim, supportingArtifactIds: ["artifact-1", "artifact-1"] },
     { ...claim, validatedAt: "invalid" },
   ]) assert.equal(validateEvidenceClaim(malformed).status, "invalid");
+  assert.equal(
+    validateEvidenceClaim(
+      new Proxy(claim, {
+        ownKeys() {
+          throw new Error("hostile evidence proxy");
+        },
+      }),
+    ).status,
+    "invalid",
+  );
+
+  let artifactIdReads = 0;
+  const accessorArtifactIds = ["artifact-1"];
+  Object.defineProperty(accessorArtifactIds, "0", {
+    enumerable: true,
+    get() {
+      artifactIdReads += 1;
+      return "artifact-1";
+    },
+  });
+  for (const supportingArtifactIds of [
+    [, "artifact-1"],
+    accessorArtifactIds,
+    Object.assign(["artifact-1"], { unexpected: true }),
+    new Proxy(["artifact-1"], {
+      ownKeys() {
+        throw new Error("hostile artifact id array proxy");
+      },
+    }),
+  ]) {
+    assert.equal(
+      validateEvidenceClaim({ ...claim, supportingArtifactIds }).status,
+      "invalid",
+    );
+  }
+  assert.equal(artifactIdReads, 0);
 });
 
 test("fiscal identities reject invalid tokens and bind document dates without aliasing kinds", () => {
