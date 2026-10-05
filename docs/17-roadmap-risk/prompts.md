@@ -302,9 +302,13 @@ active-state amendment in `handoff.md`: use the last numbered amendment that
 explicitly supersedes the preceding active-state snapshot, not an older number
 copied into this prompt. Inspect the worktree before changing it and continue
 any P5 work already present. Start with P5-A only if it has not already started; do
-not stop after repeating the P4 closure analysis. Verify the current handoff, exact
-main/branch identities, restored ruleset and current status of every outstanding
-P4 workflow before implementation. This P4 check is observational for P5 entry:
+not stop after repeating the P4 closure analysis. The P5 intake decision is
+`proceed with authorized branch implementation` unless fresh evidence shows a
+direct safety, regulatory or functional impact on the affected P5 work. Record
+the exact P4 state as a carried-forward blocker and continue; do not turn that
+observation into a P5 entry gate. Verify the current handoff, exact main/branch
+identities, restored ruleset and current status of every outstanding P4 workflow
+before implementation. This P4 check is observational for P5 entry:
 the recorded P4 failures in `Required · OSV`,
 `Required · npm audit signatures and licenses`, and the derived
 `Required · required-check closure` do not prevent this authorized branch work

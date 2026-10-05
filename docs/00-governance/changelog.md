@@ -15,6 +15,14 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Make the P5 intake action explicit
+
+- Clarified that the P5 session's intake decision is to proceed with authorized
+  branch implementation after recording P4's exact state, unless fresh evidence
+  shows a direct safety, regulatory or functional impact on the affected P5
+  work. P4 closure remains visible and required where applicable for P5 phase
+  closure; no required check or protected merge condition changed.
+
 ## 2026-10-05 — Reject false-clean npm bundle lock workaround
 
 - Recorded that manual lockfile edits can make `npm audit` report zero while
