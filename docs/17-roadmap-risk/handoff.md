@@ -5132,3 +5132,82 @@ and unmerged at this exact head. The protected-main ruleset remains active with
   phase-exit prerequisite. Applicable P4 closure rows, normal protected P5
   checks, serial signed+DCO wave acceptance and the complete frozen P5 evidence
   remain required; no status or check is waived.
+
+## Amendment P5-024 — 2026-10-05 dependency-map correction and exact-head read-back
+
+This amendment supersedes P5-023 as the active-state snapshot. At the
+2026-10-05 07:34 UTC read-back, local `work/p5-implementation` and
+`origin/work/p5-implementation` were clean and synchronized at signed+DCO
+commit `705fb9f7b87e1b8971f6c62eae606a4f86606bd8` (tree
+`dabf0557629ce9a2e8004015005b64ea317e892b`). It is based on protected `main`
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`. Issue #113 remains open; PR #114
+is open and unmerged at this exact head. The active `protected-main` ruleset
+still requires the same 17 strict contexts, signed commits, linear history and
+squash-only PR integration.
+
+- Documentation now states the scoped P5 continuation rule consistently in
+  the dependency map, roadmap, ADR-0060 and executable P5 prompt. P4 remains
+  phase-unclosed; its closure findings do not block implementation on the
+  named P5 branch, but they still block P5 phase closure. This changes no check,
+  merge rule or phase-exit criterion.
+- Exact-subject local validation passed: `build:packages` 3/3;
+  `p5:quality-plan` 10/10; `test:p5` 104/104 across 23/23 files, with
+  99.12% line, 95.21% branch and 99.04% function coverage; 49,152 property
+  executions; and 56/56 seeded faults. `p5:mutation` killed all 42/42 planned
+  mutants (26 critical, 16 other), and `gate:p5` passed 2/2 tasks without
+  failures, skips or diagnostics. `policy:docs` passed 544/544,
+  `policy:format` 124/124, `policy:supply-chain` 259/259, and
+  `package:reproducibility` 6/6, with no failures, skips or diagnostics.
+  `npm audit signatures` verified 232 registry signatures and 87 attestations.
+  Reproducible package SHA-256 values were `@noeos/verifactu`
+  `b2b6a71df20b5e0cc70506bd37d3e009adb3a6898a21cf2b99f83396164cee28`,
+  adapter-kit `0f59f26b4d88372a1e1067da984d90f9d26d5088ed7964d8c297869f5e51e1d6`,
+  and CLI `bbe6f1797b6f8f3ec66c76e784a4829596b8e4f968027f03647e05fd2170e9a4`.
+- `npm audit --audit-level=moderate` still fails on four packages under
+  `node_modules/npm/node_modules`: `brace-expansion@5.0.9` (high),
+  `http-cache-semantics@4.2.0` (high), `ip-address@10.5.0` (moderate) and
+  `undici@6.28.0` (high). The official registry tarballs for npm `11.21.0`
+  and `12.2.0` were inspected: both still bundle those exact versions. npm
+  `11.21.0` supports the frozen Node 22.14.0 cell but does not fix the
+  findings; npm `12.2.0` also requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`.
+  A throwaway explicit-override experiment left all four lockfile entries
+  marked `inBundle` at vulnerable versions and `npm audit` still failed.
+  `npm audit fix --dry-run` changed, added and removed zero packages and
+  reported that each bundled dependency cannot be fixed automatically. No
+  scanner, lock or policy was weakened.
+- On exact SHA `705fb9f`, the Performance reproducibility smoke passed.
+  Required engineering run
+  [37275976031](https://github.com/noeos/verifactu/actions/runs/37275976031)
+  was still running its macOS 15 / Node 24.21.0 portable platform gate; its
+  other 15 leaf jobs were queued and required-check closure had not run.
+  Engineering CI run
+  [37275975998](https://github.com/noeos/verifactu/actions/runs/37275975998)
+  was running `gate:p2`. Conformance
+  [37275975926](https://github.com/noeos/verifactu/actions/runs/37275975926),
+  Security [37275976145](https://github.com/noeos/verifactu/actions/runs/37275976145)
+  and regulatory observation
+  [37275975828](https://github.com/noeos/verifactu/actions/runs/37275975828)
+  remained queued. These statuses are pending, not passes; all require a fresh
+  read-back on the eventual final SHA.
+- The P4 PR #109 exact-head Required run remains terminal at 14/17 successful
+  reports and exactly three failures: `Required · OSV`, `Required · npm audit
+  signatures and licenses` and the derived `Required · required-check closure`.
+  Its closure log names only those two failed audit reports; it does not report
+  missing or duplicate leaf reports. The post-merge protected-main Required
+  run shows the same three failed contexts. P4 therefore remains blocked.
+- PR inventory confirms that P5-A…P5-G is still represented by one cumulative
+  PR #114, not seven serial accepted signed+DCO wave PRs. Its PR description is
+  stale and still cites head `4336c158`; a previous GitHub metadata-write
+  attempt was denied with HTTP 403 `Resource not accessible by integration`.
+  No alternate write path was used. Therefore neither serial-wave acceptance
+  nor a current PR-body read-back is claimed, and P5 is not evidence-complete.
+- A fresh authorized-access inventory found no configured repository secrets,
+  GitHub environments, AEAT/certificate-related local environment-variable
+  names or tracked certificate/key files. The adjacent Facturacion checkout
+  still has no commits. No portal call or external AEAT acceptance is claimed;
+  the local peer remains synthetic and the edition remains
+  `creationAllowed=false`.
+
+The handoff-documentation commit itself has a new subject. The local evidence
+above is bound to `705fb9f`; read all workflows for the new head before
+describing its GitHub checks as current or complete.

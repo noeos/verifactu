@@ -15,6 +15,14 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Refresh P5 exact-head handoff and dependency audit evidence
+
+- Recorded the local P5 gate and package results for `705fb9f`, plus the
+  current pending GitHub checks and the exact unresolved P4 audit closure.
+- Rechecked the latest compatible official npm bundles and confirmed their
+  in-bundle dependencies still carry the four audit findings; no scan or
+  dependency exception was applied.
+
 ## 2026-10-05 — Reconcile dependency scheduling with scoped P5 authorization
 
 - Updated the dependency map so its general fail-closed scheduling rule points
