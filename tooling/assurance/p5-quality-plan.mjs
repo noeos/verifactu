@@ -54,6 +54,27 @@ export function validateP5QualityPlan(plan, discovered = {}) {
     "plan no longer binds the authorized P5 input",
   );
   assert(
+    canonical(plan.additiveAmendment) ===
+      canonical({
+        id: "P5-PLAN-AMEND-001",
+        date: "2026-10-05",
+        reason:
+          "Close the DNS SSRF gap for IANA special-purpose addresses using separate IPv4 and IPv6 critical controls.",
+        addedCriticalCatalogue: [
+          "P5-CRIT-025:non-global-ipv4-destinations-rejected",
+          "P5-CRIT-026:non-global-ipv6-destinations-rejected",
+        ],
+        addedCriticalMutants: ["P5-MUT-041", "P5-MUT-042"],
+        resultingPopulation: {
+          criticalMutants: 26,
+          otherMutants: 16,
+          totalMutants: 42,
+        },
+      }),
+    "P5_PLAN_AMENDMENT",
+    "the documented additive DNS security amendment changed",
+  );
+  assert(
     plan.edition.id === "rrsif-2026-09-21-authoritative-candidate" &&
       plan.edition.sourceSnapshot === "rrsif-2026-09-21-authoritative" &&
       plan.edition.sourceManifestSha256 ===
@@ -100,9 +121,11 @@ export function validateP5QualityPlan(plan, discovered = {}) {
       plan.criticalCatalogue.every((entry, index) =>
         entry.startsWith(`P5-CRIT-${String(index + 1).padStart(3, "0")}:`),
       ) &&
-      [...plan.mutation.criticalMutants, ...plan.mutation.otherMutants].every(
-        (id, index) => id === `P5-MUT-${String(index + 1).padStart(3, "0")}`,
-      ) &&
+      [...plan.mutation.criticalMutants, ...plan.mutation.otherMutants]
+        .sort()
+        .every(
+          (id, index) => id === `P5-MUT-${String(index + 1).padStart(3, "0")}`,
+        ) &&
       plan.faultInjectionIds.every((entry, index) =>
         entry.startsWith(`P5-FAULT-${String(index + 1).padStart(3, "0")}:`),
       ),
@@ -129,8 +152,8 @@ export function validateP5QualityPlan(plan, discovered = {}) {
     "P5 test outside the declared test inventory",
   );
   assert(
-    plan.criticalCatalogue.length === 24 &&
-      plan.mutation.criticalMutants.length === 24 &&
+    plan.criticalCatalogue.length === 26 &&
+      plan.mutation.criticalMutants.length === 26 &&
       plan.mutation.otherMutants.length === 16 &&
       plan.propertyCampaigns.length === 12 &&
       plan.propertyCampaigns.every(

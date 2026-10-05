@@ -5,6 +5,21 @@
   "declaredBeforeImplementation": true,
   "governingProtectedMain": "1f66da46e21127d1d82018cfdf093f595e1c08ae",
   "authorizationCommit": "4b31844af98f7e3e62bcea31b4e97a510116e392",
+  "additiveAmendment": {
+    "id": "P5-PLAN-AMEND-001",
+    "date": "2026-10-05",
+    "reason": "Close the DNS SSRF gap for IANA special-purpose addresses using separate IPv4 and IPv6 critical controls.",
+    "addedCriticalCatalogue": [
+      "P5-CRIT-025:non-global-ipv4-destinations-rejected",
+      "P5-CRIT-026:non-global-ipv6-destinations-rejected"
+    ],
+    "addedCriticalMutants": ["P5-MUT-041", "P5-MUT-042"],
+    "resultingPopulation": {
+      "criticalMutants": 26,
+      "otherMutants": 16,
+      "totalMutants": 42
+    }
+  },
   "edition": {
     "id": "rrsif-2026-09-21-authoritative-candidate",
     "sourceSnapshot": "rrsif-2026-09-21-authoritative",
@@ -106,7 +121,9 @@
     "P5-CRIT-021:restore-workers-fenced-until-verified",
     "P5-CRIT-022:migration-unknown-newer-schema-read-only",
     "P5-CRIT-023:retention-hold-blocks-purge",
-    "P5-CRIT-024:telemetry-excludes-fiscal-and-secret-data"
+    "P5-CRIT-024:telemetry-excludes-fiscal-and-secret-data",
+    "P5-CRIT-025:non-global-ipv4-destinations-rejected",
+    "P5-CRIT-026:non-global-ipv6-destinations-rejected"
   ],
   "mutation": {
     "criticalKilledPercent": 100,
@@ -135,7 +152,9 @@
       "P5-MUT-021",
       "P5-MUT-022",
       "P5-MUT-023",
-      "P5-MUT-024"
+      "P5-MUT-024",
+      "P5-MUT-041",
+      "P5-MUT-042"
     ],
     "otherMutants": [
       "P5-MUT-025",

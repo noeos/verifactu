@@ -481,6 +481,8 @@ test("HTTPS DNS filtering rejects malformed, oversized, private and transition a
       "198.19.255.254",
       "192.0.0.1",
       "192.2.0.1",
+      "192.88.99.0",
+      "192.88.99.255",
       "198.51.100.1",
       "203.0.1.1",
       "224.0.0.1",
@@ -491,9 +493,15 @@ test("HTTPS DNS filtering rejects malformed, oversized, private and transition a
       "ff02::1",
       "2001:db8::1",
       "2001:0::1",
+      "2001:2::1",
+      "2001:0002:0000:0000:0000:0000:0000:0001",
+      "2001:0000:0002:0000:0000:0000:0000:0001",
+      "2001:10::1",
       "2002::1",
       "3fff::1",
       "::ffff:10.0.0.1",
+      "::ffff:192.88.99.42",
+      "0:0:0:0:0:ffff:0a00:0001",
     ].map((address) => ({
       addresses: [{ address, family: address.includes(":") ? 6 : 4 }],
       diagnostic: "DIAG-AEAT-DNS-PRIVATE",
@@ -550,6 +558,76 @@ test("HTTPS DNS filtering rejects malformed, oversized, private and transition a
     assert.equal(result.failureCode, diagnostic, JSON.stringify(addresses));
     assert.equal(result.delivery, "not-started");
     assert.equal(acquired, 0);
+  }
+});
+
+test("HTTPS DNS CIDR boundaries preserve globally reachable IPv4 and IPv6", async () => {
+  const active = profile();
+  const batch = batchPlan(active);
+  const publicAddresses = [
+    { address: "192.88.98.255", family: 4 },
+    { address: "192.88.100.1", family: 4 },
+    { address: "8.8.8.8", family: 4 },
+    { address: "2001:400::1", family: 6 },
+    { address: "2001:4860:4860::8888", family: 6 },
+    { address: "::ffff:8.8.8.8", family: 6 },
+    { address: "::ffff:808:808", family: 6 },
+    { address: "0:0:0:0:0:ffff:0808:0808", family: 6 },
+  ];
+  for (const resolved of publicAddresses) {
+    let acquired = 0;
+    const transport = createNodeHttpsTransport({
+      resolver: {
+        async resolve() {
+          return [resolved];
+        },
+      },
+      tlsMaterials: {
+        async acquire() {
+          acquired += 1;
+          throw new Error("stop after address policy admission");
+        },
+      },
+    });
+    const result = await transport.observeOnce({
+      profile: active,
+      operationId: batch.operationId,
+      context,
+      endpoint: {
+        endpointId: batch.endpointId,
+        environment: "production",
+        url: new URL("https://public.example.test/soap"),
+        serviceId: "synthetic-production",
+        portId: "production-port",
+        editionId: active.editionId,
+        editionDigest: active.digest,
+      },
+      request: batch.request,
+      certificateAuthorization: {
+        ...certificateAuthorization,
+        environment: "production",
+      },
+      limits: {
+        maxResponseBytes: 1000,
+        connectTimeoutMs: 100,
+        tlsTimeoutMs: 100,
+        writeTimeoutMs: 100,
+        firstByteTimeoutMs: 100,
+        bodyIdleTimeoutMs: 100,
+        totalTimeoutMs: 500,
+      },
+      clock: {
+        wallNow: () => "2026-10-03T12:00:00.000Z",
+        monotonicNow: () => 1,
+      },
+    });
+    assert.equal(
+      result.failureCode,
+      "DIAG-AEAT-CREDENTIAL-UNAVAILABLE",
+      resolved.address,
+    );
+    assert.equal(result.delivery, "not-started", resolved.address);
+    assert.equal(acquired, 1, resolved.address);
   }
 });
 

@@ -158,7 +158,13 @@
         "P5-PROP-011",
         "P5-PROP-012"
       ],
-      "criticalMutantIds": ["P5-MUT-016", "P5-MUT-018", "P5-MUT-019"],
+      "criticalMutantIds": [
+        "P5-MUT-016",
+        "P5-MUT-018",
+        "P5-MUT-019",
+        "P5-MUT-041",
+        "P5-MUT-042"
+      ],
       "otherMutantIds": [
         "P5-MUT-035",
         "P5-MUT-036",

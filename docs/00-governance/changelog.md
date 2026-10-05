@@ -5,7 +5,7 @@ status: active
 authority: normative
 owner: project-owner
 created: 2026-09-21
-last-reviewed: 2026-10-04
+last-reviewed: 2026-10-05
 dependencies: [ROADMAP-DOC-0017, ROADMAP-DOC-0020]
 decisions: [ADR-0026, ADR-0053]
 ---
@@ -14,6 +14,18 @@ decisions: [ADR-0026, ADR-0053]
 
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
+
+## 2026-10-05 — Amend P5-D address policy and critical mutation population
+
+- Closed a DNS SSRF gap by applying CIDR-aware IPv4/IPv6 classification before
+  credential acquisition or socket creation, including expanded and
+  IPv4-mapped IPv6 forms. Added IANA registry and Node.js net sources to the
+  transport policy.
+- Added the governed P5-D controls `P5-CRIT-025/026` and mutants
+  `P5-MUT-041/042`; population is now 26 critical and 16 other mutants. The
+  prior controls and thresholds remain unchanged.
+- Dirty-worktree `gate:p5` passed after the amended mutants were both killed.
+  The new commit still requires clean exact-head local and GitHub checks.
 
 ## 2026-10-04 — Refresh P5 documentation-head checks
 

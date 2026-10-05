@@ -242,6 +242,14 @@ const criticalTargets = [
     "packages/verifactu/src/operations/safe-observability.ts",
     'input.category === "certificate-expiry" &&\n      input.code !== "DIAG-CERTIFICATE-EXPIRING"',
   ],
+  [
+    "packages/verifactu/src/aeat/node-https-transport.ts",
+    'return nonGlobalIpv4.check(address, "ipv4") === false;',
+  ],
+  [
+    "packages/verifactu/src/aeat/node-https-transport.ts",
+    'return (\n      globalUnicastIpv6.check(address, "ipv6") &&\n      !nonGlobalIpv6.check(address, "ipv6")\n    );',
+  ],
 ].map(([module, needle]) => ({ module, needle }));
 
 async function main() {

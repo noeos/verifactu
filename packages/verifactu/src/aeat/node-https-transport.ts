@@ -1,7 +1,7 @@
 import { createHash, X509Certificate } from "node:crypto";
 import { lookup as nodeLookup } from "node:dns";
 import { request as httpsRequest } from "node:https";
-import { isIP, type LookupFunction } from "node:net";
+import { BlockList, isIP, type LookupFunction } from "node:net";
 import { clearTimeout } from "node:timers";
 import type { TLSSocket } from "node:tls";
 import type { CertificateAuthorization } from "./certificate-authorization.js";
@@ -86,46 +86,88 @@ function isLoopback(address: string): boolean {
   );
 }
 
+const nonGlobalIpv4 = new BlockList();
+for (const [network, prefix] of [
+  ["0.0.0.0", 8],
+  ["10.0.0.0", 8],
+  ["127.0.0.0", 8],
+  ["169.254.0.0", 16],
+  ["172.16.0.0", 12],
+  ["192.0.0.0", 16],
+  ["192.2.0.0", 16],
+  ["192.88.99.0", 24],
+  ["192.168.0.0", 16],
+  ["198.18.0.0", 15],
+  ["198.51.0.0", 16],
+  ["203.0.0.0", 16],
+  ["100.64.0.0", 10],
+  ["224.0.0.0", 3],
+] as const)
+  nonGlobalIpv4.addSubnet(network, prefix, "ipv4");
+
+const globalUnicastIpv6 = new BlockList();
+globalUnicastIpv6.addSubnet("2000::", 3, "ipv6");
+
+const nonGlobalIpv6 = new BlockList();
+for (const [network, prefix] of [
+  // IANA marks this aggregate non-global unless a more-specific allocation
+  // explicitly permits global reachability. AEAT destinations do not use it.
+  ["2001::", 23],
+  ["2001:2::", 48],
+  ["2001:10::", 28],
+  ["2001:db8::", 32],
+  ["2002::", 16],
+  ["3fff::", 16],
+] as const)
+  nonGlobalIpv6.addSubnet(network, prefix, "ipv6");
+
+function mappedIpv4Address(address: string): string | null {
+  const normalized = address.toLowerCase();
+  const dottedTail = /:(\d{1,3}(?:\.\d{1,3}){3})$/u.exec(normalized)?.[1];
+  const expandedTail = dottedTail
+    ? dottedTail
+        .split(".")
+        .map(Number)
+        .reduce<number[]>((groups, octet, index) => {
+          if (index % 2 === 0) groups.push(octet << 8);
+          else groups[groups.length - 1] = groups.at(-1)! | octet;
+          return groups;
+        }, [])
+        .map((group) => group.toString(16))
+        .join(":")
+    : null;
+  const source = dottedTail
+    ? `${normalized.slice(0, -dottedTail.length)}${expandedTail}`
+    : normalized;
+  const halves = source.split("::");
+  const left = halves[0] ? halves[0].split(":") : [];
+  const right = halves.length === 2 && halves[1] ? halves[1].split(":") : [];
+  const zeroGroups = halves.length === 2 ? 8 - left.length - right.length : 0;
+  const groups =
+    halves.length === 1
+      ? left
+      : [...left, ...Array.from({ length: zeroGroups }, () => "0"), ...right];
+  const numericGroups = groups.map((group) => Number.parseInt(group, 16));
+  if (
+    numericGroups.length !== 8 ||
+    numericGroups.slice(0, 5).some((group) => group !== 0) ||
+    numericGroups[5] !== 0xffff
+  )
+    return null;
+  const high = numericGroups[6]!;
+  const low = numericGroups[7]!;
+  return [high >>> 8, high & 0xff, low >>> 8, low & 0xff].join(".");
+}
+
 function isPublicAddress(address: string): boolean {
   const family = isIP(address);
-  if (family === 4) {
-    const octets = address.split(".").map(Number);
-    const [a, b] = octets;
-    if (a === undefined || b === undefined) return false;
-    return !(
-      a === 0 ||
-      a === 10 ||
-      a === 127 ||
-      a >= 224 ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      (a === 100 && b >= 64 && b <= 127) ||
-      (a === 198 && (b === 18 || b === 19)) ||
-      (a === 192 && b === 0) ||
-      (a === 192 && b === 2) ||
-      (a === 198 && b === 51) ||
-      (a === 203 && b === 0)
-    );
-  }
+  if (family === 4) return nonGlobalIpv4.check(address, "ipv4") === false;
   if (family === 6) {
-    const normalized = address.toLowerCase();
-    if (normalized.startsWith("::ffff:"))
-      return isPublicAddress(normalized.slice(7));
-    const firstGroup = Number.parseInt(normalized.split(":", 1)[0] || "0", 16);
-    // Only admit global unicast (2000::/3); this also rejects unspecified,
-    // loopback, link-local, unique-local, multicast and transition ranges.
-    if (
-      !Number.isFinite(firstGroup) ||
-      firstGroup < 0x2000 ||
-      firstGroup > 0x3fff
-    )
-      return false;
-    return !(
-      normalized.startsWith("2001:db8:") ||
-      normalized.startsWith("2001:0:") ||
-      normalized.startsWith("2002:") ||
-      normalized.startsWith("3fff:")
+    const mapped = mappedIpv4Address(address);
+    if (mapped !== null) return isPublicAddress(mapped);
+    return (
+      globalUnicastIpv6.check(address, "ipv6") &&
+      !nonGlobalIpv6.check(address, "ipv6")
     );
   }
   return false;
