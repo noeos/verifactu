@@ -39,7 +39,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current state is amended by the latest numbered P5 amendment in this file
-(currently P5-028) and ADR-0060. A session resuming P5 must read that amendment
+(currently P5-029) and ADR-0060. A session resuming P5 must read that amendment
 and inspect live GitHub state; older snapshots are historical.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
@@ -5464,3 +5464,45 @@ it does not authorize starting wave D before A/B/C are accepted in sequence.
 This amendment changes documentation on PR #114 and creates a new subject.
 Re-read all workflows for its resulting head. It changes no P4 status, P5-A
 check result, dependency finding, wave order or protected-merge requirement.
+
+## Amendment P5-029 — 2026-10-05 cumulative P5 revalidation after P5-A fix
+
+This amendment supersedes P5-028 as the active-state snapshot. The
+`work/p5-implementation` worktree is clean and synchronized with origin at
+signed+DCO commit `e07c631f6f501e5f76bf9e8af1dfcd64774a8731` (tree
+`8e5abf04bc92818db569b01b809754f0aaf1adf7`), based on protected `main`
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`. This commit carries the P5-A
+defensive snapshot correction from `cb874b0` into the cumulative implementation
+branch so its product code matches the P5-A serial delivery PR.
+
+- Exact-subject cumulative P5 validation passed on `e07c631`: `gate:p5` 2/2;
+  `test:p5` 104/104 in all 23/23 files; 99.13% line, 95.17% branch and 99.04%
+  function coverage; 49,152/49,152 property executions; and 56/56 fault
+  injections. The recovery campaign recorded wall time 1,822.44 ms, peak RSS
+  91,561,984 bytes, event-loop delay 12.27 ms, queue high-water 128 and open
+  handles 2→2. Quality plan was 10/10 with the complete 25-module/23-test/five-
+  cell/56-fault population. Mutation was 42/42 (26 critical and 16 other); the
+  report separately records three syntax candidates outside the frozen
+  selected mutant set. Types passed
+  3/3, format 124/124 and lint 84/84. These are local exact-subject reports,
+  not protected CI or seven accepted serial-wave reports.
+- PR #114 is open and `BLOCKED` at exact head `e07c631`, based on protected
+  main `1f66da46`. All 25 reported check-runs were queued at 10:46 UTC. Pending
+  results are unknown, not passes; re-read this exact head's workflows.
+- PR #118 remains open and `BLOCKED` at exact P5-A head
+  `cb874b069179f5393b2e97aacbd16e81def80abe`, based on the same protected main.
+  At 10:46 UTC all check-runs were queued except the Windows regulatory
+  observation, which succeeded. No required-check closure has completed; A is
+  not accepted. Do not begin wave B until A merges after every required context
+  and its closure report succeed.
+- P4 remains merged but phase-blocked by the exact OSV, npm audit/signature/
+  licence and derived required-check closure failures on PR #109. The active
+  protected-main ruleset and all 17 strict required contexts remain unchanged.
+- The strict independent SOAP peer described by the P5-D contract remains an
+  open requirement for its serial wave. P5-A local/cumulative test success does
+  not satisfy it, change wave order, or establish external AEAT acceptance.
+
+The local reports are bound to `e07c631`; this handoff amendment creates a new
+PR #114 subject. Re-read every workflow for the resulting head. This update
+does not change P4 status, scanner coverage, wave order, protected checks or
+P5 phase-exit conditions.
