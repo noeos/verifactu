@@ -15,6 +15,16 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Correct P5 external-scope wording and refresh capsule
+
+- Refreshed the current handoff capsule and added Amendment P5-023 with local
+  exact-head evidence, current PR #114 checks, the three still-failed P4
+  contexts and the unwaived audit failures on the current P5 head.
+- Corrected P5-021's overstatement: a real production backend qualification or
+  external AEAT observation is not an implied P5 phase-exit prerequisite under
+  the frozen quality plan. Required capability claims, protected checks,
+  serial-wave acceptance and applicable P4 closure rows remain governed.
+
 ## 2026-10-05 — Refresh active P5 exact-head evidence
 
 - Added Amendment P5-022 with a fresh local `gate:p5` result and the live
@@ -22,8 +32,11 @@ changelog and makes no compliance, publication or support claim.
   exact required-check findings; the current P5 head has two failed audit
   contexts and its remaining required checks are still running.
 - Recorded the still-open P5 boundaries: seven serial signed+DCO wave PRs,
-  qualified production `atomic-host` backend, and authorized external AEAT
-  evidence. No check, merge rule or phase-exit criterion was waived.
+  qualified adapter evidence before any real adapter capability claim, and
+  separately authorized external AEAT observation. Corrected P5-021's
+  overstatement that these unselected external capabilities are P5 phase-exit
+  prerequisites; the frozen P5 plan and applicable P4 closure rows govern
+  phase exit. No check, merge rule or phase-exit criterion was waived.
 
 ## 2026-10-05 — Reconfirm P5 continuation with P4 closure outstanding
 
