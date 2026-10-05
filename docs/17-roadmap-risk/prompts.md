@@ -294,6 +294,8 @@ P5 implementation start and continuation were explicitly authorized by ADR-0060
 and reconfirmed by the project owner on 2026-10-05, on issue #113 and branch
 `work/p5-implementation`, despite P4 remaining phase-unclosed. Do not
 block P5 branch development solely because P4 is not `evidence-complete`; do not
+ask the project owner to reconfirm this recorded authorization or wait for a
+new P4 closure decision before continuing the authorized P5 branch work. Do not
 describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
 the normal protected required checks, or close P5 while applicable P4 closure
 rows remain unresolved. P4 phase closure is not a prerequisite for starting or

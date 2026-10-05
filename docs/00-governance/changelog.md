@@ -15,6 +15,15 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Prevent repeated P5 entry authorization prompts
+
+- Clarified the executable P5 prompt that a resumed session must not ask the
+  project owner to reconfirm the already recorded ADR-0060 authorization or
+  wait for P4 closure before continuing the authorized P5 branch work.
+- Preserved the boundaries: P4 remains unclosed; the authorization does not
+  permit protected P5 merges, waive required checks or allow P5 closure while
+  applicable P4 closure rows remain unresolved.
+
 ## 2026-10-05 — Refresh P5 exact-head and npm bundle evidence
 
 - Added Amendment P5-026 with exact-subject local P5/P5-A reports, the live
