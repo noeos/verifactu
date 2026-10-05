@@ -5,7 +5,7 @@ status: accepted
 authority: decision
 owner: project-owner
 created: 2026-10-03
-last-reviewed: 2026-10-04
+last-reviewed: 2026-10-05
 dependencies: [ADR-0051, ADR-0058]
 ---
 
@@ -116,3 +116,14 @@ that branch and does not change any P5 protected-merge check, P4 closure row,
 P5 phase-exit criterion or external qualification requirement. A fresh P4
 safety, regulatory or functional impact can still stop the affected P5 work as
 stated above.
+
+## Owner reconfirmation — 2026-10-05
+
+The project owner reconfirmed in the Codex session on 2026-10-05 that P5 work
+may proceed without waiting for P4 phase closure. A new or resumed session must
+inspect the live repository and GitHub state, then start or continue P5 on issue
+#113's `work/p5-implementation` branch under this decision. It must not stop
+solely because the three recorded P4 required contexts remain failed. Those
+failures remain unresolved and visible; this reconfirmation changes no check
+result, scanner coverage, protected-merge condition, P4 status or P5 phase-exit
+requirement.

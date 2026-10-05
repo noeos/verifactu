@@ -290,8 +290,9 @@ remaining external prerequisites; reread protected main and every required check
 
 ```text
 Execute Phase P5 of docs/17-roadmap-risk/implementation-roadmap.md completely.
-P5 implementation start is explicitly authorized by ADR-0060 on issue #113 and
-branch `work/p5-implementation`, despite P4 remaining phase-unclosed. Do not
+P5 implementation start and continuation were explicitly authorized by ADR-0060
+and reconfirmed by the project owner on 2026-10-05, on issue #113 and branch
+`work/p5-implementation`, despite P4 remaining phase-unclosed. Do not
 block P5 branch development solely because P4 is not `evidence-complete`; do not
 describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
 the normal protected required checks, or close P5 while applicable P4 closure

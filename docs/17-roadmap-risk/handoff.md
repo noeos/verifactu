@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-10-04
+last-reviewed: 2026-10-05
 dependencies:
   [ROADMAP-DOC-0004, ROADMAP-DOC-0005, ROADMAP-DOC-0007, ROADMAP-DOC-0013]
 decisions:
@@ -39,7 +39,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current state is amended by the latest numbered P5 amendment in this file
-(currently P5-017) and ADR-0060. A session resuming P5 must read that amendment
+(currently P5-021) and ADR-0060. A session resuming P5 must read that amendment
 and inspect live GitHub state; older snapshots are historical.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
@@ -99,17 +99,17 @@ Historical detail belongs in phase records below.
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Roadmap                     | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | Current phase               | P5 implementation active, issue `#113`, branch `work/p5-implementation`, under ADR-0060.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Phase status                | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 implementation is `active` on the ADR-0060 branch; P5 merge requires its ordinary protected checks, and P5 phase closure remains blocked while applicable P4 closure rows are unresolved. `creationAllowed=false`.                                                                                                                                                                                                                                                                                                                                  |
-| Last evidence-complete wave | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Local repository            | At the 2026-10-04 23:01 UTC read-back, clean local and remote `work/p5-implementation` both point to signed+DCO commit `00e0c2731114bb4c7ac69fb68537853b8d0a6c92` (tree `e33f6c4ed2644726284b960c07dd9ffc8c6defbd`). This documentation update creates a new exact-head subject and requires fresh checks.                                                                                                                                                                                                                                                                                                                                            |
+| Phase status                | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`, because OSV and npm audit fail and required-check closure reports those two failures. P5 implementation is `active` on the ADR-0060 branch; P5 merge requires its ordinary protected checks, and P5 phase closure remains blocked while applicable P4 closure rows are unresolved. `creationAllowed=false`.                                                                                                                                                                                                                                                                 |
+| Last evidence-complete wave | P4-G cumulative local campaign passed on `ce21e8e`; all five GitHub runtime cells passed (Windows 2025, macOS 15, Ubuntu 24.04 with Node 22.14.0, 22.23.2 and 24.21.0). P4 phase closure remains blocked by the exact dependency audit results.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Local repository            | At the 2026-10-05 04:26 UTC read-back, clean local and remote `work/p5-implementation` both point to signed+DCO commit `ce21e8ed5d0ba55f712d74fe4e5429343ae35b7b` (tree `7995f5e9871d5f89e3c1c8670bd27bd9ed8c3c8a`). A subsequent handoff-only commit will require its own exact-head checks.                                                                                                                                                                                                                                                                                                                     |
 | Protected `main` SHA        | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| GitHub effective state      | EXC-0001 / issue #112 is closed. Ruleset `protected-main` is active and strict with all 17 configured contexts. PR #114 is open and `BLOCKED` at remote head `00e0c2731114bb4c7ac69fb68537853b8d0a6c92`, based on protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`. At 2026-10-04 23:01 UTC, every new exact-head check was queued, including all 17 required contexts; none is a pass. The three P4 closure findings remain OSV, npm audit signatures/licences and derived required-check closure; their presence does not block continuing the already-authorized P5 branch work. See Amendment P5-019 for the exact check-run snapshot. |
+| GitHub effective state      | EXC-0001 / issue #112 is closed. Ruleset `protected-main` is active and strict with all 17 configured contexts. PR #114 is open and `BLOCKED` at remote head `ce21e8ed5d0ba55f712d74fe4e5429343ae35b7b`, based on protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`. Required engineering run `37251723819` received all 16 leaf reports and its closure job failed only for OSV and npm audit; the remaining 14 leaves passed. Engineering CI `37251723815`, Conformance `37251723812`, Performance `37251723775`, Security `37251723770` and regulatory observation `37251723794` passed. PR metadata update was denied by the GitHub connector with HTTP 403. See Amendment P5-021 for exact evidence and limitations. |
 | Toolchain/lock              | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Regulatory edition          | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Verification Engine         | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Public packages             | Three `0.0.0-development` package shells; not published. P4-D provider and its new internal interfaces are not re-exported from `packages/verifactu/src/index.ts`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | External gates              | Legal, AEAT, stable-performance, independent-assurance and publication gates remain downstream; none is claimed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Immediate instruction       | Continue P5 implementation on the authorized branch under ADR-0060; do not stop or repeat the P4 closure analysis as a prerequisite. P4's failed contexts remain visible and must not be waived, disabled, or counted as passing. Preserve P4's blocked status. Protected P5 merges still require normal green checks, and P5 phase closure still requires applicable P4 closure rows resolved plus signed+DCO serial wave acceptance.                                                                                                                                                                                                                |
+| Immediate instruction       | Continue P5 implementation on the authorized branch under ADR-0060; do not stop or repeat the P4 closure analysis as a prerequisite. P4's two failed leaf contexts remain visible and must not be waived, disabled, or counted as passing. Preserve P4's blocked status. Protected P5 merges still require normal green checks, and P5 phase closure still requires applicable P4 closure rows resolved plus signed+DCO serial wave acceptance, a qualified production durable adapter and applicable external AEAT evidence.                                                                                                                                 |
 
 ## Phase ledger
 
@@ -120,7 +120,7 @@ Historical detail belongs in phase records below.
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                      | `#28`–`#30`                                              | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.                                                                                                                                                                                                                                                                                                                         |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                                       | `999d78c19b0e1be3097201a0cc61947a10760bbe`                      | `#31`–`#34`, `#38`                                       | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.                                                                                                                                                                                                                                                                                                                              |
 | P4    | blocked           | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | implementation merge `1f66da46e21127d1d82018cfdf093f595e1c08ae` | PR `#109`; EXC-0001 `#112`                               | P4-A–G implementation is merged; phase closure is incomplete because exact PR required contexts OSV, npm audit/signature/licence and derived required-check closure failed; protected-push runs are recorded below.                                                                                                                                                                                                                       |
-| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060       | —                                                               | issue `#113`, branch `work/p5-implementation`, PR `#114` | Local cumulative `gate:p5` and policy checks passed on clean `909db8a`; see Amendment P5-018. PR #114 remains a single cumulative A…G PR, not serial wave acceptance. All exact-head GitHub checks for `00e0c27` were queued at the latest read-back. P4's three failed closure rows do not block P5 branch continuation; P5 closure still requires applicable P4 rows, qualified external boundaries and protected serial-wave delivery. |
+| P5    | active            | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060       | —                                                               | issue `#113`, branch `work/p5-implementation`, PR `#114` | On `ce21e8e`, local `gate:p2` passed 13/13 and `gate:p5` passed: P4-G 2,249 mutants (2,224 killed, 25 surviving, zero compile/test/no-coverage/timeouts), P5 104/104 TAP, 42/42 mutants, 49,152 properties and 56/56 faults. All platform cells passed. Required closure received 16/16 leaf reports and failed only on OSV and npm audit. PR #114 remains one cumulative A…G PR, not serial wave acceptance; durable production adapter qualification and external AEAT evidence remain unfulfilled. See Amendment P5-021. |
 | P6    | planned           | P5 closure required                                                              | —                                                               | —                                                        | Public products and ecosystem conformance.                                                                                                                                                                                                                                                                                                                                                                                                |
 | P7    | planned           | P6 closure required                                                              | —                                                               | —                                                        | Whole-product assurance, external validation and release rehearsal.                                                                                                                                                                                                                                                                                                                                                                       |
 | P8    | planned           | P7 closure required                                                              | —                                                               | —                                                        | Stable publication, verification and support.                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -4929,3 +4929,69 @@ protected required context. The repository's serial P5-A…P5-G acceptance,
 qualified production durable adapter, applicable P4 closure rows and external
 AEAT evidence remain phase-exit conditions. `creationAllowed=false`; no
 external AEAT acceptance is claimed.
+
+## Amendment P5-021 — exact-head P5-D and protected-check read-back
+
+This amendment supersedes the in-progress snapshot in P5-020. At the
+2026-10-05 04:26 UTC read-back, local `work/p5-implementation` and
+`origin/work/p5-implementation` were clean and synchronized at signed+DCO
+commit `ce21e8ed5d0ba55f712d74fe4e5429343ae35b7b` (tree
+`7995f5e9871d5f89e3c1c8670bd27bd9ed8c3c8a`). It is based on protected
+`main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`. PR #114 remains open and
+unmerged. The connector refused an attempted PR description refresh with HTTP
+403 `Resource not accessible by integration`; the PR body therefore remains
+stale and must be refreshed by an actor with PR metadata write access.
+
+- Exact local validation passed on this commit and tree: `gate:p2` passed
+  13/13 tasks with no diagnostics; `gate:p5` passed. P4-G passed 262/262 TAP
+  with independent oracle 9/9, 2,249 mutants generated, 2,224 killed, 25
+  surviving, and zero compile errors, test errors, no-coverage outcomes or
+  timeouts. P5 passed 104/104 TAP; coverage was 99.12% lines, 95.21% branches
+  and 99.04% functions; all 26 critical and 16 additional mutants were killed,
+  all 49,152 property executions completed, and all 56 seeded faults were
+  detected. P4-D also passed with the admitted Temurin JDK 21.0.12.1+1, Maven
+  3.9.12 and 280/280 JAR/POM plus 100/100 metadata POM hashes verified.
+- GitHub workflows on the exact SHA were Required engineering
+  [37251723819](https://github.com/noeos/verifactu/actions/runs/37251723819),
+  Engineering CI
+  [37251723815](https://github.com/noeos/verifactu/actions/runs/37251723815),
+  Conformance
+  [37251723812](https://github.com/noeos/verifactu/actions/runs/37251723812),
+  Security [37251723770](https://github.com/noeos/verifactu/actions/runs/37251723770),
+  Performance
+  [37251723775](https://github.com/noeos/verifactu/actions/runs/37251723775)
+  and regulatory observation
+  [37251723794](https://github.com/noeos/verifactu/actions/runs/37251723794).
+  Engineering CI gate:p2, Conformance, Security, Performance, regulatory
+  observation, Required quality/policy, CodeQL, documentation, package
+  reproducibility, governance/DCO, secret scan, dependency review, integration
+  conformance, regulatory sources/generated contracts and all five platform
+  cells passed. The platform cells were Ubuntu 24.04 with Node 22.14.0,
+  22.23.2 and 24.21.0; macOS 15 with Node 24.21.0; and Windows 2025 with Node
+  24.21.0. Their P4-G cumulative artifacts were retained by the Required run.
+- Required engineering received and validated exactly 16/16 leaf reports.
+  Required `required-check closure` failed only on `Required · OSV` and
+  `Required · npm audit signatures and licenses`; there were no missing or
+  duplicate reports. The closure log reported
+  `CLOSURE_REPORT_FAILURES` for those two contexts. Consequently PR #114
+  remains blocked and P4 phase closure remains `blocked`.
+- In the npm audit job, admitted npm `11.19.1` bundled under Node 24.21.0
+  reported four vulnerable packages inside the global tool tree
+  `node_modules/npm/node_modules`: `brace-expansion` (high),
+  `http-cache-semantics` (high), `ip-address` (moderate) and `undici` (high).
+  The job separately verified 232 registry signatures and 87 attestations.
+  The vulnerable npm-bundled packages are present in `package-lock.json` under
+  the pinned npm development-tool installation; they are not application
+  runtime dependencies. OSV and npm audit remain enabled and unsuppressed; no
+  exception or waiver is present. A compatible fixed official Node/npm bundle
+  and a fresh exact-head scan are required to clear these findings.
+- P5-A…P5-G continuation remains authorized on the ADR-0060 branch while P4
+  closure is blocked; this does not authorize merge or phase completion. P5 is
+  still one cumulative PR rather than the required serial signed+DCO wave PRs.
+  A qualified production durable adapter and applicable independent/external
+  AEAT evidence are also absent. The edition remains `creationAllowed=false`,
+  and no external AEAT acceptance is claimed.
+
+The documentation update for P5-021 creates a new exact-head subject. Re-run
+the repository's applicable local and protected checks on that new SHA; the
+results above apply only to `ce21e8e`.

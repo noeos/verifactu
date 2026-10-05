@@ -15,6 +15,16 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Reconfirm P5 continuation with P4 closure outstanding
+
+- Recorded the project owner's reconfirmation that a new or resumed session may
+  start or continue P5 on issue #113's `work/p5-implementation` branch under
+  ADR-0060 without waiting for P4 phase closure.
+- Updated the executable P5 prompt to direct the next session to inspect live
+  state and proceed with the authorized branch work. P4's three failed required
+  contexts remain unresolved and visible; no check, merge rule or phase-exit
+  criterion is waived or changed.
+
 ## 2026-10-05 — Amend P5-D address policy and critical mutation population
 
 - Closed a DNS SSRF gap by applying CIDR-aware IPv4/IPv6 classification before
