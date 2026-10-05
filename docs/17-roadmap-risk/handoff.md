@@ -39,7 +39,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current state is amended by the latest numbered P5 amendment in this file
-(currently P5-029) and ADR-0060. A session resuming P5 must read that amendment
+(currently P5-030) and ADR-0060. A session resuming P5 must read that amendment
 and inspect live GitHub state; older snapshots are historical.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
@@ -5506,3 +5506,58 @@ The local reports are bound to `e07c631`; this handoff amendment creates a new
 PR #114 subject. Re-read every workflow for the resulting head. This update
 does not change P4 status, scanner coverage, wave order, protected checks or
 P5 phase-exit conditions.
+
+## Amendment P5-030 — 2026-10-05 defensive reads for accepted byte snapshots
+
+This amendment supersedes P5-029 as the active-state snapshot. The protected
+base remains `1f66da46e21127d1d82018cfdf093f595e1c08ae`; the active
+`protected-main` ruleset still requires all 17 strict contexts, signatures,
+linear history and squash integration. P4 PR #109 remains merged at exact head
+`2396d87a3748e20a1a02f66a5b4ab21337f758ce` with its three terminal required
+failures: OSV, npm audit signatures/licences and derived required-check closure.
+P4 remains phase-blocked.
+
+### P5-A defensive byte snapshot correction
+
+- Review found that `validateRecord` and `validateArtifact` copied caller input
+  before digest verification, but then exposed the accepted copy as a mutable
+  `Uint8Array`. Freezing the containing object does not make a typed-array's
+  elements immutable, so a caller could alter validated bytes after return.
+- The accepted bytes now remain closure-owned and each read of
+  `canonicalBytes` or artifact `bytes` returns a new copy. Regression tests
+  mutate both the original input and a returned copy, then verify later reads
+  still equal the digest-validated bytes.
+- Signed+DCO cumulative commit
+  `0b016d5093b90fb6890f10bf0efeae0deeaa4559` (tree
+  `ea4539c4d09399894900fc75a4029156866e0f7b`) passed exact local `gate:p5`
+  2/2. Its reports record `test:p5` 104/104 over 23/23 files, 99.13% lines,
+  95.18% branches and 99.04% functions, 49,152/49,152 property executions,
+  56/56 fault injections, quality plan 10/10, mutation 42/42 (26 critical,
+  16 other), build 3/3, types 3/3, format 124/124, lint 84/84 and package
+  reproducibility 6/6. The mutation report transparently records three
+  syntactically invalid catalog candidates outside the frozen valid selected
+  population; all 42 selected mutants compiled and were killed.
+- The same P5-A-only correction is in signed+DCO commit
+  `f5eb5d07708c33b77dd4844967cfdce24cc66692` on `work/p5-a`. Exact local
+  `gate:p5` passed 2/2, including 9/9 tests over 2/2 A files (100% lines,
+  98.45% branches, 100% functions, 16,384 property executions) and mutation
+  2/2 (one critical and one other mutant). The A worktree is clean and pushed.
+
+### Current exact-head GitHub state
+
+- PR #114 is open at `0b016d5093b90fb6890f10bf0efeae0deeaa4559`, based on the
+  protected base above. PR #118 is open at
+  `f5eb5d07708c33b77dd4844967cfdce24cc66692`, on the same base. GitHub reported
+  all 25 check-runs queued on both exact heads when read after the pushes;
+  both PRs are `BLOCKED`. Queued is pending evidence, not a pass. Reports from
+  `ea15ef1` or `cb874b0` are stale for these heads.
+- No P5-A protected merge or successful required-check closure has occurred.
+  Do not start/deliver P5-B before P5-A merges through the normal protected
+  process. PR #114 remains cumulative P5-G staging and cannot substitute for
+  the ordered wave PRs.
+- The exact-head P5-A and full-prefix P5-G local reports above are not GitHub
+  matrix acceptance. Re-read all workflows on the resulting documentation
+  head after this amendment is committed.
+- P4's three failed rows, full scanner coverage, P5 serial wave order and
+  protected rules remain unchanged. No scan, check, threshold, denominator,
+  predecessor requirement or phase-exit condition is waived.

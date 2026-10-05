@@ -15,6 +15,17 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Defend accepted P5 byte snapshots from caller mutation
+
+- P5 record and artifact validation now keeps accepted bytes privately and
+  returns defensive copies on every read, preventing a caller from changing
+  validated persistence content after admission.
+- Added regression coverage for mutation of both input buffers and exposed
+  copies; recorded exact local P5-A and cumulative P5-G validation in handoff
+  Amendment P5-030.
+- Protected CI is pending on exact PR heads. P4 remains blocked and no check,
+  scanner, denominator, serial-wave prerequisite or phase-exit rule changed.
+
 ## 2026-10-05 — Prevent repeated P5 entry authorization prompts
 
 - Clarified the executable P5 prompt that a resumed session must not ask the
