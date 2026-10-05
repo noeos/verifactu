@@ -5,7 +5,7 @@ status: approved
 authority: normative
 owner: project-owner
 created: 2026-09-11
-last-reviewed: 2026-10-04
+last-reviewed: 2026-10-05
 ---
 
 # VeriFactu documentation
@@ -33,7 +33,12 @@ may continue while P4 closure remains open. The local P5 synthetic campaign has
 passed; it does not establish production-backend qualification, external AEAT
 acceptance, a compliance claim, publication or release authorization. See the
 [current handoff](17-roadmap-risk/handoff.md) for exact subjects, checks and
-remaining blockers.
+remaining blockers. To start or resume P5, use the P5 section in
+[`prompts.md`](17-roadmap-risk/prompts.md): it directs the session to proceed
+with authorized branch implementation while carrying P4's unresolved closure
+rows forward. ADR-0060 amends the general predecessor-closure rule for P5
+implementation entry; normal protected checks and the documented P5 exit
+criteria remain in force.
 
 The approved documentation map and the rules for developing it are recorded in
 [`STRUCTURE.md`](STRUCTURE.md).

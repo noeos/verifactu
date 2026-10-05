@@ -39,7 +39,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current state is amended by the latest numbered P5 amendment in this file
-(currently P5-021) and ADR-0060. A session resuming P5 must read that amendment
+(currently P5-027) and ADR-0060. A session resuming P5 must read that amendment
 and inspect live GitHub state; older snapshots are historical.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
@@ -5353,3 +5353,39 @@ does not waive a scanner, check, threshold, serial-wave prerequisite, protected
 merge or P4/P5 phase-exit condition. Do not create P5-B before P5-A is merged.
 This handoff amendment creates a new subject; the local reports above are bound
 to `a29bea7`. Inspect all workflows again after this documentation change.
+
+## Amendment P5-027 — 2026-10-05 P5 entry-point clarification and exact-head read-back
+
+This amendment makes the authorized P5 entry instruction prominent for new
+sessions and supersedes P5-026 as the active-state snapshot. At 09:59 UTC, the
+clean local branch was `work/p5-implementation` at
+`c196bb09c040addb693c1d7945e9f09f51c76cf6`; PR #114 was open at that exact
+head against protected `main`
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`, with merge state `BLOCKED`.
+
+- ADR-0060 authorizes P5-A…P5-G implementation to start or continue on issue
+  #113's named branch while P4 phase closure is open. The P5 execution prompt
+  says the intake decision is to proceed with authorized branch implementation,
+  unless fresh evidence shows direct safety, regulatory or functional impact on
+  the affected P5 work. The P4 status read-back is observational for P5 entry;
+  repeating the P4 closure analysis is not a reason to refuse P5 branch work.
+- This entry authorization preserves P4's blocked status and all failed
+  evidence. It does not waive or disable a check, permit a P5 protected merge
+  without every effective required context, change serial wave prerequisites,
+  or permit P5 phase closure while applicable P4 closure rows remain unresolved.
+- `docs/README.md` now links directly to the executable P5 prompt and explains
+  that the generic predecessor-closure rule is amended for P5 implementation
+  entry by ADR-0060. `prompts.md` is marked reviewed on 2026-10-05.
+- GitHub exact-head read-back: PR #114 is open at
+  `c196bb09c040addb693c1d7945e9f09f51c76cf6`, merge state `BLOCKED`; all
+  reported check-runs were queued when read at 09:59 UTC. They are pending,
+  not passes. PR #118 remains open at
+  `916a6670c2a53835f9cc82af95a9d211cda57a3e`; its OSV and npm audit checks had
+  failed, Engineering CI `gate:p2` was in progress, and remaining checks were
+  pending or had passed as listed by GitHub. P5-A is not accepted and P5-B
+  must not begin on its delivery branch before A's protected merge.
+
+This documentation change creates a new exact subject. Re-read every workflow
+on its resulting head before treating any check as current. P4 remains blocked
+by its three exact closure failures; this clarification changes no check result
+and authorizes no waiver.

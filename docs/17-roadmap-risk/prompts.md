@@ -5,7 +5,7 @@ status: approved
 authority: informative
 owner: project-owner
 created: 2026-09-13
-last-reviewed: 2026-10-04
+last-reviewed: 2026-10-05
 dependencies: [ROADMAP-DOC-0004, ROADMAP-DOC-0017]
 decisions: [ADR-0001, ADR-0031, ADR-0051, ADR-0055, ADR-0056, ADR-0057, ADR-0058, ADR-0060]
 historical-inputs: [REV-063, REV-074, REV-079, REV-084]
