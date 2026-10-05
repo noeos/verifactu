@@ -39,7 +39,7 @@ its scope or gates. False, ambiguous, stale or secret-bearing entries are defect
 ## Current authority notice
 
 The current state is amended by the latest numbered P5 amendment in this file
-(currently P5-030) and ADR-0060. A session resuming P5 must read that amendment
+(currently P5-031) and ADR-0060. A session resuming P5 must read that amendment
 and inspect live GitHub state; older snapshots are historical.
 P4-A–P4-G implementation PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`; P4 phase closure remains blocked
@@ -5561,3 +5561,65 @@ P4 remains phase-blocked.
 - P4's three failed rows, full scanner coverage, P5 serial wave order and
   protected rules remain unchanged. No scan, check, threshold, denominator,
   predecessor requirement or phase-exit condition is waived.
+
+## Amendment P5-031 — 2026-10-05 hostile persistence inputs and host UoW decision
+
+This amendment supersedes P5-030 as the active-state snapshot. The protected
+base remains `1f66da46e21127d1d82018cfdf093f595e1c08ae`; the active
+`protected-main` ruleset remains unchanged. P4 PR #109 is still merged but
+phase-blocked by its exact OSV, npm audit signatures/licences and derived
+required-check closure failures.
+
+### P5-A input-validation correction
+
+- Review found that persistence validators could throw when descriptor
+  accessors or proxies behaved hostilely. Reading a property once for
+  validation and spreading the caller object afterward also allowed accessor
+  time-of-check/time-of-use changes. Validators now snapshot exact own data
+  properties, reject accessors and unexpected keys, validate copied
+  identity/context and sparse-free artifact-id arrays, and return
+  `invalid-input` when proxy traps throw. Returned byte fields remain defensive
+  copies.
+- Regression coverage proves accessors are not invoked, hostile record,
+  artifact, evidence and array proxies fail closed, and sparse/accessor/extended
+  artifact-id arrays are rejected.
+- Cumulative commit `15ed55b5a1e018619e227f80e08c72787f89a271` (tree
+  `7c9ff907907aab777307e7db61b273b0ae96f0ff`) passed exact local `gate:p5`
+  2/2; `test:p5` 104/104 over 23/23 files; 99.15% line, 95.08% branch and
+  99.06% function coverage; 49,152/49,152 property executions; 56/56 fault
+  injections; quality plan 10/10; mutation 42/42 (26 critical, 16 other);
+  format 124/124, types 3/3 and lint 84/84. Recovery metrics were 1,919.49 ms
+  wall time, 95,875,072 peak RSS bytes, 12.99 ms event-loop delay, queue
+  high-water 128 and open handles 2→2. All reports are clean-tree evidence for
+  that exact subject.
+- Serial P5-A carries the same fix in signed+DCO commit
+  `5f4df027da2ff39c4ad3a8b3e4690f48853c35e9` (tree
+  `4fe31f7e439f044d1823f39f0ffa115e3d5d18dc`): `gate:p5` 2/2, 9/9 tests in
+  2/2 A files, 100% line, 96.25% branch and 100% function coverage,
+  16,384/16,384 property executions, mutation 2/2 (one critical, one other),
+  format 101/101, types 3/3 and lint 61/61.
+
+### P5 durable-backend decision and remote state
+
+- The product owner selected the **host database unit of work** as P5's durable
+  backend boundary. P5-B must persist through the host-owned durable database
+  UoW and demonstrate records, artifacts, evidence claims, outbox/journal state
+  and sequence-head publication in the same atomic commit, with indeterminate
+  commits resolved through read-back. A standalone volatile or file-only store
+  is not an acceptable substitute. This records the backend choice; it does not
+  advance or waive the serial wave order.
+- PR #114 is open at exact cumulative head
+  `15ed55b5a1e018619e227f80e08c72787f89a271`; PR #118 is open at exact P5-A
+  head `5f4df027da2ff39c4ad3a8b3e4690f48853c35e9`. GitHub reported all 25
+  checks queued on each exact head at 12:14 UTC. Pending is unknown, not passed.
+  Read every check again on any later documentation head. P5-A is not accepted
+  and P5-B must not begin on its delivery branch until A merges after all
+  required contexts and `required-check closure` succeed.
+- The strict independent SOAP peer remains a P5-D requirement. P4's failed
+  rows, all scanner coverage, the 17 protected required contexts, signatures,
+  linear-history/squash rules and P5 wave sequence remain in force. No PR was
+  merged or closed by this amendment.
+
+This handoff update changes the cumulative P5-G subject and restarts its
+required workflows. Re-read the exact resulting PR head; do not reuse queued or
+terminal results from `15ed55b` for the documentation commit.
