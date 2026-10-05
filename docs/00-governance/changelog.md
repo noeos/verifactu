@@ -15,6 +15,15 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Align P5 capability boundaries with phase exit
+
+- Updated the P5 external-gap matrix to distinguish prerequisites for a named
+  real adapter, live AEAT operation, edition submission or production SLO claim
+  from P5 phase-exit requirements. P5 still requires serial signed+DCO waves,
+  current required checks and applicable P4 closure rows.
+- Kept P6 planned until P5 closes; absence of unclaimed production/external
+  capability does not itself block P5 phase exit under the frozen plan.
+
 ## 2026-10-05 — Correct P5 external-scope wording and refresh capsule
 
 - Refreshed the current handoff capsule and added Amendment P5-023 with local
