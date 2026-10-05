@@ -5,7 +5,11 @@ import { createFiscalContext } from "../domain/context.js";
 import type { FiscalInstant } from "../domain/date-time.js";
 import { createFiscalInstant } from "../domain/date-time.js";
 import type { Identity, IdentityKind } from "../domain/identities.js";
-import { identityKey, isIdentity } from "../domain/identities.js";
+import {
+  createIdentity,
+  identityKey,
+  isIdentity,
+} from "../domain/identities.js";
 
 export const PERSISTENCE_SCHEMA_VERSION = 1 as const;
 export type Sha256 = `sha256:${string}`;
@@ -188,34 +192,64 @@ export function sha512Digest(bytes: Uint8Array): `sha512:${string}` {
   return `sha512:${createHash("sha512").update(bytes).digest("hex")}`;
 }
 
+function snapshotIdentity<K extends IdentityKind>(
+  value: unknown,
+  kind: K,
+): Identity<K> | null {
+  if (!isIdentity(value, kind)) return null;
+  const result = createIdentity(kind, value.value);
+  return result.status === "ok" ? result.value : null;
+}
+
 export function validateRecord(
   record: ImmutableRecord,
 ): StoreResult<ImmutableRecord> {
+  const context = record && createFiscalContext(record.context);
+  const canonicalBytes =
+    record?.canonicalBytes instanceof Uint8Array
+      ? Uint8Array.from(record.canonicalBytes)
+      : null;
+  const recordId = record ? snapshotIdentity(record.id, "record") : null;
+  const editionId = record
+    ? snapshotIdentity(record.editionId, "edition")
+    : null;
+  const predecessorId: Identity<"record"> | null =
+    record?.predecessorId === null
+      ? null
+      : record
+        ? snapshotIdentity(record.predecessorId, "record")
+        : null;
   if (
     !record ||
     typeof record !== "object" ||
     record.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
-    !isIdentity(record.id, "record") ||
-    !isIdentity(record.editionId, "edition") ||
-    (record.predecessorId !== null &&
-      !isIdentity(record.predecessorId, "record")) ||
-    record.predecessorId?.value === record.id.value ||
-    createFiscalContext(record.context).status !== "ok" ||
-    record.context.editionId.value !== record.editionId.value ||
+    !recordId ||
+    !editionId ||
+    (record.predecessorId !== null && !predecessorId) ||
+    predecessorId?.value === recordId.value ||
+    context?.status !== "ok" ||
+    context.value.editionId.value !== editionId.value ||
     !["alta", "anulacion", "correction", "substitution"].includes(
       record.kind,
     ) ||
-    !(record.canonicalBytes instanceof Uint8Array) ||
-    record.canonicalBytes.byteLength === 0 ||
-    record.canonicalBytes.byteLength > 1_048_576 ||
-    record.semanticDigest !== sha256Digest(record.canonicalBytes) ||
+    !canonicalBytes ||
+    canonicalBytes.byteLength === 0 ||
+    canonicalBytes.byteLength > 1_048_576 ||
+    record.semanticDigest !== sha256Digest(canonicalBytes) ||
     !Number.isSafeInteger(record.sequence) ||
     record.sequence < 1 ||
     createFiscalInstant(record.createdAt).status !== "ok"
   )
     return storeFailure("invalid", "invalid-input");
   return storeOk(
-    Object.freeze({ ...record, canonicalBytes: record.canonicalBytes.slice() }),
+    Object.freeze({
+      ...record,
+      id: recordId,
+      context: context.value,
+      editionId,
+      predecessorId,
+      canonicalBytes,
+    }),
   );
 }
 
@@ -223,12 +257,18 @@ export function validateArtifact(
   descriptor: ArtifactDescriptor,
   bytes: Uint8Array,
 ): StoreResult<ArtifactObject> {
+  const context = descriptor && createFiscalContext(descriptor.context);
+  const identity = descriptor
+    ? snapshotIdentity(descriptor.id, "operation")
+    : null;
+  const exactBytes =
+    bytes instanceof Uint8Array ? Uint8Array.from(bytes) : null;
   if (
     !descriptor ||
     typeof descriptor !== "object" ||
     descriptor.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
-    createFiscalContext(descriptor.context).status !== "ok" ||
-    !isIdentity(descriptor.id, "operation") ||
+    context?.status !== "ok" ||
+    !identity ||
     !isSafeStoreToken(descriptor.artifactId) ||
     !/^[a-zA-Z0-9][a-zA-Z0-9.+/-]{0,126}[a-zA-Z0-9]$/u.test(
       descriptor.mediaType,
@@ -236,17 +276,21 @@ export function validateArtifact(
     !Number.isSafeInteger(descriptor.byteLength) ||
     descriptor.byteLength < 0 ||
     descriptor.byteLength > 1_048_576 ||
-    !(bytes instanceof Uint8Array) ||
-    bytes.byteLength !== descriptor.byteLength ||
-    sha256Digest(bytes) !== descriptor.sha256 ||
-    sha512Digest(bytes) !== descriptor.sha512 ||
+    !exactBytes ||
+    exactBytes.byteLength !== descriptor.byteLength ||
+    sha256Digest(exactBytes) !== descriptor.sha256 ||
+    sha512Digest(exactBytes) !== descriptor.sha512 ||
     createFiscalInstant(descriptor.createdAt).status !== "ok"
   )
     return storeFailure("invalid", "invalid-input");
   return storeOk(
     Object.freeze({
-      descriptor: Object.freeze({ ...descriptor }),
-      bytes: bytes.slice(),
+      descriptor: Object.freeze({
+        ...descriptor,
+        id: identity,
+        context: context.value,
+      }),
+      bytes: exactBytes,
     }),
   );
 }
@@ -254,12 +298,14 @@ export function validateArtifact(
 export function validateEvidenceClaim(
   claim: EvidenceClaim,
 ): StoreResult<EvidenceClaim> {
+  const context = claim && createFiscalContext(claim.context);
+  const identity = claim ? snapshotIdentity(claim.id, "operation") : null;
   if (
     !claim ||
     typeof claim !== "object" ||
     claim.schemaVersion !== PERSISTENCE_SCHEMA_VERSION ||
-    !isIdentity(claim.id, "operation") ||
-    createFiscalContext(claim.context).status !== "ok" ||
+    !identity ||
+    context?.status !== "ok" ||
     !isSafeStoreToken(claim.claimId) ||
     !/^sha256:[0-9a-f]{64}$/u.test(claim.subjectDigest) ||
     !isSafeStoreToken(claim.verifierId) ||
@@ -276,7 +322,8 @@ export function validateEvidenceClaim(
   return storeOk(
     Object.freeze({
       ...claim,
-      context: Object.freeze({ ...claim.context }),
+      id: identity,
+      context: context.value,
       supportingArtifactIds: Object.freeze([...claim.supportingArtifactIds]),
     }),
   );
