@@ -129,11 +129,15 @@ P1 protected bootstrap
 ```
 
 A successor starts only after its mandatory predecessor is `evidence-complete`
-on protected `main` and its inputs remain current, except for the one-time P4 to
+on protected `main` and its inputs remain current, except for the scoped P4 to
 P5 implementation-start authorization in [ADR-0060](../00-governance/decisions/ADR-0060-scoped-p5-start-with-open-p4-closure.md).
-That authorization permits development on issue #113's named branch only. It
-does not close P4, authorize a P5 merge to `main`, waive required checks or allow
-P5 closure while P4's applicable closure rows remain unresolved.
+For P5, this permits serial development on issue #113's `work/p5-a` through
+`work/p5-g` branches. Start each wave from current protected `main` after the
+previous wave has merged. The cumulative `work/p5-implementation` branch is a
+staging branch and does not establish acceptance of those vertical waves. This
+authorization does not close P4, authorize a P5 merge to `main`, waive any
+required check or allow P5 closure while P4's applicable closure rows remain
+unresolved.
 
 ## Long-lead lane
 

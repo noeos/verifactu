@@ -62,10 +62,13 @@ The project owner, `ddavid07`, explicitly approved option 2 in the Codex session
 on 2026-10-03. This decision is a one-time, narrowly scoped amendment to the
 P4-to-P5 start prerequisite in ADR-0058 and the roadmap: P5-A through P5-G
 implementation work may begin from protected `main`
-`1f66da46e21127d1d82018cfdf093f595e1c08ae`, tracked by issue #113 and branch
-`work/p5-implementation`.
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`, tracked by issue #113. The
+2026-10-05 clarification below specifies the owner's required serial branch
+routing: `work/p5-a` through `work/p5-g`, with each wave based on current
+protected `main` after the prior wave merges.
 
-This authorization is for development on that P5 work branch only. It does not
+This authorization is for development on the P5 wave branches specified below
+only. It does not
 authorize merging P5 implementation to `main`, bypassing any check for a P5 PR,
 closing P4, marking P4 `evidence-complete`, or claiming that any failed or
 pending check passed. Protected P5 merges continue to require all effective
@@ -91,16 +94,31 @@ exposure.
 
 ## Verification
 
-At P5 intake, verify the exact `main` and branch SHAs, issue #113, restored
-ruleset, current P4 run states and this decision. Each P5 PR must pass its full
-exact-head required matrix and closure normally. Before P5 closure, verify P4's
+At P5 intake and every wave transition, verify the exact `main` and branch SHAs,
+issue #113, restored ruleset, current P4 run states and this decision. Each P5
+PR must pass its full exact-head required matrix and closure normally. Before
+P5 closure, verify P4's
 complete phase-close matrix and current protected-main read-back; no stale or
 pending result may be represented as passed.
 
 ## Migration and reversal
 
-This decision authorizes only the P5 implementation branch named above. It does
+This decision authorizes only the P5 serial wave branches named above. It does
 not generalize to later phases or other exceptions. If P4 evidence reveals
 functional, regulatory or security impact beyond the documented dependency
 findings, stop affected P5 work and reassess. Withdrawal before P5 closure
 returns phase sequencing to ADR-0058's normal predecessor-closure rule.
+
+## Clarification — 2026-10-05 serial-wave branch execution
+
+The project owner's P5 phase mandate requires separate signed+DCO vertical PRs
+for P5-A through P5-G. Those PRs may use the already-governed branch pattern
+`work/p5-a` through `work/p5-g` in `config/quality/p5-delivery-waves.json`, all
+under issue #113 and targeting protected `main`. Each wave after A must be based
+on the immediately preceding wave after its protected merge. The existing
+`work/p5-implementation` branch is a cumulative development/staging branch; its
+full P5-G contents do not count as accepted serial waves. This clarification
+extends only the branch routing required to deliver the owner's approved P5
+scope. Every PR remains subject to the normal exact-head required checks and
+protected merge rules. It does not authorize check bypass, close P4, or permit
+P5 phase closure while applicable P4 closure rows remain unresolved.

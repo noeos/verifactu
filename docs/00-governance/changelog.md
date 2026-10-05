@@ -5,7 +5,7 @@ status: active
 authority: normative
 owner: project-owner
 created: 2026-09-21
-last-reviewed: 2026-09-21
+last-reviewed: 2026-10-05
 dependencies: [ROADMAP-DOC-0017, ROADMAP-DOC-0020]
 decisions: [ADR-0026, ADR-0053]
 ---
@@ -14,6 +14,165 @@ decisions: [ADR-0026, ADR-0053]
 
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
+
+## 2026-10-05 — Authorize serial P5 wave branch routing
+
+- Recorded that the owner's P5 mandate uses the existing `work/p5-a` through
+  `work/p5-g` branch pattern for separate vertical PRs under issue #113.
+- Clarified that cumulative `work/p5-implementation` contents do not count as
+  accepted waves. All required checks, protected merges, P4 closure rows and
+  P5 phase-exit criteria remain unchanged.
+- Aligned the roadmap, readiness rule, dependency map, P5 prompt and current
+  handoff with that serial routing. Refreshed the P4 read-back: its PR head and
+  protected-push run are terminal with the same three required-check failures.
+
+## 2026-10-05 — Refresh P5 exact-head handoff and dependency audit evidence
+
+- Recorded the local P5 gate and package results for `705fb9f`, plus the
+  then-pending GitHub checks and the exact unresolved P4 audit closure.
+- Rechecked the latest compatible official npm bundles and confirmed their
+  in-bundle dependencies still carry the four audit findings; no scan or
+  dependency exception was applied.
+
+## 2026-10-05 — Reconcile dependency scheduling with scoped P5 authorization
+
+- Updated the dependency map so its general fail-closed scheduling rule points
+  to explicit, bounded ADR authorizations instead of contradicting ADR-0060.
+- Clarified that P4 closure findings do not block P5 branch implementation,
+  while P4 closure, protected P5 merge checks and P5 phase-exit requirements
+  remain unchanged.
+
+## 2026-10-05 — Align P5 capability boundaries with phase exit
+
+- Updated the P5 external-gap matrix to distinguish prerequisites for a named
+  real adapter, live AEAT operation, edition submission or production SLO claim
+  from P5 phase-exit requirements. P5 still requires serial signed+DCO waves,
+  current required checks and applicable P4 closure rows.
+- Kept P6 planned until P5 closes; absence of unclaimed production/external
+  capability does not itself block P5 phase exit under the frozen plan.
+
+## 2026-10-05 — Correct P5 external-scope wording and refresh capsule
+
+- Refreshed the current handoff capsule and added Amendment P5-023 with local
+  exact-head evidence, current PR #114 checks, the three still-failed P4
+  contexts and the unwaived audit failures on the current P5 head.
+- Corrected P5-021's overstatement: a real production backend qualification or
+  external AEAT observation is not an implied P5 phase-exit prerequisite under
+  the frozen quality plan. Required capability claims, protected checks,
+  serial-wave acceptance and applicable P4 closure rows remain governed.
+
+## 2026-10-05 — Refresh active P5 exact-head evidence
+
+- Added Amendment P5-022 with a fresh local `gate:p5` result and the live
+  workflow states for PR #114 at `5729aea`. P4 remains blocked by its three
+  exact required-check findings; the current P5 head has two failed audit
+  contexts and its remaining required checks are still running.
+- Recorded the still-open P5 boundaries: seven serial signed+DCO wave PRs,
+  qualified adapter evidence before any real adapter capability claim, and
+  separately authorized external AEAT observation. Corrected P5-021's
+  overstatement that these unselected external capabilities are P5 phase-exit
+  prerequisites; the frozen P5 plan and applicable P4 closure rows govern
+  phase exit. No check, merge rule or phase-exit criterion was waived.
+
+## 2026-10-05 — Reconfirm P5 continuation with P4 closure outstanding
+
+- Recorded the project owner's reconfirmation that a new or resumed session may
+  start or continue P5 on issue #113's `work/p5-implementation` branch under
+  ADR-0060 without waiting for P4 phase closure.
+- Updated the executable P5 prompt to direct the next session to inspect live
+  state and proceed with the authorized branch work. P4's three failed required
+  contexts remain unresolved and visible; no check, merge rule or phase-exit
+  criterion is waived or changed.
+
+## 2026-10-05 — Amend P5-D address policy and critical mutation population
+
+- Closed a DNS SSRF gap by applying CIDR-aware IPv4/IPv6 classification before
+  credential acquisition or socket creation, including expanded and
+  IPv4-mapped IPv6 forms. Added IANA registry and Node.js net sources to the
+  transport policy.
+- Added the governed P5-D controls `P5-CRIT-025/026` and mutants
+  `P5-MUT-041/042`; population is now 26 critical and 16 other mutants. The
+  prior controls and thresholds remain unchanged.
+- Dirty-worktree `gate:p5` passed after the amended mutants were both killed.
+  The new commit still requires clean exact-head local and GitHub checks.
+
+## 2026-10-04 — Refresh P5 documentation-head checks
+
+- Added Amendment P5-019 with the exact `00e0c27` branch/PR identity and
+  check-run states after P5-018 was pushed. All current checks were queued;
+  the new docs subject requires a fresh read-back.
+- Preserved the instruction to continue P5 branch work under ADR-0060 while
+  P4 remains blocked, without changing any merge or phase-exit requirement.
+
+## 2026-10-04 — Refresh the active P5 continuation handoff
+
+- Added Amendment P5-018 and refreshed the handoff capsule with the current
+  clean local/remote branch SHA and PR #114 exact-head workflow snapshot.
+- Made the operational instruction explicit: a P5 session must continue
+  authorized branch work while P4 is blocked. The P4 failures remain visible;
+  this does not waive checks, enable a protected merge or close either phase.
+- Recorded local P5 gate evidence and the remaining serial-wave and external
+  qualification conditions without treating pending GitHub checks as passes.
+
+## 2026-10-04 — Clarify continued P5 implementation authorization
+
+- Clarified ADR-0060: its one-time owner decision authorizes continued P5-A…P5-G
+  implementation on issue #113's named branch; the authorization was not
+  consumed by the first session or commit. Resumed sessions must continue the
+  branch without reopening P4 closure as an entry prerequisite.
+- P4 remains blocked. The clarification changes no P4 finding, required check,
+  P5 protected-merge gate, P5 phase-exit criterion or external qualification
+  requirement.
+
+## 2026-10-04 — Add durable recovery checkpoint port and bounded startup read
+
+- P5 review found that recovery accepted `RecoveryCheckpoint` as an input but
+  `PersistencePorts` had no checkpoint storage contract. Added
+  `RecoveryCheckpointStore` with complete-chain read verification and an
+  immutable predecessor-digest compare-and-append staged in the host UoW; the
+  persistence port contract is now version 2.
+- Startup recovery now applies a bounded, cancellable checkpoint read and
+  blocks worker/network activity on timeout, cancellation, unavailable data or
+  adapter failure. Replaced the immediate unavailable mock behind
+  `P5-FAULT-054` with a real deadline and abort-triggered store response.
+- The P5 production/test path inventories and campaign counts are unchanged.
+  Exact local gate and protected-head evidence will be recorded after the
+  revised commit and workflows complete.
+
+## 2026-10-04 — Record terminal P5-head workflow closure
+
+- Added Amendment P5-015 with terminal results for PR #114's exact `94db4c6`
+  head: all five platform cells, P2, conformance and 14/17 required contexts
+  passed; OSV, npm audit and derived required-check closure failed.
+- Recorded that the closure job downloaded all 16 expected leaf artifacts and
+  rejected only the two audit reports. P4 remains blocked and unwaived.
+
+## 2026-10-04 — Refresh exact P5 remote-state handoff
+
+- Added Amendment P5-014 to replace the stale P5-013 read-back with the exact
+  `94db4c6` branch/PR identity and current required workflow states.
+- Recorded the completed prior-head P2 and conformance results separately from
+  the newer exact-head runs, which remain pending or failed as observed.
+- P4 remains blocked; no required check, serial-wave condition or P5 exit gate
+  changed.
+
+## 2026-10-04 — Refresh P5 handoff after entry-rule clarification
+
+- Added Amendment P5-013 with the exact local commit/tree, local P5-G and
+  documentation check evidence, current PR #114 workflow observation, active
+  protection state and the still-open serial-wave delivery gap.
+- Recorded the latest upstream npm/cli bundled-dependency issue observation.
+  P4 remains blocked; no required check or P5 exit dependency changed.
+
+## 2026-10-04 — Cross-reference the scoped P5 entry decision from ADR-0058
+
+- Updated ADR-0058's governing transition rule to point directly to ADR-0060's
+  P4-to-P5 implementation-entry exception. A resumed P5 session is explicitly
+  directed to continue the named branch without treating open P4 closure as an
+  implementation blocker.
+- The exception is limited to P5 branch implementation. P4 remains blocked;
+  P4's sequence and assurance criteria, P5 required checks, protected merge
+  rules and P5 phase-exit dependency remain in force.
 
 ## 2026-10-03 — P5 assurance population frozen
 
@@ -29,6 +188,9 @@ changelog and makes no compliance, publication or support claim.
   `config/quality/p5-quality-plan.json` and
   `tooling/assurance/p5-quality-plan.mjs`; `p5:quality-plan` is included in the
   P2 and platform task closures before P5-A starts.
+- The signed+DCO baseline identity, clean reports, package hashes, current PR
+  check state and exact public-source read-back are recorded in Amendment
+  P5-003 of `docs/17-roadmap-risk/handoff.md`.
 
 ## 2026-10-03 — Scoped P5 implementation start authorized
 
@@ -48,6 +210,10 @@ changelog and makes no compliance, publication or support claim.
 - The current repository handoff capsule, roadmap index, definition of ready and
   P5 prompt point to ADR-0060 so a resumed Codex session applies this scoped
   authorization. P4's protected closure matrix itself remains unchanged.
+- The roadmap and P5 execution prompt now explicitly direct the next session to
+  start P5-A on the authorized branch while P4 remains phase-unclosed. P4
+  evidence, protected-check requirements and P5 phase-exit dependencies remain
+  unchanged.
 
 ## 2026-09-21 — P3-B pre-P4 assurance
 
@@ -212,3 +378,90 @@ changelog and makes no compliance, publication or support claim.
   final handoff PR and protected-push read-back. `creationAllowed=false`; no
   compliance, AEAT acceptance, certification, publication or release claim is
   made.
+
+## 2026-10-04 — Clarify continued P5 implementation authorization
+
+- Clarified that ADR-0060's one-time start authorization covers the P5-A…P5-G
+  implementation work on the named branch, including its continuation after the
+  initial start. This corrects any reading of the earlier changelog shorthand
+  as permission that expires once work begins. A resumed session must continue
+  existing P5 work while preserving P4's blocked status.
+- The roadmap, definition of ready and phase-exit criteria now state this scope
+  directly; the P5 prompt and current handoff already tell sessions to continue
+  existing branch work.
+- Protected P5 merges still require every normal required context, and P5 phase
+  closure still requires applicable P4 closure rows to be resolved. No check,
+  denominator, or phase-exit criterion was waived.
+
+## 2026-10-04 — Make P5 entry decision explicit
+
+- The project owner reaffirmed that P5-A…P5-G branch implementation should
+  proceed while P4 retains its three failed required contexts. The prompt,
+  readiness definition, roadmap index and handoff now state directly that these
+  failures are not a P5 branch-entry blocker.
+- This wording records authorization to start or continue P5 implementation. It
+  leaves P4 `blocked`, preserves the failed results, and does not waive P5 checks,
+  protected merge requirements or the P5 phase-exit dependency on applicable P4
+  closure rows.
+- The handoff capsule now records the observed local/remote implementation SHA
+  `95a01d1c9cd4f477424cb6f8b2c74023cd1f6991`; the full point-in-time read-back is
+  Amendment P5-005.
+
+## 2026-10-04 — Refresh P5 continuation handoff
+
+- Reaffirmed in the executable P5 prompt that P4 phase closure is not a
+  prerequisite to start or continue P5 implementation on the ADR-0060 branch.
+  A resumed session must inspect the current state and continue existing P5
+  work rather than stopping after repeating the P4 closure analysis.
+- Updated the handoff capsule and added Amendment P5-007 with the observed
+  clean local/remote SHA `87edec46df6f74582f8a651226876cb3801762f3`, PR #114
+  state and exact-head checks observed at 2026-10-04 07:18:39 UTC.
+- P4 remains blocked. P5 protected merge still requires all normal required
+  contexts to pass, and P5 phase closure still requires truthful resolution of
+  applicable P4 closure rows. No check or gate is waived.
+
+## 2026-10-04 — Clarify phase-prompt sequencing exception
+
+- Clarified the general prompt-use rule: the next phase normally waits for
+  predecessor closure, except where an explicit recorded decision authorizes a
+  bounded implementation exception.
+- Named ADR-0060 and its exact scope in that rule so a resumed P5 session can
+  start or continue P5-A…P5-G branch work without treating P4 closure as an
+  entry blocker.
+- P4 remains blocked; P5 protected merges and phase closure retain their
+  existing checks and dependencies.
+
+## 2026-10-04 — Record P5 DER fixture correction and continuation state
+
+- Recorded the intermittent Node 22.14 synthetic-certificate failure, its
+  noncanonical DER serial root cause, deterministic regression and local P5
+  results in the active handoff amendment.
+- Refreshed the P5 prompt's handoff pointer and corrected the P4 workflow
+  observation to its terminal status while preserving the three failed closure
+  contexts and active protection.
+- Recorded the unresolved difference between issue #113's serial wave PR
+  requirement and the single cumulative PR #114; no check, denominator or phase
+  closure criterion was waived.
+
+## 2026-10-04 — Refresh the P5 entry handoff
+
+- The project owner reaffirmed the ADR-0060 authorization to continue P5-A…P5-G
+  branch implementation while P4 remains phase-unclosed.
+- Refreshed the handoff capsule and added Amendment P5-009 with the observed
+  local/remote SHA and exact-head PR #114 status. Updated the P5 prompt to point
+  at that amendment and name the three outstanding P4 closure failures.
+- The failures remain failed and do not become waived checks: P4 stays blocked,
+  P5 merge needs every normal protected context, and P5 phase closure retains
+  its applicable P4 closure dependency.
+
+## 2026-10-04 — Add P5 implementation and recovery evidence matrices
+
+- Added exact-subject `gate:p5` results and handoff matrices for stores, outbox
+  state/retry, protocol operations, recovery/fault campaigns, external gaps and
+  P6 readiness.
+- Recorded the verified serial-wave delivery conflict: aggregate `gate:p2` and
+  `gate:platform` depend on a P5 gate whose current validator requires the full
+  frozen source/test population, preventing a partial-wave PR from passing.
+- P5 remains active and P4 remains blocked. The cumulative PR, audit failures,
+  incomplete current-head checks and external boundaries remain open; no check,
+  threshold, denominator or phase-exit dependency was waived.

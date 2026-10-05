@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { getP5WaveScope, resolveP5Wave } from "./p5-delivery-stage.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const planPath = "config/quality/p5-quality-plan.json";
@@ -53,6 +54,27 @@ export function validateP5QualityPlan(plan, discovered = {}) {
     "plan no longer binds the authorized P5 input",
   );
   assert(
+    canonical(plan.additiveAmendment) ===
+      canonical({
+        id: "P5-PLAN-AMEND-001",
+        date: "2026-10-05",
+        reason:
+          "Close the DNS SSRF gap for IANA special-purpose addresses using separate IPv4 and IPv6 critical controls.",
+        addedCriticalCatalogue: [
+          "P5-CRIT-025:non-global-ipv4-destinations-rejected",
+          "P5-CRIT-026:non-global-ipv6-destinations-rejected",
+        ],
+        addedCriticalMutants: ["P5-MUT-041", "P5-MUT-042"],
+        resultingPopulation: {
+          criticalMutants: 26,
+          otherMutants: 16,
+          totalMutants: 42,
+        },
+      }),
+    "P5_PLAN_AMENDMENT",
+    "the documented additive DNS security amendment changed",
+  );
+  assert(
     plan.edition.id === "rrsif-2026-09-21-authoritative-candidate" &&
       plan.edition.sourceSnapshot === "rrsif-2026-09-21-authoritative" &&
       plan.edition.sourceManifestSha256 ===
@@ -99,9 +121,11 @@ export function validateP5QualityPlan(plan, discovered = {}) {
       plan.criticalCatalogue.every((entry, index) =>
         entry.startsWith(`P5-CRIT-${String(index + 1).padStart(3, "0")}:`),
       ) &&
-      [...plan.mutation.criticalMutants, ...plan.mutation.otherMutants].every(
-        (id, index) => id === `P5-MUT-${String(index + 1).padStart(3, "0")}`,
-      ) &&
+      [...plan.mutation.criticalMutants, ...plan.mutation.otherMutants]
+        .sort()
+        .every(
+          (id, index) => id === `P5-MUT-${String(index + 1).padStart(3, "0")}`,
+        ) &&
       plan.faultInjectionIds.every((entry, index) =>
         entry.startsWith(`P5-FAULT-${String(index + 1).padStart(3, "0")}:`),
       ),
@@ -128,8 +152,8 @@ export function validateP5QualityPlan(plan, discovered = {}) {
     "P5 test outside the declared test inventory",
   );
   assert(
-    plan.criticalCatalogue.length === 24 &&
-      plan.mutation.criticalMutants.length === 24 &&
+    plan.criticalCatalogue.length === 26 &&
+      plan.mutation.criticalMutants.length === 26 &&
       plan.mutation.otherMutants.length === 16 &&
       plan.propertyCampaigns.length === 12 &&
       plan.propertyCampaigns.every(
@@ -207,6 +231,8 @@ export function validateP5QualityPlan(plan, discovered = {}) {
 }
 
 const plan = await readJson(planPath);
+const wave = resolveP5Wave();
+const scope = getP5WaveScope(wave, plan);
 const doc = await readFile(resolve(root, docPath), "utf8");
 const extract = (heading) => {
   const position = doc.indexOf(heading);
@@ -281,10 +307,18 @@ const scanTests = async (directory) => {
 await scanTests("tests");
 assert(
   canonical([...discoveredP5Production].sort()) ===
-    canonical([...presentProduction].sort()) &&
-    canonical(allTestPaths.sort()) === canonical([...presentTests].sort()),
+    canonical([...scope.productionModules].sort()) &&
+    canonical(allTestPaths.sort()) === canonical([...scope.testFiles].sort()),
   "P5_PLAN_DISCOVERY_MISMATCH",
-  "discovered P5 source/test paths differ from frozen plan",
+  `discovered paths differ from cumulative P5-${wave} inventory`,
+);
+assert(
+  canonical([...presentProduction].sort()) ===
+    canonical([...scope.productionModules].sort()) &&
+    canonical([...presentTests].sort()) ===
+      canonical([...scope.testFiles].sort()),
+  "P5_WAVE_INCOMPLETE",
+  `working tree does not contain the exact cumulative P5-${wave} inventory`,
 );
 validateP5QualityPlan(plan, {
   productionModules: discoveredP5Production,
@@ -326,21 +360,18 @@ const report = {
   schemaVersion: 1,
   planId: plan.id,
   status: "passed",
-  stage:
-    presentProduction.length === 0 && presentTests.length === 0
-      ? "pre-implementation"
-      : "implementation",
-  productionModules: plan.productionModules.length,
+  stage: `P5-${wave}`,
+  cumulative: scope.full,
+  productionModules: scope.productionModules.length,
   sharedProductionModules: plan.sharedProductionModules.length,
-  testFiles: plan.testFiles.length,
-  criticalBranches: plan.criticalCatalogue.length,
-  criticalMutants: plan.mutation.criticalMutants.length,
-  otherMutants: plan.mutation.otherMutants.length,
-  propertyExecutions: plan.propertyCampaigns.reduce(
-    (total, campaign) => total + campaign.executions,
-    0,
-  ),
-  faultInjections: plan.faultInjectionIds.length,
+  testFiles: scope.testFiles.length,
+  criticalBranches: scope.criticalMutantIds.length,
+  criticalMutants: scope.criticalMutantIds.length,
+  otherMutants: scope.otherMutantIds.length,
+  propertyExecutions: plan.propertyCampaigns
+    .filter((campaign) => scope.propertyIds.includes(campaign.id))
+    .reduce((total, campaign) => total + campaign.executions, 0),
+  faultInjections: scope.faultIds.length,
   compatibilityCells: plan.compatibilityMatrix.length,
   seededPlanDefectsKilled: negativeCases.length,
   planSha256: createHash("sha256").update(canonical(plan)).digest("hex"),

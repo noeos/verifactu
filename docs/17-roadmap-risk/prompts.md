@@ -284,15 +284,18 @@ remaining external prerequisites; reread protected main and every required check
 
 ```text
 Execute Phase P5 of docs/17-roadmap-risk/implementation-roadmap.md completely.
-P5 implementation start is explicitly authorized by ADR-0060 on issue #113 and
-branch `work/p5-implementation`, despite P4 remaining phase-unclosed. Do not
-block P5 branch development solely because P4 is not `evidence-complete`; do not
-describe P4 as closed, count P5 work as P4 evidence, merge P5 changes without
-the normal protected required checks, or close P5 while applicable P4 closure
-rows remain unresolved. Verify the current handoff, exact main/branch identities,
-restored ruleset and current status of every outstanding P4 workflow before
-implementation. Read all documentation; verify the handoff and deterministic-
-core package bytes.
+P5 implementation start is explicitly authorized by ADR-0060 on issue #113,
+despite P4 remaining phase-unclosed. Deliver P5-A through P5-G as separate,
+serial signed+DCO vertical PRs on `work/p5-a` through `work/p5-g`, each based on
+current protected `main` after the preceding wave's merge. The cumulative
+`work/p5-implementation` branch is staging only and does not count as accepted
+wave delivery. Do not block P5 wave development solely because P4 is not
+`evidence-complete`; do not describe P4 as closed, count P5 work as P4 evidence,
+merge P5 changes without the normal protected required checks, or close P5 while
+applicable P4 closure rows remain unresolved. Verify the current handoff, exact
+main/branch identities, restored ruleset and current status of every outstanding
+P4 workflow before implementation. Read all documentation; verify the handoff
+and deterministic-core package bytes.
 Prioritize all 08-persistence-consistency and 09-aeat-integration documents plus
 host/provider contracts, concurrency, security/privacy, quality, performance and
 historical findings. Re-observe authorized AEAT/certificate access without

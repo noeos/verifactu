@@ -16,9 +16,10 @@ Status: all 22 substantive specifications are approved as design authority under
 `PLAN-L4`; P1–P3-B and the zero-code P4-readiness gate are evidence-complete at
 their recorded protected subjects. P4-A…P4-G implementation is merged on
 protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4 phase closure
-is incomplete. Under ADR-0060, P5 implementation may start on issue #113's
-`work/p5-implementation` branch; P4 is not evidence-complete, and protected P5
-merges and P5 closure remain gated.
+is incomplete. Under ADR-0060, P5 implementation may start as serial vertical
+waves on issue #113's `work/p5-a` through `work/p5-g` branches; the cumulative
+`work/p5-implementation` branch is staging only. P4 is not evidence-complete,
+and protected P5 merges and P5 closure remain gated.
 
 Authority for dependency-driven execution, readiness, completion and visible
 risk. Phases order work; they do not reduce final scope.

@@ -42,10 +42,12 @@ The current state is amended by Amendment P5-002 in this file and ADR-0060.
 P4-A–P4-F have protected final read-backs. P4-G implementation
 PR #109 is merged at protected `main`
 `1f66da46e21127d1d82018cfdf093f595e1c08ae`, but P4 phase closure is blocked by
-the documented check failures and pending protected-push workflows. The project
-owner authorized P5 implementation on issue #113 / branch
-`work/p5-implementation`; this does not close P4 or authorize a P5 protected
-merge. `creationAllowed=false`.
+the documented three required-check failures. The project's current read-back
+records terminal PR-head and protected-push results; re-fetch them before reuse. The project
+owner authorized serial P5-A…P5-G development on issue #113 using
+`work/p5-a`…`work/p5-g`; the cumulative `work/p5-implementation` branch is
+staging only. This does not close P4 or authorize a P5 protected merge.
+`creationAllowed=false`.
 
 ## Historical initial baseline control — retained
 
@@ -96,12 +98,12 @@ Historical detail belongs in phase records below.
 | Field                        | Current value                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Roadmap                      | Eight phases P1–P8, with mandatory P3-B between P3 and P4.                                                                                                                     |
-| Current phase                | P5 implementation start, issue `#113`, branch `work/p5-implementation`, under ADR-0060. |
-| Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 is `ready` to start under ADR-0060; P5 protected merge and phase closure are not authorized by ADR-0060. `creationAllowed=false`. |
+| Current phase                | P5 implementation start, issue `#113`, serial branches `work/p5-a`…`work/p5-g`, under ADR-0060. |
+| Phase status                 | P4 implementation P4-A…P4-G is merged; P4 phase closure is `blocked`, not `evidence-complete`. P5 serial wave development is `ready` under ADR-0060; protected merge still requires every normal required check and phase closure requires P4 disposition. `creationAllowed=false`. |
 | Last evidence-complete wave  | P4-F final protected read-back. P4-G cumulative implementation campaign passed on its candidate cells; phase-level final closure is outstanding. |
 | Local repository             | One canonical checkout, clean at read-back; P5 branch is based on protected `main`. |
 | Protected `main` SHA         | P4-G PR #109 squash `1f66da46e21127d1d82018cfdf093f595e1c08ae`; source head `2396d87a3748e20a1a02f66a5b4ab21337f758ce`. |
-| GitHub effective state       | EXC-0001 / issue #112 allowed only the one-time merge of PR #109 and is closed. `protected-main` is restored with all 17 required contexts. On the PR head, OSV and npm audit/signature/licence failed, and required-check closure failed as a consequence. |
+| GitHub effective state       | EXC-0001 / issue #112 allowed only the one-time merge of PR #109 and is closed. `protected-main` is restored with all 17 required contexts. PR #109 exact head `2396d87a3748e20a1a02f66a5b4ab21337f758ce` had 14/17 successes; OSV and npm audit signatures/licences failed, and required-check closure failed as a consequence. Protected-push run `37125943358` on merge SHA `1f66da46e21127d1d82018cfdf093f595e1c08ae` is terminal with the same three failures. |
 | Toolchain/lock               | Node `22.14.0`, `22.23.2`, `24.21.0`; npm `10.9.2`/`11.19.1`; Python `3.13.15`; Java `21.0.12.1+1`, Maven `3.9.12`, EU DSS `6.5`.                                      |
 | Regulatory edition           | Immutable authoritative snapshot `rrsif-2026-09-21-authoritative` and generated candidate `rrsif-2026-09-21-authoritative-candidate`; creation remains disabled.              |
 | Verification Engine          | Public `@noeos/verification-engine@1.0.1` exactly admitted and used by P4-F's private adapter.                                                                                  |
@@ -118,7 +120,7 @@ Historical detail belongs in phase records below.
 | P3    | evidence-complete | `9571b69df4f5eec2b0efc548c30867fcadfd356b`                       | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e` | `#28`–`#30`        | Protected safe source custody, blocked candidate and independent oracle, with truthful blocker handoff/read-back.        |
 | P3-B  | evidence-complete | `89e85f1ff79c0569ddc7c1dfbcb6fdc0e365c71e`                       | `999d78c19b0e1be3097201a0cc61947a10760bbe` | `#31`–`#34`, `#38` | Source observation, implementation, handoff/read-back and authoritative-edition pointer correction complete.             |
 | P4    | blocked           | P3-B protected restart + P4 readiness `763b58239d9e589e377b86928ecfc953d72f321b` | implementation merge `1f66da46e21127d1d82018cfdf093f595e1c08ae` | PR `#109`; EXC-0001 `#112` | P4-A–G implementation is merged; phase closure is incomplete because exact PR required contexts OSV, npm audit/signature/licence and derived required-check closure failed; protected-push runs are recorded below. |
-| P5    | ready             | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, branch `work/p5-implementation` | P5 implementation may begin on the named branch only. P5 protected merges and evidence-complete closure remain subject to their normal gates and P4 closure disposition. |
+| P5    | ready             | Protected `main` `1f66da46e21127d1d82018cfdf093f595e1c08ae` under ADR-0060 | —                                          | issue `#113`, serial branches `work/p5-a`…`work/p5-g` | P5 waves may begin serially; `work/p5-implementation` is staging only. Protected merges and evidence-complete closure remain subject to normal gates and P4 closure disposition. |
 | P6    | planned           | P5 closure required                                              | —                                          | —                  | Public products and ecosystem conformance.                                                                               |
 | P7    | planned           | P6 closure required                                              | —                                          | —                  | Whole-product assurance, external validation and release rehearsal.                                                      |
 | P8    | planned           | P7 closure required                                              | —                                          | —                  | Stable publication, verification and support.                                                                            |
@@ -3762,8 +3764,10 @@ historical records or claim P4 phase closure. The decision authority is
 ### Entry instructions for the next Codex session
 
 Read ADR-0060, this amendment, issue #113 and the P5 prompt. Verify local and
-remote `main`, P5 branch, merge SHA, the effective 17-context ruleset and the
-current terminal state of every run above. Begin P5 branch implementation under
-the named authorization even if P4 phase closure remains incomplete. Preserve
-all P4 failures and resolve P4 closure under a separate exact-subject protected
-read-back. Do not merge P5 changes without every normal required context passing.
+remote `main`, the current P5 wave branch and merge SHA, the effective
+17-context ruleset and the current terminal state of every P4 run above. Begin
+P5-A on `work/p5-a` from current protected `main`; after each protected wave
+merge, start the next wave on its matching branch. The cumulative
+`work/p5-implementation` branch is staging only. Preserve all P4 failures and
+resolve P4 closure under a separate exact-subject protected read-back. Do not
+merge P5 changes without every normal required context passing.
