@@ -15,6 +15,14 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Reconcile dependency scheduling with scoped P5 authorization
+
+- Updated the dependency map so its general fail-closed scheduling rule points
+  to explicit, bounded ADR authorizations instead of contradicting ADR-0060.
+- Clarified that P4 closure findings do not block P5 branch implementation,
+  while P4 closure, protected P5 merge checks and P5 phase-exit requirements
+  remain unchanged.
+
 ## 2026-10-05 — Align P5 capability boundaries with phase exit
 
 - Updated the P5 external-gap matrix to distinguish prerequisites for a named
