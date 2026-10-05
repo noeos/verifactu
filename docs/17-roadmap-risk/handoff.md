@@ -5211,3 +5211,72 @@ squash-only PR integration.
 The handoff-documentation commit itself has a new subject. The local evidence
 above is bound to `705fb9f`; read all workflows for the new head before
 describing its GitHub checks as current or complete.
+
+## Amendment P5-025 — 2026-10-05 serial-wave and bundled-npm read-back
+
+This amendment supersedes P5-024 as the active-state snapshot. At 2026-10-05
+08:57 UTC, `work/p5-implementation` and its remote were clean and synchronized
+at signed+DCO commit `0761e172ca9ce10354ae6caafcdf0fb5e97d824c` (tree
+`c927ea7531defa4d1ad5ec7d563d086b01bf4e18`), based on protected `main`
+`1f66da46e21127d1d82018cfdf093f595e1c08ae`. Issue #113 remains open. PR #114
+remains the cumulative staging PR; it is not an accepted serial wave. The
+actual wave-A delivery is branch `work/p5-a`, PR #118, exact head
+`916a6670c2a53835f9cc82af95a9d211cda57a3e`, against the same protected main.
+PR #118 is open and `BLOCKED`. The active `protected-main` ruleset still
+requires all 17 strict contexts, signed commits, linear history and squash-only
+integration.
+
+- Exact-subject local cumulative P5 validation passed on `0761e17`: `gate:p5`
+  2/2 tasks; `test:p5` 104/104 tests in 23/23 files; 99.12% line, 95.21%
+  branch and 99.04% function coverage; 49,152/49,152 property executions;
+  56/56 seeded faults; and `p5:mutation` 42/42 mutants (26 critical and 16
+  other). The P5 plan validator passed 10/10 and reconciled all 25 production
+  modules, 23 test files, five platform cells and the full frozen population.
+  `policy:docs` passed 544/544, `policy:format` 124/124,
+  `policy:supply-chain` 259/259, and `package:reproducibility` 6/6. The local
+  report digests are `gate:p5` `e48b4829790c57c4cc57c89357e27c614b0f6b8260f4cb5a0a0d45e4fa3b4773`,
+  `test:p5` `68abcae6412d0400ae449cb8085b08c19c69c7296ffe8b43d26e482d9edd3f5c`,
+  mutation `efe6e0ebeea2cafe262f294baee03c1745175016a6a422d0ab85179cc22efd30`,
+  documentation `3d63a0fb08f2594b5a954a6179933175414d18781369f5b70c27124e6c0d0dd0`,
+  formatting `a52f43ba4a858c5973b1f0cae49a3cc24e1dd557969971982c4623f2864678bb`,
+  supply chain `b2e8bcc6560a169c79f3f88a0ff51abf30921d51991019559e2059e14ecb5fb1`,
+  and reproducibility `373f8776e5c8927efb3511401b54215556f1fc4882fdb49f8cd5ac1018d08097`.
+- Exact-subject local P5-A validation passed separately on `916a667`: plan
+  10/10, tests 9/9 across the two assigned files, 16,384 property executions,
+  and both assigned mutants killed. This does not replace PR #118's protected
+  matrix.
+- A fresh registry read at 08:57 UTC still returned npm `12.2.0` as `latest`;
+  `12.2.1` and unversioned `next`/`beta`/`canary` tags were absent. Upstream
+  issue [npm/cli #10062](https://github.com/npm/cli/issues/10062) remains open
+  and documents that the current official npm bundles retain outdated
+  vulnerable dependency versions.
+- A disposable lockfile-patching experiment was run only under
+  `/tmp/npm-bundle-probe` and is rejected. After changing four lock entries to
+  fixed registry versions, `npm ci` completed, `npm audit signatures` verified
+  148 packages and 75 attestations, and `npm audit` reported zero findings;
+  however the installed `node_modules/npm/node_modules` still contained
+  `brace-expansion@5.0.9`, `http-cache-semantics@4.2.0`, `ip-address@10.5.0`
+  and `undici@6.28.0`. This was a false-clean lock/runtime mismatch, not a
+  correction. It made no repository change. The repository's admitted-toolchain
+  and lock-generation controls must remain intact; do not
+  use manual lock edits or report this audit result as a pass.
+- On PR #118 exact head `916a667`, the last read-back showed CodeQL and
+  dependency review passed. Packed consumers, performance reproducibility,
+  security checks and all three regulatory observations passed. Engineering
+  `gate:p2` run `37281718987`, Required engineering run `37281716417` and
+  Conformance run `37281716435` were still in progress/queued; all remaining
+  required leaf contexts were pending, with no required-check-closure result.
+  Pending statuses are not passes. Re-read every run on the final pushed head.
+- P4 PR #109 remains terminal at 14/17 successful required reports with exactly
+  `Required · OSV`, `Required · npm audit signatures and licenses`, and derived
+  `Required · required-check closure` failed. Its protected-push Required run
+  `37125943358` has the same three failures. P4 remains phase-blocked; P5 branch
+  implementation may continue under ADR-0060, but P5 cannot merge around
+  failed required contexts or close while applicable P4 rows remain unresolved.
+- P5-A cannot be accepted until its predecessor and its own exact-head required
+  checks satisfy the normal protected process. Do not start wave B on its
+  delivery branch before A merges. No scanner, required context, threshold,
+  report requirement or phase-exit condition has been waived.
+
+This documentation change creates a new subject. The local campaign results
+above are bound to `0761e17`; inspect all workflows again for the new head.

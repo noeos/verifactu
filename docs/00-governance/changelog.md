@@ -15,6 +15,15 @@ decisions: [ADR-0026, ADR-0053]
 This log records protected phase transitions. It is not a product release
 changelog and makes no compliance, publication or support claim.
 
+## 2026-10-05 — Reject false-clean npm bundle lock workaround
+
+- Recorded that manual lockfile edits can make `npm audit` report zero while
+  `npm ci` leaves vulnerable npm-bundled package bytes installed. The experiment
+  stayed under `/tmp`; no repository lock, scanner or admission rule changed.
+- Refreshed the P5 exact-head handoff with current serial-wave state, exact local
+  P5-G results and live PR #118 checks. P4 remains blocked; P5 protected checks
+  and its applicable P4 phase-exit dependency remain in force.
+
 ## 2026-10-05 — Refresh P5 exact-head handoff and dependency audit evidence
 
 - Recorded the local P5 gate and package results for `705fb9f`, plus the
