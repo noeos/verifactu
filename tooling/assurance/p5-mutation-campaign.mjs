@@ -196,7 +196,7 @@ const criticalTargets = [
   ],
   [
     "packages/verifactu/src/persistence/model.ts",
-    "sha256Digest(bytes) !== descriptor.sha256",
+    "sha256Digest(exactBytes) !== descriptor.sha256",
   ],
   [
     "packages/verifactu/src/aeat/correlation.ts",

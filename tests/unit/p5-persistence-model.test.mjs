@@ -49,7 +49,23 @@ test("P5 immutable record validates context, edition, sequence and canonical byt
   const result = validateRecord(valid);
   assert.equal(result.status, "ok");
   assert.notEqual(result.value.canonicalBytes, recordBytes);
-  assert.deepEqual(result.value.canonicalBytes, recordBytes);
+  assert.deepEqual(Buffer.from(result.value.canonicalBytes), recordBytes);
+  const mutableBytes = Buffer.from(recordBytes);
+  const byteSnapshot = validateRecord({ ...valid, canonicalBytes: mutableBytes });
+  const originalByte = byteSnapshot.value.canonicalBytes[0];
+  mutableBytes[0] ^= 0xff;
+  assert.equal(byteSnapshot.value.canonicalBytes[0], originalByte);
+  const mutableContext = { ...context, tenantId: { kind: "tenant", value: "tenant-a" } };
+  const mutableId = { kind: "record", value: "record-mutable" };
+  const snapshotted = validateRecord({ ...valid, id: mutableId, context: mutableContext,
+    editionId: { kind: "edition", value: context.editionId.value } });
+  assert.equal(snapshotted.status, "ok");
+  mutableContext.tenantId.value = "tenant-b";
+  mutableId.value = "record-changed";
+  assert.equal(snapshotted.value.context.tenantId.value, "tenant-a");
+  assert.equal(snapshotted.value.id.value, "record-mutable");
+  assert.equal(Object.isFrozen(snapshotted.value.context.tenantId), true);
+  assert.equal(Object.isFrozen(snapshotted.value.id), true);
   for (const malformed of [
     null,
     { ...valid, schemaVersion: 2 },
@@ -85,7 +101,20 @@ test("artifact descriptors bind exact bytes, length, both digests and context", 
   const stored = validateArtifact(descriptor, bytes);
   assert.equal(stored.status, "ok");
   assert.notEqual(stored.value.bytes, bytes);
-  assert.deepEqual(stored.value.bytes, bytes);
+  assert.deepEqual(Buffer.from(stored.value.bytes), bytes);
+  const mutableBytes = Buffer.from(bytes);
+  const byteSnapshot = validateArtifact(descriptor, mutableBytes);
+  const originalByte = byteSnapshot.value.bytes[0];
+  mutableBytes[0] ^= 0xff;
+  assert.equal(byteSnapshot.value.bytes[0], originalByte);
+  const mutableContext = { ...context, tenantId: { kind: "tenant", value: "tenant-a" } };
+  const mutableId = { kind: "operation", value: "op-mutable" };
+  const snapshotted = validateArtifact({ ...descriptor, id: mutableId, context: mutableContext }, bytes);
+  assert.equal(snapshotted.status, "ok");
+  mutableContext.tenantId.value = "tenant-b";
+  mutableId.value = "op-changed";
+  assert.equal(snapshotted.value.descriptor.context.tenantId.value, "tenant-a");
+  assert.equal(snapshotted.value.descriptor.id.value, "op-mutable");
   assert.equal(validateArtifact({ ...descriptor, byteLength: bytes.length + 1 }, bytes).status, "invalid");
   assert.equal(validateArtifact({ ...descriptor, sha512: `sha512:${"0".repeat(128)}` }, bytes).status, "invalid");
   assert.equal(validateArtifact(descriptor, Buffer.from("changed", "utf8")).status, "invalid");
@@ -108,6 +137,14 @@ test("evidence claims bind identity, verifier outcome and unique bounded artifac
     subjectDigest: `sha256:${"a".repeat(64)}`, verifierId: "verifier-1", profileId: "profile-1", result: "verified",
     supportingArtifactIds: ["artifact-1"], validatedAt: "2026-10-03T12:00:00Z" };
   assert.equal(validateEvidenceClaim(claim).status, "ok");
+  const mutableContext = { ...context, tenantId: { kind: "tenant", value: "tenant-a" } };
+  const mutableId = { kind: "operation", value: "claim-mutable" };
+  const snapshotted = validateEvidenceClaim({ ...claim, id: mutableId, context: mutableContext });
+  assert.equal(snapshotted.status, "ok");
+  mutableContext.tenantId.value = "tenant-b";
+  mutableId.value = "claim-changed";
+  assert.equal(snapshotted.value.context.tenantId.value, "tenant-a");
+  assert.equal(snapshotted.value.id.value, "claim-mutable");
   for (const malformed of [
     null,
     { ...claim, schemaVersion: 2 },
